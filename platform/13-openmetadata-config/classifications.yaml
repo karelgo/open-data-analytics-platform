@@ -84,6 +84,8 @@ classifications:
         description: "Wettelijke verplichting (art. 6 lid 1 onder c)."
       - name: Art6_1e
         description: "Publieke taak (art. 6 lid 1 onder e)."
+      - name: Art6_1f
+        description: "Gerechtvaardigd belang (art. 6 lid 1 onder f) — bv. FinOps/spend-monitoring."
       - name: Art9_2h
         description: "Sociale zekerheid — bijzondere PG (art. 9 lid 2 onder h)."
       - name: Art5_1b_VerenigbaarGebruik

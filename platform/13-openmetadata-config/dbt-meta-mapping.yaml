@@ -31,6 +31,8 @@ doelbinding_to_tag:
 legal_basis_to_tags:
   AVG_art_6_1e: [LegalBasis.Art6_1e]
   AVG_art_6_1_e: [LegalBasis.Art6_1e]        # typo-tolerant
+  AVG_art_6_1f: [LegalBasis.Art6_1f]
+  AVG_art_6_1_f: [LegalBasis.Art6_1f]        # UC-12 FinOps (gerechtvaardigd belang)
   WIA_art_64: [LegalBasis.Art6_1c]
   Wet_proactieve_dienstverlening_SZW_2025: [LegalBasis.Art6_1c]
   Wet_SUWI+Wfsv: [LegalBasis.Art6_1c]
@@ -87,6 +89,7 @@ eigenaar_to_team:
   divisie_fez: divisie_fez
   divisie_crm: divisie_crm
   divisie_klantcontact: divisie_klantcontact
+  divisie_finance: divisie_finance
   knowledge_center: knowledge_center
   data_steward_polisadm: data_steward_polisadm
   data_steward_platform: data_steward_platform
@@ -105,6 +108,7 @@ tier_rules:
     cross: Tier1
     uc01: Tier1
     uc11: Tier1
+    uc12: Tier2     # FinOps spend dashboard — tactical, geen DoD-anchor
 
 # Custom-properties die op Table-entiteit geregistreerd worden door de
 # init-Job (PUT /metadata/types/{table-id}). Eenmalige registratie;
@@ -198,6 +202,9 @@ teams:
   - name: data_office
     displayName: "Data Office UWV"
     teamType: Group
+  - name: divisie_finance
+    displayName: "Divisie Finance (FinOps)"
+    teamType: Group
 
 # OM Domains — UWV mesh-model. dbt meta.domain → domain-name mapping.
 # Source-aligned = de divisie 'bezit' het brondomein. Aggregate = cross-domein
@@ -254,6 +261,11 @@ domains:
     description: "Data-quality overzicht, audit, lineage-monitoring."
     domainType: Aggregate
     owner: data_steward_platform
+  - name: FinOps
+    displayName: "FinOps & Cloud Spend"
+    description: "FOCUS-spec cloud-spend telemetrie (UC-12). Provider-agnostisch (OCI/AWS/Azure/GCP)."
+    domainType: Aggregate
+    owner: divisie_finance
 
 # Mapping meta.domain (dbt) → Domain-naam (OM).
 dbt_domain_to_om:
@@ -270,6 +282,7 @@ dbt_domain_to_om:
   zw: AG          # ZW = onderdeel van AG (vangnet)
   wajong: AG
   intermediate: Cross
+  finops: FinOps
 
 # Data Products — één per Use-Case / use-case-groep. Tabellen worden via
 # dbt-tag (uc01 / uc04 / etc.) gelinkt aan een DataProduct.
@@ -328,3 +341,9 @@ data_products:
     domain: Governance
     owner: data_steward_platform
     dbt_tag: dq
+  - name: uc12_focus_finops
+    displayName: "UC-12 — FinOps Spend (FOCUS)"
+    description: "Cloud-spend telemetrie volgens FOCUS-spec. Spend × provider × service × commitment-utilization + savings + top-resources."
+    domain: FinOps
+    owner: divisie_finance
+    dbt_tag: uc12

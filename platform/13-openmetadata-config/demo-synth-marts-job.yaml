@@ -52,6 +52,7 @@ data:
     from urllib.parse import quote
 
     OM = os.environ["OM_URL"].rstrip("/")
+    SERVICE = os.environ.get("OM_TRINO_SERVICE", "trino")
     H = {"Authorization": f"Bearer {os.environ['OM_JWT_TOKEN']}", "Accept": "application/json"}
     JH = {"Authorization": f"Bearer {os.environ['OM_JWT_TOKEN']}", "Content-Type": "application/json"}
     PH = {"Authorization": f"Bearer {os.environ['OM_JWT_TOKEN']}", "Content-Type": "application/json-patch+json"}
@@ -242,6 +243,91 @@ data:
         "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "governance"},
         "pii_cols": {},
       },
+      # UC-12 FinOps — FOCUS-spec cloud spend. 5 marts in dezelfde schema/
+      # dataProduct. Geen PII, geen CGM-glossary (FinOps-domein, niet UWV-CGM).
+      {
+        "schema": "uc12_focus_finops", "name": "mart_uc12_focus_spend_monthly",
+        "description": "UC-12 — FinOps spend per maand × provider × service-categorie × charge-categorie. Primaire trend-mart.",
+        "columns": [
+          col("billing_month", DT),
+          col("provider", V(16), "oci/aws/azure/gcp."),
+          col("service_category", V(64)),
+          col("charge_category", V(32), "Usage/Purchase/Tax/Credit/Adjustment."),
+          col("effective_cost", DBL),
+        ],
+        "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
+        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "glossary": [],
+        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "pii_cols": {},
+      },
+      {
+        "schema": "uc12_focus_finops", "name": "mart_uc12_focus_service_breakdown",
+        "description": "UC-12 — Spend per service-naam × regio × environment × applicatie. Voedt pie-charts en drill-downs.",
+        "columns": [
+          col("billing_month", DT),
+          col("service_name", V(128)),
+          col("region", V(32)),
+          col("environment", V(32), "prod/staging/dev/unknown."),
+          col("application", V(128)),
+          col("effective_cost", DBL),
+        ],
+        "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
+        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "glossary": [],
+        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "pii_cols": {},
+      },
+      {
+        "schema": "uc12_focus_finops", "name": "mart_uc12_focus_commitment_utilization",
+        "description": "UC-12 — Committed-discount utilization per maand × provider × service-categorie. Coverage vs on-demand.",
+        "columns": [
+          col("billing_month", DT),
+          col("provider", V(16)),
+          col("service_category", V(64)),
+          col("commitment_coverage_pct", DBL, "0-100% — fractie spend onder commitment."),
+          col("effective_discount_pct", DBL),
+        ],
+        "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
+        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "glossary": [],
+        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "pii_cols": {},
+      },
+      {
+        "schema": "uc12_focus_finops", "name": "mart_uc12_focus_top_resources",
+        "description": "UC-12 — Top-resources per maand op effective_cost. Eén rij per (billing_month × resource_id) met rank.",
+        "columns": [
+          col("billing_month", DT),
+          col("resource_id", V(256)),
+          col("service_name", V(128)),
+          col("effective_cost", DBL),
+          col("rank_in_month", INT),
+        ],
+        "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
+        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "glossary": [],
+        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "pii_cols": {},
+      },
+      {
+        "schema": "uc12_focus_finops", "name": "mart_uc12_focus_savings",
+        "description": "UC-12 — Savings-mart (list_cost vs effective_cost) per maand × provider × pricing/service-categorie.",
+        "columns": [
+          col("billing_month", DT),
+          col("provider", V(16)),
+          col("pricing_category", V(32), "OnDemand/Reserved/Spot/Savings_Plan."),
+          col("service_category", V(64)),
+          col("list_cost", DBL),
+          col("effective_cost", DBL),
+          col("savings_eur", DBL),
+        ],
+        "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
+        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "glossary": [],
+        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "pii_cols": {},
+      },
     ]
 
     _team, _domain, _dp = {}, {}, {}
@@ -266,10 +352,32 @@ data:
             headers=H, timeout=15)
         return r.json() if r.status_code == 200 else None
 
+    _schema_seen: set[str] = set()
+
+    def ensure_schema(database: str, schema: str) -> bool:
+        """Garandeer dat het databaseSchema bestaat. Trino-catalog-ingest
+        creëert deze normaal; voor de demo-synth maken we ze on-the-fly
+        zodat UC's zonder Trino-table (bv. UC-12) ook landen."""
+        fqn = f"{SERVICE}.{database}.{schema}"
+        if fqn in _schema_seen: return True
+        r = requests.get(f"{OM}/api/v1/databaseSchemas/name/{quote(fqn, safe='.')}",
+                         headers=H, timeout=10)
+        if r.status_code == 200:
+            _schema_seen.add(fqn); return True
+        body = {"name": schema, "database": f"{SERVICE}.{database}"}
+        r = requests.post(f"{OM}/api/v1/databaseSchemas", headers=JH,
+                          data=json.dumps(body), timeout=15)
+        if r.status_code in (200, 201, 409):
+            _schema_seen.add(fqn); return True
+        print(f"  ! CREATE schema {fqn} status={r.status_code} body={r.text[:200]}")
+        return False
+
     def put_table(database, schema, name, cols, description):
+        if not ensure_schema(database, schema):
+            return None
         body = {
             "name": name,
-            "databaseSchema": f"trino.{database}.{schema}",
+            "databaseSchema": f"{SERVICE}.{database}.{schema}",
             "columns": cols,
             "description": description,
         }
@@ -322,12 +430,22 @@ data:
             })
         return ops
 
+    # Bookkeeping voor de eindverificatie. OM 1.12 dataProduct.assets is GEEN
+    # persistent veld meer (zoals in 1.5 was) — de UI Data Product-pagina
+    # rendert assets via search-query `dataProducts.name.keyword:X` op
+    # table_search_index. Bidirectie is dus automatisch zolang:
+    #   1. table.dataProducts is gezet (gebeurt hierboven via build_ops_for_mart)
+    #   2. de OS-index die referentie heeft (gebeurt op table-PATCH door OM)
+    #   3. de OS fielddata-bug op glossaryTags/classificationTags is gefixt
+    #      (zie om-fix-search-mapping.sh).
+    expected_assets: dict[str, int] = {}
+
     created = enriched = errs = 0
     for m in MARTS:
         # Beide zones — gold is wat testsuites + Superset gebruiken; bronze
         # spiegelt de dbt-manifest realiteit (alles materialiseert daar).
         for db in ("bronze", "gold"):
-            fqn = f"trino.{db}.{m['schema']}.{m['name']}"
+            fqn = f"{SERVICE}.{db}.{m['schema']}.{m['name']}"
             existing = get_table(fqn)
             if existing:
                 print(f"  = {fqn} (bestaat al — {len(existing.get('columns') or [])} kolommen)")
@@ -346,6 +464,25 @@ data:
             ops = build_ops_for_mart(table, m)
             if patch_table(table, ops, f"verrijk {fqn}"):
                 enriched += 1
+            expected_assets[m["dataProduct"]] = expected_assets.get(m["dataProduct"], 0) + 1
+
+    # Eindverificatie: zou de UI per dataProduct de juiste aantallen assets
+    # tonen? Search-index kan een lag hebben t.o.v. table-PATCHes; loggen
+    # zonder fail zodat operator weet of een reindex/touch nodig is.
+    print("Verificatie: dataProduct → assets via search-index")
+    for product_name, expected in sorted(expected_assets.items()):
+        r = requests.get(
+            f"{OM}/api/v1/search/query"
+            f"?q=dataProducts.name.keyword:{product_name}"
+            f"&index=table_search_index&size=0",
+            headers=H, timeout=15)
+        if r.status_code != 200:
+            print(f"  ? {product_name}: search-call faalde ({r.status_code})")
+            continue
+        actual = r.json().get("hits", {}).get("total", {}).get("value", 0)
+        flag = "✓" if actual >= expected else "?"
+        print(f"  {flag} {product_name:<22} expected={expected:>2}  search-index={actual}")
+
     print(f"Klaar. created={created} enriched={enriched} errors={errs}")
 ---
 apiVersion: batch/v1
