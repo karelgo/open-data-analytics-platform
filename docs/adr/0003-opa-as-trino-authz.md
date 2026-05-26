@@ -19,9 +19,9 @@ Trino moet rijke authorisatie afdwingen die past bij UWV's compliance-eisen:
   rol/het doel daar aanleiding toe heeft.
 - **Column-level security & masking** (R-BIO-11): BSN, IBAN, diagnose,
   bankrekening worden gemaskeerd voor rollen die ze niet primair nodig
-  hebben (bv. `crm_medewerker` ziet `'XXXXX' || substring(bsn, 6)` ipv ruwe BSN).
-- **Row-level security** (R-BIO-11): WIA-beoordelaars zien alleen dossiers in
-  hun regio; FEZ-analisten zien geen individu-rijen.
+  hebben (bv. `marketing_analyst` ziet `'XXXXX' || substring(bsn, 6)` ipv ruwe BSN).
+- **Row-level security** (R-BIO-11): Claims Analysts zien alleen dossiers in
+  hun regio; Finance Analysten zien geen individu-rijen.
 - **Audit-log van decisies** (R-BIO-20): elke deny is herleidbaar.
 
 Trino ondersteunt drie plug-bare authorizers: `file`, `system-property` en

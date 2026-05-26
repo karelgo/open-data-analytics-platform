@@ -89,7 +89,7 @@ voor opvolg-werk.
 | 2.4.3 | **JIT-access voor `data_engineer`** — `jit_required: true` in role-mapping, geen TTL-mechanisme | 🟠 | L |
 | 2.4.4 | **Break-glass logging** — `platform_admin` zou elk gebruik moeten loggen + Slack-alert | 🟠 | M |
 | 2.4.5 | **Policy voor write-ops uitwerken** — nu alleen `data_engineer` + `platform_admin` mogen schrijven; geen tests voor specifieke schrijf-paden | 🟠 | M |
-| 2.4.6 | **Verplicht regio-attribuut voor wia_beoordelaar** — als `extraCredentials.regio` ontbreekt, deny i.p.v. fall-back-no-filter | 🟠 | S |
+| 2.4.6 | **Verplicht regio-attribuut voor claims_analyst** — als `extraCredentials.regio` ontbreekt, deny i.p.v. fall-back-no-filter | 🟠 | S |
 | 2.4.7 | **OPA bundle-coverage > 80%** — `opa test --coverage` toevoegen aan CI | 🟡 | S |
 | 2.4.8 | **Reverse-metadata OM → OPA** — OM tags `Doelbinding.*` als bron voor `resource_purposes` (vervangt hardcoded data.json) | 🟠 | XL |
 
@@ -264,7 +264,7 @@ voor opvolg-werk.
 | 8.2 | **UC-06 Lastprognose-dashboard** met scenario-vergelijking | 🟠 | M |
 | 8.3 | **UC-07 DQ-dashboard** met alerts | 🟠 | S |
 | 8.4 | **Superset row-level security** bovenop OPA — extra zekerheid | 🟡 | M |
-| 8.5 | **Superset OIDC role-mapping** — automatisch `data_steward` → Superset `Alpha`, `crm_medewerker` → `Gamma` | 🟠 | S |
+| 8.5 | **Superset OIDC role-mapping** — automatisch `data_steward` → Superset `Alpha`, `marketing_analyst` → `Gamma` | 🟠 | S |
 | 8.6 | **Superset `extraCredentials.purpose` doorzetten** naar Trino — nu gebruikt Superset zijn eigen connection-credentials, OPA krijgt geen purpose | 🔴 | L |
 | 8.7 | **Superset assets-bundle in repo** voor declaratieve dashboard-deploy via Superset CLI | 🟡 | M |
 

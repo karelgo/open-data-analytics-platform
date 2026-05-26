@@ -52,7 +52,7 @@ data:
 
     AUTH_TYPE = AUTH_OAUTH
     AUTH_USER_REGISTRATION = True
-    # Public = geen Airflow-rechten; non-platform users (wia_beoordelaar
+    # Public = geen Airflow-rechten; non-platform users (claims_analyst
     # etc.) landen hier en kunnen de UI niet gebruiken.
     AUTH_USER_REGISTRATION_ROLE = "Public"
     AUTH_ROLES_SYNC_AT_LOGIN = True

@@ -39,7 +39,7 @@ het bestand of de setting".
 | R-AVG-06 | Doelbinding per dataset | 5, 8, 9 | dbt `meta.doelbinding`; OM tag `Doelbinding.*`; **`opa-policies-src/trino/trino-doelbinding.rego` + `data/role_mappings.json::resource_purposes`** (tests dekken DoD: data_steward zonder purpose op `gold.uc05_*` → deny) |
 | R-AVG-07 | Pseudonimisering & anonimisering | 5, 9 | Macro `dbt/macros/pseudonymize.sql` (hash + zout); OPA column masks BSN/IBAN/diagnose in `opa-policies-src/trino/trino-column-masks.rego` |
 | R-AVG-08 | Bewaartermijnen | 5, 6, 11 | dbt `meta.bewaartermijn_jaren`; **`platform/11-airflow/dags/bewaartermijn_enforcer.py`** (daily DAG, dry-run-flag per tabel) |
-| R-AVG-09 | Privacy by default (least privilege) | 9 | `opa-policies-src/trino/trino-base.rego::default allow := false` + role-list-restriction in `data/role_mappings.json` (alleen `wajong_arbeidsdeskundige` + `platform_admin` hebben `sensitive` catalog) |
+| R-AVG-09 | Privacy by default (least privilege) | 9 | `opa-policies-src/trino/trino-base.rego::default allow := false` + role-list-restriction in `data/role_mappings.json` (alleen `claims_analyst` + `platform_admin` hebben `sensitive` catalog) |
 | R-AVG-10 | Inzage/rectificatie/verwijdering | 5, 6 | `gdpr_request` DAG; dbt-models met `bsn` als unique key |
 | R-AVG-11 | SAR over alle datalagen | 8 | OM lineage tabel-/kolom-niveau |
 | R-AVG-12 | Geautomatiseerde besluitvorming (art. 22) | 0, 5 | `docs/use-cases/uc02-*` mens-in-de-lus design; UC-03 |
@@ -85,7 +85,7 @@ het bestand of de setting".
 | R-NIS2-03 | Supply chain security (SBOM) | 10 | Stackable images SBOM-verifieerbaar via `cosign verify --certificate-identity ... docker.stackable.tech/...` (CI-scan in [`ci/github-actions/security-scan.yml`](../ci/github-actions/security-scan.yml)) |
 | R-NIS2-04 | Meldplicht 24/72u/1mnd | 10 | [`docs/runbook.md` § 4.5](runbook.md#4-veelvoorkomende-incidenten) — incident-detect via Prometheus + OpenSearch alert-rules (TBD productie volledige uitwerking) |
 | R-NIS2-05 | Vulnerability disclosure-beleid | 10, 11 | [`SECURITY.md`](../SECURITY.md) — SLA per CVSS-severity, in/out-of-scope, 90-dagen-default-disclosure |
-| R-NIS2-06 | MFA voor kritieke systemen | 1, 11 | Keycloak realm — **TOTP-policy + `requiredActions: ["CONFIGURE_TOTP"]` op `platform.admin`, `data.engineer`, `wajong.arbeidsdeskundige`**; passkeys voor productie via WebAuthn |
+| R-NIS2-06 | MFA voor kritieke systemen | 1, 11 | Keycloak realm — **TOTP-policy + `requiredActions: ["CONFIGURE_TOTP"]` op `platform.admin`, `data.engineer`, `case.manager`**; passkeys voor productie via WebAuthn |
 | R-NIS2-07 | Versleutelde communicatie | 1, 2 | cert-manager `platform-issuer` ClusterIssuer voor alle ingress; Stackable secret-operator + `tls-internal` SecretClass voor mTLS tussen pods |
 | R-NIS2-08 | Awareness en training | n/a | Organisatorisch |
 | R-NIS2-09 | Crisismanagement / BCM | 10 | [`docs/runbook.md` § 2 + § 5 + § 6](runbook.md#2-cluster-lifecycle); productie: tabletop + technical exercise per kwartaal (organisatorisch) |

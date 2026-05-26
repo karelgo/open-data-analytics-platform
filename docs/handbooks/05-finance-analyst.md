@@ -1,6 +1,6 @@
-# Handleiding — FEZ-analist
+# Handleiding — Finance Analyst
 
-> Rol-key: `fez_analist` · Domein: Financiën / Beleid · Risiconiveau toegang: laag (alleen aggregaten, geen PII)
+> Rol-key: `finance_analyst` · Domein: Financiën / Beleid · Risiconiveau toegang: laag (alleen aggregaten, geen PII)
 
 Deze handleiding is voor **financieel-economische analisten** die werken
 aan schadelast, prognoses en beleidsanalyses. Je werkt op **geaggregeerde
@@ -158,6 +158,6 @@ WHERE peilkwartaal = '2026-Q1';
 
 ---
 
-**Vorige:** [04-crm-medewerker.md](04-crm-medewerker.md) ·
-**Volgende:** [06-smz-planner.md](06-smz-planner.md) ·
+**Vorige:** [04-marketing-analyst.md](04-marketing-analyst.md) ·
+**Volgende:** [06-operations-manager.md](06-operations-manager.md) ·
 **Index:** [README.md](README.md)

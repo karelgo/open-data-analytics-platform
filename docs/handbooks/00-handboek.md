@@ -34,13 +34,13 @@ en [`opa-policies-src/data/role_mappings.json`](../../opa-policies-src/data/role
 
 ### Business-rollen (eindgebruikers)
 
-1. **WIA-beoordelaar** — AG / WIA — beoordeelt WIA-aanvragen, ziet PII en medisch in eigen regio
-2. **WW-handhaver** — WW / Handhaving — onderzoekt signalen, ziet bankrekening voor onderzoek
-3. **Wajong-arbeidsdeskundige** — AG / Wajong — Sensitive Vault (4-eyes), ziet medisch
-4. **CRM-medewerker** — Klantcontact — werkt met 360°-cliëntbeeld, BSN gemaskeerd
-5. **FEZ-analist** — Financiën / Beleid — alleen aggregaten, geen PII
-6. **SMZ-planner** — Sociaal-medische zaken — capaciteitsplanning, geen cliënt-PII
-7. **Proactief dienstverlener** — Toeslagenwet — werklijst-rol, opt-out gerespecteerd
+1. **Claims Analyst** — AG / WIA — beoordeelt WIA-aanvragen, ziet PII en medisch in eigen regio
+2. **Fraud Analyst** — WW / Handhaving — onderzoekt signalen, ziet bankrekening voor onderzoek
+3. **Claims Analyst** — AG / Wajong — Sensitive Vault (4-eyes), ziet medisch
+4. **Marketing Analyst** — Klantcontact — werkt met 360°-cliëntbeeld, BSN gemaskeerd
+5. **Finance Analyst** — Financiën / Beleid — alleen aggregaten, geen PII
+6. **Operations Manager** — Sociaal-medische zaken — capaciteitsplanning, geen cliënt-PII
+7. **Marketing Analyst** — Toeslagenwet — werklijst-rol, opt-out gerespecteerd
 8. **Researcher** — Onderzoek — alleen sandbox, gepseudonimiseerde panels
 
 ### Technische rollen (platform-team)
@@ -108,9 +108,9 @@ Werkt iets niet? In deze volgorde:
 
 
 
-## Handleiding — WIA-beoordelaar
+## Handleiding — Claims Analyst
 
-> Rol-key: `wia_beoordelaar` · Domein: AG / WIA · Risiconiveau toegang: hoog (PII + medisch)
+> Rol-key: `claims_analyst` · Domein: AG / WIA · Risiconiveau toegang: hoog (PII + medisch)
 
 Deze handleiding is voor **verzekeringsartsen, arbeidsdeskundigen en
 beoordelaars** die WIA-aanvragen behandelen. Je gebruikt het platform om
@@ -130,7 +130,7 @@ categorie (IVA, WGA volledig, WGA gedeeltelijk). Je gebruikt het platform om:
 - Geanonimiseerde overzichten te maken voor capaciteitsplanning
 
 Je hebt **geen** toegang tot dossiers buiten je eigen regio en geen toegang
-tot de Sensitive Vault (`sensitive.*`) — die is voor de Wajong-arbeidsdeskundige.
+tot de Sensitive Vault (`sensitive.*`) — die is voor de Claims Analyst.
 
 ---
 
@@ -138,7 +138,7 @@ tot de Sensitive Vault (`sensitive.*`) — die is voor de Wajong-arbeidsdeskundi
 
 ### 2.1 Account
 
-Je accountnaam is `wia.beoordelaar` (in productie: je eigen platform account, gefedereerd via SSO).
+Je accountnaam is `claims.analyst` (in productie: je eigen platform account, gefedereerd via SSO).
 Het wachtwoord wijzig je bij eerste inlog. **MFA is verplicht** —
 configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Password etc.).
 
@@ -200,7 +200,7 @@ Voor `silver.wia.aanvraag` en `gold.uc01_wia_funnel.*`:
 ### 3.3 Wat zie je echt **niet**?
 
 - WW-data (`silver.ww.*`) — andere doelbinding (handhaving, niet WIA)
-- Wajong sensitive (`sensitive.wajong.*`) — alleen Wajong-arbeidsdeskundigen
+- Wajong sensitive (`sensitive.wajong.*`) — alleen Claims Analystn
 - Bankrekening- en IBAN-velden onmasked — niet nodig voor WIA-beoordeling
 - Bronze-laag (`bronze.*`) — alleen voor data-engineers met JIT-toegang
 - Andere regio's dan die jou zijn toegewezen
@@ -318,7 +318,7 @@ ORDER  BY n DESC LIMIT 10;
 
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
-| `Access Denied: cannot select from gold.uc02_wajong.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Wajong-arbeidsdeskundige |
+| `Access Denied: cannot select from gold.uc02_wajong.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Claims Analyst |
 | `Access Denied: regio = 'Zuid' niet toegestaan` | Je rij-filter blokkeert dit, BSN valt buiten je regio | Vraag een collega in de juiste regio |
 | `Access Denied: column 'iban' is masked` | Je probeert IBAN onmasked te zien — niet voor WIA | Leef met de mask, of vraag FEZ |
 | `Authentication failed: token expired` | OIDC-token is verlopen | Log opnieuw in via Keycloak |
@@ -366,15 +366,15 @@ massaal data lezen valt op.
 
 ---
 
-**Volgende handleiding:** [02-ww-handhaver.md](02-ww-handhaver.md) ·
+**Volgende handleiding:** [02-fraud-analyst.md](02-fraud-analyst.md) ·
 **Index:** [README.md](README.md)
 
 ---
 
 
-## Handleiding — WW-handhaver
+## Handleiding — Fraud Analyst
 
-> Rol-key: `ww_handhaver` · Domein: WW / Handhaving · Risiconiveau toegang: hoog (PII + bankrekening)
+> Rol-key: `fraud_analyst` · Domein: WW / Handhaving · Risiconiveau toegang: hoog (PII + bankrekening)
 
 Deze handleiding is voor **handhavers** die WW-uitkeringen onderzoeken op
 recht- en doelmatigheid. Je hebt toegang tot WW-data en een aantal
@@ -403,7 +403,7 @@ voor het doel "handhaving".
 
 ### 2.1 Account
 
-Accountnaam: `ww.handhaver`. **MFA verplicht** — zelfde TOTP-procedure als
+Accountnaam: `fraud.analyst`. **MFA verplicht** — zelfde TOTP-procedure als
 voor andere rollen. Wachtwoord wijzigen bij eerste login.
 
 ### 2.2 Welke applicaties gebruik je?
@@ -449,7 +449,7 @@ Voor `silver.ww.*` en `gold.uc03_ww_risk.*`:
 
 Op `silver.persoon.persoon` zien:
 
-| Veld | jij (`ww_handhaver`) | `crm_medewerker` | `fez_analist` |
+| Veld | jij (`fraud_analyst`) | `marketing_analyst` | `finance_analyst` |
 |---|---|---|---|
 | `bsn` | volledig | gemaskeerd | aggregaat-only (geen ruwe BSN) |
 | `iban` | volledig | gemaskeerd | gemaskeerd |
@@ -538,7 +538,7 @@ ORDER BY 1;
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
 | `Access Denied: column 'diagnose' returns NULL` | Medische velden zijn voor jou gemaskeerd | Niet nodig voor handhaving |
-| `Access Denied: silver.wia.*` | WIA is niet jouw doel | Vraag een WIA-beoordelaar voor cross-domein vragen |
+| `Access Denied: silver.wia.*` | WIA is niet jouw doel | Vraag een Claims Analyst voor cross-domein vragen |
 | `Access Denied: sensitive.*` | Sensitive Vault is afgeschermd | Niet beschikbaar — Wajong-route via collega |
 | `Bias / fairness warning op model` | Het UC-03 model heeft een waarschuwing afgegeven | Stop het automatisch gebruik; meld bij data-steward |
 
@@ -574,16 +574,16 @@ Het model levert een score en een korte uitleg (top-drivers). Volg deze regels:
 
 ---
 
-**Vorige:** [01-wia-beoordelaar.md](01-wia-beoordelaar.md) ·
-**Volgende:** [03-wajong-arbeidsdeskundige.md](03-wajong-arbeidsdeskundige.md) ·
+**Vorige:** [01-claims-analyst.md](01-claims-analyst.md) ·
+**Volgende:** [03-claims-analyst.md](03-claims-analyst.md) ·
 **Index:** [README.md](README.md)
 
 ---
 
 
-## Handleiding — Wajong-arbeidsdeskundige
+## Handleiding — Claims Analyst
 
-> Rol-key: `wajong_arbeidsdeskundige` · Domein: AG / Wajong · Risiconiveau toegang: zeer hoog (Sensitive Vault, art. 9 AVG)
+> Rol-key: `claims_analyst` · Domein: AG / Wajong · Risiconiveau toegang: zeer hoog (Sensitive Vault, art. 9 AVG)
 
 Deze handleiding is voor **arbeidsdeskundigen die Wajong-trajecten begeleiden**.
 Jouw rol is bijzonder: je hebt als enige business-rol toegang tot de
@@ -613,7 +613,7 @@ model-card, EU-registratie en externe audit. Dat is geen referentie-werk.
 
 ### 2.1 Account
 
-Accountnaam `wajong.arbeidsdeskundige`. **MFA verplicht** + extra waarschuwing
+Accountnaam `case.manager`. **MFA verplicht** + extra waarschuwing
 in de Keycloak-login: "Je hebt toegang tot de Sensitive Vault. Elke query wordt
 gelogd en periodiek gereviewd."
 
@@ -765,7 +765,7 @@ LIMIT 50;
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
 | `Access Denied: column 'iban' is masked` | IBAN niet voor jouw doel | Doorgaan, niet nodig voor reintegratie |
-| `Access Denied: silver.wia.*` | WIA-domein niet toegankelijk | Vraag WIA-beoordelaar |
+| `Access Denied: silver.wia.*` | WIA-domein niet toegankelijk | Vraag Claims Analyst |
 | `Audit-flag: review required` | Sensitive-query staat klaar voor review | Niets doen — review verloopt automatisch |
 | `Authentication failed: token expired` | Sessie verlopen | Opnieuw inloggen via Keycloak |
 
@@ -810,16 +810,16 @@ voor besluitvormingsdata: 7 jaar.
 
 ---
 
-**Vorige:** [02-ww-handhaver.md](02-ww-handhaver.md) ·
-**Volgende:** [04-crm-medewerker.md](04-crm-medewerker.md) ·
+**Vorige:** [02-fraud-analyst.md](02-fraud-analyst.md) ·
+**Volgende:** [04-marketing-analyst.md](04-marketing-analyst.md) ·
 **Index:** [README.md](README.md)
 
 ---
 
 
-## Handleiding — CRM-medewerker
+## Handleiding — Marketing Analyst
 
-> Rol-key: `crm_medewerker` · Domein: Klantcontact · Risiconiveau toegang: middel (PII gemaskeerd, geen medisch)
+> Rol-key: `marketing_analyst` · Domein: Klantcontact · Risiconiveau toegang: middel (PII gemaskeerd, geen medisch)
 
 Deze handleiding is voor **medewerkers van klantcontact en CRM**. Je werkt
 met het 360°-cliëntbeeld (UC-05) en helpt cliënten via telefoon, balie of
@@ -844,7 +844,7 @@ Je gebruikt het platform om:
 
 ### 2.1 Account
 
-Accountnaam `crm.medewerker`. **MFA verplicht**. Bij eerste login
+Accountnaam `marketing.analyst`. **MFA verplicht**. Bij eerste login
 wachtwoord wijzigen.
 
 ### 2.2 Welke applicaties?
@@ -981,16 +981,16 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 ---
 
-**Vorige:** [03-wajong-arbeidsdeskundige.md](03-wajong-arbeidsdeskundige.md) ·
-**Volgende:** [05-fez-analist.md](05-fez-analist.md) ·
+**Vorige:** [03-claims-analyst.md](03-claims-analyst.md) ·
+**Volgende:** [05-finance-analyst.md](05-finance-analyst.md) ·
 **Index:** [README.md](README.md)
 
 ---
 
 
-## Handleiding — FEZ-analist
+## Handleiding — Finance Analyst
 
-> Rol-key: `fez_analist` · Domein: Financiën / Beleid · Risiconiveau toegang: laag (alleen aggregaten, geen PII)
+> Rol-key: `finance_analyst` · Domein: Financiën / Beleid · Risiconiveau toegang: laag (alleen aggregaten, geen PII)
 
 Deze handleiding is voor **financieel-economische analisten** die werken
 aan schadelast, prognoses en beleidsanalyses. Je werkt op **geaggregeerde
@@ -1146,16 +1146,16 @@ WHERE peilkwartaal = '2026-Q1';
 
 ---
 
-**Vorige:** [04-crm-medewerker.md](04-crm-medewerker.md) ·
-**Volgende:** [06-smz-planner.md](06-smz-planner.md) ·
+**Vorige:** [04-marketing-analyst.md](04-marketing-analyst.md) ·
+**Volgende:** [06-operations-manager.md](06-operations-manager.md) ·
 **Index:** [README.md](README.md)
 
 ---
 
 
-## Handleiding — SMZ-planner
+## Handleiding — Operations Manager
 
-> Rol-key: `smz_planner` · Domein: Sociaal-medische zaken · Risiconiveau toegang: laag (geen cliënt-PII)
+> Rol-key: `operations_manager` · Domein: Sociaal-medische zaken · Risiconiveau toegang: laag (geen cliënt-PII)
 
 Deze handleiding is voor **planners die SMZ-capaciteit beheren**:
 verzekeringsartsen, arbeidsdeskundigen, roosters en wachttijden. Je werkt
@@ -1304,16 +1304,16 @@ teamleider — geen BSN's, alleen aggregaten.
 
 ---
 
-**Vorige:** [05-fez-analist.md](05-fez-analist.md) ·
-**Volgende:** [07-proactief-dienstverlener.md](07-proactief-dienstverlener.md) ·
+**Vorige:** [05-finance-analyst.md](05-finance-analyst.md) ·
+**Volgende:** [07-marketing-analyst.md](07-marketing-analyst.md) ·
 **Index:** [README.md](README.md)
 
 ---
 
 
-## Handleiding — Proactief dienstverlener
+## Handleiding — Marketing Analyst
 
-> Rol-key: `proactief_dienstverlener` · Domein: Toeslagenwet (proactief) · Risiconiveau toegang: middel (PII, geen medisch)
+> Rol-key: `marketing_analyst` · Domein: Toeslagenwet (proactief) · Risiconiveau toegang: middel (PII, geen medisch)
 
 Deze handleiding is voor **medewerkers die proactief cliënten benaderen
 voor TW-eligibility** (Toeslagenwet). De use case (UC-04) gebruikt
@@ -1470,7 +1470,7 @@ ORDER  BY conversie_pct DESC;
 
 ---
 
-**Vorige:** [06-smz-planner.md](06-smz-planner.md) ·
+**Vorige:** [06-operations-manager.md](06-operations-manager.md) ·
 **Volgende:** [08-researcher.md](08-researcher.md) ·
 **Index:** [README.md](README.md)
 
@@ -1649,7 +1649,7 @@ SELECT COUNT(*) FROM gematched;
 
 ---
 
-**Vorige:** [07-proactief-dienstverlener.md](07-proactief-dienstverlener.md) ·
+**Vorige:** [07-marketing-analyst.md](07-marketing-analyst.md) ·
 **Volgende:** [09-data-steward.md](09-data-steward.md) ·
 **Index:** [README.md](README.md)
 
@@ -1675,7 +1675,7 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 - Eigenaarschap, classificaties en doelbindingen actueel te houden
 - Lineage te valideren (van bron tot dashboard)
 - Glossary (CGM-begrippen) te onderhouden
-- Sensitive-queries van Wajong-arbeidsdeskundigen te reviewen
+- Sensitive-queries van Claims Analystn te reviewen
 - Eindgebruikers te helpen bij begrip en interpretatie van data
 
 ---
@@ -1701,7 +1701,7 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 | `bronze` | **Ja** (kwaliteitscontrole) | Vergelijken bron met silver |
 | `silver` | **Ja** | DQ-bewaking, profiler |
 | `gold` | **Ja** | Validatie van marts |
-| `sensitive` | **Nee** | Niet jouw doel — alleen Wajong-arbeidsdeskundigen + admin |
+| `sensitive` | **Nee** | Niet jouw doel — alleen Claims Analystn + admin |
 | `sandbox` | **Nee** | Researcher-zone |
 
 ### 3.2 Welke kolommen?
@@ -1763,7 +1763,7 @@ Vermoeden: ingestion-issue. Je escaleert naar de data-engineer.
 **Dagelijks om 9:00.** Open OpenSearch / OPA decision-log:
 
 ```
-filter: catalog="sensitive" AND user_role="wajong_arbeidsdeskundige"
+filter: catalog="sensitive" AND user_role="claims_analyst"
        AND timestamp >= "yesterday"
 ```
 

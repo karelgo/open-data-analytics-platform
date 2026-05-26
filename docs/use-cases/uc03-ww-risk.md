@@ -83,7 +83,7 @@ meta:
 
 ## OPA-policies
 
-- Toegang tot `gold.uc03_ww_risk.*` alleen voor rol `ww_handhaver` met doelcode `handhaving`.
+- Toegang tot `gold.uc03_ww_risk.*` alleen voor rol `fraud_analyst` met doelcode `handhaving`.
 - Singular test (Rego): geen *protected attributes* (etniciteit, wijk-code) in features. Falt af bij detectie.
 - Audit-log van **elke** read (volledig, niet samples): WW-handhaving is
   toezicht-gevoelig.

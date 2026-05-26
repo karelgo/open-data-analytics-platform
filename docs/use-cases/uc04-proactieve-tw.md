@@ -82,7 +82,7 @@ meta:
 
 ## OPA-policies
 
-- Toegang tot `gold.uc04_tw_eligibility.*` alleen voor rol `proactief_dienstverlener`
+- Toegang tot `gold.uc04_tw_eligibility.*` alleen voor rol `marketing_analyst`
   + doelcode `proactieve_dienstverlening`.
 - Audit-log per uitlezing (welke cliënten zijn benaderd) — gekoppeld aan
   `gold.uc04_tw_eligibility.benaderd_log` (door cliëntcommunicatie-team

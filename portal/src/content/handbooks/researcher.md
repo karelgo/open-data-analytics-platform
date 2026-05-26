@@ -173,6 +173,6 @@ SELECT COUNT(*) FROM gematched;
 
 ---
 
-**Vorige:** [07-proactief-dienstverlener.md](07-proactief-dienstverlener.md) ·
+**Vorige:** [07-marketing-analyst.md](07-marketing-analyst.md) ·
 **Volgende:** [09-data-steward.md](09-data-steward.md) ·
 **Index:** [README.md](README.md)

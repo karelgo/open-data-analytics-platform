@@ -4,10 +4,10 @@
 # Runt OPA-decision-calls (in-cluster via curl-pod) tegen een paar key-scenarios:
 #
 #   1. anonymous user             → allow=false (default-deny)
-#   2. crm_medewerker + purpose `klantcontact` op uc05    → allow=true
+#   2. marketing_analyst + purpose `klantcontact` op uc05    → allow=true
 #   3. data_steward zonder purpose op uc05                → allow=false (DoD)
-#   4. crm_medewerker + bsn-column                        → columnMask retourneert masking-expr (DoD)
-#   5. wia_beoordelaar + regio AMS op silver.wia          → rowFilter `regio_code = 'AMS'`
+#   4. marketing_analyst + bsn-column                        → columnMask retourneert masking-expr (DoD)
+#   5. claims_analyst + regio AMS op silver.wia          → rowFilter `regio_code = 'AMS'`
 #   6. data.steward + diagnose-column (sensitive)         → columnMask = NULL
 #
 # Vereist: fase 0+1+2+3+9 (OpaCluster + bundle uit fase 9 deployed).
@@ -40,13 +40,13 @@ echo "$r" | grep -q '"result": *false' \
   && pass "anonymous → allow=false" \
   || fail "anonymous: $r"
 
-# --- 2. crm_medewerker + klantcontact op uc05 → allow ----------------
-log "crm_medewerker + klantcontact op gold.uc05_client_360.* → allow=true"
+# --- 2. marketing_analyst + klantcontact op uc05 → allow ----------------
+log "marketing_analyst + klantcontact op gold.uc05_client_360.* → allow=true"
 r=$(curl_decide trino/allow \
-    '{"input":{"context":{"identity":{"user":"crm.medewerker","groups":["crm_medewerker"],"extraCredentials":{"purpose":"klantcontact"}}},"action":{"operation":"SelectFromColumns","resource":{"table":{"catalogName":"gold","schemaName":"uc05_client_360","tableName":"mart_uc05_client_360"}}}}}')
+    '{"input":{"context":{"identity":{"user":"marketing.analyst","groups":["marketing_analyst"],"extraCredentials":{"purpose":"klantcontact"}}},"action":{"operation":"SelectFromColumns","resource":{"table":{"catalogName":"gold","schemaName":"uc05_client_360","tableName":"mart_uc05_client_360"}}}}}')
 echo "$r" | grep -q '"result": *true' \
-  && pass "crm_medewerker+klantcontact → allow=true" \
-  || fail "crm_medewerker+klantcontact: $r"
+  && pass "marketing_analyst+klantcontact → allow=true" \
+  || fail "marketing_analyst+klantcontact: $r"
 
 # --- 3. data_steward zonder purpose op uc05 → deny (DoD!) ------------
 log "data_steward ZONDER purpose op gold.uc05 → allow=false (DoD R-AVG-06)"
@@ -56,32 +56,32 @@ echo "$r" | grep -q '"result": *false' \
   && pass "data_steward zonder purpose → allow=false (doelbinding-deny)" \
   || fail "data_steward zonder purpose: $r"
 
-# --- 4. crm_medewerker + bsn-kolom → columnMask (DoD!) ---------------
-log "crm_medewerker + bsn → columnMask (DoD R-AVG-07)"
+# --- 4. marketing_analyst + bsn-kolom → columnMask (DoD!) ---------------
+log "marketing_analyst + bsn → columnMask (DoD R-AVG-07)"
 r=$(curl_decide trino/columnMask \
-    '{"input":{"context":{"identity":{"user":"crm.medewerker","groups":["crm_medewerker"]}},"action":{"operation":"SelectFromColumns","resource":{"column":{"catalogName":"gold","schemaName":"uc05_client_360","tableName":"mart_uc05_client_360","columnName":"bsn"}}}}}')
+    '{"input":{"context":{"identity":{"user":"marketing.analyst","groups":["marketing_analyst"]}},"action":{"operation":"SelectFromColumns","resource":{"column":{"catalogName":"gold","schemaName":"uc05_client_360","tableName":"mart_uc05_client_360","columnName":"bsn"}}}}}')
 if echo "$r" | grep -q "concat('XXXXX', substr(bsn, 6, 4))"; then
-  pass "BSN gemaskeerd voor crm_medewerker"
+  pass "BSN gemaskeerd voor marketing_analyst"
 else
   fail "BSN-mask onverwacht: $r"
 fi
 
-# --- 5. wia_beoordelaar + regio AMS → rowFilter ----------------------
-log "wia_beoordelaar (regio=AMS) op silver.wia → rowFilter"
+# --- 5. claims_analyst + regio AMS → rowFilter ----------------------
+log "claims_analyst (regio=AMS) op silver.wia → rowFilter"
 r=$(curl_decide trino/rowFilters \
-    '{"input":{"context":{"identity":{"user":"wia.beoordelaar","groups":["wia_beoordelaar"],"extraCredentials":{"regio":"ams"}}},"action":{"operation":"SelectFromColumns","resource":{"table":{"catalogName":"silver","schemaName":"wia","tableName":"aanvraag"}}}}}')
+    '{"input":{"context":{"identity":{"user":"claims.analyst","groups":["claims_analyst"],"extraCredentials":{"regio":"ams"}}},"action":{"operation":"SelectFromColumns","resource":{"table":{"catalogName":"silver","schemaName":"wia","tableName":"aanvraag"}}}}}')
 if echo "$r" | grep -q "regio_code = 'AMS'"; then
   pass "row-filter regio_code=AMS toegepast"
 else
   fail "row-filter onverwacht: $r"
 fi
 
-# --- 6. crm_medewerker + diagnose → NULL-mask ------------------------
-log "crm_medewerker + diagnose-column → NULL-mask"
+# --- 6. marketing_analyst + diagnose → NULL-mask ------------------------
+log "marketing_analyst + diagnose-column → NULL-mask"
 r=$(curl_decide trino/columnMask \
-    '{"input":{"context":{"identity":{"user":"crm.medewerker","groups":["crm_medewerker"]}},"action":{"operation":"SelectFromColumns","resource":{"column":{"catalogName":"sensitive","schemaName":"wajong","tableName":"dossier","columnName":"diagnose"}}}}}')
+    '{"input":{"context":{"identity":{"user":"marketing.analyst","groups":["marketing_analyst"]}},"action":{"operation":"SelectFromColumns","resource":{"column":{"catalogName":"sensitive","schemaName":"wajong","tableName":"dossier","columnName":"diagnose"}}}}}')
 if echo "$r" | grep -q '"expression": *"NULL"'; then
-  pass "diagnose gemaskeerd als NULL voor crm_medewerker"
+  pass "diagnose gemaskeerd als NULL voor marketing_analyst"
 else
   fail "diagnose-mask onverwacht: $r"
 fi

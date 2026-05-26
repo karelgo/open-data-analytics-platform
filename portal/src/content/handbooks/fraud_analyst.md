@@ -1,9 +1,9 @@
 ---
-title: "Handleiding — WW-handhaver"
-role: ww_handhaver
+title: "Handleiding — Fraud Analyst"
+role: fraud_analyst
 ---
 
-> Rol-key: `ww_handhaver` · Domein: WW / Handhaving · Risiconiveau toegang: hoog (PII + bankrekening)
+> Rol-key: `fraud_analyst` · Domein: WW / Handhaving · Risiconiveau toegang: hoog (PII + bankrekening)
 
 Deze handleiding is voor **handhavers** die WW-uitkeringen onderzoeken op
 recht- en doelmatigheid. Je hebt toegang tot WW-data en een aantal
@@ -32,7 +32,7 @@ voor het doel "handhaving".
 
 ### 2.1 Account
 
-Accountnaam: `ww.handhaver`. **MFA verplicht** — zelfde TOTP-procedure als
+Accountnaam: `fraud.analyst`. **MFA verplicht** — zelfde TOTP-procedure als
 voor andere rollen. Wachtwoord wijzigen bij eerste login.
 
 ### 2.2 Welke applicaties gebruik je?
@@ -78,7 +78,7 @@ Voor `silver.ww.*` en `gold.uc03_ww_risk.*`:
 
 Op `silver.persoon.persoon` zien:
 
-| Veld | jij (`ww_handhaver`) | `crm_medewerker` | `fez_analist` |
+| Veld | jij (`fraud_analyst`) | `marketing_analyst` | `finance_analyst` |
 |---|---|---|---|
 | `bsn` | volledig | gemaskeerd | aggregaat-only (geen ruwe BSN) |
 | `iban` | volledig | gemaskeerd | gemaskeerd |
@@ -167,7 +167,7 @@ ORDER BY 1;
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
 | `Access Denied: column 'diagnose' returns NULL` | Medische velden zijn voor jou gemaskeerd | Niet nodig voor handhaving |
-| `Access Denied: silver.wia.*` | WIA is niet jouw doel | Vraag een WIA-beoordelaar voor cross-domein vragen |
+| `Access Denied: silver.wia.*` | WIA is niet jouw doel | Vraag een Claims Analyst voor cross-domein vragen |
 | `Access Denied: sensitive.*` | Sensitive Vault is afgeschermd | Niet beschikbaar — Wajong-route via collega |
 | `Bias / fairness warning op model` | Het UC-03 model heeft een waarschuwing afgegeven | Stop het automatisch gebruik; meld bij data-steward |
 
@@ -203,6 +203,6 @@ Het model levert een score en een korte uitleg (top-drivers). Volg deze regels:
 
 ---
 
-**Vorige:** [01-wia-beoordelaar.md](01-wia-beoordelaar.md) ·
-**Volgende:** [03-wajong-arbeidsdeskundige.md](03-wajong-arbeidsdeskundige.md) ·
+**Vorige:** [01-claims-analyst.md](01-claims-analyst.md) ·
+**Volgende:** [03-claims-analyst.md](03-claims-analyst.md) ·
 **Index:** [README.md](README.md)

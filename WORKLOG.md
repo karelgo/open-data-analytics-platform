@@ -50,7 +50,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
   - `prometheus-stack/values.yaml` (Prometheus + Grafana, Alertmanager uit, scaled-down).
   - `vector/values.yaml` (Agent-mode, OpenSearch sink — fase 8).
   - `openmetadata/values.yaml` (gedeelde Postgres + OpenSearch, OIDC via Keycloak — fase 8).
-- **Keycloak ODAP realm** (`infrastructure/helm/keycloak/realm.json`): 11 realm-rollen (de 8 mock-rollen + `researcher`, `smz_planner`, `proactief_dienstverlener`), één mock-user per rol, 5 OIDC-clients (trino, superset, airflow, nifi, openmetadata) met dev-only secrets en redirect-URIs op `*.odap.local:8443`.
+- **Keycloak ODAP realm** (`infrastructure/helm/keycloak/realm.json`): 11 realm-rollen (de 8 mock-rollen + `researcher`, `operations_manager`, `marketing_analyst`), één mock-user per rol, 5 OIDC-clients (trino, superset, airflow, nifi, openmetadata) met dev-only secrets en redirect-URIs op `*.odap.local:8443`.
 - **Stackable release pin** (`infrastructure/stackablectl/release.yaml` — SDP 26.3 alle 12 operators) + `stack.yaml` (verwijst naar `platform/00..13`).
 - **Scripts** (`scripts/`): `cluster.sh`, `bootstrap.sh` (idempotente helm upgrade --install volgorde: cert-manager → ClusterIssuer → ingress-nginx → Postgres → MinIO → Keycloak → Prometheus → Stackable operators), `clean.sh`, `doctor.sh` (tooling + /etc/hosts check), `port-forward.sh`, `run-smoke-tests.sh`, `deploy-platform.sh` (stub voor fase 2+), `seed.sh` (stub voor fase 4+). Allemaal `chmod +x`.
 - **Smoke test** `tests/smoke/01-stackable-up.sh`: cluster, namespaces, helm-releases, ClusterIssuer Ready, MinIO buckets, Stackable operator pods, Keycloak OIDC discovery.
@@ -241,7 +241,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - **`generate_schema_name` + `generate_database_name` overrides** zodat `+database: silver` letterlijk de Trino-catalog wordt. Default dbt-gedrag prefixt `target.schema_<custom>`, wat onleesbare schema-namen geeft in de catalog.
 - **Bronze-naar-silver via JSON-parse in staging** — bronze.uwv.<entity>.payload is raw JSON envelope. dbt's staging-laag is verantwoordelijk voor schema-on-read. Nieuwe brontypen vergen een nieuw staging-model maar geen Spark-wijziging.
 - **One row per Wet × Regio × Maand voor UC-06 baseline** — eenvoudige projection (gem. uit historie); productie zou Prophet/statsforecast gebruiken in een Spark-job (zie `spark-jobs/`).
-- **UC-05 client-360 alle kolommen aanwezig** — OPA-policies (fase 9) maskeren BSN voor `crm_medewerker`; default-deny op medische velden. Mart zelf is een wide-table; access-control is laag-9-verantwoordelijkheid.
+- **UC-05 client-360 alle kolommen aanwezig** — OPA-policies (fase 9) maskeren BSN voor `marketing_analyst`; default-deny op medische velden. Mart zelf is een wide-table; access-control is laag-9-verantwoordelijkheid.
 - **Singular test op UC-03 protected attributes** — defensieve guard tegen accidenteel toevoegen van etniciteit/wijk-features in WW-domein. Faalt CI direct.
 - **`dbt-trino` LDAP-method voor smoke** — `smoketest` user → Trino static-auth-class. Productie schakelt over op OIDC (`method: oidc` + `jwt_token` in profiles).
 
@@ -379,12 +379,12 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `trino-platform-roles.rego` — `role_allows_resource` met **twee paden**: (1) `schemas == null` → catalog-only, (2) `schemas != null` → catalog + schema-membership. Helpers `role_has_capability` + `any_role_has_capability` voor capability-driven masks.
 - `trino-doelbinding.rego` — `purpose_allows_resource` (R-AVG-06). Wildcard-resolver matcht `<catalog>.<schema>.<table>` of `<catalog>.<schema>.*`. `user_allowed_purposes` is union over rollen. `*` wildcard voor platform_admin.
 - `trino-row-filters.rego` — WIA regio-filter `regio_code = '<UPPER>'` met regex-injection-validatie (`^[a-z]{3}$`); UC-04 opt-out filter; sandbox `bsn_pseudo IS NOT NULL`.
-- `trino-column-masks.rego` — BSN-mask `concat('XXXXX', substr(bsn, 6, 4))` voor crm_medewerker; BSN-hard-mask voor rollen zonder `can_see_pii`; IBAN/bankrekening masked voor rollen zonder `can_see_bankrekening`; diagnose/icd10 → NULL voor rollen zonder `can_see_medical`; geboortedatum bucket-per-jaar voor data_steward.
+- `trino-column-masks.rego` — BSN-mask `concat('XXXXX', substr(bsn, 6, 4))` voor marketing_analyst; BSN-hard-mask voor rollen zonder `can_see_pii`; IBAN/bankrekening masked voor rollen zonder `can_see_bankrekening`; diagnose/icd10 → NULL voor rollen zonder `can_see_medical`; geboortedatum bucket-per-jaar voor data_steward.
 
 **Vier test-files (23 tests, allemaal PASS)**
 - `trino-base_test.rego` — anonymous deny + authenticated meta allow + no-role deny.
 - `trino-doelbinding_test.rego` — DoD-check `test_uc05_denied_without_purpose` + 4 anderen.
-- `trino-column-masks_test.rego` — DoD-check `test_bsn_masked_for_crm_medewerker` + 5 anderen (IBAN, diagnose, etc.).
+- `trino-column-masks_test.rego` — DoD-check `test_bsn_masked_for_marketing_analyst` + 5 anderen (IBAN, diagnose, etc.).
 - `trino-row-filters_test.rego` — regio-filter, geen filter voor data_steward, opt-out, regex-injection-defense.
 - `trino-platform-roles_test.rego` — 5 role-resource-tests.
 
@@ -395,7 +395,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `platform/10-opa/kustomization.yaml` — `configMapGenerator` met **6 files** (5 rego + data.json), label `odap.io/policy-tier: production` (vervangt fase-3 allow-all base).
 
 **Smoke + compliance**
-- `tests/smoke/08-opa-decisions.sh` — 6 OPA-decision-checks: anonymous deny, crm_medewerker+klantcontact allow, **data_steward zonder purpose op uc05 → deny (DoD R-AVG-06)**, **crm_medewerker+bsn → masking-expr (DoD R-AVG-07)**, wia_beoordelaar+regio_AMS → row-filter, crm_medewerker+diagnose → NULL.
+- `tests/smoke/08-opa-decisions.sh` — 6 OPA-decision-checks: anonymous deny, marketing_analyst+klantcontact allow, **data_steward zonder purpose op uc05 → deny (DoD R-AVG-06)**, **marketing_analyst+bsn → masking-expr (DoD R-AVG-07)**, claims_analyst+regio_AMS → row-filter, marketing_analyst+diagnose → NULL.
 - `docs/compliance-mapping.md` — evidence-paths bijgewerkt voor R-AVG-05/06/07/09, R-BIO-06/11, R-GOV-06 met concrete `opa-policies-src/...` paden + tests-status (23/23 PASS) + smoke-script-link.
 
 ### Verificatie (host, OPA 0.69.0 lokaal geïnstalleerd)
@@ -482,7 +482,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 | Superset toont WIA Funnel-dashboard | **datasets aangemaakt** (init-Job); dashboard zelf interactief te bouwen (zie `dashboards/README.md`) |
 | OpenMetadata e2e lineage | **services + workflows gedefinieerd**; lineage-run via `om_ingest_trino` DAG |
 | OPA weigert query op `client_360.bsn` zonder doel | **`opa test` 23/23 + smoke 08 dekkend** |
-| OPA maskeert BSN voor `crm_medewerker` | **`opa test` 23/23 + smoke 08 dekkend** |
+| OPA maskeert BSN voor `marketing_analyst` | **`opa test` 23/23 + smoke 08 dekkend** |
 | dbt-test `bsn_valid` faalt op ongeldige BSN | **generic-test in `dbt/macros/test_bsn_valid.sql`** |
 | OM toont `meta` per gold-tabel | **dbt-workflow leest `meta.eigenaar/legal_basis/doelbinding/...`** |
 | `compliance-mapping.md` mapt elke R-* op file/setting | **groen — alle ~75 requirements ingevuld** |
@@ -525,7 +525,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - #2 `platform/06-kafka/kafkatopics-job.yaml` — ConfigMap met 14 topics (incl. DLQ + audit), Bitnami Kafka-image-Job die ze idempotent creëert. KafkaCluster-config: `auto.create.topics.enable=false`.
 
 **Identity hardening**:
-- #6 Realm odap.json uitgebreid met `passwordPolicy: length(12) and digits(1) and upperCase(1) and specialChars(1) and notUsername and passwordHistory(5)`, sessie-timeouts (1u idle, 8u max), TOTP-policy + `requiredActions: ["CONFIGURE_TOTP"]` op `platform.admin`, `data.engineer`, `wajong.arbeidsdeskundige`.
+- #6 Realm odap.json uitgebreid met `passwordPolicy: length(12) and digits(1) and upperCase(1) and specialChars(1) and notUsername and passwordHistory(5)`, sessie-timeouts (1u idle, 8u max), TOTP-policy + `requiredActions: ["CONFIGURE_TOTP"]` op `platform.admin`, `data.engineer`, `case.manager`.
 
 **Pseudonymize-macro daadwerkelijk gebruikt**:
 - #7 `dbt/models/intermediate/int_persona_pseudonymized.sql` — pseudo-identifier helper. `dbt/models/marts/uc09_reint_effect/mart_uc09_effect_panel.sql` — sandbox-panel met **alleen** `bsn_pseudo`, geen ruwe BSN. Vult ook gap #1.1 (UC-09 mart leeg).

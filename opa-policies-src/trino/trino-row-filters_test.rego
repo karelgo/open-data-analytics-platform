@@ -2,12 +2,12 @@ package trino
 
 import rego.v1
 
-# WIA-beoordelaar in regio AMS → filter `regio_code = 'AMS'`.
-test_wia_beoordelaar_regio_filter if {
+# Claims Analyst in regio AMS → filter `regio_code = 'AMS'`.
+test_claims_analyst_regio_filter if {
 	filters := rowFilters with input as {
 		"context": {"identity": {
-			"user": "wia.beoordelaar",
-			"groups": ["wia_beoordelaar"],
+			"user": "claims.analyst",
+			"groups": ["claims_analyst"],
 			"extraCredentials": {"regio": "ams"},
 		}},
 		"action": {
@@ -45,8 +45,8 @@ test_no_regio_filter_for_data_steward if {
 test_uc04_opt_out_filter if {
 	filters := rowFilters with input as {
 		"context": {"identity": {
-			"user": "proactief.dienstverlener",
-			"groups": ["proactief_dienstverlener"],
+			"user": "outreach.specialist",
+			"groups": ["marketing_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -65,8 +65,8 @@ test_uc04_opt_out_filter if {
 test_invalid_regio_no_filter if {
 	rowFilters == [] with input as {
 		"context": {"identity": {
-			"user": "wia.beoordelaar",
-			"groups": ["wia_beoordelaar"],
+			"user": "claims.analyst",
+			"groups": ["claims_analyst"],
 			"extraCredentials": {"regio": "DROPTABLE"},
 		}},
 		"action": {
@@ -80,13 +80,13 @@ test_invalid_regio_no_filter if {
 	}
 }
 
-# UC-11 — wia_beoordelaar in regio AMS op gold.uc11_klantreis → regio-filter
+# UC-11 — claims_analyst in regio AMS op gold.uc11_klantreis → regio-filter
 # met fallback "OR regio_code IS NULL" zodat non-WIA events zichtbaar blijven.
-test_uc11_wia_beoordelaar_regio_filter if {
+test_uc11_claims_analyst_regio_filter if {
 	filters := rowFilters with input as {
 		"context": {"identity": {
-			"user": "wia.beoordelaar",
-			"groups": ["wia_beoordelaar"],
+			"user": "claims.analyst",
+			"groups": ["claims_analyst"],
 			"extraCredentials": {"regio": "ams"},
 		}},
 		"action": {
@@ -102,12 +102,12 @@ test_uc11_wia_beoordelaar_regio_filter if {
 	filters[0].expression == "regio_code = 'AMS' OR regio_code IS NULL"
 }
 
-# UC-11 — ww_handhaver mag medische uitkomst-events niet zien.
-test_uc11_ww_handhaver_medical_filter if {
+# UC-11 — fraud_analyst mag medische uitkomst-events niet zien.
+test_uc11_fraud_analyst_medical_filter if {
 	filters := rowFilters with input as {
 		"context": {"identity": {
-			"user": "ww.handhaver",
-			"groups": ["ww_handhaver"],
+			"user": "fraud.analyst",
+			"groups": ["fraud_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",

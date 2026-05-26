@@ -74,7 +74,7 @@ Beide hebben geen externe service nodig.
 ### Persona-handleidingen
 
 Onder [`handbooks/`](handbooks/) staan 13 stap-voor-stap-handleidingen
-voor verschillende rollen (WIA-beoordelaar, WW-handhaver, FEZ-analist,
+voor verschillende rollen (Claims Analyst, Fraud Analyst, Finance Analyst,
 data-steward, platform-admin, …). Zie [handbooks/README.md](handbooks/README.md)
 voor de index.
 

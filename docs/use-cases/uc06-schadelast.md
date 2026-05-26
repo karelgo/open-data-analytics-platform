@@ -79,7 +79,7 @@ meta:
 
 ## OPA-policies
 
-- Toegang tot `gold.uc06_lastprognose.*` voor rollen `fez_analist`,
+- Toegang tot `gold.uc06_lastprognose.*` voor rollen `finance_analyst`,
   `data_steward`, `platform_admin`.
 - Geen kolom-masks; geen row-filters (data is publiek-publiceerbaar).
 - Wel: audit-log van wijzigingen aan `scenario_inputs` (kritisch voor

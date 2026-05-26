@@ -233,21 +233,21 @@ function subtitle(slide, text) {
       hdr("regio-filter"),
     ],
     [
-      c("crm_medewerker"),
+      c("marketing_analyst"),
       mask("XXXXX + last-4"),
       mask("gesanitized"),
       deny("deny"),
       c("—"),
     ],
     [
-      c("wia_beoordelaar"),
+      c("claims_analyst"),
       ok("full"),
       ok("full"),
       ok("full"),
       mask("eigen regio"),
     ],
     [
-      c("ww_handhaver"),
+      c("fraud_analyst"),
       ok("full"),
       ok("full"),
       deny("WGA/IVA hidden"),
@@ -261,7 +261,7 @@ function subtitle(slide, text) {
       c("—"),
     ],
     [
-      c("fez_analist"),
+      c("finance_analyst"),
       mask("hashed"),
       mask("aggregated"),
       mask("aggregated"),
@@ -714,7 +714,7 @@ function subtitle(slide, text) {
     bold: true, charSpacing: 3, margin: 0,
   });
   s.addText(
-    "Eén query — verschillende projecties per rol. crm_medewerker ziet géén diagnose, wia_beoordelaar zonder beperking. Geen aparte views, geen extra applicatie-code, geen vergeten checks.",
+    "Eén query — verschillende projecties per rol. marketing_analyst ziet géén diagnose, claims_analyst zonder beperking. Geen aparte views, geen extra applicatie-code, geen vergeten checks.",
     {
       x: 0.7, y: 5.7, w: 11.9, h: 1.1,
       fontFace: F_HEAD, fontSize: 14, color: INK_1,
@@ -815,7 +815,7 @@ function subtitle(slide, text) {
 
   // 4-step timeline horizontal with icons (use shapes/text)
   const steps = [
-    { t: "T+0s · query",  label: "Query", detail: "crm_medewerker vraagt\narbeidsongeschikt_pct op", color: INK_1 },
+    { t: "T+0s · query",  label: "Query", detail: "marketing_analyst vraagt\narbeidsongeschikt_pct op", color: INK_1 },
     { t: "T+0s · deny",   label: "OPA deny", detail: "Geen can_see_medical\n→ allow=false", color: RED },
     { t: "T+5s",          label: "Audit-emit", detail: "Trino event-listener\n→ Kafka audit-topic", color: AMBER },
     { t: "T+30s",         label: "Dashboard", detail: "Vector → OpenSearch\nopzoekbaar per user/rol/BSN", color: GREEN },

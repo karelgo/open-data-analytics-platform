@@ -93,7 +93,7 @@ Voor elke van de 11 platform-rollen moet er één Entra security-group
 bestaan (idealiter `platform-role-{rolename}`). Vraag de GUIDs op:
 
 ```bash
-az ad group show --group "platform-role-wia_beoordelaar" --query id -o tsv
+az ad group show --group "platform-role-claims_analyst" --query id -o tsv
 # herhaal voor de andere 10 rollen
 ```
 
@@ -112,9 +112,9 @@ sed -i.bak \
   infrastructure/helm/keycloak/realm.json
 
 # group-GUIDs (één regel per rol)
-for ROLE in wia_beoordelaar ww_handhaver wajong_arbeidsdeskundige \
-            crm_medewerker fez_analist data_steward data_engineer \
-            platform_admin researcher smz_planner proactief_dienstverlener; do
+for ROLE in claims_analyst fraud_analyst claims_analyst \
+            marketing_analyst finance_analyst data_steward data_engineer \
+            platform_admin researcher operations_manager marketing_analyst; do
   GUID=$(az ad group show --group "platform-role-$ROLE" --query id -o tsv)
   sed -i.bak "s/REPLACE_ME_GROUP_GUID_$ROLE/$GUID/g" \
     infrastructure/helm/keycloak/realm.json
@@ -164,7 +164,7 @@ Manueel:
    een nieuw lokaal account wil aanmaken. Voor een schone Entra-only flow:
    kies "Add to existing account" alleen als je dezelfde gebruiker al in
    de realm hebt; anders "Review profile" en doorgaan.
-5. Eindresultaat: portal-topbar toont je rol-badge (bv. `wia_beoordelaar`)
+5. Eindresultaat: portal-topbar toont je rol-badge (bv. `claims_analyst`)
    en je email — gefedereerd via Entra.
 
 ### Bekende valkuilen

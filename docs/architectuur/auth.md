@@ -39,8 +39,8 @@ sequenceDiagram
 
 - **Realm:** `uwv` in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
 - **Mock-rollen** in deze referentie:
-    - Business: `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`,
-      `crm_medewerker`, `fez_analist`, `smz_planner`, `proactief_dienstverlener`,
+    - Business: `claims_analyst`, `fraud_analyst`, `claims_analyst`,
+      `marketing_analyst`, `finance_analyst`, `operations_manager`, `marketing_analyst`,
       `researcher`
     - Tech: `data_steward`, `data_engineer`, `platform_admin`
 - **MFA:** TOTP verplicht voor tech-rollen; aanbevolen voor business-rollen
@@ -66,7 +66,7 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 | `trino-base.rego` | OIDC token-validatie, role-mapping |
 | `trino-data-access.rego` | Catalog/schema/table-toegang per rol |
 | `trino-doelbinding.rego` | Doelbinding (purpose) afdwingen op gold-tabellen |
-| `trino-row-filters.rego` | Rij-filters per rol (bijv. WW-handhaver ziet alleen WW-claims) |
+| `trino-row-filters.rego` | Rij-filters per rol (bijv. Fraud Analyst ziet alleen WW-claims) |
 | `trino-column-masks.rego` | Kolom-maskering (PII, gezondheid → hash of `***`) |
 | `trino-platform-roles.rego` | UWV-rol-definities (single source) |
 
@@ -76,7 +76,7 @@ Build van de bundle: `scripts/build-opa-bundle.sh`, geïntegreerd in
 !!! tip "Doelbinding eerst"
     Bij elke query controleert OPA of er een **geldig doel** is meegegeven
     (bijv. `uitkering`, `handhaving`, `onderzoek`). Zonder doel: deny.
-    Doelbinding is harder dan rol — een WIA-beoordelaar zonder doel
+    Doelbinding is harder dan rol — een Claims Analyst zonder doel
     `uitkering` krijgt ook in zijn eigen mart geen data.
 
 ## Zie ook

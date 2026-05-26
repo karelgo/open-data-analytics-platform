@@ -99,7 +99,7 @@ const payload = {
   <script>
     import { startStatusRefresh, refreshStatus } from '../scripts/status';
 
-    interface RoleMeta { id: string; displayName: string; domain: string; category: string; handleidingPath: string; }
+    interface RoleMeta { id: string; displayName: string; domain: string; category: string; handbookPath: string; }
     interface Component {
       id: string; name: string; layer: string; stage: string;
       short: string; purpose: string; icon: string;
@@ -174,7 +174,7 @@ const payload = {
         role.category === 'tech' ? 'platform-team' : 'eindgebruiker';
 
       const handleiding = document.getElementById('help-handleiding') as HTMLAnchorElement;
-      handleiding.href = `/${role.handleidingPath}`;
+      handleiding.href = `/${role.handbookPath}`;
 
       // ─── Capabilities ───
       const caps: string[] = [];

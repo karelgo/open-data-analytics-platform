@@ -8,7 +8,7 @@ package trino
 # Default: geen mask (cleartext).
 #
 # Mask-categorieën:
-#   - BSN:          show last 4 (`'XXXXX' || substr(bsn, 6, 4)`)  voor crm_medewerker
+#   - BSN:          show last 4 (`'XXXXX' || substr(bsn, 6, 4)`)  voor marketing_analyst
 #   - IBAN/bankrekening:  fully masked  (`'NLxx XXXX XXXX XXXX'`) voor wie geen `can_see_bankrekening`
 #   - diagnose/icd10: NULL  voor wie geen `can_see_medical`
 #   - geboortedatum: bucket-per-jaar  (`date_trunc('year', geboortedatum)`) voor data_steward
@@ -16,17 +16,17 @@ package trino
 
 import rego.v1
 
-# --- BSN: maskeer voor crm_medewerker ---------------------------------
+# --- BSN: maskeer voor marketing_analyst ---------------------------------
 columnMask := {"expression": expr} if {
 	column_lower == "bsn"
-	"crm_medewerker" in user_roles
+	"marketing_analyst" in user_roles
 	expr := "concat('XXXXX', substr(bsn, 6, 4))"
 }
 
 # --- BSN: hard-mask voor rollen zonder can_see_pii --------------------
 columnMask := {"expression": "concat('XXXXXX', substr(bsn, 7, 3))"} if {
 	column_lower == "bsn"
-	not "crm_medewerker" in user_roles # die heeft eigen mask
+	not "marketing_analyst" in user_roles # die heeft eigen mask
 	not any_role_has_capability("can_see_pii")
 }
 
@@ -53,7 +53,7 @@ columnMask := {"expression": "date_trunc('year', geboortedatum)"} if {
 
 # --- UC-11 — event_label sanitization voor non-medische rollen --------
 # Klantreis-labels kunnen medische info bevatten (bv. "WIA-aanvraag, AO 80%").
-# Voor crm_medewerker / ww_handhaver / data_steward redigeren we het label tot
+# Voor marketing_analyst / fraud_analyst / data_steward redigeren we het label tot
 # een generiek "WIA-procedure"-label.
 columnMask := {"expression": "concat(domein, '.', event_type)"} if {
 	column_lower == "event_label"
@@ -67,7 +67,7 @@ columnMask := {"expression": "'***'"} if {
 	column_lower == "source_ref_id"
 	resource_schema_lower == "uc11_klantreis"
 	not any_role_has_capability("can_see_pii")
-	not "crm_medewerker" in user_roles
+	not "marketing_analyst" in user_roles
 }
 
 # --- helpers ----------------------------------------------------------

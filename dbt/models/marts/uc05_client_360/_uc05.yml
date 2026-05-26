@@ -21,7 +21,7 @@ models:
       cgm_entiteiten: [Cliënt, Uitkering, Contact, Kanaal]
     columns:
       - name: bsn
-        description: "BSN — wordt door OPA gemaskeerd voor `crm_medewerker`."
+        description: "BSN — wordt door OPA gemaskeerd voor `marketing_analyst`."
         tests:
           - not_null
           - unique

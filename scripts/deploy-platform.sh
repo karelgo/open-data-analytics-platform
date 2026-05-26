@@ -270,7 +270,7 @@ T=$(curl -fsS -d "client_id=admin-cli" -d "username=kcadmin" -d "password=odap-d
 [ -z "$T" ] && { echo "Keycloak admin login faalde"; exit 0; }
 A="Authorization: Bearer $T"
 KC=http://localhost:8080
-for u in platform.admin wia.beoordelaar wajong.arbeidsdeskundige data.engineer; do
+for u in platform.admin claims.analyst case.manager data.engineer; do
   KCUID=$(curl -fsS -H "$A" "$KC/admin/realms/odap/users?username=$u" 2>/dev/null | grep -oE "\"id\":\"[^\"]*\"" | head -1 | cut -d"\"" -f4)
   [ -z "$KCUID" ] && continue
   curl -sS -X PUT -H "$A" -H "Content-Type: application/json" "$KC/admin/realms/odap/users/$KCUID" \

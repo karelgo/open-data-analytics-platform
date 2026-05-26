@@ -2,12 +2,12 @@ package trino
 
 import rego.v1
 
-# DoD-check: OPA maskeert BSN voor crm_medewerker.
-test_bsn_masked_for_crm_medewerker if {
+# DoD-check: OPA maskeert BSN voor marketing_analyst.
+test_bsn_masked_for_marketing_analyst if {
 	mask := columnMask with input as {
 		"context": {"identity": {
-			"user": "crm.medewerker",
-			"groups": ["crm_medewerker"],
+			"user": "marketing.analyst",
+			"groups": ["marketing_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -23,11 +23,11 @@ test_bsn_masked_for_crm_medewerker if {
 }
 
 # Wia_beoordelaar mag PII zien — geen mask op BSN.
-test_bsn_unmasked_for_wia_beoordelaar if {
+test_bsn_unmasked_for_claims_analyst if {
 	columnMask == {} with input as {
 		"context": {"identity": {
-			"user": "wia.beoordelaar",
-			"groups": ["wia_beoordelaar"],
+			"user": "claims.analyst",
+			"groups": ["claims_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -41,12 +41,12 @@ test_bsn_unmasked_for_wia_beoordelaar if {
 	}
 }
 
-# Diagnose: NULL voor crm_medewerker (geen can_see_medical).
-test_diagnose_nulled_for_crm_medewerker if {
+# Diagnose: NULL voor marketing_analyst (geen can_see_medical).
+test_diagnose_nulled_for_marketing_analyst if {
 	mask := columnMask with input as {
 		"context": {"identity": {
-			"user": "crm.medewerker",
-			"groups": ["crm_medewerker"],
+			"user": "marketing.analyst",
+			"groups": ["marketing_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -61,12 +61,12 @@ test_diagnose_nulled_for_crm_medewerker if {
 	mask.expression == "NULL"
 }
 
-# Diagnose: cleartext voor wajong_arbeidsdeskundige.
-test_diagnose_visible_for_wajong_arbeidsdeskundige if {
+# Diagnose: cleartext voor claims_analyst.
+test_diagnose_visible_for_claims_analyst if {
 	columnMask == {} with input as {
 		"context": {"identity": {
-			"user": "wajong.arbeidsdeskundige",
-			"groups": ["wajong_arbeidsdeskundige"],
+			"user": "case.manager",
+			"groups": ["claims_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -80,12 +80,12 @@ test_diagnose_visible_for_wajong_arbeidsdeskundige if {
 	}
 }
 
-# IBAN: gemaskeerd voor crm_medewerker (geen can_see_bankrekening).
-test_iban_masked_for_crm_medewerker if {
+# IBAN: gemaskeerd voor marketing_analyst (geen can_see_bankrekening).
+test_iban_masked_for_marketing_analyst if {
 	mask := columnMask with input as {
 		"context": {"identity": {
-			"user": "crm.medewerker",
-			"groups": ["crm_medewerker"],
+			"user": "marketing.analyst",
+			"groups": ["marketing_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -100,12 +100,12 @@ test_iban_masked_for_crm_medewerker if {
 	mask.expression == "'NLxx XXXX XXXX XXXX'"
 }
 
-# IBAN: cleartext voor ww_handhaver (heeft can_see_bankrekening).
-test_iban_visible_for_ww_handhaver if {
+# IBAN: cleartext voor fraud_analyst (heeft can_see_bankrekening).
+test_iban_visible_for_fraud_analyst if {
 	columnMask == {} with input as {
 		"context": {"identity": {
-			"user": "ww.handhaver",
-			"groups": ["ww_handhaver"],
+			"user": "fraud.analyst",
+			"groups": ["fraud_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -119,12 +119,12 @@ test_iban_visible_for_ww_handhaver if {
 	}
 }
 
-# UC-11 — event_label gesanitized voor crm_medewerker (geen can_see_medical).
-test_uc11_event_label_sanitized_for_crm_medewerker if {
+# UC-11 — event_label gesanitized voor marketing_analyst (geen can_see_medical).
+test_uc11_event_label_sanitized_for_marketing_analyst if {
 	mask := columnMask with input as {
 		"context": {"identity": {
-			"user": "crm.medewerker",
-			"groups": ["crm_medewerker"],
+			"user": "marketing.analyst",
+			"groups": ["marketing_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -139,12 +139,12 @@ test_uc11_event_label_sanitized_for_crm_medewerker if {
 	mask.expression == "concat(domein, '.', event_type)"
 }
 
-# UC-11 — event_label cleartext voor wia_beoordelaar (heeft can_see_medical).
-test_uc11_event_label_visible_for_wia_beoordelaar if {
+# UC-11 — event_label cleartext voor claims_analyst (heeft can_see_medical).
+test_uc11_event_label_visible_for_claims_analyst if {
 	columnMask == {} with input as {
 		"context": {"identity": {
-			"user": "wia.beoordelaar",
-			"groups": ["wia_beoordelaar"],
+			"user": "claims.analyst",
+			"groups": ["claims_analyst"],
 		}},
 		"action": {
 			"operation": "SelectFromColumns",

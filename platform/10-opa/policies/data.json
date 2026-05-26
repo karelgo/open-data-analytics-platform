@@ -63,21 +63,23 @@
       ]
     },
     "roles": {
-      "crm_medewerker": {
+      "marketing_analyst": {
         "break_glass": false,
         "can_see_bankrekening": false,
         "can_see_medical": false,
-        "can_see_pii": false,
+        "can_see_pii": true,
         "catalogs": [
           "gold"
         ],
         "purposes": [
-          "klantcontact",
-          "behandeling"
+          "customer_contact",
+          "case_handling",
+          "proactive_outreach"
         ],
         "regio_filter": false,
         "schemas": [
-          "uc05_client_360"
+          "uc04_eligibility_outreach",
+          "uc05_customer_360"
         ]
       },
       "data_engineer": {
@@ -112,7 +114,7 @@
         "regio_filter": false,
         "schemas": null
       },
-      "fez_analist": {
+      "finance_analyst": {
         "break_glass": false,
         "can_see_bankrekening": false,
         "can_see_medical": false,
@@ -147,22 +149,6 @@
         "regio_filter": false,
         "schemas": null
       },
-      "proactief_dienstverlener": {
-        "break_glass": false,
-        "can_see_bankrekening": false,
-        "can_see_medical": false,
-        "can_see_pii": true,
-        "catalogs": [
-          "gold"
-        ],
-        "purposes": [
-          "proactieve_dienstverlening"
-        ],
-        "regio_filter": false,
-        "schemas": [
-          "uc04_tw_eligibility"
-        ]
-      },
       "researcher": {
         "break_glass": false,
         "can_see_bankrekening": false,
@@ -195,7 +181,7 @@
         "regio_filter": false,
         "schemas": null
       },
-      "smz_planner": {
+      "operations_manager": {
         "break_glass": false,
         "can_see_bankrekening": false,
         "can_see_medical": false,
@@ -213,7 +199,7 @@
           "smz"
         ]
       },
-      "wajong_arbeidsdeskundige": {
+      "claims_analyst": {
         "break_glass": false,
         "can_see_bankrekening": false,
         "can_see_medical": true,
@@ -225,36 +211,19 @@
         ],
         "four_eyes_required": true,
         "purposes": [
-          "reintegratie",
-          "behandeling"
-        ],
-        "regio_filter": false,
-        "schemas": [
-          "wajong",
-          "uc02_wajong"
-        ]
-      },
-      "wia_beoordelaar": {
-        "break_glass": false,
-        "can_see_bankrekening": false,
-        "can_see_medical": true,
-        "can_see_pii": true,
-        "catalogs": [
-          "silver",
-          "gold"
-        ],
-        "purposes": [
-          "uitkering",
-          "behandeling",
-          "reintegratie"
+          "claim_processing",
+          "case_handling",
+          "reintegration"
         ],
         "regio_filter": true,
         "schemas": [
-          "wia",
-          "uc01_wia_funnel"
+          "claims",
+          "eligibility_cases",
+          "uc01_claims_funnel",
+          "uc02_complex_cases"
         ]
       },
-      "ww_handhaver": {
+      "fraud_analyst": {
         "break_glass": false,
         "can_see_bankrekening": true,
         "can_see_medical": false,

@@ -1,9 +1,9 @@
 ---
-title: "Handleiding — WIA-beoordelaar"
-role: wia_beoordelaar
+title: "Handleiding — Claims Analyst"
+role: claims_analyst
 ---
 
-> Rol-key: `wia_beoordelaar` · Domein: AG / WIA · Risiconiveau toegang: hoog (PII + medisch)
+> Rol-key: `claims_analyst` · Domein: AG / WIA · Risiconiveau toegang: hoog (PII + medisch)
 
 Deze handleiding is voor **verzekeringsartsen, arbeidsdeskundigen en
 beoordelaars** die WIA-aanvragen behandelen. Je gebruikt het platform om
@@ -23,7 +23,7 @@ categorie (IVA, WGA volledig, WGA gedeeltelijk). Je gebruikt het platform om:
 - Geanonimiseerde overzichten te maken voor capaciteitsplanning
 
 Je hebt **geen** toegang tot dossiers buiten je eigen regio en geen toegang
-tot de Sensitive Vault (`sensitive.*`) — die is voor de Wajong-arbeidsdeskundige.
+tot de Sensitive Vault (`sensitive.*`) — die is voor de Claims Analyst.
 
 ---
 
@@ -31,7 +31,7 @@ tot de Sensitive Vault (`sensitive.*`) — die is voor de Wajong-arbeidsdeskundi
 
 ### 2.1 Account
 
-Je accountnaam is `wia.beoordelaar` (in productie: je eigen platform account, gefedereerd via SSO).
+Je accountnaam is `claims.analyst` (in productie: je eigen platform account, gefedereerd via SSO).
 Het wachtwoord wijzig je bij eerste inlog. **MFA is verplicht** —
 configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Password etc.).
 
@@ -93,7 +93,7 @@ Voor `silver.wia.aanvraag` en `gold.uc01_wia_funnel.*`:
 ### 3.3 Wat zie je echt **niet**?
 
 - WW-data (`silver.ww.*`) — andere doelbinding (handhaving, niet WIA)
-- Wajong sensitive (`sensitive.wajong.*`) — alleen Wajong-arbeidsdeskundigen
+- Wajong sensitive (`sensitive.wajong.*`) — alleen Claims Analystn
 - Bankrekening- en IBAN-velden onmasked — niet nodig voor WIA-beoordeling
 - Bronze-laag (`bronze.*`) — alleen voor data-engineers met JIT-toegang
 - Andere regio's dan die jou zijn toegewezen
@@ -211,7 +211,7 @@ ORDER  BY n DESC LIMIT 10;
 
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
-| `Access Denied: cannot select from gold.uc02_wajong.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Wajong-arbeidsdeskundige |
+| `Access Denied: cannot select from gold.uc02_wajong.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Claims Analyst |
 | `Access Denied: regio = 'Zuid' niet toegestaan` | Je rij-filter blokkeert dit, BSN valt buiten je regio | Vraag een collega in de juiste regio |
 | `Access Denied: column 'iban' is masked` | Je probeert IBAN onmasked te zien — niet voor WIA | Leef met de mask, of vraag FEZ |
 | `Authentication failed: token expired` | OIDC-token is verlopen | Log opnieuw in via Keycloak |
@@ -259,5 +259,5 @@ massaal data lezen valt op.
 
 ---
 
-**Volgende handleiding:** [02-ww-handhaver.md](02-ww-handhaver.md) ·
+**Volgende handleiding:** [02-fraud-analyst.md](02-fraud-analyst.md) ·
 **Index:** [README.md](README.md)

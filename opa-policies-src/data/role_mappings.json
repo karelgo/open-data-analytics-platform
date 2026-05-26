@@ -54,39 +54,43 @@
         "break_glass": false,
         "jit_required": true
       },
-      "wia_beoordelaar": {
-        "_role_purpose": "WIA-beoordeling \u2014 eigen regio, mag PII en medisch zien.",
+      "claims_analyst": {
+        "_role_purpose": "Claim review (incl. complex / sensitive cases) \u2014 PII and medical context, regional scope, four-eyes required on sensitive zone.",
         "catalogs": [
+          "sensitive",
           "silver",
           "gold"
         ],
         "schemas": [
-          "wia",
-          "uc01_wia_funnel"
+          "claims",
+          "eligibility_cases",
+          "uc01_claims_funnel",
+          "uc02_complex_cases"
         ],
         "purposes": [
-          "uitkering",
-          "behandeling",
-          "reintegratie"
+          "claim_processing",
+          "case_handling",
+          "reintegration"
         ],
         "can_see_pii": true,
         "can_see_medical": true,
         "can_see_bankrekening": false,
         "regio_filter": true,
+        "four_eyes_required": true,
         "break_glass": false
       },
-      "ww_handhaver": {
-        "_role_purpose": "WW-handhaving. Mag bankrekening zien voor onderzoek.",
+      "fraud_analyst": {
+        "_role_purpose": "Fraud / risk enforcement. May see bank account details for investigations.",
         "catalogs": [
           "silver",
           "gold"
         ],
         "schemas": [
-          "ww",
-          "uc03_ww_risk"
+          "service_requests",
+          "uc03_fraud_risk"
         ],
         "purposes": [
-          "handhaving"
+          "enforcement"
         ],
         "can_see_pii": true,
         "can_see_medical": false,
@@ -94,47 +98,7 @@
         "regio_filter": false,
         "break_glass": false
       },
-      "wajong_arbeidsdeskundige": {
-        "_role_purpose": "Wajong + Sensitive Vault. 4-eyes; mag medisch zien.",
-        "catalogs": [
-          "sensitive",
-          "silver",
-          "gold"
-        ],
-        "schemas": [
-          "wajong",
-          "uc02_wajong"
-        ],
-        "purposes": [
-          "reintegratie",
-          "behandeling"
-        ],
-        "can_see_pii": true,
-        "can_see_medical": true,
-        "can_see_bankrekening": false,
-        "regio_filter": false,
-        "four_eyes_required": true,
-        "break_glass": false
-      },
-      "crm_medewerker": {
-        "_role_purpose": "CRM/klantcontact \u2014 gemaskeerde BSN, geen medisch.",
-        "catalogs": [
-          "gold"
-        ],
-        "schemas": [
-          "uc05_client_360"
-        ],
-        "purposes": [
-          "klantcontact",
-          "behandeling"
-        ],
-        "can_see_pii": false,
-        "can_see_medical": false,
-        "can_see_bankrekening": false,
-        "regio_filter": false,
-        "break_glass": false
-      },
-      "fez_analist": {
+      "finance_analyst": {
         "_role_purpose": "FEZ \u2014 geaggregeerde data, geen PII.",
         "catalogs": [
           "gold"
@@ -152,7 +116,7 @@
         "regio_filter": false,
         "break_glass": false
       },
-      "smz_planner": {
+      "operations_manager": {
         "_role_purpose": "SMZ-planning (UC-08); geen cli\u00ebnt-PII.",
         "catalogs": [
           "gold",
@@ -171,16 +135,19 @@
         "regio_filter": false,
         "break_glass": false
       },
-      "proactief_dienstverlener": {
-        "_role_purpose": "UC-04 TW-eligibility-werklijst; opt-out gefilterd.",
+      "marketing_analyst": {
+        "_role_purpose": "Customer 360 + proactive outreach worklists; PII visible, no medical, opt-out filtered.",
         "catalogs": [
           "gold"
         ],
         "schemas": [
-          "uc04_tw_eligibility"
+          "uc04_eligibility_outreach",
+          "uc05_customer_360"
         ],
         "purposes": [
-          "proactieve_dienstverlening"
+          "customer_contact",
+          "case_handling",
+          "proactive_outreach"
         ],
         "can_see_pii": true,
         "can_see_medical": false,

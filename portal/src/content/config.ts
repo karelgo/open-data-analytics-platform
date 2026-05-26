@@ -7,13 +7,11 @@
 import { defineCollection, z } from 'astro:content';
 
 const roleIds = [
-  'wia_beoordelaar',
-  'ww_handhaver',
-  'wajong_arbeidsdeskundige',
-  'crm_medewerker',
-  'fez_analist',
-  'smz_planner',
-  'proactief_dienstverlener',
+  'claims_analyst',
+  'fraud_analyst',
+  'marketing_analyst',
+  'finance_analyst',
+  'operations_manager',
   'researcher',
   'data_steward',
   'data_engineer',
@@ -58,7 +56,7 @@ const learn = defineCollection({
     order: z.number().int().positive(),
     summary: z.string(),
     duration: z.string(), // "20 min", "1 uur"
-    prereqs: z.array(z.string()).default([]), // ["wia_beoordelaar/foundation"]
+    prereqs: z.array(z.string()).default([]), // ["claims_analyst/foundation"]
     labs: z.array(labSchema).default([]),
     quiz: z.array(quizQuestionSchema).default([]),
     checks: z.array(checkSchema).default([]),

@@ -273,8 +273,8 @@ met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
 
     ---
 
-    {role_count} rollen met elk eigen handleiding: WIA-beoordelaar,
-    WW-handhaver, data-engineer, platform-admin, … Toegang en data-zichtbaarheid
+    {role_count} rollen met elk eigen handleiding: Claims Analyst,
+    Fraud Analyst, data-engineer, platform-admin, … Toegang en data-zichtbaarheid
     komen uit OPA-policies en Keycloak-rollen.
 
     [:octicons-arrow-right-24: Bekijk rollen](rollen/index.md)
@@ -534,8 +534,8 @@ def _render_role_matrix(comps: list[Component]) -> str:
                 all_roles.add(r)
 
     role_order = [
-        "wia_beoordelaar", "ww_handhaver", "wajong_arbeidsdeskundige",
-        "crm_medewerker", "fez_analist", "smz_planner", "proactief_dienstverlener",
+        "claims_analyst", "fraud_analyst", "claims_analyst",
+        "marketing_analyst", "finance_analyst", "operations_manager", "marketing_analyst",
         "researcher", "data_steward", "data_engineer", "platform_admin",
     ]
     # Behoud volgorde + voeg onbekende rollen toe.
@@ -600,7 +600,7 @@ onveranderd (zie [ADR-0002](../adr/0002-iceberg-vs-delta.md)).
 
 Dit volgt 1-op-1 de rol-handleidingen:
 
-- **WIA-beoordelaar / Wajong-arbeidsdeskundige / etc.** → primair `gold`,
+- **Claims Analyst / Claims Analyst / etc.** → primair `gold`,
   beperkt `silver` (eigen domein). Geen `bronze`.
 - **Data-engineer** → `bronze` (JIT), `silver`, `gold`, `sensitive` (alleen
   via break-glass).
@@ -654,8 +654,8 @@ sequenceDiagram
 
 - **Realm:** `uwv` in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
 - **Mock-rollen** in deze referentie:
-    - Business: `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`,
-      `crm_medewerker`, `fez_analist`, `smz_planner`, `proactief_dienstverlener`,
+    - Business: `claims_analyst`, `fraud_analyst`, `claims_analyst`,
+      `marketing_analyst`, `finance_analyst`, `operations_manager`, `marketing_analyst`,
       `researcher`
     - Tech: `data_steward`, `data_engineer`, `platform_admin`
 - **MFA:** TOTP verplicht voor tech-rollen; aanbevolen voor business-rollen
@@ -681,7 +681,7 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 | `trino-base.rego` | OIDC token-validatie, role-mapping |
 | `trino-data-access.rego` | Catalog/schema/table-toegang per rol |
 | `trino-doelbinding.rego` | Doelbinding (purpose) afdwingen op gold-tabellen |
-| `trino-row-filters.rego` | Rij-filters per rol (bijv. WW-handhaver ziet alleen WW-claims) |
+| `trino-row-filters.rego` | Rij-filters per rol (bijv. Fraud Analyst ziet alleen WW-claims) |
 | `trino-column-masks.rego` | Kolom-maskering (PII, gezondheid → hash of `***`) |
 | `trino-platform-roles.rego` | UWV-rol-definities (single source) |
 
@@ -691,7 +691,7 @@ Build van de bundle: `scripts/build-opa-bundle.sh`, geïntegreerd in
 !!! tip "Doelbinding eerst"
     Bij elke query controleert OPA of er een **geldig doel** is meegegeven
     (bijv. `uitkering`, `handhaving`, `onderzoek`). Zonder doel: deny.
-    Doelbinding is harder dan rol — een WIA-beoordelaar zonder doel
+    Doelbinding is harder dan rol — een Claims Analyst zonder doel
     `uitkering` krijgt ook in zijn eigen mart geen data.
 
 ## Zie ook
@@ -873,7 +873,7 @@ Het platform is "klaar" wanneer:
 3. OpenMetadata toont end-to-end lineage van synthetische bron → dbt-model →
    Superset chart.
 4. OPA weigert query op `client_360.bsn` voor rol zonder doel "uitkering";
-   maskeert BSN voor `crm_medewerker`.
+   maskeert BSN voor `marketing_analyst`.
 5. dbt-test `bsn_valid` faalt op een ingespoten ongeldige BSN-record.
 6. OpenMetadata toont voor elke gold-tabel: eigenaar, doelbinding-tag,
    classificatie, bewaartermijn.
@@ -904,13 +904,13 @@ en [`opa-policies-src/data/role_mappings.json`](https://github.com/fresh-minds/F
 
 | # | Rol | Domein | Handleiding |
 |---|---|---|---|
-| 1 | WIA-beoordelaar | AG / WIA | [01-wia-beoordelaar](../handbooks/01-wia-beoordelaar.md) |
-| 2 | WW-handhaver | WW | [02-ww-handhaver](../handbooks/02-ww-handhaver.md) |
-| 3 | Wajong-arbeidsdeskundige | AG / Wajong | [03-wajong-arbeidsdeskundige](../handbooks/03-wajong-arbeidsdeskundige.md) |
-| 4 | CRM-medewerker | CRM / Klantcontact | [04-crm-medewerker](../handbooks/04-crm-medewerker.md) |
-| 5 | FEZ-analist | Financiën | [05-fez-analist](../handbooks/05-fez-analist.md) |
-| 6 | SMZ-planner | Sociaal-medische zaken | [06-smz-planner](../handbooks/06-smz-planner.md) |
-| 7 | Proactief dienstverlener | Toeslagenwet (proactief) | [07-proactief-dienstverlener](../handbooks/07-proactief-dienstverlener.md) |
+| 1 | Claims Analyst | AG / WIA | [01-claims-analyst](../handbooks/01-claims-analyst.md) |
+| 2 | Fraud Analyst | WW | [02-fraud-analyst](../handbooks/02-fraud-analyst.md) |
+| 3 | Claims Analyst | AG / Wajong | [03-claims-analyst](../handbooks/03-claims-analyst.md) |
+| 4 | Marketing Analyst | CRM / Klantcontact | [04-marketing-analyst](../handbooks/04-marketing-analyst.md) |
+| 5 | Finance Analyst | Financiën | [05-finance-analyst](../handbooks/05-finance-analyst.md) |
+| 6 | Operations Manager | Sociaal-medische zaken | [06-operations-manager](../handbooks/06-operations-manager.md) |
+| 7 | Marketing Analyst | Toeslagenwet (proactief) | [07-marketing-analyst](../handbooks/07-marketing-analyst.md) |
 | 8 | Researcher | Onderzoek (sandbox) | [08-researcher](../handbooks/08-researcher.md) |
 
 ## Technische rollen (platform-team)

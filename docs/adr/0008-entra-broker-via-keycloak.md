@@ -152,12 +152,12 @@ Entra ondersteunt SAML 2.0 als alternatief voor OIDC.
       `realm.json` ingevuld (geen `REPLACE_ME_*` meer).
 - [ ] Keycloak gestart, IdP `entra` zichtbaar in Admin UI.
 - [ ] Eén Entra-testaccount logt in op portal en krijgt rolbadge
-      (`wia_beoordelaar`).
+      (`claims_analyst`).
 - [ ] Eén ODAP realm-account logt parallel in en blijft werken.
 - [ ] Trino-CLI met Entra-user kan een SELECT op `bronze.persoon.persoon`
       uitvoeren met dezelfde row/column-policies als de equivalente
       lokale rol.
-- [ ] OPA decision-log toont `input.context.identity.groups: ["wia_beoordelaar"]`
+- [ ] OPA decision-log toont `input.context.identity.groups: ["claims_analyst"]`
       voor de Entra-user.
 
 ## Open vraagstukken

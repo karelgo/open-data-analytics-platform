@@ -20,7 +20,7 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 - Eigenaarschap, classificaties en doelbindingen actueel te houden
 - Lineage te valideren (van bron tot dashboard)
 - Glossary (CGM-begrippen) te onderhouden
-- Sensitive-queries van Wajong-arbeidsdeskundigen te reviewen
+- Sensitive-queries van Claims Analystn te reviewen
 - Eindgebruikers te helpen bij begrip en interpretatie van data
 
 ---
@@ -46,7 +46,7 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 | `bronze` | **Ja** (kwaliteitscontrole) | Vergelijken bron met silver |
 | `silver` | **Ja** | DQ-bewaking, profiler |
 | `gold` | **Ja** | Validatie van marts |
-| `sensitive` | **Nee** | Niet jouw doel — alleen Wajong-arbeidsdeskundigen + admin |
+| `sensitive` | **Nee** | Niet jouw doel — alleen Claims Analystn + admin |
 | `sandbox` | **Nee** | Researcher-zone |
 
 ### 3.2 Welke kolommen?
@@ -108,7 +108,7 @@ Vermoeden: ingestion-issue. Je escaleert naar de data-engineer.
 **Dagelijks om 9:00.** Open OpenSearch / OPA decision-log:
 
 ```
-filter: catalog="sensitive" AND user_role="wajong_arbeidsdeskundige"
+filter: catalog="sensitive" AND user_role="claims_analyst"
        AND timestamp >= "yesterday"
 ```
 

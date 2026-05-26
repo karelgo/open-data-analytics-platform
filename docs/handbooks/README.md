@@ -25,13 +25,13 @@ en [`opa-policies-src/data/role_mappings.json`](../../opa-policies-src/data/role
 
 | # | Rol | Domein | Handleiding |
 |---|---|---|---|
-| 1 | WIA-beoordelaar | AG / WIA | [01-wia-beoordelaar.md](01-wia-beoordelaar.md) |
-| 2 | WW-handhaver | WW | [02-ww-handhaver.md](02-ww-handhaver.md) |
-| 3 | Wajong-arbeidsdeskundige | AG / Wajong | [03-wajong-arbeidsdeskundige.md](03-wajong-arbeidsdeskundige.md) |
-| 4 | CRM-medewerker | CRM / Klantcontact | [04-crm-medewerker.md](04-crm-medewerker.md) |
-| 5 | FEZ-analist | Financiën | [05-fez-analist.md](05-fez-analist.md) |
-| 6 | SMZ-planner | Sociaal-medische zaken | [06-smz-planner.md](06-smz-planner.md) |
-| 7 | Proactief dienstverlener | Toeslagenwet (proactief) | [07-proactief-dienstverlener.md](07-proactief-dienstverlener.md) |
+| 1 | Claims Analyst | AG / WIA | [01-claims-analyst.md](01-claims-analyst.md) |
+| 2 | Fraud Analyst | WW | [02-fraud-analyst.md](02-fraud-analyst.md) |
+| 3 | Claims Analyst | AG / Wajong | [03-claims-analyst.md](03-claims-analyst.md) |
+| 4 | Marketing Analyst | CRM / Klantcontact | [04-marketing-analyst.md](04-marketing-analyst.md) |
+| 5 | Finance Analyst | Financiën | [05-finance-analyst.md](05-finance-analyst.md) |
+| 6 | Operations Manager | Sociaal-medische zaken | [06-operations-manager.md](06-operations-manager.md) |
+| 7 | Marketing Analyst | Toeslagenwet (proactief) | [07-marketing-analyst.md](07-marketing-analyst.md) |
 | 8 | Researcher | Onderzoek (sandbox) | [08-researcher.md](08-researcher.md) |
 
 ### Technische rollen (platform-team)

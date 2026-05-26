@@ -24,8 +24,8 @@ test_uc05_denied_without_purpose if {
 test_uc05_allowed_with_klantcontact_purpose if {
 	allow with input as {
 		"context": {"identity": {
-			"user": "crm.medewerker",
-			"groups": ["crm_medewerker"],
+			"user": "marketing.analyst",
+			"groups": ["marketing_analyst"],
 			"extraCredentials": {"purpose": "klantcontact"},
 		}},
 		"action": {
@@ -40,11 +40,11 @@ test_uc05_allowed_with_klantcontact_purpose if {
 }
 
 test_uc05_denied_with_wrong_purpose if {
-	# crm_medewerker heeft `klantcontact` maar declareert `actuarie` → mismatch
+	# marketing_analyst heeft `klantcontact` maar declareert `actuarie` → mismatch
 	not allow with input as {
 		"context": {"identity": {
-			"user": "crm.medewerker",
-			"groups": ["crm_medewerker"],
+			"user": "marketing.analyst",
+			"groups": ["marketing_analyst"],
 			"extraCredentials": {"purpose": "actuarie"},
 		}},
 		"action": {

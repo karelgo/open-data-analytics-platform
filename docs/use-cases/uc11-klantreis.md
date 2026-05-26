@@ -130,7 +130,7 @@ Implementatie via window-functions (`row_number()`, `lag()`) over
 Eén query op `gold.uc11_klantreis.mart_uc11_klantreis_events`, acht
 weergaves. Volledige matrix in `opa-policies-src/trino/`:
 
-| Kolom | `crm_medewerker` | `wia_beoordelaar` | `ww_handhaver` | `wajong_arbeidsdeskundige` | `fez_analist` | `data_steward` |
+| Kolom | `marketing_analyst` | `claims_analyst` | `fraud_analyst` | `claims_analyst` | `finance_analyst` | `data_steward` |
 |---|---|---|---|---|---|---|
 | `bsn` | masked (last-4) | full | full | full | hashed | bucket |
 | `event_label` | sanitized (geen diagnose) | full | full | full | aggregated | sanitized |
@@ -140,9 +140,9 @@ weergaves. Volledige matrix in `opa-policies-src/trino/`:
 | `source_ref_id` | masked | full | full | full | masked | masked |
 
 **Row-filters:**
-- `wia_beoordelaar` met `extraCredentials.regio=AMS` → `regio_code = 'AMS' OR regio_code IS NULL`
+- `claims_analyst` met `extraCredentials.regio=AMS` → `regio_code = 'AMS' OR regio_code IS NULL`
 - `klantreis_demo_persona` capability → `bsn = 'XXXXX-XXX01'` (voor presentatie-modus, één persona)
-- `ww_handhaver` → medische event-types weggefilterd (`domein != 'wia' OR event_status != 'TOEGEKEND_IVA'`)
+- `fraud_analyst` → medische event-types weggefilterd (`domein != 'wia' OR event_status != 'TOEGEKEND_IVA'`)
 
 Implementatie:
 - `opa-policies-src/trino/trino-row-filters.rego` — regel toegevoegd voor `schemaName = 'uc11_klantreis'`.
@@ -214,7 +214,7 @@ Pad: Trino event-listener → Kafka `uwv.audit.klantreis` → Spark batch →
 5. **dbt-lineage** — staging × 7 → intermediate → 2 marts. Toon `dbt docs` lineage-graaf.
 6. **Doelbinding als code** — OpenMetadata tag → OPA Rego → Trino-query-resultaat. Live demo van één query met `purpose=klantcontact` vs. zonder.
 7. **AI-laag (minimaal)** — "next best contact" heuristiek; AI Act-classificatie `Laag`; algoritmeregister-stub.
-8. **Audit demo** — `crm_medewerker` probeert WIA-medische details te zien → OPA deny → 30s later in audit-dashboard.
+8. **Audit demo** — `marketing_analyst` probeert WIA-medische details te zien → OPA deny → 30s later in audit-dashboard.
 9. **Access-request** — nieuwe verzekeringsarts wil toegang tot `sensitive.wia.medisch_dossier` → OM-bridge → Keycloak realm-role.
 10. **Wat dit kost** — k3d cluster, één `make` commando, geen cloud-bill.
 

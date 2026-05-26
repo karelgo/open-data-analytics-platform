@@ -9,7 +9,7 @@
 // de Astro-tree hoeven te lezen. Sync draait elke `npm run build` (zie
 // package.json prebuild).
 //
-// Mapping (role-id → filename) komt uit roles.ts handleidingPath; we extracten
+// Mapping (role-id → filename) komt uit roles.ts handbookPath; we extracten
 // alleen de basename zodat we niet de hele roles.ts hier hoeven te imorteren.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
@@ -24,13 +24,13 @@ const destDir = resolve(__dirname, '..', 'src', 'content', 'handbooks');
 // Mapping role-id → docs/handbooks/-basename. Keep in sync with
 // portal/src/data/roles.ts (handbookPath).
 const MAP = {
-  wia_beoordelaar:          '01-wia-beoordelaar.md',
-  ww_handhaver:             '02-ww-handhaver.md',
-  wajong_arbeidsdeskundige: '03-wajong-arbeidsdeskundige.md',
-  crm_medewerker:           '04-crm-medewerker.md',
-  fez_analist:              '05-fez-analist.md',
-  smz_planner:              '06-smz-planner.md',
-  proactief_dienstverlener: '07-proactief-dienstverlener.md',
+  claims_analyst:          '01-claims-analyst.md',
+  fraud_analyst:             '02-fraud-analyst.md',
+  claims_analyst: '03-claims-analyst.md',
+  marketing_analyst:           '04-marketing-analyst.md',
+  finance_analyst:              '05-finance-analyst.md',
+  operations_manager:              '06-operations-manager.md',
+  marketing_analyst: '07-marketing-analyst.md',
   researcher:               '08-researcher.md',
   data_steward:             '09-data-steward.md',
   data_engineer:            '10-data-engineer.md',

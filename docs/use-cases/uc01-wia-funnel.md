@@ -75,7 +75,7 @@ meta:
 
 ## OPA-policies (UC-relevant)
 
-- Toegang tot `gold.uc01_wia_funnel.*` voor rollen `data_steward`, `wia_beoordelaar`, `platform_admin`.
+- Toegang tot `gold.uc01_wia_funnel.*` voor rollen `data_steward`, `claims_analyst`, `platform_admin`.
 - Geen row filters nodig (data is regio-aggregaat); regio-filter is een UI-keuze.
 - Geen kolom-masks (geen PII in gold).
 

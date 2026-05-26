@@ -34,7 +34,7 @@ Het platform is "klaar" wanneer:
 3. OpenMetadata toont end-to-end lineage van synthetische bron → dbt-model →
    Superset chart.
 4. OPA weigert query op `client_360.bsn` voor rol zonder doel "uitkering";
-   maskeert BSN voor `crm_medewerker`.
+   maskeert BSN voor `marketing_analyst`.
 5. dbt-test `bsn_valid` faalt op een ingespoten ongeldige BSN-record.
 6. OpenMetadata toont voor elke gold-tabel: eigenaar, doelbinding-tag,
    classificatie, bewaartermijn.

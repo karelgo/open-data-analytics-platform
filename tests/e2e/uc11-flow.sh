@@ -9,15 +9,15 @@
 #   2. (cluster) dbt run -s tag:uc11 — bouwt mart_uc11_klantreis_{events,phases}
 #   3. (cluster) dbt test -s tag:uc11 — kolom/relationship-tests groen
 #   4. (cluster) Trino SELECT op gold.uc11_klantreis.* — n_rows > 0
-#   5. (cluster) Trino SELECT met `crm_medewerker`-rol + purpose=klantcontact
+#   5. (cluster) Trino SELECT met `marketing_analyst`-rol + purpose=klantcontact
 #                op gold.uc11_klantreis.mart_uc11_klantreis_events met BSN-mask
-#   6. (cluster) Trino SELECT met `wia_beoordelaar` + regio=AMS — row-filter werkt
+#   6. (cluster) Trino SELECT met `claims_analyst` + regio=AMS — row-filter werkt
 #
 # DoD-anchors die deze test dekt:
 #   - mart_uc11_klantreis_events bevat events voor ≥7 domeinen
 #   - mart_uc11_klantreis_phases bevat ≥1 fase per cliënt met events
 #   - OPA row-filter `regio_code = 'AMS' OR regio_code IS NULL` werkt op uc11
-#   - OPA column-mask op event_label voor crm_medewerker werkt op uc11
+#   - OPA column-mask op event_label voor marketing_analyst werkt op uc11
 
 set -euo pipefail
 

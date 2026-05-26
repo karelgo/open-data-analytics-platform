@@ -53,7 +53,7 @@ silver.uitkeringen + silver.contacten + silver.werkmap_berichten + silver.trajec
 
 ## OPA — kolomen-projectie per rol (kritiek voor deze UC)
 
-| Kolom | `crm_medewerker` | `wia_beoordelaar` | `ww_handhaver` | `data_steward` |
+| Kolom | `marketing_analyst` | `claims_analyst` | `fraud_analyst` | `data_steward` |
 |---|---|---|---|---|
 | `bsn` | masked (`'XXXXXXX' || substring(bsn, 8)`) | full | full | masked |
 | `naam` | full | full | full | masked |

@@ -9,9 +9,9 @@
 # die filteren we hier uit en checken alleen UC-11-specifieke tests.
 #
 # DoD-anchors die deze test dekt:
-#   - UC-11 row-filter voor wia_beoordelaar regio + null-safe                 (rego-test)
-#   - UC-11 row-filter voor ww_handhaver verbergt medische uitkomst-events    (rego-test)
-#   - UC-11 columnMask op event_label voor crm_medewerker                     (rego-test)
+#   - UC-11 row-filter voor claims_analyst regio + null-safe                 (rego-test)
+#   - UC-11 row-filter voor fraud_analyst verbergt medische uitkomst-events    (rego-test)
+#   - UC-11 columnMask op event_label voor marketing_analyst                     (rego-test)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -40,10 +40,10 @@ opa test "$ROOT/opa-policies-src/trino/" \
 
 # Alle vier UC-11-specifieke tests moeten slagen met wrapped data.
 EXPECTED_PASS=(
-  test_uc11_wia_beoordelaar_regio_filter
-  test_uc11_ww_handhaver_medical_filter
-  test_uc11_event_label_sanitized_for_crm_medewerker
-  test_uc11_event_label_visible_for_wia_beoordelaar
+  test_uc11_claims_analyst_regio_filter
+  test_uc11_fraud_analyst_medical_filter
+  test_uc11_event_label_sanitized_for_marketing_analyst
+  test_uc11_event_label_visible_for_claims_analyst
 )
 
 failed=0

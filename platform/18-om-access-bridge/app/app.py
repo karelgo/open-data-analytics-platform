@@ -29,7 +29,7 @@ Event-shape (subset van OM's webhook payload):
         "status":      "Closed",
         "resolution":  "approved" | "rejected",
         "assignees":   [{"name": "data.steward", ...}],
-        "createdBy":   "wia.beoordelaar",
+        "createdBy":   "claims.analyst",
         "about":       "trino.gold.uc05_client_360.mart_uc05_client_360"
       }
     }

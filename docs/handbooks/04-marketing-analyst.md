@@ -1,6 +1,6 @@
-# Handleiding — CRM-medewerker
+# Handleiding — Marketing Analyst
 
-> Rol-key: `crm_medewerker` · Domein: Klantcontact · Risiconiveau toegang: middel (PII gemaskeerd, geen medisch)
+> Rol-key: `marketing_analyst` · Domein: Klantcontact · Risiconiveau toegang: middel (PII gemaskeerd, geen medisch)
 
 Deze handleiding is voor **medewerkers van klantcontact en CRM**. Je werkt
 met het 360°-cliëntbeeld (UC-05) en helpt cliënten via telefoon, balie of
@@ -27,7 +27,7 @@ Je gebruikt het platform om:
 
 ### 2.1 Account
 
-Accountnaam `crm.medewerker`. **MFA verplicht**. Bij eerste login
+Accountnaam `marketing.analyst`. **MFA verplicht**. Bij eerste login
 wachtwoord wijzigen.
 
 ### 2.2 Welke applicaties?
@@ -164,6 +164,6 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 ---
 
-**Vorige:** [03-wajong-arbeidsdeskundige.md](03-wajong-arbeidsdeskundige.md) ·
-**Volgende:** [05-fez-analist.md](05-fez-analist.md) ·
+**Vorige:** [03-claims-analyst.md](03-claims-analyst.md) ·
+**Volgende:** [05-finance-analyst.md](05-finance-analyst.md) ·
 **Index:** [README.md](README.md)

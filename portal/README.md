@@ -32,7 +32,7 @@ npm run dev
 ```
 
 In dev draait Astro zonder `oauth2-proxy`; `/me` valt terug op een
-demo-modus (`/me?role=wia_beoordelaar`). Status-badges blijven grijs omdat
+demo-modus (`/me?role=claims_analyst`). Status-badges blijven grijs omdat
 er geen Prometheus-proxy beschikbaar is.
 
 ## Datastromen

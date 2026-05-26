@@ -100,7 +100,7 @@ meta:
 ## OPA-policies
 
 - `sensitive.wajong.*` is **default-deny** voor alle rollen behalve
-  `wajong_arbeidsdeskundige` met expliciete doelcode `reintegratie`.
+  `claims_analyst` met expliciete doelcode `reintegratie`.
 - 4-eyes principe op `sensitive.wajong.dossier`: query met
   `bsn_pseudo IS NOT NULL` vereist dual-approval (Rego-policy controleert
   `request_context.dual_approval_token`).

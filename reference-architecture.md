@@ -293,7 +293,7 @@ Iedere domein-zone publiceert "data products" met:
 - **Centraal IdP**: Entra ID of Keycloak met SAML/OIDC.
 - **MFA verplicht** voor alle gebruikers; **FIDO2/passkeys** voor privileged accounts.
 - **Federatie**: eHerkenning voor werkgeversportalen; DigiD voor cliënten (via Werkmap).
-- **RBAC + ABAC**: rollen op basis van wettelijke taak (bv. "WIA-beoordelaar", "WW-handhaver"), attributen op basis van regio, divisie, geclassificeerd niveau.
+- **RBAC + ABAC**: rollen op basis van wettelijke taak (bv. "Claims Analyst", "Fraud Analyst"), attributen op basis van regio, divisie, geclassificeerd niveau.
 - **Privileged Access Management (PAM)**: jump hosts, session recording, just-in-time elevation.
 - **Secret management**: HashiCorp Vault of Azure Key Vault, automatische rotatie.
 

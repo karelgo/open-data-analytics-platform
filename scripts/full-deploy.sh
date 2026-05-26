@@ -204,7 +204,7 @@ A='Authorization: Bearer '\"\$T\"
 
 # 1. TOTP clearen voor demo-admins. NB: PUT moet username + email + enabled
 #    MEEsturen — partial body wist andere velden in Keycloak 24+.
-for u in platform.admin wajong.arbeidsdeskundige data.engineer; do
+for u in platform.admin case.manager data.engineer; do
   KCUID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/users?username=\$u\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
   [ -z \"\$KCUID\" ] && continue
   curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/users/\$KCUID\" -d \"{\\\"username\\\":\\\"\$u\\\",\\\"email\\\":\\\"\$u@\$DOMAIN\\\",\\\"emailVerified\\\":true,\\\"enabled\\\":true,\\\"requiredActions\\\":[]}\" -o /dev/null
@@ -259,7 +259,7 @@ fi
 
 # 5. policy attribute voor MinIO consoleAdmin op demo-admins. NB: PUT
 #    moet email + enabled MEEsturen om partial-body wipe te voorkomen.
-for u in wia.beoordelaar platform.admin; do
+for u in claims.analyst platform.admin; do
   KCUID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/users?username=\$u\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
   [ -z \"\$KCUID\" ] && continue
   curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/users/\$KCUID\" \\
@@ -287,7 +287,7 @@ for i in {1..30}; do
   sleep 5
 done
 if [[ "$STATE" = "true" ]]; then
-  for u in wia.beoordelaar platform.admin; do
+  for u in claims.analyst platform.admin; do
     kubectl -n odap-platform exec airflow-webserver-default-0 -c airflow -- \
       airflow users add-role -e "$u@${PLATFORM_DOMAIN}" -r Admin 2>/dev/null | tail -1 | grep -v "does not exist" || true
   done
@@ -344,5 +344,5 @@ bash "$ROOT/scripts/om-glossary-link.sh"      || warn "om-glossary-link meldt fo
 
 echo
 ok "Alles klaar. Open: https://platform.${PLATFORM_DOMAIN}:${PLATFORM_PORT}/"
-echo "Login: wia.beoordelaar / odap-dev-only-CHANGE-ME-Wia2026"
+echo "Login: claims.analyst / odap-dev-only-CHANGE-ME-Wia2026"
 echo "Of:    platform.admin   / odap-dev-only-CHANGE-ME-Admin2026"

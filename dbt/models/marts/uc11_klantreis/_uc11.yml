@@ -7,7 +7,7 @@ models:
       over zeven domeinen (persoon, polisadm, ww, zw, wia, wajong, crm). Gebruikt
       voor tijdlijn-visualisatie in Superset en voor downstream CRM-API. OPA
       maskeert `bsn` / `event_label` / `source_ref_id` per rol; row-filter
-      regio_code voor wia_beoordelaar.
+      regio_code voor claims_analyst.
     config:
       tags: ["marts", "uc11", "cross", "klantcontact"]
     meta:

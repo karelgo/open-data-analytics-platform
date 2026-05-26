@@ -6,7 +6,7 @@ package trino
 # Trino verwacht: data.trino.rowFilters → [ { "expression": "..." }, ... ]
 #
 # Implementaties:
-#   - WIA-beoordelaar in `silver.wia.*` of `gold.uc01_wia_funnel.*`:
+#   - Claims Analyst in `silver.wia.*` of `gold.uc01_wia_funnel.*`:
 #       regio_code = '<eigen regio uit extraCredentials.regio>'
 #   - UC-04 mart: opt_out = false  (verberg cliënten die zich hebben afgemeld)
 
@@ -15,7 +15,7 @@ import rego.v1
 # WIA-regio-filter
 rowFilters := [{"expression": expr}] if {
 	some r in user_roles
-	r == "wia_beoordelaar"
+	r == "claims_analyst"
 	resource_schema in {"wia", "uc01_wia_funnel"}
 	regio := lower(input.context.identity.extraCredentials.regio)
 	regio != ""
@@ -36,12 +36,12 @@ rowFilters := [{"expression": "bsn_pseudo IS NOT NULL"}] if {
 	resource_catalog == "sandbox"
 }
 
-# UC-11 — wia_beoordelaar ziet klantreis-events alleen voor eigen regio.
+# UC-11 — claims_analyst ziet klantreis-events alleen voor eigen regio.
 # `regio_code` is alleen gevuld voor WIA-events; non-WIA events (regio_code IS NULL)
 # blijven zichtbaar zodat de tijdlijn niet onnodig leeg is.
 rowFilters := [{"expression": expr}] if {
 	some r in user_roles
-	r == "wia_beoordelaar"
+	r == "claims_analyst"
 	resource_schema == "uc11_klantreis"
 	regio := lower(input.context.identity.extraCredentials.regio)
 	regio != ""
@@ -49,11 +49,11 @@ rowFilters := [{"expression": expr}] if {
 	expr := sprintf("regio_code = '%s' OR regio_code IS NULL", [upper(regio)])
 }
 
-# UC-11 — ww_handhaver mag geen medische WIA-status-events zien (IVA = duurzaam).
+# UC-11 — fraud_analyst mag geen medische WIA-status-events zien (IVA = duurzaam).
 # Filter sluit medische uitkomst-events uit; aanvraag-meta blijft zichtbaar.
 rowFilters := [{"expression": expr}] if {
 	some r in user_roles
-	r == "ww_handhaver"
+	r == "fraud_analyst"
 	resource_schema == "uc11_klantreis"
 	expr := "NOT (domein = 'wia' AND event_status IN ('TOEGEKEND_WGA', 'TOEGEKEND_IVA'))"
 }

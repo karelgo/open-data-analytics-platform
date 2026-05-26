@@ -44,24 +44,20 @@
   "roles": {
     "realm": [
       {
-        "name": "wia_beoordelaar",
-        "description": "WIA-beoordelaar — toegang tot WIA-claim-velden in eigen regio."
+        "name": "claims_analyst",
+        "description": "Claims Analyst — toegang tot WIA-claim-velden in eigen regio."
       },
       {
-        "name": "ww_handhaver",
-        "description": "WW-handhaver — toegang tot WW-risk-data en handhavings-relevante kolommen."
+        "name": "fraud_analyst",
+        "description": "Fraud Analyst — toegang tot WW-risk-data en handhavings-relevante kolommen."
       },
       {
-        "name": "wajong_arbeidsdeskundige",
-        "description": "Wajong-arbeidsdeskundige — toegang tot Wajong-dossier (incl. Sensitive Vault) met 4-eyes."
+        "name": "marketing_analyst",
+        "description": "Marketing Analyst — gemaskeerde BSN, geen medische data."
       },
       {
-        "name": "crm_medewerker",
-        "description": "CRM-medewerker — gemaskeerde BSN, geen medische data."
-      },
-      {
-        "name": "fez_analist",
-        "description": "FEZ-analist — financieel-aggregaten, geen PII."
+        "name": "finance_analyst",
+        "description": "Finance Analyst — financieel-aggregaten, geen PII."
       },
       {
         "name": "data_steward",
@@ -80,12 +76,8 @@
         "description": "Researcher — alleen sandbox-zone (UC-09), geen productie-PII."
       },
       {
-        "name": "smz_planner",
+        "name": "operations_manager",
         "description": "SMZ planner — capaciteitsplanning UC-08."
-      },
-      {
-        "name": "proactief_dienstverlener",
-        "description": "Proactieve dienstverlener — UC-04 TW-eligibility-werklijst."
       },
       {
         "name": "csv_uploader",
@@ -95,12 +87,12 @@
   },
   "users": [
     {
-      "username": "wia.beoordelaar",
+      "username": "claims.analyst",
       "enabled": true,
       "emailVerified": true,
       "firstName": "WIA",
       "lastName": "Beoordelaar",
-      "email": "wia.beoordelaar@odap.local",
+      "email": "claims.analyst@odap.local",
       "credentials": [
         {
           "type": "password",
@@ -109,16 +101,16 @@
         }
       ],
       "realmRoles": [
-        "wia_beoordelaar"
+        "claims_analyst"
       ]
     },
     {
-      "username": "ww.handhaver",
+      "username": "fraud.analyst",
       "enabled": true,
       "emailVerified": true,
       "firstName": "WW",
       "lastName": "Handhaver",
-      "email": "ww.handhaver@odap.local",
+      "email": "fraud.analyst@odap.local",
       "credentials": [
         {
           "type": "password",
@@ -127,16 +119,16 @@
         }
       ],
       "realmRoles": [
-        "ww_handhaver"
+        "fraud_analyst"
       ]
     },
     {
-      "username": "wajong.arbeidsdeskundige",
+      "username": "case.manager",
       "enabled": true,
       "emailVerified": true,
       "firstName": "Wajong",
       "lastName": "Arbeidsdeskundige",
-      "email": "wajong.arbeidsdeskundige@odap.local",
+      "email": "case.manager@odap.local",
       "credentials": [
         {
           "type": "password",
@@ -145,19 +137,19 @@
         }
       ],
       "realmRoles": [
-        "wajong_arbeidsdeskundige"
+        "claims_analyst"
       ],
       "requiredActions": [
         "CONFIGURE_TOTP"
       ]
     },
     {
-      "username": "crm.medewerker",
+      "username": "marketing.analyst",
       "enabled": true,
       "emailVerified": true,
       "firstName": "CRM",
       "lastName": "Medewerker",
-      "email": "crm.medewerker@odap.local",
+      "email": "marketing.analyst@odap.local",
       "credentials": [
         {
           "type": "password",
@@ -166,16 +158,16 @@
         }
       ],
       "realmRoles": [
-        "crm_medewerker"
+        "marketing_analyst"
       ]
     },
     {
-      "username": "fez.analist",
+      "username": "finance.analyst",
       "enabled": true,
       "emailVerified": true,
       "firstName": "FEZ",
       "lastName": "Analist",
-      "email": "fez.analist@odap.local",
+      "email": "finance.analyst@odap.local",
       "credentials": [
         {
           "type": "password",
@@ -184,7 +176,7 @@
         }
       ],
       "realmRoles": [
-        "fez_analist"
+        "finance_analyst"
       ]
     },
     {
@@ -206,7 +198,9 @@
         "csv_uploader"
       ],
       "attributes": {
-        "policy": ["csv-uploader"]
+        "policy": [
+          "csv-uploader"
+        ]
       }
     },
     {
@@ -228,7 +222,9 @@
         "csv_uploader"
       ],
       "attributes": {
-        "policy": ["csv-uploader"]
+        "policy": [
+          "csv-uploader"
+        ]
       },
       "requiredActions": [
         "CONFIGURE_TOTP"
@@ -253,7 +249,9 @@
         "csv_uploader"
       ],
       "attributes": {
-        "policy": ["csv-uploader"]
+        "policy": [
+          "csv-uploader"
+        ]
       },
       "requiredActions": [
         "CONFIGURE_TOTP"
@@ -278,12 +276,12 @@
       ]
     },
     {
-      "username": "smz.planner",
+      "username": "operations.manager",
       "enabled": true,
       "emailVerified": true,
       "firstName": "SMZ",
       "lastName": "Planner",
-      "email": "smz.planner@odap.local",
+      "email": "operations.manager@odap.local",
       "credentials": [
         {
           "type": "password",
@@ -292,16 +290,16 @@
         }
       ],
       "realmRoles": [
-        "smz_planner"
+        "operations_manager"
       ]
     },
     {
-      "username": "proactief.dienstverlener",
+      "username": "outreach.specialist",
       "enabled": true,
       "emailVerified": true,
       "firstName": "Proactief",
       "lastName": "Dienstverlener",
-      "email": "proactief.dienstverlener@odap.local",
+      "email": "outreach.specialist@odap.local",
       "credentials": [
         {
           "type": "password",
@@ -310,7 +308,7 @@
         }
       ],
       "realmRoles": [
-        "proactief_dienstverlener"
+        "marketing_analyst"
       ]
     },
     {
@@ -417,7 +415,6 @@
       "redirectUris": [
         "https://platform.odap.local:8443/superset/*",
         "https://platform.example.com/superset/*",
-        "https://platform.example.com/superset/*",
         "https://superset.odap.local:8443/*",
         "https://superset.odap.local/*",
         "http://superset.odap.local:8443/*",
@@ -444,7 +441,6 @@
       "standardFlowEnabled": true,
       "redirectUris": [
         "https://platform.odap.local:8443/airflow/*",
-        "https://platform.example.com/airflow/*",
         "https://platform.example.com/airflow/*",
         "https://airflow.odap.local:8443/*",
         "https://airflow.odap.local/*",
@@ -682,13 +678,11 @@
       "redirectUris": [
         "https://platform.odap.local:8443/jupyter/hub/oauth_callback",
         "https://platform.example.com/jupyter/hub/oauth_callback",
-        "https://platform.example.com/jupyter/hub/oauth_callback",
         "https://jupyter.odap.local:8443/hub/oauth_callback",
         "https://jupyter.odap.local/hub/oauth_callback"
       ],
       "webOrigins": [
         "https://platform.odap.local:8443",
-        "https://platform.example.com",
         "https://platform.example.com",
         "https://jupyter.odap.local:8443",
         "https://jupyter.odap.local"
@@ -775,19 +769,15 @@
       "redirectUris": [
         "https://platform.odap.local:8443/grafana/login/generic_oauth",
         "https://platform.example.com/grafana/login/generic_oauth",
-        "https://platform.example.com/grafana/login/generic_oauth",
         "https://grafana.odap.local:8443/login/generic_oauth",
         "https://grafana.odap.local/login/generic_oauth",
-        "https://grafana.example.com/login/generic_oauth",
         "https://grafana.example.com/login/generic_oauth"
       ],
       "webOrigins": [
         "https://platform.odap.local:8443",
         "https://platform.example.com",
-        "https://platform.example.com",
         "https://grafana.odap.local:8443",
         "https://grafana.odap.local",
-        "https://grafana.example.com",
         "https://grafana.example.com"
       ],
       "attributes": {
@@ -879,7 +869,11 @@
       ]
     }
   ],
-  "defaultDefaultClientScopes": ["profile", "email", "roles"],
+  "defaultDefaultClientScopes": [
+    "profile",
+    "email",
+    "roles"
+  ],
   "identityProviders": [
     {
       "alias": "entra",
@@ -917,58 +911,47 @@
   ],
   "identityProviderMappers": [
     {
-      "name": "entra-group-wia-beoordelaar",
+      "name": "entra-group-claims-analyst",
       "identityProviderAlias": "entra",
       "identityProviderMapper": "oidc-role-idp-mapper",
       "config": {
         "syncMode": "FORCE",
         "claim": "groups",
-        "claim.value": "REPLACE_ME_GROUP_GUID_wia_beoordelaar",
-        "role": "wia_beoordelaar"
+        "claim.value": "REPLACE_ME_GROUP_GUID_claims_analyst",
+        "role": "claims_analyst"
       }
     },
     {
-      "name": "entra-group-ww-handhaver",
+      "name": "entra-group-fraud-analyst",
       "identityProviderAlias": "entra",
       "identityProviderMapper": "oidc-role-idp-mapper",
       "config": {
         "syncMode": "FORCE",
         "claim": "groups",
-        "claim.value": "REPLACE_ME_GROUP_GUID_ww_handhaver",
-        "role": "ww_handhaver"
+        "claim.value": "REPLACE_ME_GROUP_GUID_fraud_analyst",
+        "role": "fraud_analyst"
       }
     },
     {
-      "name": "entra-group-wajong-arbeidsdeskundige",
+      "name": "entra-group-marketing-analyst",
       "identityProviderAlias": "entra",
       "identityProviderMapper": "oidc-role-idp-mapper",
       "config": {
         "syncMode": "FORCE",
         "claim": "groups",
-        "claim.value": "REPLACE_ME_GROUP_GUID_wajong_arbeidsdeskundige",
-        "role": "wajong_arbeidsdeskundige"
+        "claim.value": "REPLACE_ME_GROUP_GUID_marketing_analyst",
+        "role": "marketing_analyst"
       }
     },
     {
-      "name": "entra-group-crm-medewerker",
+      "name": "entra-group-finance-analyst",
       "identityProviderAlias": "entra",
       "identityProviderMapper": "oidc-role-idp-mapper",
       "config": {
         "syncMode": "FORCE",
         "claim": "groups",
-        "claim.value": "REPLACE_ME_GROUP_GUID_crm_medewerker",
-        "role": "crm_medewerker"
-      }
-    },
-    {
-      "name": "entra-group-fez-analist",
-      "identityProviderAlias": "entra",
-      "identityProviderMapper": "oidc-role-idp-mapper",
-      "config": {
-        "syncMode": "FORCE",
-        "claim": "groups",
-        "claim.value": "REPLACE_ME_GROUP_GUID_fez_analist",
-        "role": "fez_analist"
+        "claim.value": "REPLACE_ME_GROUP_GUID_finance_analyst",
+        "role": "finance_analyst"
       }
     },
     {
@@ -1016,25 +999,14 @@
       }
     },
     {
-      "name": "entra-group-smz-planner",
+      "name": "entra-group-operations-manager",
       "identityProviderAlias": "entra",
       "identityProviderMapper": "oidc-role-idp-mapper",
       "config": {
         "syncMode": "FORCE",
         "claim": "groups",
-        "claim.value": "REPLACE_ME_GROUP_GUID_smz_planner",
-        "role": "smz_planner"
-      }
-    },
-    {
-      "name": "entra-group-proactief-dienstverlener",
-      "identityProviderAlias": "entra",
-      "identityProviderMapper": "oidc-role-idp-mapper",
-      "config": {
-        "syncMode": "FORCE",
-        "claim": "groups",
-        "claim.value": "REPLACE_ME_GROUP_GUID_proactief_dienstverlener",
-        "role": "proactief_dienstverlener"
+        "claim.value": "REPLACE_ME_GROUP_GUID_operations_manager",
+        "role": "operations_manager"
       }
     },
     {

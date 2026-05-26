@@ -28,8 +28,8 @@ in een handleiding die in detail beschrijft wat je dagelijks doet.
 
     ---
 
-    Je gaat met het platform werken vanuit een business-rol — WIA-beoordelaar,
-    WW-handhaver, CRM-medewerker, FEZ-analist, researcher, … Je werkt via
+    Je gaat met het platform werken vanuit een business-rol — Claims Analyst,
+    Fraud Analyst, Marketing Analyst, Finance Analyst, researcher, … Je werkt via
     de portal, Superset-dashboards en (soms) ad-hoc Trino-queries.
 
     [:octicons-arrow-right-24: Naar pad 1](#pad-1-eindgebruiker-business-rollen)
@@ -85,14 +85,14 @@ platform werkt:
 
 ## Pad 1 — Eindgebruiker (business-rollen)
 
-Voor: WIA-beoordelaar, WW-handhaver, Wajong-arbeidsdeskundige,
-CRM-medewerker, FEZ-analist, SMZ-planner, proactief dienstverlener,
+Voor: Claims Analyst, Fraud Analyst, Claims Analyst,
+Marketing Analyst, Finance Analyst, Operations Manager, proactief dienstverlener,
 researcher.
 
 ### Stap 1 · Krijg je account
 
 Je platform-admin maakt je Keycloak-account aan en kent één primaire rol
-toe (bv. `wia_beoordelaar`, `researcher`). Die rol bepaalt welke catalogs
+toe (bv. `claims_analyst`, `researcher`). Die rol bepaalt welke catalogs
 en schemas je standaard mag zien — geen handmatige permissies nodig.
 
 ### Stap 2 · Log in op de portal
@@ -117,13 +117,13 @@ workflows met voorbeelden · escalatie bij problemen.
 
 | Rol | Domein | Handleiding |
 |---|---|---|
-| WIA-beoordelaar | AG / WIA | [01-wia-beoordelaar](../handbooks/01-wia-beoordelaar.md) |
-| WW-handhaver | WW / Handhaving | [02-ww-handhaver](../handbooks/02-ww-handhaver.md) |
-| Wajong-arbeidsdeskundige | AG / Wajong (4-eyes) | [03-wajong-arbeidsdeskundige](../handbooks/03-wajong-arbeidsdeskundige.md) |
-| CRM-medewerker | Klantcontact | [04-crm-medewerker](../handbooks/04-crm-medewerker.md) |
-| FEZ-analist | Financiën / Beleid | [05-fez-analist](../handbooks/05-fez-analist.md) |
-| SMZ-planner | Sociaal-medische zaken | [06-smz-planner](../handbooks/06-smz-planner.md) |
-| Proactief dienstverlener | Toeslagenwet | [07-proactief-dienstverlener](../handbooks/07-proactief-dienstverlener.md) |
+| Claims Analyst | AG / WIA | [01-claims-analyst](../handbooks/01-claims-analyst.md) |
+| Fraud Analyst | WW / Handhaving | [02-fraud-analyst](../handbooks/02-fraud-analyst.md) |
+| Claims Analyst | AG / Wajong (4-eyes) | [03-claims-analyst](../handbooks/03-claims-analyst.md) |
+| Marketing Analyst | Klantcontact | [04-marketing-analyst](../handbooks/04-marketing-analyst.md) |
+| Finance Analyst | Financiën / Beleid | [05-finance-analyst](../handbooks/05-finance-analyst.md) |
+| Operations Manager | Sociaal-medische zaken | [06-operations-manager](../handbooks/06-operations-manager.md) |
+| Marketing Analyst | Toeslagenwet | [07-marketing-analyst](../handbooks/07-marketing-analyst.md) |
 | Researcher | Onderzoek (sandbox) | [08-researcher](../handbooks/08-researcher.md) |
 
 ### Stap 5 · Extra data nodig?

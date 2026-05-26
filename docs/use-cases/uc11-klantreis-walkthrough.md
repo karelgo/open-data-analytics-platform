@@ -34,9 +34,9 @@ deel van dezelfde mart zien:
 
 | Account | Rol | Wat UC-11 toont |
 |---|---|---|
-| `crm.medewerker` | `crm_medewerker` | BSN gemaskeerd, event_label gesanitized (geen medisch) |
-| `wia.beoordelaar` | `wia_beoordelaar` | volledige medische events, regio-filter actief |
-| `ww.handhaver` | `ww_handhaver` | financiële + werkgever-events, medische **deny** |
+| `marketing.analyst` | `marketing_analyst` | BSN gemaskeerd, event_label gesanitized (geen medisch) |
+| `claims.analyst` | `claims_analyst` | volledige medische events, regio-filter actief |
+| `fraud.analyst` | `fraud_analyst` | financiële + werkgever-events, medische **deny** |
 | `data.steward` | `data_steward` | aggregated view voor DQ-reviews |
 | `smoketest` | `smoketest` | technische runner — schrijft de marts |
 
@@ -122,9 +122,9 @@ LIMIT 20;
 ```
 
 Toon alle kolommen ongemaskeerd (smoketest heeft `can_see_pii`). Log dan uit
-en in als `crm.medewerker` (purpose header `klantcontact` zetten in client).
+en in als `marketing.analyst` (purpose header `klantcontact` zetten in client).
 Run dezelfde query → `bsn` gemaskeerd, `event_label` vervangen door
-`<domein>.<event_type>`. Login als `wia.beoordelaar` met `regio=AMS` →
+`<domein>.<event_type>`. Login als `claims.analyst` met `regio=AMS` →
 alleen rows met `regio_code IN ('AMS', NULL)`.
 
 **Dit is het kernmoment**: één tabel, één query, fundamenteel andere
@@ -157,12 +157,12 @@ staging-tags → intermediate → marts → tests.
 
 ### Stap 8 — Audit & glass-box
 
-Demo-foutpoging: laat `crm.medewerker` proberen `numeric_value` op een
+Demo-foutpoging: laat `marketing.analyst` proberen `numeric_value` op een
 WIA-event te selecteren (waar `arbeidsongeschikt_pct` in zou zitten).
 Of: query `sensitive.wia.medisch_dossier`. → OPA `deny`.
 
 Open https://opensearch.odap.local:8443 (of de Vector-index in
-OpenMetadata) → zoek op `crm.medewerker` in de laatste minuut → de poging
+OpenMetadata) → zoek op `marketing.analyst` in de laatste minuut → de poging
 staat geregistreerd met user, rol, queried table, denied=true.
 
 ### Stap 9 — Self-service access-request
@@ -248,7 +248,7 @@ Schema-config in [dbt/dbt_project.yml](../../dbt/dbt_project.yml) onder
 
 In [opa-policies-src/trino/](../../opa-policies-src/trino/):
 
-- [trino-row-filters.rego](../../opa-policies-src/trino/trino-row-filters.rego) — UC-11 regel: wia_beoordelaar regio-filter + ww_handhaver medisch-filter
+- [trino-row-filters.rego](../../opa-policies-src/trino/trino-row-filters.rego) — UC-11 regel: claims_analyst regio-filter + fraud_analyst medisch-filter
 - [trino-column-masks.rego](../../opa-policies-src/trino/trino-column-masks.rego) — UC-11 regel: event_label + source_ref_id sanitization
 - [trino-row-filters_test.rego](../../opa-policies-src/trino/trino-row-filters_test.rego) + [trino-column-masks_test.rego](../../opa-policies-src/trino/trino-column-masks_test.rego) — UC-11 unit-tests
 

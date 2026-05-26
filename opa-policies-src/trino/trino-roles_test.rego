@@ -18,10 +18,10 @@ test_data_steward_allowed_in_silver if {
 	}
 }
 
-test_crm_medewerker_denied_outside_uc05 if {
-	# crm_medewerker mag alleen `gold.uc05_client_360.*` zien.
+test_marketing_analyst_denied_outside_uc05 if {
+	# marketing_analyst mag alleen `gold.uc05_client_360.*` zien.
 	not role_allows_resource with input as {
-		"context": {"identity": {"user": "crm.medewerker", "groups": ["crm_medewerker"]}},
+		"context": {"identity": {"user": "marketing.analyst", "groups": ["marketing_analyst"]}},
 		"action": {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
@@ -33,9 +33,9 @@ test_crm_medewerker_denied_outside_uc05 if {
 	}
 }
 
-test_wia_beoordelaar_only_wia_schemas if {
+test_claims_analyst_only_wia_schemas if {
 	role_allows_resource with input as {
-		"context": {"identity": {"user": "wia.beoordelaar", "groups": ["wia_beoordelaar"]}},
+		"context": {"identity": {"user": "claims.analyst", "groups": ["claims_analyst"]}},
 		"action": {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
@@ -47,10 +47,10 @@ test_wia_beoordelaar_only_wia_schemas if {
 	}
 }
 
-test_wia_beoordelaar_denied_in_polisadm if {
-	# polisadm zit niet in wia_beoordelaar.schemas
+test_claims_analyst_denied_in_polisadm if {
+	# polisadm zit niet in claims_analyst.schemas
 	not role_allows_resource with input as {
-		"context": {"identity": {"user": "wia.beoordelaar", "groups": ["wia_beoordelaar"]}},
+		"context": {"identity": {"user": "claims.analyst", "groups": ["claims_analyst"]}},
 		"action": {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {

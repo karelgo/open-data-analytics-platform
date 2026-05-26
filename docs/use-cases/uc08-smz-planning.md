@@ -81,7 +81,7 @@ meta:
 
 ## OPA-policies
 
-- Toegang tot `gold.uc08_smz_capaciteit.*` voor rol `smz_planner` +
+- Toegang tot `gold.uc08_smz_capaciteit.*` voor rol `operations_manager` +
   `data_steward`.
 - Geen PII in mart → geen kolom-masks nodig.
 - Cliëntdata in onderliggende silver-tabellen blijft onder strikte access.

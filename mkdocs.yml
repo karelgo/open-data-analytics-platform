@@ -160,13 +160,13 @@ nav:
       - Originele referentie: architectuur/referentie.md
   - Voor wie:
       - Overzicht: rollen/index.md
-      - WIA-beoordelaar: handbooks/01-wia-beoordelaar.md
-      - WW-handhaver: handbooks/02-ww-handhaver.md
-      - Wajong-arbeidsdeskundige: handbooks/03-wajong-arbeidsdeskundige.md
-      - CRM-medewerker: handbooks/04-crm-medewerker.md
-      - FEZ-analist: handbooks/05-fez-analist.md
-      - SMZ-planner: handbooks/06-smz-planner.md
-      - Proactief dienstverlener: handbooks/07-proactief-dienstverlener.md
+      - Claims Analyst: handbooks/01-claims-analyst.md
+      - Fraud Analyst: handbooks/02-fraud-analyst.md
+      - Claims Analyst: handbooks/03-claims-analyst.md
+      - Marketing Analyst: handbooks/04-marketing-analyst.md
+      - Finance Analyst: handbooks/05-finance-analyst.md
+      - Operations Manager: handbooks/06-operations-manager.md
+      - Marketing Analyst: handbooks/07-marketing-analyst.md
       - Researcher: handbooks/08-researcher.md
       - Data-steward: handbooks/09-data-steward.md
       - Data-engineer: handbooks/10-data-engineer.md

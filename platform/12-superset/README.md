@@ -11,7 +11,7 @@ Apache Superset (BI) via Stackable's SupersetCluster CRD.
 ## OIDC
 
 Stackable's AuthenticationClass `keycloak` koppelt Superset aan Keycloak.
-Mock-rollen (`data_steward`, `wia_beoordelaar`, etc.) komen mee via `userRegistration`.
+Mock-rollen (`data_steward`, `claims_analyst`, etc.) komen mee via `userRegistration`.
 Superset's role-mapping doet dit automatisch op login (`syncRolesAt: Login`).
 
 ODAP roles → Superset-rollen mapping is **default**: alle nieuwe users krijgen

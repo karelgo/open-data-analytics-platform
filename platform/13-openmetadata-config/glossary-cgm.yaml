@@ -52,9 +52,9 @@ terms:
     displayName: "Diagnose"
     description: "Medische diagnose — bijzonder PG (art. 9 AVG). Sensitive Vault."
     # Medisch art. 9 AVG — review door arbeidsdeskundige naast data.steward.
-    dataOwner: wajong.arbeidsdeskundige
+    dataOwner: case.manager
     reviewers:
-      - wajong.arbeidsdeskundige
+      - case.manager
       - data.steward
 
   # Re-integratie
@@ -89,28 +89,28 @@ terms:
   - name: Uitkering
     displayName: "Uitkering"
     description: "Periodieke betaling aan Cliënt op grond van een wet (WW/WIA/Wajong/ZW/TW)."
-    dataOwner: fez.analist
+    dataOwner: finance.analyst
   - name: Inkomen
     displayName: "Inkomen"
     description: "Bruto inkomen per periode (uit IKV's)."
-    dataOwner: fez.analist
+    dataOwner: finance.analyst
   - name: Huishouden
     displayName: "Huishouden"
     description: "Huishoudsamenstelling (uit BRP-spiegel) voor TW-toets."
   - name: Aggregaat
     displayName: "Aggregaat"
     description: "Geanonimiseerde geaggregeerde uitkeringslast per wet × regio × periode (UC-06)."
-    dataOwner: fez.analist
+    dataOwner: finance.analyst
 
   # CRM
   - name: Contact
     displayName: "Klantcontact"
     description: "Contactgebeurtenis tussen Cliënt en UWV (telefoon, balie, beeldbellen, mail)."
-    dataOwner: crm.medewerker
+    dataOwner: marketing.analyst
   - name: Kanaal
     displayName: "Kanaal"
     description: "Communicatiekanaal — telefoon, balie, beeldbellen, werkmap_bericht, mail."
-    dataOwner: crm.medewerker
+    dataOwner: marketing.analyst
 
   # Doelgroep
   - name: Doelgroepregister
@@ -126,9 +126,9 @@ terms:
       Afgeleid uit events in IKV, WW, ZW, WIA, Wajong en Contact. Eigenaar is
       divisie_klantcontact; OPA filtert per rol op kolom + rij.
     relatedTerms: [Client, IKV, Aanvraag, Beoordeling, Uitkering, Contact, Traject, Werkhervatting]
-    dataOwner: crm.medewerker
+    dataOwner: marketing.analyst
     reviewers:
-      - crm.medewerker
+      - marketing.analyst
       - data.steward
   - name: Fase
     displayName: "Klantreis-fase"

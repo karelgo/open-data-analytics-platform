@@ -37,8 +37,8 @@ met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
 
     ---
 
-    12 rollen met elk eigen handleiding: WIA-beoordelaar,
-    WW-handhaver, data-engineer, platform-admin, … Toegang en data-zichtbaarheid
+    12 rollen met elk eigen handleiding: Claims Analyst,
+    Fraud Analyst, data-engineer, platform-admin, … Toegang en data-zichtbaarheid
     komen uit OPA-policies en Keycloak-rollen.
 
     [:octicons-arrow-right-24: Bekijk rollen](rollen/index.md)

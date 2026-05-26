@@ -44,7 +44,7 @@ onveranderd (zie [ADR-0002](../adr/0002-iceberg-vs-delta.md)).
 
 Dit volgt 1-op-1 de rol-handleidingen:
 
-- **WIA-beoordelaar / Wajong-arbeidsdeskundige / etc.** → primair `gold`,
+- **Claims Analyst / Claims Analyst / etc.** → primair `gold`,
   beperkt `silver` (eigen domein). Geen `bronze`.
 - **Data-engineer** → `bronze` (JIT), `silver`, `gold`, `sensitive` (alleen
   via break-glass).

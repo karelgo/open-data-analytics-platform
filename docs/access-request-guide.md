@@ -33,7 +33,7 @@ Direct: `https://platform.odap.local:8443/access-request`.
 ## Wat is "toegang aanvragen" hier?
 
 Het ODAP platform gebruikt **default-deny** met doelbinding (R-AVG-06). Jouw
-primaire rol (`wia_beoordelaar`, `crm_medewerker`, `researcher`, …)
+primaire rol (`claims_analyst`, `marketing_analyst`, `researcher`, …)
 bepaalt welke catalogs/schemas je *standaard* mag zien. Als je daarnaast
 toegang nodig hebt tot een andere zone — bv. `gold.uc05_client_360` —
 loopt dat via deze flow:
@@ -61,7 +61,7 @@ toegang aan"**. Of direct: <https://platform.odap.local:8443/access-request>.
 | Veld | Wat je invult |
 |---|---|
 | **Welke dataset?** | OM-FQN — bv. `trino.gold.uc11_klantreis.mart_uc11_klantreis_events`. Vind 'm via OpenMetadata → Explore → klik op het asset → kopieer de FQN onder de titel. |
-| **Wie ben je?** | Je Keycloak-gebruikersnaam (eerste deel van je e-mail, bv. `researcher`, `fez.analist`). |
+| **Wie ben je?** | Je Keycloak-gebruikersnaam (eerste deel van je e-mail, bv. `researcher`, `finance.analyst`). |
 | **Voor welk doel?** | Kies een doelbinding (AVG art. 5 lid 1b). |
 | **Hoe lang?** | Optioneel — bv. "2 maanden, t/m 2026-08-01". |
 | **Motivatie** | Korte uitleg: project, waarom de bestaande aggregaten niet volstaan, etc. |
@@ -110,11 +110,11 @@ Grant na approval: realm-role `data_access:gold.uc11_klantreis`.
 > (admin kent de role handmatig toe). Een staging/silver-tabel uit
 > dezelfde catalog werkt nu wél foutloos via dezelfde grant.
 
-### Voorbeeld 2 — FEZ-analist wil bronze-data voor reconciliatie
+### Voorbeeld 2 — Finance Analyst wil bronze-data voor reconciliatie
 
 ```
 Asset:      trino.bronze.uwv.polisadm_ikv
-Requester:  fez.analist
+Requester:  finance.analyst
 Purpose:    kwaliteitscontrole
 Duration:   2 weken
 Motivation: Q2 bronze-reconciliatie — silver/gold-aggregaten checken

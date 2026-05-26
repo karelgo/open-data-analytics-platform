@@ -191,7 +191,7 @@ fi
 
 # 4. policy attribute voor MinIO consoleAdmin op demo-admins. NB: PUT
 #    moet email + enabled MEEsturen — partial body wist andere velden.
-for u in wia.beoordelaar platform.admin; do
+for u in claims.analyst platform.admin; do
   KCUID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/users?username=\$u\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
   [ -z \"\$KCUID\" ] && continue
   curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/users/\$KCUID\" \\
@@ -199,7 +199,7 @@ for u in wia.beoordelaar platform.admin; do
 done
 
 # 5. TOTP-requirement clearen voor demo-admins zodat eerste login simpel is
-for u in platform.admin wajong.arbeidsdeskundige data.engineer; do
+for u in platform.admin case.manager data.engineer; do
   KCUID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/users?username=\$u\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
   [ -z \"\$KCUID\" ] && continue
   curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/users/\$KCUID\" -d \"{\\\"username\\\":\\\"\$u\\\",\\\"email\\\":\\\"\$u@odap.local\\\",\\\"emailVerified\\\":true,\\\"enabled\\\":true,\\\"requiredActions\\\":[]}\" -o /dev/null

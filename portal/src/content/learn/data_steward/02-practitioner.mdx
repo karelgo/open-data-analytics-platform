@@ -100,13 +100,13 @@ Voor jou geen verdere actie hier, maar je hebt het wel gezien.
 
 Open
 [role_mappings.json](https://vscode.dev/github.com/UWV/UDP_Stackable/blob/main/opa-policies-src/data/role_mappings.json)
-in vscode.dev. Onder `roles.ww_handhaver.unmasked_columns` voeg je:
+in vscode.dev. Onder `roles.fraud_analyst.unmasked_columns` voeg je:
 
 ```json
 "silver.ww.aanvraag.werkgever_branchecode"
 ```
 
-Voor `crm_medewerker` is de kolom niet relevant — niet toevoegen. Default
+Voor `marketing_analyst` is de kolom niet relevant — niet toevoegen. Default
 is "niet zichtbaar" voor onbekende rollen, dat is bewust restrictief.
 
 ## Stap 6 — review afsluiten
@@ -117,7 +117,7 @@ Comment op de PR:
 Approved.
 Tags: bedrijfsdata, intern_gebruik
 Glossary: branchecode (SBI) — koppeling toegevoegd
-OPA: ww_handhaver krijgt unmasked toegang; andere rollen niet
+OPA: fraud_analyst krijgt unmasked toegang; andere rollen niet
 DQ: not_null + relationships geconfigureerd door @engineer
 ```
 

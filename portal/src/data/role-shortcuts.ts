@@ -44,35 +44,31 @@ export function toEmbedHref(s: Shortcut): string {
 }
 
 export const shortcuts: Record<RoleId, Shortcut[]> = {
-  wia_beoordelaar: [
-    { title: 'WIA Funnel dashboard', hint: 'Voorraad en doorlooptijden in jouw regio', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:wia-funnel)' },
-    { title: 'SQL Lab — open > 8 weken', hint: 'Wettelijke termijn-overschrijdingen', component: 'superset', href: 'https://superset.odap.local:8443/sqllab/' },
-    { title: 'Tabel: silver.wia.aanvraag', hint: 'Definities en eigenaren opzoeken', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/table/trino.silver.wia.aanvraag' },
+  claims_analyst: [
+    { title: 'Claims Funnel dashboard', hint: 'Backlog and lead-time in your region', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:claims-funnel)' },
+    { title: 'SQL Lab — claims open > 8 weeks', hint: 'Statutory deadline overruns', component: 'superset', href: 'https://superset.odap.local:8443/sqllab/' },
+    { title: 'Table: silver.claims.application', hint: 'Look up definitions and owners', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/table/trino.silver.claims.application' },
+    { title: 'Complex-case dashboard', hint: 'Sensitive zone — four-eyes required', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:uc02-complex-cases)' },
+    { title: 'Glossary: case-handling terms', hint: 'Definitions in one place', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/glossary' },
   ],
-  ww_handhaver: [
-    { title: 'WW Risk dashboard', hint: 'Risico-scores per dossier', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:ww-risk)' },
-    { title: 'Lineage WW-funnel', hint: 'Bron → silver → gold', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/lineage/trino.gold.uc03_ww_risk' },
+  fraud_analyst: [
+    { title: 'Fraud Risk dashboard', hint: 'Risk scores per case', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:fraud-risk)' },
+    { title: 'Lineage fraud funnel', hint: 'Source → silver → gold', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/lineage/trino.gold.uc03_fraud_risk' },
   ],
-  wajong_arbeidsdeskundige: [
-    { title: 'UC02 Wajong dashboard', hint: 'Reïntegratie-trajecten', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:uc02-wajong)' },
-    { title: 'Glossary: „participatie” termen', hint: 'Begrippen opéén plek', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/glossary' },
+  marketing_analyst: [
+    { title: 'Customer 360 (UC-05)', hint: 'PII visible, customer-contact purpose only', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:customer-360)' },
+    { title: 'Table: gold.uc05_customer_360', hint: 'Which columns you can see', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/table/trino.gold.uc05_customer_360' },
+    { title: 'Eligibility outreach worklist', hint: 'UC-04 — opt-out filtered', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:uc04-outreach)' },
+    { title: 'Purpose & opt-out', hint: 'Rules that apply to proactive outreach', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/glossary/term/proactive_outreach' },
   ],
-  crm_medewerker: [
-    { title: 'Klant 360 (UC-05)', hint: 'BSN gemaskeerd, alleen klantcontact-doel', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:client-360)' },
-    { title: 'Tabel: gold.uc05_client_360', hint: 'Welke kolommen je ziet', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/table/trino.gold.uc05_client_360' },
+  finance_analyst: [
+    { title: 'Cost forecast (UC-06)', hint: 'Aggregated cost figures, no PII', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:uc06-forecast)' },
+    { title: 'Table: gold.uc06_forecast', hint: 'Definitions + owner', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/table/trino.gold.uc06_forecast' },
+    { title: 'ODAP Lab — ad-hoc analysis', hint: 'Notebook with polars/pandas on gold aggregates', component: 'jupyter', href: 'https://jupyter.odap.local:8443' },
   ],
-  fez_analist: [
-    { title: 'Lastprognose (UC-06)', hint: 'Geaggregeerde uitkeringen, geen PII', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:uc06-lastprognose)' },
-    { title: 'Tabel: gold.uc06_lastprognose', hint: 'Definities + eigenaar', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/table/trino.gold.uc06_lastprognose' },
-    { title: 'ODAP Lab — ad-hoc analyse', hint: 'Notebook met polars/pandas op gold-aggregaten', component: 'jupyter', href: 'https://jupyter.odap.local:8443' },
-  ],
-  smz_planner: [
-    { title: 'SMZ Capaciteitsplanning', hint: 'UC-08 — geen cliënt-PII', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:uc08-smz)' },
-    { title: 'Glossary: spreekuur-typen', hint: 'Welke planning-categorieën bestaan', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/glossary' },
-  ],
-  proactief_dienstverlener: [
-    { title: 'TW-eligibility werklijst', hint: 'UC-04 — opt-out gefilterd', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:uc04-tw)' },
-    { title: 'Doelbinding & opt-out', hint: 'Welke regels gelden voor proactief contact', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/glossary/term/proactieve_dienstverlening' },
+  operations_manager: [
+    { title: 'Capacity planning', hint: 'UC-08 — no customer PII', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:uc08-capacity)' },
+    { title: 'Glossary: planning types', hint: 'Which planning categories exist', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/glossary' },
   ],
   researcher: [
     { title: 'ODAP Lab (notebooks)', hint: 'Jupyter + Trino + Delta — research op sandbox-data, versioneer met Git', component: 'jupyter', href: 'https://jupyter.odap.local:8443' },

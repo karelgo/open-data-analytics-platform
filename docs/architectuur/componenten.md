@@ -110,7 +110,7 @@ Streaming + batch jobs die Delta-tabellen op MinIO schrijven.
 SQL query-engine over Delta-lakehouse, met OPA-authorisatie.
 
 - **URL:** _geen UI_
-- **Gebruikt door:** `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`, `fez_analist`, `smz_planner`, `proactief_dienstverlener`, `researcher`, `data_steward`, `data_engineer`, `platform_admin`
+- **Gebruikt door:** `claims_analyst`, `fraud_analyst`, `claims_analyst`, `finance_analyst`, `operations_manager`, `marketing_analyst`, `researcher`, `data_steward`, `data_engineer`, `platform_admin`
 
 ### OPA { #opa }
 
@@ -138,7 +138,7 @@ _Eindgebruikers consumeren via dashboards en SQL._
 Dashboards en SQL Lab — primaire UI voor de meeste eindgebruikers.
 
 - **URL:** [Live UI ↗](https://superset.odap.local:8443)
-- **Gebruikt door:** `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`, `crm_medewerker`, `fez_analist`, `smz_planner`, `proactief_dienstverlener`, `researcher`, `data_steward`, `platform_admin`
+- **Gebruikt door:** `claims_analyst`, `fraud_analyst`, `claims_analyst`, `marketing_analyst`, `finance_analyst`, `operations_manager`, `marketing_analyst`, `researcher`, `data_steward`, `platform_admin`
 
 ### ODAP Lab (Jupyter) { #jupyter }
 
@@ -150,7 +150,7 @@ Dashboards en SQL Lab — primaire UI voor de meeste eindgebruikers.
 Notebook-werkomgeving — Python/SQL op bronze/silver/gold/sensitive, met Git-integratie.
 
 - **URL:** [Live UI ↗](https://jupyter.odap.local:8443)
-- **Gebruikt door:** `researcher`, `data_engineer`, `data_steward`, `wajong_arbeidsdeskundige`, `fez_analist`, `platform_admin`
+- **Gebruikt door:** `researcher`, `data_engineer`, `data_steward`, `claims_analyst`, `finance_analyst`, `platform_admin`
 
 ### Power BI { #powerbi }
 
@@ -162,7 +162,7 @@ Notebook-werkomgeving — Python/SQL op bronze/silver/gold/sensitive, met Git-in
 Dashboards en self-service exploration via Microsoft Fabric / Power BI (eigen Azure-tenant SSO).
 
 - **URL:** [Live UI ↗](https://app.fabric.microsoft.com)
-- **Gebruikt door:** `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`, `crm_medewerker`, `fez_analist`, `smz_planner`, `proactief_dienstverlener`, `researcher`, `data_analyst`, `data_steward`, `platform_admin`
+- **Gebruikt door:** `claims_analyst`, `fraud_analyst`, `claims_analyst`, `marketing_analyst`, `finance_analyst`, `operations_manager`, `marketing_analyst`, `researcher`, `data_analyst`, `data_steward`, `platform_admin`
 
 ## Data Discovery
 
@@ -178,7 +178,7 @@ _Catalog, lineage en data-kwaliteit — wat hebben we eigenlijk?_
 Catalog, glossary, lineage, data-quality.
 
 - **URL:** [Live UI ↗](https://openmetadata.odap.local:8443)
-- **Gebruikt door:** `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`, `crm_medewerker`, `fez_analist`, `smz_planner`, `researcher`, `data_steward`, `data_engineer`, `platform_admin`
+- **Gebruikt door:** `claims_analyst`, `fraud_analyst`, `claims_analyst`, `marketing_analyst`, `finance_analyst`, `operations_manager`, `researcher`, `data_steward`, `data_engineer`, `platform_admin`
 
 ### dbt docs { #dbt-docs }
 
@@ -286,13 +286,13 @@ directe toegang nodig heeft (toegang kan alsnog via JIT/break-glass).
 
 | Rol | keycloak | nifi | kafka | minio | hive | spark | trino | opa | superset | openmetadata | dbt-docs | jupyter | airflow | prometheus | grafana | opensearch | multica | powerbi | nanitics |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `wia_beoordelaar` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  | ✓ |  |
-| `ww_handhaver` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  | ✓ |  |
-| `wajong_arbeidsdeskundige` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  | ✓ |  |  |  |  |  | ✓ |  |
-| `crm_medewerker` | ✓ |  |  |  |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |  | ✓ |  |
-| `fez_analist` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  | ✓ |  |  |  |  |  | ✓ |  |
-| `smz_planner` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  | ✓ |  |
-| `proactief_dienstverlener` | ✓ |  |  |  |  |  | ✓ |  | ✓ |  |  |  |  |  |  |  |  | ✓ |  |
+| `claims_analyst` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  | ✓ |  |
+| `fraud_analyst` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  | ✓ |  |
+| `claims_analyst` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  | ✓ |  |  |  |  |  | ✓ |  |
+| `marketing_analyst` | ✓ |  |  |  |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |  | ✓ |  |
+| `finance_analyst` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  | ✓ |  |  |  |  |  | ✓ |  |
+| `operations_manager` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  | ✓ |  |
+| `marketing_analyst` | ✓ |  |  |  |  |  | ✓ |  | ✓ |  |  |  |  |  |  |  |  | ✓ |  |
 | `researcher` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ |  | ✓ |  |  |  |  |  | ✓ |  |
 | `data_steward` | ✓ |  |  |  |  |  | ✓ |  | ✓ | ✓ | ✓ | ✓ |  |  |  | ✓ |  | ✓ |  |
 | `data_engineer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  | ✓ | ✓ | ✓ | ✓ |  | ✓ |  | ✓ |  | ✓ |

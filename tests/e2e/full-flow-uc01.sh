@@ -18,7 +18,7 @@
 #   - bronze.uwv.persona_created bevat ≥10k rijen met test-bereik BSN's   (smoke 03)
 #   - bronze.uwv.wia_aanvraag bestaat                                     (smoke 03 generic)
 #   - OPA weigert bsn-query op uc05 zonder purpose                        (smoke 08)
-#   - OPA maskeert BSN voor crm_medewerker                                (smoke 08)
+#   - OPA maskeert BSN voor marketing_analyst                                (smoke 08)
 #   - Superset Trino-database geregistreerd                               (smoke 06)
 #   - OpenMetadata classifications + glossary aanwezig                    (smoke 07)
 #

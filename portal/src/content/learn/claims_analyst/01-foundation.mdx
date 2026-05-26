@@ -1,6 +1,6 @@
 ---
-title: "Het platform voor de WIA-beoordelaar"
-role: wia_beoordelaar
+title: "Het platform voor de Claims Analyst"
+role: claims_analyst
 level: foundation
 order: 1
 duration: "20 min"
@@ -13,14 +13,14 @@ labs:
     hint: "Wat betekent welke kolom, wie is eigenaar?"
     href: "/go/openmetadata/"
 quiz:
-  - q: "Welke catalogs mag een WIA-beoordelaar direct queryen?"
+  - q: "Welke catalogs mag een Claims Analyst direct queryen?"
     options:
       - "alleen bronze"
       - "silver en gold (eigen regio voor PII-kolommen)"
       - "alle catalogs, mits met TICKET-id"
       - "alleen sensitive"
     correct: 1
-    explain: "Je werkt op silver.wia (geconformeerd) en gold.uc01_wia_funnel (sturing). Bronze is voor data-engineers; sensitive voor de Wajong-arbeidsdeskundige."
+    explain: "Je werkt op silver.wia (geconformeerd) en gold.uc01_wia_funnel (sturing). Bronze is voor data-engineers; sensitive voor de Claims Analyst."
   - q: "Wat doet de OPA-policy in Trino voor jouw rol?"
     options:
       - "Hij encrypt je query voor verzending"

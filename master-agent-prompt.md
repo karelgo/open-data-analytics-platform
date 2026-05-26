@@ -368,7 +368,7 @@ odap-data-platform/
 
 ### Fase 1 — Cluster bootstrap
 1. Helm install: cert-manager, ingress-nginx (of listener-operator), Prometheus stack, MinIO, PostgreSQL, Keycloak met ODAP realm.
-2. **Keycloak realm**: rollen `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`, `crm_medewerker`, `fez_analist`, `data_steward`, `data_engineer`, `platform_admin`. Mock-users per rol.
+2. **Keycloak realm**: rollen `claims_analyst`, `fraud_analyst`, `claims_analyst`, `marketing_analyst`, `finance_analyst`, `data_steward`, `data_engineer`, `platform_admin`. Mock-users per rol.
 3. `stackablectl operator install --release-file infrastructure/stackablectl/release.yaml`.
 
 ### Fase 2 — Foundation services
@@ -419,7 +419,7 @@ odap-data-platform/
 1. Schrijf alle Rego-policies in `opa-policies-src/trino/`. **Belangrijk**:
    - Doelbinding-policy implementeert R-AVG-05 en R-AVG-06 uit het requirements-document.
    - Column masks voor BSN, diagnose, bankrekening (R-AVG-07, R-BIO-11).
-   - Row filters per regio voor WIA-beoordelaars.
+   - Row filters per regio voor Claims Analysts.
 2. **OPA-tests** — CI faalt bij failure.
 3. Build naar ConfigMap, activeer in TrinoCluster.
 4. **Smoke test** `tests/smoke/03-opa-decision.sh`.
@@ -547,7 +547,7 @@ afweging in een markdown blok (opties + voor/tegen + voorstel) en wacht op input
 - [ ] Superset toont dashboard "WIA Funnel" voor rol `data_steward` met 7 dagen synthetische data.
 - [ ] OpenMetadata toont end-to-end lineage: synthetische bron → dbt-model → Superset chart.
 - [ ] OPA weigert query op `client_360.bsn` voor rol zonder doel "uitkering".
-- [ ] OPA maskeert BSN voor `crm_medewerker`.
+- [ ] OPA maskeert BSN voor `marketing_analyst`.
 - [ ] dbt-test `bsn_valid` faalt op een ingespoten ongeldige BSN-record.
 - [ ] OpenMetadata toont voor elke gold-tabel: eigenaar, doelbinding-tag, classificatie, bewaartermijn.
 - [ ] `docs/compliance-mapping.md` mappt elk R-NORA-xx, R-AVG-xx, R-BIO-xx, R-NIS2-xx uit het requirements-document op een concreet bestand/setting.

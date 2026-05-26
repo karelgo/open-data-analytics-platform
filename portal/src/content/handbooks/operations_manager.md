@@ -1,9 +1,9 @@
 ---
-title: "Handleiding — SMZ-planner"
-role: smz_planner
+title: "Handleiding — Operations Manager"
+role: operations_manager
 ---
 
-> Rol-key: `smz_planner` · Domein: Sociaal-medische zaken · Risiconiveau toegang: laag (geen cliënt-PII)
+> Rol-key: `operations_manager` · Domein: Sociaal-medische zaken · Risiconiveau toegang: laag (geen cliënt-PII)
 
 Deze handleiding is voor **planners die SMZ-capaciteit beheren**:
 verzekeringsartsen, arbeidsdeskundigen, roosters en wachttijden. Je werkt
@@ -152,6 +152,6 @@ teamleider — geen BSN's, alleen aggregaten.
 
 ---
 
-**Vorige:** [05-fez-analist.md](05-fez-analist.md) ·
-**Volgende:** [07-proactief-dienstverlener.md](07-proactief-dienstverlener.md) ·
+**Vorige:** [05-finance-analyst.md](05-finance-analyst.md) ·
+**Volgende:** [07-marketing-analyst.md](07-marketing-analyst.md) ·
 **Index:** [README.md](README.md)

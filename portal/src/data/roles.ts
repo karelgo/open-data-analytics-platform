@@ -1,17 +1,15 @@
-// Rol-metadata: leesbare naam, domein, link naar handleiding.
-// Capability-data (catalogs/PII/medisch) wordt geladen uit
-// role-mappings.generated.json (gegenereerd uit opa-policies-src).
+// Role metadata: human-readable name, domain, link to handbook.
+// Capability data (catalogs/PII/medical) is loaded from
+// role-mappings.generated.json (generated from opa-policies-src).
 
 import roleMappings from './role-mappings.generated.json';
 
 export type RoleId =
-  | 'wia_beoordelaar'
-  | 'ww_handhaver'
-  | 'wajong_arbeidsdeskundige'
-  | 'crm_medewerker'
-  | 'fez_analist'
-  | 'smz_planner'
-  | 'proactief_dienstverlener'
+  | 'claims_analyst'
+  | 'fraud_analyst'
+  | 'marketing_analyst'
+  | 'finance_analyst'
+  | 'operations_manager'
   | 'researcher'
   | 'data_steward'
   | 'data_engineer'
@@ -22,24 +20,22 @@ export interface RoleMeta {
   displayName: string;
   domain: string;
   category: 'business' | 'tech';
-  // Portal-pad naar de gebundelde rol-handleiding (zie
-  // portal/src/pages/handbooks/[role].astro). Sync'ed door
-  // portal/scripts/sync-handleidingen.mjs vanuit docs/handbooks/.
-  handleidingPath: string;
+  // Portal path to the bundled role handbook (see
+  // portal/src/pages/handbooks/[role].astro). Synced by
+  // portal/scripts/sync-handbooks.mjs from docs/handbooks/.
+  handbookPath: string;
 }
 
 export const roles: RoleMeta[] = [
-  { id: 'wia_beoordelaar',          displayName: 'WIA-beoordelaar',          domain: 'AG / WIA',           category: 'business', handleidingPath: 'handbooks/wia_beoordelaar/' },
-  { id: 'ww_handhaver',             displayName: 'WW-handhaver',             domain: 'WW',                 category: 'business', handleidingPath: 'handbooks/ww_handhaver/' },
-  { id: 'wajong_arbeidsdeskundige', displayName: 'Wajong-arbeidsdeskundige', domain: 'AG / Wajong',        category: 'business', handleidingPath: 'handbooks/wajong_arbeidsdeskundige/' },
-  { id: 'crm_medewerker',           displayName: 'CRM-medewerker',           domain: 'CRM / Klantcontact', category: 'business', handleidingPath: 'handbooks/crm_medewerker/' },
-  { id: 'fez_analist',              displayName: 'FEZ-analist',              domain: 'Financiën',          category: 'business', handleidingPath: 'handbooks/fez_analist/' },
-  { id: 'smz_planner',              displayName: 'SMZ-planner',              domain: 'Sociaal-medisch',    category: 'business', handleidingPath: 'handbooks/smz_planner/' },
-  { id: 'proactief_dienstverlener', displayName: 'Proactief dienstverlener', domain: 'TW (proactief)',     category: 'business', handleidingPath: 'handbooks/proactief_dienstverlener/' },
-  { id: 'researcher',               displayName: 'Researcher',               domain: 'Onderzoek (sandbox)',category: 'business', handleidingPath: 'handbooks/researcher/' },
-  { id: 'data_steward',             displayName: 'Data-steward',             domain: 'Governance',         category: 'tech',     handleidingPath: 'handbooks/data_steward/' },
-  { id: 'data_engineer',            displayName: 'Data-engineer',            domain: 'Pipelines',          category: 'tech',     handleidingPath: 'handbooks/data_engineer/' },
-  { id: 'platform_admin',           displayName: 'Platform-admin',           domain: 'Cluster / security', category: 'tech',     handleidingPath: 'handbooks/platform_admin/' },
+  { id: 'claims_analyst',     displayName: 'Claims Analyst',     domain: 'Claims',             category: 'business', handbookPath: 'handbooks/claims_analyst/' },
+  { id: 'fraud_analyst',      displayName: 'Fraud Analyst',      domain: 'Risk & Compliance',  category: 'business', handbookPath: 'handbooks/fraud_analyst/' },
+  { id: 'marketing_analyst',  displayName: 'Marketing Analyst',  domain: 'Customer 360',       category: 'business', handbookPath: 'handbooks/marketing_analyst/' },
+  { id: 'finance_analyst',    displayName: 'Finance Analyst',    domain: 'Finance',            category: 'business', handbookPath: 'handbooks/finance_analyst/' },
+  { id: 'operations_manager', displayName: 'Operations Manager', domain: 'Operations',         category: 'business', handbookPath: 'handbooks/operations_manager/' },
+  { id: 'researcher',         displayName: 'Researcher',         domain: 'Research (sandbox)', category: 'business', handbookPath: 'handbooks/researcher/' },
+  { id: 'data_steward',       displayName: 'Data Steward',       domain: 'Governance',         category: 'tech',     handbookPath: 'handbooks/data_steward/' },
+  { id: 'data_engineer',      displayName: 'Data Engineer',      domain: 'Pipelines',          category: 'tech',     handbookPath: 'handbooks/data_engineer/' },
+  { id: 'platform_admin',     displayName: 'Platform Admin',     domain: 'Cluster / security', category: 'tech',     handbookPath: 'handbooks/platform_admin/' },
 ];
 
 export interface RoleCapability {

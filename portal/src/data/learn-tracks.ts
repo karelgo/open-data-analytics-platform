@@ -22,19 +22,17 @@ export interface TrackMeta {
   oneLiner: string;
 }
 
-// Korte zin per rol — staat boven de track op /learn/<rol>/.
+// One-liner per role — shown above the track on /learn/<role>/.
 export const tracks: TrackMeta[] = [
-  { role: 'wia_beoordelaar',          oneLiner: 'WIA-aanvragen beoordelen met dashboards en doelbinding-bewuste queries.' },
-  { role: 'ww_handhaver',             oneLiner: 'WW-risk-signalen interpreteren binnen de grenzen van handhavingsdoel.' },
-  { role: 'wajong_arbeidsdeskundige', oneLiner: 'Wajong-dossiers en AI-uitkomsten beoordelen met menselijke regie.' },
-  { role: 'crm_medewerker',           oneLiner: 'Klantbeeld opbouwen zonder onnodige PII-exposure.' },
-  { role: 'fez_analist',              oneLiner: 'Schadelast en lastprognose analyseren op gemodelleerde marts.' },
-  { role: 'smz_planner',              oneLiner: 'Sociaal-medische capaciteitsplanning op geaggregeerde data.' },
-  { role: 'proactief_dienstverlener', oneLiner: 'Proactief contact met inzage- en opt-out-discipline.' },
-  { role: 'researcher',               oneLiner: 'Onderzoek doen op gepseudonimiseerde sandbox-zones.' },
-  { role: 'data_steward',             oneLiner: 'Data-kwaliteit, lineage en classificaties bewaken.' },
-  { role: 'data_engineer',            oneLiner: 'Pipelines bouwen van bron tot mart, met tests en lineage.' },
-  { role: 'platform_admin',           oneLiner: 'Cluster, identity en operators beheren — incl. break-glass.' },
+  { role: 'claims_analyst',     oneLiner: 'Review claims with dashboards and purpose-limitation-aware queries.' },
+  { role: 'fraud_analyst',      oneLiner: 'Interpret fraud-risk signals within enforcement-purpose limits.' },
+  { role: 'marketing_analyst',  oneLiner: 'Build customer 360 views without unnecessary PII exposure.' },
+  { role: 'finance_analyst',    oneLiner: 'Analyse cost and forecast on modelled finance marts.' },
+  { role: 'operations_manager', oneLiner: 'Capacity planning on aggregated operational data.' },
+  { role: 'researcher',         oneLiner: 'Run research on pseudonymised sandbox zones.' },
+  { role: 'data_steward',       oneLiner: 'Govern data quality, lineage, and classifications.' },
+  { role: 'data_engineer',      oneLiner: 'Build pipelines from source to mart, with tests and lineage.' },
+  { role: 'platform_admin',     oneLiner: 'Operate cluster, identity, and operators — incl. break-glass.' },
 ];
 
 export function trackFor(role: RoleId): TrackMeta | undefined {

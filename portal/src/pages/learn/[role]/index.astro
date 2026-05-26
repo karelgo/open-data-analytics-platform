@@ -39,7 +39,7 @@ const byLevel = new Map(levels.map((l) => [l.id, all.filter((m) => m.data.level 
   <p class="muted">
     Domein: <strong>{meta.domain}</strong>.
     Categorie: <strong>{meta.category === 'tech' ? 'platform-team' : 'eindgebruiker'}</strong>.
-    Achtergrond: <a href={`/${meta.handleidingPath}`}>rol-handleiding</a>.
+    Achtergrond: <a href={`/${meta.handbookPath}`}>rol-handleiding</a>.
   </p>
 
   {levels.map((lvl) => {
