@@ -1,7 +1,7 @@
 # OpenSearch ILM-policy (improvements #15).
 #
-# Index Lifecycle Management voor `uwv-logs-*` indices: 7 dagen hot, 23 dagen
-# warm, daarna delete. Voor audit-logs (`uwv-logs-audit-*`) houden we 7 jaar.
+# Index Lifecycle Management voor `logs-*` indices: 7 dagen hot, 23 dagen
+# warm, daarna delete. Voor audit-logs (`logs-audit-*`) houden we 7 jaar.
 #
 # Wordt eenmalig toegepast via een Job na OpenSearch-bootstrap.
 ---
@@ -9,12 +9,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: opensearch-ilm-policies
-  namespace: uwv-meta
+  namespace: odap-meta
 data:
   app-logs-policy.json: |
     {
       "policy": {
-        "description": "UWV-platform app-logs: 7d hot, 23d warm, delete na 30d",
+        "description": "ODAP platform app-logs: 7d hot, 23d warm, delete na 30d",
         "default_state": "hot",
         "states": [
           {
@@ -38,7 +38,7 @@ data:
           }
         ],
         "ism_template": [
-          {"index_patterns": ["uwv-logs-*"], "priority": 50}
+          {"index_patterns": ["logs-*"], "priority": 50}
         ]
       }
     }
@@ -46,7 +46,7 @@ data:
   audit-logs-policy.json: |
     {
       "policy": {
-        "description": "UWV-platform audit-logs: 30d hot, daarna 7 jaar warm (R-BIO-20).",
+        "description": "ODAP platform audit-logs: 30d hot, daarna 7 jaar warm (R-BIO-20).",
         "default_state": "hot",
         "states": [
           {
@@ -67,7 +67,7 @@ data:
           }
         ],
         "ism_template": [
-          {"index_patterns": ["uwv-logs-audit-*"], "priority": 100}
+          {"index_patterns": ["logs-audit-*"], "priority": 100}
         ]
       }
     }
@@ -77,16 +77,16 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: opensearch-ilm-bootstrap
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: opensearch-ilm
+    odap.io/component: opensearch-ilm
 spec:
   ttlSecondsAfterFinished: 3600
   backoffLimit: 3
   template:
     metadata:
       labels:
-        uwv.nl/component: opensearch-ilm
+        odap.io/component: opensearch-ilm
     spec:
       restartPolicy: OnFailure
       containers:
@@ -95,7 +95,7 @@ spec:
           command: ["sh", "-euo", "pipefail", "-c"]
           args:
             - |
-              OS_URL="http://opensearch-uwv.uwv-meta.svc.cluster.local:9200"
+              OS_URL="http://opensearch.odap-meta.svc.cluster.local:9200"
 
               echo "Wachten op OpenSearch (max 5 min)..."
               for i in $(seq 1 60); do
@@ -104,12 +104,12 @@ spec:
               done
 
               echo "Apply app-logs ILM"
-              curl -fsS -X PUT "$OS_URL/_plugins/_ism/policies/uwv-app-logs" \
+              curl -fsS -X PUT "$OS_URL/_plugins/_ism/policies/app-logs" \
                 -H "Content-Type: application/json" \
                 -d @/policies/app-logs-policy.json
 
               echo "Apply audit-logs ILM"
-              curl -fsS -X PUT "$OS_URL/_plugins/_ism/policies/uwv-audit-logs" \
+              curl -fsS -X PUT "$OS_URL/_plugins/_ism/policies/audit-logs" \
                 -H "Content-Type: application/json" \
                 -d @/policies/audit-logs-policy.json
 

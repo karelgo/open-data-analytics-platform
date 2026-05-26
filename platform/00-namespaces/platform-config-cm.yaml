@@ -19,9 +19,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: platform-config
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    app.kubernetes.io/part-of: uwv-platform
+    app.kubernetes.io/part-of: odap-platform
     app.kubernetes.io/component: platform-config
 data:
   # ---- Table format ----
@@ -29,28 +29,28 @@ data:
 
   # ---- Catalog backend ----
   CATALOG_BACKEND: "hive_metastore"
-  HIVE_METASTORE_URI: "thrift://uwv-hive-metastore:9083"
+  HIVE_METASTORE_URI: "thrift://hive-metastore:9083"
 
   # ---- Object store ----
   OBJECT_STORE: "minio"
-  S3_ENDPOINT: "http://minio.uwv-platform.svc.cluster.local:9000"
+  S3_ENDPOINT: "http://minio.odap-platform.svc.cluster.local:9000"
 
   # ---- Bucket layout ----
-  BUCKET_RAW: "uwv-raw"
-  BUCKET_BRONZE: "uwv-bronze"
-  BUCKET_SILVER: "uwv-silver"
-  BUCKET_GOLD: "uwv-gold"
-  BUCKET_SENSITIVE: "uwv-sensitive"
-  BUCKET_STAGING: "uwv-staging"
-  BUCKET_CHECKPOINTS: "uwv-checkpoints"
-  BUCKET_META: "uwv-meta"
+  BUCKET_RAW: "odap-raw"
+  BUCKET_BRONZE: "odap-bronze"
+  BUCKET_SILVER: "odap-silver"
+  BUCKET_GOLD: "odap-gold"
+  BUCKET_SENSITIVE: "sensitive"
+  BUCKET_STAGING: "odap-staging"
+  BUCKET_CHECKPOINTS: "odap-checkpoints"
+  BUCKET_META: "odap-meta"
 
   # ---- Paths derived from buckets (convenient for jobs) ----
-  RAW_PATH: "s3a://uwv-raw/"
-  BRONZE_PATH: "s3a://uwv-bronze/"
-  SILVER_PATH: "s3a://uwv-silver/"
-  GOLD_PATH: "s3a://uwv-gold/"
-  CHECKPOINTS_PATH: "s3a://uwv-checkpoints/streaming"
+  RAW_PATH: "s3a://odap-raw/"
+  BRONZE_PATH: "s3a://odap-bronze/"
+  SILVER_PATH: "s3a://odap-silver/"
+  GOLD_PATH: "s3a://odap-gold/"
+  CHECKPOINTS_PATH: "s3a://odap-checkpoints/streaming"
 
   # ---- Region tag (metadata only, not a cloud region) ----
   REGION: "eu-nl-1"

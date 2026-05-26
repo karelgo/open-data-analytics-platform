@@ -8,7 +8,7 @@ init-job, CronJobs) 401's krijgen. Werkbaar pad voor "rotation" is daarom:
      (genereert nieuwe encrypted JWT in user_entity.json).
   2. Deze CronJob leest de huidige encrypted JWT uit Postgres,
      decrypt'm met de OM-fernet-key, en patcht het K8s-secret
-     `openmetadata-admin.jwtToken` in zowel uwv-meta als uwv-platform.
+     `openmetadata-admin.jwtToken` in zowel odap-meta als odap-platform.
 
 Dit garandeert dat de K8s-secret altijd in sync is met de actieve token
 in OM. Het is geen "echte" rotatie (OM moet 'm zelf re-issuen), maar het
@@ -17,14 +17,14 @@ sluit de gap dat een nieuwe token in OM niet vanzelf bij Airflow landt.
 Voor productie: External Secrets Operator + Vault dynamic-secret backend.
 
 Env-vars:
-  POSTGRES_HOST       postgres-postgresql.uwv-data.svc.cluster.local (default)
+  POSTGRES_HOST       postgres-postgresql.odap-data.svc.cluster.local (default)
   POSTGRES_USER       postgres (default)
   POSTGRES_PASSWORD   <secret> — uit postgres-postgresql.password
   POSTGRES_DB         openmetadata (default)
   OM_FERNET_KEY       <secret> — uit openmetadata-fernetkey-secret
   BOT_USERNAME        ingestion-bot (default)
-  K8S_SECRET_NS       uwv-meta (primary)
-  K8S_MIRROR_NS       uwv-platform (KPO consumer)
+  K8S_SECRET_NS       odap-meta (primary)
+  K8S_MIRROR_NS       odap-platform (KPO consumer)
 """
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ from cryptography.fernet import Fernet, MultiFernet
 BOT = os.environ.get("BOT_USERNAME", "ingestion-bot")
 
 PG_HOST = os.environ.get(
-    "POSTGRES_HOST", "postgres-postgresql.uwv-data.svc.cluster.local"
+    "POSTGRES_HOST", "postgres-postgresql.odap-data.svc.cluster.local"
 )
 PG_USER = os.environ.get("POSTGRES_USER", "postgres")
 PG_PASS = os.environ["POSTGRES_PASSWORD"]
@@ -49,8 +49,8 @@ PG_DB = os.environ.get("POSTGRES_DB", "openmetadata")
 FERNET_KEY = os.environ["OM_FERNET_KEY"]
 
 SECRET_NAME = os.environ.get("K8S_SECRET_NAME", "openmetadata-admin")
-SECRET_NS = os.environ.get("K8S_SECRET_NS", "uwv-meta")
-MIRROR_NS = os.environ.get("K8S_MIRROR_NS", "uwv-platform")
+SECRET_NS = os.environ.get("K8S_SECRET_NS", "odap-meta")
+MIRROR_NS = os.environ.get("K8S_MIRROR_NS", "odap-platform")
 SECRET_KEY = os.environ.get("K8S_SECRET_KEY", "jwtToken")
 
 KUBE_HOST = "https://kubernetes.default.svc"

@@ -77,7 +77,7 @@ Stackable levert **Kubernetes-operators** voor open-source data-componenten. Gee
 - **dbt-utils + dbt-expectations**: kant-en-klare test-libraries.
 - **Docs**: `dbt docs generate` produceert `manifest.json`, `catalog.json`, `run_results.json` — exact wat OpenMetadata nodig heeft.
 
-**UWV-mapping**: dbt wordt de **transformation-laag tussen bronze en silver/gold**. CGM-conformiteit wordt afgedwongen via dbt-tests + naming-conventies + tags.
+**platform mapping**: dbt wordt de **transformation-laag tussen bronze en silver/gold**. CGM-conformiteit wordt afgedwongen via dbt-tests + naming-conventies + tags.
 
 ### 1.3 OpenMetadata 1.12+
 
@@ -177,9 +177,9 @@ Stackable levert **Kubernetes-operators** voor open-source data-componenten. Gee
 │  ┌──────────────────────────────▼─────────────────────────────────────┐   │
 │  │ MinIO (S3-compatible)                                              │   │
 │  │ Buckets:                                                           │   │
-│  │   uwv-bronze   • uwv-silver   • uwv-gold                           │   │
-│  │   uwv-sensitive (medisch, art. 9 AVG)                              │   │
-│  │   uwv-staging  • uwv-checkpoints                                   │   │
+│  │   odap-bronze   • odap-silver   • odap-gold                           │   │
+│  │   sensitive (medisch, art. 9 AVG)                              │   │
+│  │   odap-staging  • odap-checkpoints                                   │   │
 │  │ Iceberg-tabellen, partitioned by event_date, etc.                  │   │
 │  └──────────────────────────────┬─────────────────────────────────────┘   │
 │                                 │                                        │
@@ -216,7 +216,7 @@ Stackable levert **Kubernetes-operators** voor open-source data-componenten. Gee
 │  └──────┬────────┘            └──────────────────┘      └──────┬────────┘│
 │         │                                                       │        │
 │         │ manifest.json + catalog.json + run_results.json       │        │
-│         │ uploaded to s3://uwv-meta/dbt/                        │        │
+│         │ uploaded to s3://odap-meta/dbt/                        │        │
 │         └───────────────────────────────────────────────────────┘        │
 │                                                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐   │
@@ -233,7 +233,7 @@ Stackable levert **Kubernetes-operators** voor open-source data-componenten. Gee
 │  ┌─── Cross-cutting ─────────────────────────────────────────────────┐   │
 │  │ • Keycloak (OIDC) — federated identity, mock SUWI-rollen         │   │
 │  │ • OPA (Stackable OpaCluster)                                      │   │
-│  │   - bundle: trino-base + uwv-doelbinding + uwv-roles + masks      │   │
+│  │   - bundle: trino-base + purpose-limitation + platform-roles + masks      │   │
 │  │ • Secret Operator + cert-manager — TLS rotation                   │   │
 │  │ • Listener Operator — service exposure                            │   │
 │  │ • Vector — log aggregation (Stackable native)                     │   │

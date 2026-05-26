@@ -7,7 +7,7 @@
 | AVG-grondslag | Voornamelijk geanonimiseerd → buiten AVG-scope |
 | Bewaartermijn | 10 jaar (begroting/realisatie) |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-06](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-06](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 

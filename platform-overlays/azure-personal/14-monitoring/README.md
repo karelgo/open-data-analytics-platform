@@ -1,9 +1,9 @@
 # azure-personal/14-monitoring
 
 Test-overlay voor de alert-email-pijp tegen een eigen Azure-tenant —
-in dit geval `freshminds.nl` / `dev-stackable-rg` / `uwv-acs`. Bedoeld
+in dit geval `freshminds.nl` / `dev-stackable-rg` / `acs`. Bedoeld
 om te bewijzen dat Alertmanager → Azure Communication Services Email →
-echte inbox werkt, zonder een UWV-SMTP-relay nodig te hebben.
+echte inbox werkt, zonder een Platform SMTP relay nodig te hebben.
 
 ## Hoe het verschilt van de andere overlays
 
@@ -19,10 +19,10 @@ dat de Azure-route werkt.
 
 ## Eenmalig: Azure-resources + Entra-app
 
-Resources `uwv-emailcs` (Email Communication Services + AzureManaged
-sender-domain) en `uwv-acs` (Communication Services) zijn al aangemaakt
+Resources `emailcs` (Email Communication Services + AzureManaged
+sender-domain) en `acs` (Communication Services) zijn al aangemaakt
 in `dev-stackable-rg`. Voor SMTP-auth is nog een Entra-app + client-
-secret + Contributor-rol op `uwv-acs` nodig.
+secret + Contributor-rol op `acs` nodig.
 
 ### Optie A — CLI (als Graph wél bereikbaar is)
 
@@ -43,7 +43,7 @@ portal-MFA-flow voldoet wél aan de policy, dus daar pak je het op.
 
 [Entra ID → App registrations → + New registration](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade)
 
-- **Name**: `uwv-platform-alertmanager-smtp`
+- **Name**: `odap-platform-alertmanager-smtp`
 - **Supported account types**: *Accounts in this organizational directory only (single tenant)*
 - **Redirect URI**: leeg
 - → **Register**
@@ -60,14 +60,14 @@ Description `alertmanager-smtp`, expiry 12 maanden, **Add**.
 Kopieer **direct** de waarde uit de kolom **Value** (NIET *Secret ID*) —
 die verdwijnt na page-refresh.
 
-**B.3 — Contributor-rol op `uwv-acs`**
+**B.3 — Contributor-rol op `acs`**
 
-[dev-stackable-rg → uwv-acs](https://portal.azure.com/#@freshminds.nl/resource/subscriptions/4910a5a6-aec6-405d-9294-c7f2845512a4/resourceGroups/dev-stackable-rg/providers/Microsoft.Communication/communicationServices/uwv-acs/overview) →
+[dev-stackable-rg → acs](https://portal.azure.com/#@freshminds.nl/resource/subscriptions/4910a5a6-aec6-405d-9294-c7f2845512a4/resourceGroups/dev-stackable-rg/providers/Microsoft.Communication/communicationServices/acs/overview) →
 **Access control (IAM) → + Add → Add role assignment**:
 
 - Role tab: zoek `Contributor` → select → Next.
 - Members tab: *User, group, or service principal* → **+ Select members** →
-  typ `uwv-platform-alertmanager-smtp` → select → Select.
+  typ `odap-platform-alertmanager-smtp` → select → Select.
 - Review + assign → Review + assign.
 
 **B.4 — Finaliseer in repo**
@@ -79,7 +79,7 @@ bash scripts/azure/setup-acs-email-test.sh \
 ```
 
 Script slaat alle Graph-calls over en doet alleen:
-- SMTP-username samenstellen (`uwv-acs.<app-id>.<tenant-id>`)
+- SMTP-username samenstellen (`acs.<app-id>.<tenant-id>`)
 - `alertmanager-add-acs.yaml` patchen met die username
 - k8s-Secret `alertmanager-receivers` patchen met `smtp_password_acs`
 
@@ -98,9 +98,9 @@ make alert-test
 
 Verwacht:
 
-- **MailHog**: `https://mailhog.uwv-platform.local:8443/` → mail #1
+- **MailHog**: `https://mailhog.odap.local:8443/` → mail #1
 - **Echte inbox**: `karel.goense@freshminds.nl` → subject begint met
-  `[ACS-test FIRING] UwvSyntheticTestAlert`
+  `[ACS-test FIRING] SyntheticTestAlert`
 
 Beide binnen ~30s.
 
@@ -108,7 +108,7 @@ Beide binnen ~30s.
 
 ```bash
 # Alertmanager-logs (zoekt naar SMTP-fouten)
-kubectl -n uwv-monitoring logs -l app.kubernetes.io/name=alertmanager \
+kubectl -n odap-monitoring logs -l app.kubernetes.io/name=alertmanager \
   --tail=200 | grep -iE 'smtp|tls'
 
 # Verifieer dat de overlay correct rendered
@@ -116,7 +116,7 @@ kubectl kustomize platform-overlays/azure-personal/14-monitoring/ \
   | grep -A 10 'smtp.azurecomm.net'
 
 # Check dat secret-key bestaat
-kubectl -n uwv-monitoring get secret alertmanager-receivers \
+kubectl -n odap-monitoring get secret alertmanager-receivers \
   -o jsonpath='{.data.smtp_password_acs}' | base64 -d | wc -c
 ```
 
@@ -127,7 +127,7 @@ Veelvoorkomende fouten:
 | `535 5.7.139 SMTP AUTH failed` | client-secret in k8s-Secret komt niet overeen met Entra-app. Re-run het script. |
 | `550 5.7.1 Sender address is not authorized` | `from:`-domain wijkt af van de Azure-managed-domain. Check `alertmanager-add-acs.yaml`. |
 | `Unable to connect to smtp.azurecomm.net:587` | Egress-firewall blokkeert SMTP-uitgaand op 587. Test met `kubectl run -it --rm test --image=busybox -- nc -vz smtp.azurecomm.net 587`. |
-| Alert komt in MailHog maar niet in Azure-inbox | Het Entra-app heeft de Contributor-rol nog niet op `uwv-acs`. `az role assignment list --assignee <app-id> --scope <acs-id>`. |
+| Alert komt in MailHog maar niet in Azure-inbox | Het Entra-app heeft de Contributor-rol nog niet op `acs`. `az role assignment list --assignee <app-id> --scope <acs-id>`. |
 
 ## Cost
 
@@ -142,7 +142,7 @@ kubectl delete -k platform-overlays/azure-personal/14-monitoring/
 
 # Of nuke alle Azure-resources
 az group delete --name dev-stackable-rg --yes  # ALS er niets anders in zit
-az communication delete   --name uwv-acs       --resource-group dev-stackable-rg --yes
-az communication email delete --name uwv-emailcs --resource-group dev-stackable-rg --yes
-az ad app delete --id "$(az ad app list --display-name uwv-platform-alertmanager-smtp --query '[0].appId' -o tsv)"
+az communication delete   --name acs       --resource-group dev-stackable-rg --yes
+az communication email delete --name emailcs --resource-group dev-stackable-rg --yes
+az ad app delete --id "$(az ad app list --display-name odap-platform-alertmanager-smtp --query '[0].appId' -o tsv)"
 ```

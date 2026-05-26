@@ -23,15 +23,15 @@ WORKSPACE_PATH = "/workspace"
 WORKSPACE_REPO = "/workspace/repo"
 
 # CA-bundle voor uitgaande TLS-calls (Trino, Keycloak, OM).
-CA_VOLUME = "uwv-ca"
-CA_MOUNT = "/etc/uwv-ca"
+CA_VOLUME = "platform-ca"
+CA_MOUNT = "/etc/platform-ca"
 
 # OpenMetadata service-/workflow-YAMLs (configMapGenerator in
 # platform/13-openmetadata-config/kustomization.yaml). Verwacht in dezelfde
-# namespace waar de KPO draait — bootstrap kopieert hem naar uwv-platform.
+# namespace waar de KPO draait — bootstrap kopieert hem naar odap-platform.
 OM_CONFIG_VOLUME = "om-config"
 OM_CONFIG_MOUNT = "/config"
-OM_CONFIG_CM_NAME = "openmetadata-uwv-config"
+OM_CONFIG_CM_NAME = "openmetadata-platform-config"
 
 
 def workspace_volume() -> V1Volume:
@@ -45,7 +45,7 @@ def workspace_mount() -> V1VolumeMount:
 def ca_volume() -> V1Volume:
     return V1Volume(
         name=CA_VOLUME,
-        config_map=V1ConfigMapVolumeSource(name="uwv-ca-bundle"),
+        config_map=V1ConfigMapVolumeSource(name="platform-ca-bundle"),
     )
 
 

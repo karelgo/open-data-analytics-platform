@@ -4,7 +4,7 @@
 # original slice 4 commit; flipped on once the watcher → Multica path
 # was verified end-to-end. To pause without redeploying:
 #
-#   kubectl -n uwv-platform patch cronjob nanitics-watcher-cron \
+#   kubectl -n odap-platform patch cronjob nanitics-watcher-cron \
 #     -p '{"spec":{"suspend":true}}'
 #
 # Cadence: every 30 min by default. concurrencyPolicy=Forbid means a
@@ -18,7 +18,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nanitics-watcher-cron-body
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   # Body POSTed to /run/watcher by each cron tick. Kept in a ConfigMap so
   # operators can tweak the prompt without rebuilding the image or
@@ -32,7 +32,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: nanitics-watcher-cron
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   suspend: false
   schedule: "*/30 * * * *"
@@ -69,7 +69,7 @@ spec:
                     -H 'Content-Type: application/json' \
                     --max-time 540 \
                     --data @/etc/watcher/body.json \
-                    http://nanitics-observatory.uwv-platform.svc.cluster.local/run/watcher \
+                    http://nanitics-observatory.odap-platform.svc.cluster.local/run/watcher \
                     | tee /dev/stderr
               volumeMounts:
                 - name: body

@@ -1,6 +1,6 @@
 """Persoon-generator met geldige test-BSN's (11-proef, 9-prefix).
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 
 Test-BSN's beginnen met '9'. BRP geeft die niet uit aan natuurlijke personen.
 Elke BSN doorstaat de 11-proef (zie `is_valid_bsn`).

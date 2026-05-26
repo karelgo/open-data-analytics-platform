@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 5 lid 1b (verenigbaar gebruik voor wetenschappelijk/statistisch doel) |
 | Bewaartermijn | Zo lang als nodig voor de studie + publicatie-archief |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-09](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-09](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 
@@ -21,7 +21,7 @@ werken voor welke doelgroep?
 
 Causale-inferentie analyses (quasi-experimentele methoden, propensity score
 matching) op effectiviteit per instrument × doelgroep. Resultaten gepubliceerd
-in `uwv.nl/kennis`.
+in `odap.io/kennis`.
 
 ## Data
 
@@ -44,7 +44,7 @@ silver.reint.traject + silver.polisadm.werkstatus + silver.demografie_pseudo
    mart_uc09_effect_panel.sql (gepseudonimiseerd panel, no re-id)
                         │
                         ▼
-   sandbox MinIO bucket: uwv-sandbox/uc09/
+   sandbox MinIO bucket: sandbox/uc09/
                         │
                         ▼
    Jupyter / SparkApplication: causalml-pipelines (DoWhy, propensity scoring)
@@ -57,7 +57,7 @@ silver.reint.traject + silver.polisadm.werkstatus + silver.demografie_pseudo
 
 UC-09 draait in een **aparte zone** met striktere regels:
 
-- Eigen MinIO-bucket `uwv-sandbox` (schaduw van silver, alleen pseudo-IDs).
+- Eigen MinIO-bucket `sandbox` (schaduw van silver, alleen pseudo-IDs).
 - Eigen Trino-schema `sandbox.uc09_*`.
 - Geen herleidbaarheid naar individu via key-lookup; pseudo-ID is
   one-way-hash + zout.
@@ -72,11 +72,11 @@ meta:
   doelbinding: [statistisch_onderzoek]
   bio_classificatie: intern
   bewaartermijn_jaren: 10  # studie-archief
-  eigenaar: kenniscentrum_uwv
+  eigenaar: knowledge_center
   pii_kolommen: [bsn_pseudo]   # alleen pseudo
   risk_tier: laag
   sandbox_only: true
-  publicatie_doel: uwv.nl/kennis
+  publicatie_doel: odap.io/kennis
 ```
 
 ## OPA-policies

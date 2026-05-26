@@ -2,20 +2,20 @@
 ---
 source:
   type: airflow
-  serviceName: uwv-airflow
+  serviceName: airflow
   serviceConnection:
     config:
       type: Airflow
-      hostPort: http://uwv-airflow-webserver.uwv-platform.svc.cluster.local:8080
+      hostPort: http://airflow-webserver.odap-platform.svc.cluster.local:8080
       connection:
         # OM 1.5 BackendConnection vereist dat de ingest-pod IN dezelfde
         # Airflow-context draait (gebruikt Airflow's eigen DB-config). Wij
         # draaien een aparte KPO-pod, dus directe PostgresConnection.
         type: Postgres
-        username: uwvplatform
+        username: odap
         authType:
           password: ${AIRFLOW_DB_PW}
-        hostPort: postgres-postgresql.uwv-data.svc.cluster.local:5432
+        hostPort: postgres-postgresql.odap-data.svc.cluster.local:5432
         database: airflow
   sourceConfig:
     config:
@@ -27,7 +27,7 @@ sink:
 workflowConfig:
   loggerLevel: INFO
   openMetadataServerConfig:
-    hostPort: http://openmetadata.uwv-meta.svc.cluster.local:8585/api
+    hostPort: http://openmetadata.odap-meta.svc.cluster.local:8585/api
     authProvider: openmetadata
     securityConfig:
       jwtToken: ${OM_JWT_TOKEN}

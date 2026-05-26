@@ -130,8 +130,8 @@ jobs:
       - name: Dump pod-status bij failure
         if: failure() && env.SKIP_DEPLOY != 'true'
         run: |
-          echo "::group::Pods across UWV namespaces"
-          for ns in uwv-platform uwv-auth uwv-data uwv-meta ingress-nginx; do
+          echo "::group::Pods across platform namespaces"
+          for ns in odap-platform odap-auth odap-data odap-meta ingress-nginx; do
             echo "--- $ns ---"
             kubectl -n "$ns" get pods -o wide 2>/dev/null || true
           done

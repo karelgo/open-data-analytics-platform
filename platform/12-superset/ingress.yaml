@@ -6,12 +6,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: superset
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: superset
-    app.kubernetes.io/instance: uwv-superset
+    app.kubernetes.io/instance: superset
   ports:
     - name: http
       port: 8088
@@ -21,9 +21,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: superset
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     # Superset (Flask-AppBuilder) bouwt OAuth redirect_uri vanuit
     # request-context via ProxyFix. ingress-nginx stuurt X-Forwarded-Proto
     # en X-Forwarded-Host standaard, maar geen X-Forwarded-Port. K3d mapt
@@ -37,14 +37,14 @@ metadata:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header X-Forwarded-Port 8443;
       proxy_hide_header X-Frame-Options;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["superset.uwv-platform.local"]
+    - hosts: ["superset.odap.local"]
       secretName: superset-tls
   rules:
-    - host: superset.uwv-platform.local
+    - host: superset.odap.local
       http:
         paths:
           - path: /

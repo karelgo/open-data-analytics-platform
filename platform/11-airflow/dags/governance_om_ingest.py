@@ -5,7 +5,7 @@ sequentiële taken. Trino-catalog eerst (anders heeft dbt-ingest geen tabel
 om aan te koppelen), dan dbt-artifacts (lineage + meta).
 
 Zie docs/adr/0007-airflow-pipeline-architecture.md.
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations

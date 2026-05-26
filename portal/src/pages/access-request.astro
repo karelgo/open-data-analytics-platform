@@ -11,7 +11,7 @@ import Eyebrow from '../components/primitives/Eyebrow.astro';
 // grant uitvoert. Volledige doc: docs/access-request-guide.md.
 
 // Bekende doelbindingen — moet sporen met de purposes in
-// resource_purposes (opa-policies-src/data/uwv_role_mappings.json).
+// resource_purposes (opa-policies-src/data/role_mappings.json).
 const purposes = [
   { id: 'klantcontact',        label: 'Klantcontact (UC-05)' },
   { id: 'behandeling',         label: 'Behandeling van aanvraag (UC-04, UC-07)' },
@@ -24,12 +24,12 @@ const purposes = [
 
 // Voorbeeld-assets om de gebruiker op weg te helpen. Echte asset-lookup
 // gebeurt server-side in de bridge (GET /api/v1/tables/name/<fqn>).
-// OM registreert de Trino-service als 'uwv-trino' — dat is de eerste
+// OM registreert de Trino-service als 'trino' — dat is de eerste
 // FQN-segment.
 const sampleAssets = [
-  'uwv-trino.gold.uc11_klantreis.mart_uc11_klantreis_events',
-  'uwv-trino.gold.uwv.polisadm_ikv',
-  'uwv-trino.bronze.uwv.crm_contact',
+  'trino.gold.uc11_klantreis.mart_uc11_klantreis_events',
+  'trino.gold.uwv.polisadm_ikv',
+  'trino.bronze.uwv.crm_contact',
 ];
 ---
 <ShellLayout title="Toegang aanvragen" activeSection="workspace">
@@ -60,14 +60,14 @@ const sampleAssets = [
           name="asset_fqn"
           type="text"
           required
-          placeholder="uwv-trino.gold.uc11_klantreis.mart_uc11_klantreis_events"
+          placeholder="trino.gold.uc11_klantreis.mart_uc11_klantreis_events"
           list="ar-asset-suggestions"
         />
         <datalist id="ar-asset-suggestions">
           {sampleAssets.map((a) => <option value={a}></option>)}
         </datalist>
         <small class="ar-hint">
-          Formaat: <code>uwv-trino.&lt;catalog&gt;.&lt;schema&gt;.&lt;table&gt;</code>.
+          Formaat: <code>trino.&lt;catalog&gt;.&lt;schema&gt;.&lt;table&gt;</code>.
           Vind 'm in <a href="/go/openmetadata" target="_blank" rel="noopener noreferrer">OpenMetadata → Explore → Tables ↗</a>.
         </small>
       </div>

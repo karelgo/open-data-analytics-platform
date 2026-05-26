@@ -1,5 +1,5 @@
 {
-  "name": "uwv-platform-portal",
+  "name": "odap-platform-portal",
   "version": "0.1.0",
   "private": true,
   "description": "Rol-aware launchpad + architectuurkaart voor het UWV Referentie Data- en Analyseplatform.",

@@ -46,7 +46,7 @@ laat de bijbehorende purposes uit `resource_purposes` automatisch toe.
 ./build-and-load.sh
 
 # Bootstrap secrets (eenmalig — zie secret.yaml voor uitleg):
-kubectl -n uwv-platform create secret generic om-access-bridge-secret \
+kubectl -n odap-platform create secret generic om-access-bridge-secret \
   --from-literal=KEYCLOAK_CLIENT_SECRET='<...>' \
   --from-literal=OM_WEBHOOK_SECRET='<32-bytes-random>' \
   --dry-run=client -o yaml | kubectl apply -f -
@@ -59,7 +59,7 @@ kubectl apply -k .
 Eén keer per cluster. Vanuit een pod met OM-token:
 
 ```bash
-curl -X POST http://openmetadata.uwv-meta.svc.cluster.local:8585/api/v1/events/subscriptions \
+curl -X POST http://openmetadata.odap-meta.svc.cluster.local:8585/api/v1/events/subscriptions \
   -H "Authorization: Bearer ${OM_JWT_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -67,7 +67,7 @@ curl -X POST http://openmetadata.uwv-meta.svc.cluster.local:8585/api/v1/events/s
     "alertType": "Notification",
     "subscriptionType": "Generic",
     "subscriptionConfig": {
-      "endpoint": "http://om-access-bridge.uwv-platform.svc.cluster.local/webhooks/om",
+      "endpoint": "http://om-access-bridge.odap-platform.svc.cluster.local/webhooks/om",
       "secretKey": "<must match OM_WEBHOOK_SECRET>"
     },
     "filteringRules": {

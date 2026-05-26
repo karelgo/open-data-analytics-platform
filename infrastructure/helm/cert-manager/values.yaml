@@ -1,6 +1,6 @@
 # cert-manager — scaled-down profiel voor k3d
 #
-# Levert TLS certificates voor alle UWV-platform services. Self-signed CA
+# Levert TLS certificates voor alle ODAP platform services. Self-signed CA
 # voor dev. Productie zou Let's Encrypt of een interne PKI gebruiken.
 #
 # Chart: jetstack/cert-manager

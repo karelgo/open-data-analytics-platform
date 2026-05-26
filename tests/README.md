@@ -24,8 +24,8 @@ Doorgenummerd `01`..`09`, in volgorde van afhankelijkheid:
 | 05 | [airflow-up](smoke/05-airflow-up.sh) | Airflow scheduler healthy, DAGs geparseerd. |
 | 06 | [superset-up](smoke/06-superset-up.sh) | Superset init-Job complete, Trino-database geregistreerd. |
 | 07 | [openmetadata-up](smoke/07-openmetadata-up.sh) | Classifications + glossary geladen. |
-| 08 | [opa-decisions](smoke/08-opa-decisions.sh) | OPA-decisions kloppen met de UWV-policies. |
-| 09 | [portal-up](smoke/09-portal-up.sh) | UWV Platform Portal bereikbaar achter oauth2-proxy. |
+| 08 | [opa-decisions](smoke/08-opa-decisions.sh) | OPA-decisions kloppen met de platform policies. |
+| 09 | [portal-up](smoke/09-portal-up.sh) | ODAP Portal bereikbaar achter oauth2-proxy. |
 
 ```bash
 make smoke                 # alle smoke tests

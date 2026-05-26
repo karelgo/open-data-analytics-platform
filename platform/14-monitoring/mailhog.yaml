@@ -4,17 +4,17 @@
 # web-UI op 8025 waar je alle alerts ziet die Alertmanager zou versturen.
 # In productie (AKS) wordt deze namespace-resource verwijderd door de
 # platform-overlays/aks/14-monitoring/ overlay en wijst Alertmanager
-# naar de echte UWV-SMTP-relay.
+# naar de echte Platform SMTP relay.
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mailhog
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   labels:
     app.kubernetes.io/name: mailhog
     app.kubernetes.io/component: dev-smtp-sink
-    uwv.nl/dev-only: "true"
+    odap.io/dev-only: "true"
 spec:
   replicas: 1
   selector:
@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/name: mailhog
         app.kubernetes.io/component: dev-smtp-sink
-        uwv.nl/dev-only: "true"
+        odap.io/dev-only: "true"
     spec:
       securityContext:
         runAsNonRoot: true
@@ -76,10 +76,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mailhog
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   labels:
     app.kubernetes.io/name: mailhog
-    uwv.nl/dev-only: "true"
+    odap.io/dev-only: "true"
 spec:
   type: ClusterIP
   selector:
@@ -94,24 +94,24 @@ spec:
       targetPort: http
       protocol: TCP
 ---
-# Web-UI op https://mailhog.uwv-platform.local:8443/ — devs kunnen daar
+# Web-UI op https://mailhog.odap.local:8443/ — devs kunnen daar
 # alle alerts inspecteren die Alertmanager zou versturen.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mailhog
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
   labels:
-    uwv.nl/dev-only: "true"
+    odap.io/dev-only: "true"
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["mailhog.uwv-platform.local"]
+    - hosts: ["mailhog.odap.local"]
       secretName: mailhog-tls
   rules:
-    - host: mailhog.uwv-platform.local
+    - host: mailhog.odap.local
       http:
         paths:
           - path: /

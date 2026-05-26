@@ -27,7 +27,7 @@ fi
 
 log "Render wrapped test-data (Stackable bundle-pad)"
 python3 "$ROOT/scripts/opa-test-data-wrap.py" \
-        --dst /tmp/uwv-opa-test-data.json >/dev/null \
+        --dst /tmp/opa-test-data.json >/dev/null \
   || fail "data-wrapper render gefaald"
 
 log "opa test op UC-11 row-filter + column-mask regels"
@@ -35,7 +35,7 @@ log "opa test op UC-11 row-filter + column-mask regels"
 # opa test exit non-zero bij eventuele fails — bewust niet propageren;
 # we filteren hieronder explicit op UC-11 tests.
 opa test "$ROOT/opa-policies-src/trino/" \
-         /tmp/uwv-opa-test-data.json -v \
+         /tmp/opa-test-data.json -v \
   > /tmp/opa-test-uc11.log 2>&1 || true
 
 # Alle vier UC-11-specifieke tests moeten slagen met wrapped data.

@@ -1,7 +1,7 @@
 /* Auto-generated door scripts/docs_gen.py.
    Aanpassingen overleven niet — wijzig in de generator. */
 
-/* UWV-amber accent override op het Material amber-palet zodat het exact de
+/* platform-amber accent override op het Material amber-palet zodat het exact de
    portal-amber matcht (oklch(0.78 0.18 76) in de portal tokens). */
 :root {
   --md-primary-fg-color:        #d68f00;

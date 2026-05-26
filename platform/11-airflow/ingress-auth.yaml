@@ -17,28 +17,28 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: airflow-auth
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header X-Forwarded-Port 8443;
       proxy_set_header X-Forwarded-Prefix /airflow/auth;
       proxy_hide_header X-Frame-Options;
       proxy_hide_header Content-Security-Policy;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["platform.uwv-platform.local"]
+    - hosts: ["platform.odap.local"]
       secretName: airflow-platform-tls
   rules:
-    - host: platform.uwv-platform.local
+    - host: platform.odap.local
       http:
         paths:
           - path: /airflow/auth
             pathType: Prefix
             backend:
               service:
-                name: uwv-airflow-webserver
+                name: airflow-webserver
                 port:
                   number: 8080

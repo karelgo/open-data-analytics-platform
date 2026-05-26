@@ -1,7 +1,7 @@
-# platform/15-portal — UWV Platform Portal
+# platform/15-portal — ODAP Portal
 
 Rol-aware launchpad + architectuurkaart + UDP Academy (certificeringstracks),
-bereikbaar op **`https://platform.uwv-platform.local`** na `make deploy-platform`.
+bereikbaar op **`https://platform.odap.local`** na `make deploy-platform`.
 
 ## UDP Academy
 
@@ -17,7 +17,7 @@ Zonder de backend werkt alles op localStorage; voortgang is dan per browser.
 ### Keycloak service-account
 
 De backend praat met Keycloak admin-API via `client_id=portal-backend`
-(zie [realm-uwv.json](../../infrastructure/helm/keycloak/realm-uwv.json)).
+(zie [realm.json](../../infrastructure/helm/keycloak/realm.json)).
 
 Eenmalig na realm-import: ken `realm-management:manage-users` toe aan het
 service-account user:
@@ -59,26 +59,26 @@ Browser ── ingress-nginx ──► Service portal:80
 
 - **oauth2-proxy** ([`configmap-oauth2-proxy.yaml`](configmap-oauth2-proxy.yaml))
   praat met Keycloak via een _split-URL-patroon_:
-  - `oidc_issuer_url` is de **externe** URL (`https://keycloak.uwv-platform.local`)
-    omdat Keycloak met `proxy: edge` + `hostname: keycloak.uwv-platform.local`
+  - `oidc_issuer_url` is de **externe** URL (`https://keycloak.odap.local`)
+    omdat Keycloak met `proxy: edge` + `hostname: keycloak.odap.local`
     draait — issuer-claim in tokens is altijd de externe URL.
   - `redeem_url`, `profile_url`, `oidc_jwks_url` zijn de **in-cluster** URL
-    (`http://keycloak.uwv-auth.svc.cluster.local`) zodat de pod ze kan bereiken
-    zonder `keycloak.uwv-platform.local` te hoeven resolveren.
+    (`http://keycloak.odap-auth.svc.cluster.local`) zodat de pod ze kan bereiken
+    zonder `keycloak.odap.local` te hoeven resolveren.
 - **nginx-unprivileged** serveert de Astro-dist op `:8080` en proxy't
-  `/api/status/up?job=…` door naar `prometheus-server.uwv-monitoring.svc`
+  `/api/status/up?job=…` door naar `prometheus-server.odap-monitoring.svc`
   voor de live status-badges.
 - **Realm-client `portal`** wordt gedeployd via
-  [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json).
+  [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json).
   Secrets staan in [`secret.yaml`](secret.yaml) (DEV-ONLY).
 
 ## Image bouwen
 
 ```bash
 # vanuit repo-root
-docker build -f portal/Dockerfile -t uwv-platform/portal:dev .
-# Cluster-naam = $CLUSTER_NAME uit Makefile (default: uwv-platform).
-k3d image import uwv-platform/portal:dev -c uwv-platform
+docker build -f portal/Dockerfile -t odap/portal:dev .
+# Cluster-naam = $CLUSTER_NAME uit Makefile (default: odap-platform).
+k3d image import odap/portal:dev -c odap-platform
 ```
 
 ## Smoke

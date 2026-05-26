@@ -3,15 +3,15 @@
 Eén DAG die UC-11 op een verse cluster volledig operationeel maakt:
 
   1. ensure_streaming_bronze    — apply streaming-bronze SparkApplication
-                                  (Spark file source: leest s3a://uwv-raw/)
+                                  (Spark file source: leest s3a://odap-raw/)
   2. ensure_seed                — kick `seed-data-generation` Job die
-                                  JSONL-files naar s3a://uwv-raw/ schrijft
+                                  JSONL-files naar s3a://odap-raw/ schrijft
   3. wait_for_bronze            — poll bronze.uwv.persona_created tot
                                   Spark-streaming de eerste batch schreef
   4. silver_* (parallel)        — trigger alle silver-staging DAGs
   5. gold_uc11_klantreis        — bouwt int_klantreis_events + 2 marts
   6. render_dbt_manifest        — dbt parse + upload (OM-compat strip) naar
-                                  s3://uwv-meta/dbt/latest/
+                                  s3://odap-meta/dbt/latest/
   7. governance_om_ingest       — Trino-catalog, dbt-lineage, Superset,
                                   Airflow — alle ingest-stappen
   8. om_cleanup_duplicates      — verwijder bronze/silver uc11_klantreis
@@ -23,7 +23,7 @@ Eén DAG die UC-11 op een verse cluster volledig operationeel maakt:
 
 Idempotent: kan onbeperkt worden hergedraaid op dezelfde cluster.
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -86,8 +86,8 @@ def _py_pod(
     is de default-SA voldoende.
     """
     env_vars: list[V1EnvVar] = [
-        V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/uwv-ca/ca.crt"),
-        V1EnvVar(name="SSL_CERT_FILE", value="/etc/uwv-ca/ca.crt"),
+        V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/platform-ca/ca.crt"),
+        V1EnvVar(name="SSL_CERT_FILE", value="/etc/platform-ca/ca.crt"),
     ]
     if om_jwt:
         env_vars.append(secret_env("OM_JWT_TOKEN", "openmetadata-admin", "jwtToken"))
@@ -96,7 +96,7 @@ def _py_pod(
 
     kwargs = dict(
         task_id=task_id,
-        namespace="uwv-platform",
+        namespace="odap-platform",
         image=_PY_IMAGE,
         cmds=["python3", "-c"],
         arguments=[script],
@@ -131,7 +131,7 @@ except Exception as e:
     raise
 ctx = ssl.create_default_context(cafile="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 HDR = {"Authorization": f"Bearer {SA_TOKEN}", "Content-Type":"application/json"}
-NS = "uwv-platform"
+NS = "odap-platform"
 
 # Skip de read-step; doe gewoon POST en accepteer 409 (AlreadyExists) als idempotent OK.
 # Apply minimaal SparkApplication-manifest. spark-streaming-jobs ConfigMap
@@ -139,8 +139,8 @@ NS = "uwv-platform"
 body = {
     "apiVersion":"spark.stackable.tech/v1alpha1","kind":"SparkApplication",
     "metadata":{"name":"streaming-bronze","namespace":NS,
-                "labels":{"uwv.nl/component":"streaming-bronze",
-                          "uwv.nl/triggered-by":"uc11_full_setup"}},
+                "labels":{"odap.io/component":"streaming-bronze",
+                          "odap.io/triggered-by":"uc11_full_setup"}},
     "spec":{
         "sparkImage":{"productVersion":"3.5.8"},
         "mode":"cluster",
@@ -164,7 +164,7 @@ body = {
             "config":{"resources":{"cpu":{"min":"100m","max":"500m"},
                                    "memory":{"limit":"1Gi"}}},
             "volumeMounts":[{"name":"jobs","mountPath":"/stackable/spark/jobs"}],
-            "envOverrides":{"TABLE_FORMAT":"delta","RAW_PATH":"s3a://uwv-raw/"},
+            "envOverrides":{"TABLE_FORMAT":"delta","RAW_PATH":"s3a://odap-raw/"},
         },
         "executor":{
             "replicas":1,
@@ -201,7 +201,7 @@ with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as f:
     SA_TOKEN = f.read().strip()
 ctx = ssl.create_default_context(cafile="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 HDR = {"Authorization": f"Bearer {SA_TOKEN}", "Content-Type":"application/json"}
-NS = "uwv-platform"
+NS = "odap-platform"
 
 # Check of seed-data-generation Job recent gedraaid heeft.
 url = f"{KAPI}/apis/batch/v1/namespaces/{NS}/jobs/seed-data-generation"
@@ -240,7 +240,7 @@ print("seed nog niet gedraaid — run `make seed` eerst, of zet "
 WAIT_FOR_BRONZE_SCRIPT = """
 import json, ssl, time, urllib.request
 ctx = ssl._create_unverified_context()
-url = "https://uwv-trino-coordinator.uwv-platform.svc.cluster.local:8443/v1/statement"
+url = "https://trino-coordinator.odap-platform.svc.cluster.local:8443/v1/statement"
 
 def trino(sql):
     req = urllib.request.Request(url, data=sql.encode(),
@@ -287,11 +287,11 @@ raise SystemExit(1)
 RENDER_MANIFEST_SCRIPT = """
 import json, os, io, ssl, sys, subprocess, urllib.request
 # Run dbt parse via subprocess — dbt-trino image heeft het ingebakken.
-# Profiles + project staan op /opt/uwv/dbt.
-os.chdir("/opt/uwv/dbt")
-os.environ["DBT_PROFILES_DIR"] = "/opt/uwv/dbt"
+# Profiles + project staan op /opt/odap/dbt.
+os.chdir("/opt/odap/dbt")
+os.environ["DBT_PROFILES_DIR"] = "/opt/odap/dbt"
 subprocess.run(["dbt","parse","--no-partial-parse"], check=False)
-with open("/opt/uwv/dbt/target/manifest.json") as f:
+with open("/opt/odap/dbt/target/manifest.json") as f:
     m = json.load(f)
 # OM 1.5.7 dbt_artifacts_parser is strict — strip newer dbt fields.
 for k in ("invocation_started_at","run_started_at","quoting","send_anonymous_usage_stats"):
@@ -302,11 +302,11 @@ data = json.dumps(m).encode()
 import boto3, urllib3
 urllib3.disable_warnings()
 s3 = boto3.client("s3",
-    endpoint_url="https://minio.uwv-platform.svc.cluster.local:9000",
+    endpoint_url="https://minio.odap-platform.svc.cluster.local:9000",
     aws_access_key_id=os.environ["MINIO_ACCESS_KEY"],
     aws_secret_access_key=os.environ["MINIO_SECRET_KEY"],
     verify=False)
-s3.put_object(Bucket="uwv-meta", Key="dbt/latest/manifest.json", Body=data)
+s3.put_object(Bucket="odap-meta", Key="dbt/latest/manifest.json", Body=data)
 print(f"manifest uploaded: {len(data)} bytes", flush=True)
 """
 
@@ -323,8 +323,8 @@ print(f"manifest uploaded: {len(data)} bytes", flush=True)
 
 RENDER_MANIFEST_DBT_SCRIPT = """
 set -eu -o pipefail
-cd /opt/uwv/dbt
-export DBT_PROFILES_DIR=/opt/uwv/dbt
+cd /opt/odap/dbt
+export DBT_PROFILES_DIR=/opt/odap/dbt
 echo "=== dbt parse ==="
 dbt parse --no-partial-parse || echo "(parse warnings — manifest mag wel bestaan)"
 test -s target/manifest.json || { echo "manifest niet aangemaakt"; exit 1; }
@@ -341,11 +341,11 @@ data = json.dumps(m).encode()
 import boto3, urllib3
 urllib3.disable_warnings()
 s3 = boto3.client("s3",
-    endpoint_url="https://minio.uwv-platform.svc.cluster.local:9000",
+    endpoint_url="https://minio.odap-platform.svc.cluster.local:9000",
     aws_access_key_id=os.environ["MINIO_ACCESS_KEY"],
     aws_secret_access_key=os.environ["MINIO_SECRET_KEY"],
     verify=False)
-s3.put_object(Bucket="uwv-meta", Key="dbt/latest/manifest.json", Body=data)
+s3.put_object(Bucket="odap-meta", Key="dbt/latest/manifest.json", Body=data)
 print(f"manifest uploaded: {len(data)} bytes")
 PY
 """
@@ -353,7 +353,7 @@ PY
 
 CLEANUP_DUPS_SCRIPT = """
 import json, os, urllib.parse, urllib.request, urllib.error
-OM = "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+OM = "http://openmetadata.odap-meta.svc.cluster.local:8585"
 JWT = os.environ["OM_JWT_TOKEN"]
 HDR = {"Authorization": f"Bearer {JWT}"}
 
@@ -375,15 +375,15 @@ def del_by_fqn(kind, fqn):
         print(f"  ! delete {fqn}: {e.code}", flush=True)
 
 for fqn in [
-    "uwv-trino.bronze.uc11_klantreis.mart_uc11_klantreis_events",
-    "uwv-trino.bronze.uc11_klantreis.mart_uc11_klantreis_phases",
-    "uwv-trino.silver.uc11_klantreis.mart_uc11_klantreis_events",
-    "uwv-trino.silver.uc11_klantreis.mart_uc11_klantreis_phases",
+    "trino.bronze.uc11_klantreis.mart_uc11_klantreis_events",
+    "trino.bronze.uc11_klantreis.mart_uc11_klantreis_phases",
+    "trino.silver.uc11_klantreis.mart_uc11_klantreis_events",
+    "trino.silver.uc11_klantreis.mart_uc11_klantreis_phases",
 ]:
     del_by_fqn("tables", fqn)
 for fqn in [
-    "uwv-trino.bronze.uc11_klantreis",
-    "uwv-trino.silver.uc11_klantreis",
+    "trino.bronze.uc11_klantreis",
+    "trino.silver.uc11_klantreis",
 ]:
     del_by_fqn("databaseSchemas", fqn)
 """
@@ -400,7 +400,7 @@ with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as f:
 import ssl
 ctx = ssl.create_default_context(cafile="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 HDR = {"Authorization": f"Bearer {SA_TOKEN}", "Content-Type":"application/json"}
-NS = "uwv-platform"
+NS = "odap-platform"
 JOB = "superset-dashboards-init"
 
 # delete existing Job (foreground propagation)
@@ -426,14 +426,14 @@ for _ in range(30):
 body = {
     "apiVersion":"batch/v1","kind":"Job",
     "metadata":{"name":JOB,"namespace":NS,
-                "labels":{"uwv.nl/component":"superset-dashboards-init"}},
+                "labels":{"odap.io/component":"superset-dashboards-init"}},
     "spec":{"ttlSecondsAfterFinished":3600,"backoffLimit":2,
         "template":{"spec":{"restartPolicy":"OnFailure","containers":[{
             "name":"build-dashboards","image":"python:3.11-slim",
             "command":["bash","-euo","pipefail","-c"],
             "args":["pip install --quiet --disable-pip-version-check requests && python /scripts/build_dashboards.py"],
             "env":[
-                {"name":"SUPERSET_URL","value":"http://uwv-superset-node:8088"},
+                {"name":"SUPERSET_URL","value":"http://superset-node:8088"},
                 {"name":"ADMIN_USER","valueFrom":{"secretKeyRef":{
                     "name":"superset-postgres-credentials","key":"adminUser.username"}}},
                 {"name":"ADMIN_PASSWORD","valueFrom":{"secretKeyRef":{
@@ -534,15 +534,15 @@ with DAG(
 
     render_manifest = KubernetesPodOperator(
         task_id="render_dbt_manifest",
-        namespace="uwv-platform",
-        image="uwv/dbt-trino:1.9.0-uwv",
+        namespace="odap-platform",
+        image="odap/dbt-trino:1.9.0",
         cmds=["bash", "-c"],
         arguments=[RENDER_MANIFEST_DBT_SCRIPT],
         env_vars=[
             secret_env("MINIO_ACCESS_KEY", "minio-s3-credentials", "accessKey"),
             secret_env("MINIO_SECRET_KEY", "minio-s3-credentials", "secretKey"),
-            V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/uwv-ca/ca.crt"),
-            V1EnvVar(name="SSL_CERT_FILE", value="/etc/uwv-ca/ca.crt"),
+            V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/platform-ca/ca.crt"),
+            V1EnvVar(name="SSL_CERT_FILE", value="/etc/platform-ca/ca.crt"),
         ],
         volumes=[ca_volume()],
         volume_mounts=[ca_mount()],

@@ -1,7 +1,7 @@
 # Overlay: route alerts naar Azure Communication Services Email in een
-# privé Azure-tenant (freshminds.nl / dev-stackable-rg / uwv-acs).
+# privé Azure-tenant (freshminds.nl / dev-stackable-rg / acs).
 #
-# Doel: end-to-end-test van de alert-email-pijp zonder een UWV-SMTP-relay
+# Doel: end-to-end-test van de alert-email-pijp zonder een Platform SMTP relay
 # nodig te hebben. ACS Email werkt met Entra-app-auth en levert mail aan
 # elke inbox — geen DNS-verificatie nodig dankzij de Azure-managed sender
 # domain.
@@ -28,4 +28,4 @@ patches:
       group: monitoring.coreos.com
       version: v1alpha1
       kind: AlertmanagerConfig
-      name: uwv-platform-receivers
+      name: odap-platform-receivers

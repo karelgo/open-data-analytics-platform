@@ -13,7 +13,7 @@ labs:
     hint: "Realm uwv: users, rollen, federatie, MFA"
     href: "/go/keycloak/"
   - title: "Open OpenSearch — audit + applicatie-logs"
-    hint: "Index uwv-logs-*"
+    hint: "Index logs-*"
     href: "/go/opensearch/"
   - title: "Open de runbook in vscode.dev"
     hint: "Incident-procedures, break-glass, recovery"
@@ -51,8 +51,8 @@ kader op orde — de Practitioner- en Expert-modules gaan dieper.
 
 | Omgeving | Hostnaam | Hoe |
 |---|---|---|
-| **Lokaal (k3d)** | `*.uwv-platform.local` | `make cluster && make bootstrap && make deploy-platform` |
-| **Cloud (AKS)** | `*.uwv-platform.cloud` | dezelfde manifests, ander ingress + oauth2-proxy |
+| **Lokaal (k3d)** | `*.odap.local` | `make cluster && make bootstrap && make deploy-platform` |
+| **Cloud (AKS)** | `*.odap-platform.cloud` | dezelfde manifests, ander ingress + oauth2-proxy |
 
 De portal-applicatie is een statische build die op beide ingressen draait —
 client-side wordt `.local` herschreven naar `.cloud` waar nodig. Zie

@@ -1,18 +1,18 @@
 # JSON6902 patch: vervang de MailHog-defaults in de email-receiver
-# door de UWV-SMTP-relay (placeholder — vul `smarthost`/`to`/`from` in
+# door de Platform SMTP relay (placeholder — vul `smarthost`/`to`/`from` in
 # zodra de echte relay-coordinaten bekend zijn).
 - op: replace
   path: /spec/receivers/0/emailConfigs/0/smarthost
-  value: smtp-relay.uwv.nl:587
+  value: smtp-relay.example.com:587
 - op: replace
   path: /spec/receivers/0/emailConfigs/0/requireTLS
   value: true
 - op: replace
   path: /spec/receivers/0/emailConfigs/0/authUsername
-  value: alertmanager@uwv.nl
+  value: alertmanager@example.com
 - op: replace
   path: /spec/receivers/0/emailConfigs/0/from
-  value: alertmanager@uwv.nl
+  value: alertmanager@example.com
 - op: replace
   path: /spec/receivers/0/emailConfigs/0/to
-  value: platform-alerts@uwv.nl
+  value: platform-alerts@example.com

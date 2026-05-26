@@ -4,7 +4,7 @@
 |---|---|
 | Datum | 2026-05-05 |
 | Beslissers | Platform Architect, IAM, Security |
-| Gerelateerd | [ADR-0001](0001-stackable-as-base.md) (Stackable als basis), [`platform/02-authentication/`](../../platform/02-authentication/), [referentiearchitectuur § Centraal IdP](../../referentiearchitectuur-uwv-data-analytics.md) |
+| Gerelateerd | [ADR-0001](0001-stackable-as-base.md) (Stackable als basis), [`platform/02-authentication/`](../../platform/02-authentication/), [referentiearchitectuur § Centraal IdP](../../referentiearchitectuur-odap-data-analytics.md) |
 
 ---
 
@@ -12,19 +12,19 @@
 
 Het platform draait Keycloak als centrale OIDC-provider met 11 realm-rollen
 en 7 OIDC-clients (MinIO, Trino, Superset, Airflow, NiFi, OpenMetadata,
-Portal — zie [`realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json)).
+Portal — zie [`realm.json`](../../infrastructure/helm/keycloak/realm.json)).
 Trino, Superset, Airflow en NiFi consumeren dat via één Stackable
-[`AuthenticationClass keycloak-uwv`](../../platform/02-authentication/authenticationclass-keycloak.yaml).
+[`AuthenticationClass keycloak`](../../platform/02-authentication/authenticationclass-keycloak.yaml).
 OPA-policies lezen `input.context.identity.groups` ([`trino-base.rego`](../../opa-policies-src/trino/trino-base.rego))
 en mappen die naar
-[`uwv_role_mappings.json`](../../opa-policies-src/data/uwv_role_mappings.json).
+[`role_mappings.json`](../../opa-policies-src/data/role_mappings.json).
 
 UWV's strategische identiteits-stack is **Microsoft Entra ID**. De
-referentiearchitectuur ([§ Centraal IdP](../../referentiearchitectuur-uwv-data-analytics.md))
+referentiearchitectuur ([§ Centraal IdP](../../referentiearchitectuur-odap-data-analytics.md))
 benoemt expliciet "**Entra ID** of Keycloak met SAML/OIDC" — beide zijn
 kandidaten, niet beide zijn nodig.
 
-De vraag: **kunnen Entra-medewerkers en interne UWV-realm-accounts naast
+De vraag: **kunnen Entra-medewerkers en interne ODAP realm-accounts naast
 elkaar inloggen op het platform, met een keuze op de loginpagina?**
 
 ## Beslissing
@@ -35,7 +35,7 @@ als externe **Identity Provider** binnen het bestaande `uwv` realm
 Keycloak automatisch een knop **"Microsoft Entra ID"** naast het
 username/password-veld. De gebruiker kiest:
 
-- **Lokaal UWV-account** → standaard Keycloak-flow (zoals nu).
+- **Lokaal platform account** → standaard Keycloak-flow (zoals nu).
 - **Microsoft Entra ID** → redirect naar `login.microsoftonline.com`,
   Entra authenticeert (incl. eigen MFA / Conditional Access), Keycloak
   ontvangt een Entra-token, mapt Entra-security-group-GUIDs op de 11
@@ -52,7 +52,7 @@ met dezelfde 11 realm-rol-claims als voorheen.
 
 Stackable's `clusterConfig.authentication` is een **lijst** ([`trinocluster.yaml:29-31`](../../platform/09-trino/trinocluster.yaml#L29))
 en kan meerdere IDPs accepteren. We zouden een tweede
-`AuthenticationClass entra-id-uwv` aanmaken met Entra als OIDC-provider
+`AuthenticationClass entra-id` aanmaken met Entra als OIDC-provider
 en die toevoegen aan elke cluster-CRD.
 
 **Niet gekozen omdat:**
@@ -62,7 +62,7 @@ en die toevoegen aan elke cluster-CRD.
   in [`Layout.astro`](../../portal/src/layouts/Layout.astro). Inschatting: 1-2 weken werk + permanente operationele complexiteit.
 - **OpenMetadata accepteert maar één issuer** ([`infrastructure/helm/openmetadata/values.yaml`](../../infrastructure/helm/openmetadata/values.yaml)
   `authentication.oidcConfiguration`). Geen native multi-IDP-support.
-- **OPA mapping verdubbelt.** `uwv_role_mappings.json` zou ofwel Entra-GUIDs
+- **OPA mapping verdubbelt.** `role_mappings.json` zou ofwel Entra-GUIDs
   moeten herkennen, ofwel een tweede mapping-bestand vereisen.
 - **Sessiebeheer en cookies** worden complex bij twee parallelle proxies
   op hetzelfde cookie-domain.
@@ -73,10 +73,10 @@ Verwijder Keycloak, point alle Stackable-services naar Entra ID direct.
 
 **Niet gekozen omdat:**
 - **Geen lokale dev-accounts.** De 11 realm-test-users in
-  [`realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json) (één per rol)
+  [`realm.json`](../../infrastructure/helm/keycloak/realm.json) (één per rol)
   geven een reproduceerbare dev/demo-omgeving zonder Azure-tenant-toegang.
 - **MinIO-policy-claim mapping.** Keycloak's `minio-policy` mapper
-  (oidc-usermodel-attribute-mapper, [`realm-uwv.json:339-348`](../../infrastructure/helm/keycloak/realm-uwv.json))
+  (oidc-usermodel-attribute-mapper, [`realm.json:339-348`](../../infrastructure/helm/keycloak/realm.json))
   kent MinIO-S3-policies toe op user-attribute-niveau. Entra ondersteunt dit
   niet zonder een Graph-API-shim.
 - **Vendor lock-in (R-NORA-05).** Keycloak is open source en draagbaar; een
@@ -107,7 +107,7 @@ Entra ondersteunt SAML 2.0 als alternatief voor OIDC.
    `platform_admin`-groep zonder dat Keycloak-policies dat per gebruiker
    moeten regelen.
 4. **Eén plek voor rol-mapping.** De 11 `oidc-role-idp-mapper`-entries in
-   [`realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json) zijn de
+   [`realm.json`](../../infrastructure/helm/keycloak/realm.json) zijn de
    enige plek waar Entra-group-GUIDs op platform-rollen mappen.
 5. **Reversibel.** Brokering uitschakelen = `enabled: false` op de
    IdentityProvider; lokale users blijven werken.
@@ -122,7 +122,7 @@ Entra ondersteunt SAML 2.0 als alternatief voor OIDC.
 2. **Group-overage claim.** Een Entra-user die in >200 groups zit krijgt
    geen `groups`-array in z'n token, maar een `_claim_names` overage. De
    role-mapper faalt dan stilletjes en de gebruiker komt rolloos binnen.
-   **Mitigatie:** dedicated `uwv-role-*`-security-groups gebruiken (niet
+   **Mitigatie:** dedicated `platform-role-*`-security-groups gebruiken (niet
    alle UWV-groepen federen) — gedocumenteerd in [README](../../platform/02-authentication/README.md).
 3. **GUID-drift per omgeving.** Group-GUIDs verschillen tussen dev/acc/prod
    tenants. **Mitigatie:** kustomize-overlay per omgeving (out-of-scope
@@ -137,9 +137,9 @@ Entra ondersteunt SAML 2.0 als alternatief voor OIDC.
 
 | # | Stap | Bestand |
 |---|------|---------|
-| 1 | `identityProviders[]` met alias `entra`, OIDC v2.0 endpoints | [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json) |
+| 1 | `identityProviders[]` met alias `entra`, OIDC v2.0 endpoints | [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json) |
 | 2 | 11× `oidc-role-idp-mapper` (group-GUID → realm-rol) + username-mapper + TOTP-trigger voor `platform_admin` | zelfde bestand, `identityProviderMappers[]` |
-| 3 | `Secret keycloak-entra-broker` in `uwv-auth` met `tenantId`, `clientId`, `clientSecret` | [`platform/01-secrets/dev-secrets.yaml`](../../platform/01-secrets/dev-secrets.yaml) |
+| 3 | `Secret keycloak-entra-broker` in `odap-auth` met `tenantId`, `clientId`, `clientSecret` | [`platform/01-secrets/dev-secrets.yaml`](../../platform/01-secrets/dev-secrets.yaml) |
 | 4 | Keycloak-pod env-vars uit Secret (`ENTRA_*`, `optional: true`) | [`infrastructure/helm/keycloak/values.yaml`](../../infrastructure/helm/keycloak/values.yaml) |
 | 5 | Setup-doc + bekende valkuilen | [`platform/02-authentication/README.md`](../../platform/02-authentication/README.md) |
 | 6 | Smoke-test stub | [`scripts/test-entra-sso.sh`](../../scripts/test-entra-sso.sh) |
@@ -148,12 +148,12 @@ Entra ondersteunt SAML 2.0 als alternatief voor OIDC.
 
 - [ ] Entra app-registration aangemaakt in een UWV test-tenant; redirect
       URI gewhitelisted.
-- [ ] 11 `uwv-role-*` security-groups aangemaakt en GUIDs in
-      `realm-uwv.json` ingevuld (geen `REPLACE_ME_*` meer).
+- [ ] 11 `platform-role-*` security-groups aangemaakt en GUIDs in
+      `realm.json` ingevuld (geen `REPLACE_ME_*` meer).
 - [ ] Keycloak gestart, IdP `entra` zichtbaar in Admin UI.
 - [ ] Eén Entra-testaccount logt in op portal en krijgt rolbadge
       (`wia_beoordelaar`).
-- [ ] Eén UWV-realm-account logt parallel in en blijft werken.
+- [ ] Eén ODAP realm-account logt parallel in en blijft werken.
 - [ ] Trino-CLI met Entra-user kan een SELECT op `bronze.persoon.persoon`
       uitvoeren met dezelfde row/column-policies als de equivalente
       lokale rol.

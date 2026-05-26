@@ -4,15 +4,15 @@ Spark on Kubernetes via Stackable's `SparkApplication` CRD.
 
 | Resource | Doel |
 |---|---|
-| `SparkApplication streaming-bronze` | Structured Streaming: leest JSONL uit `s3a://uwv-raw/`, schrijft naar Delta bronze (foreachBatch dispatcher per stream). |
+| `SparkApplication streaming-bronze` | Structured Streaming: leest JSONL uit `s3a://odap-raw/`, schrijft naar Delta bronze (foreachBatch dispatcher per stream). |
 | `ConfigMap spark-streaming-jobs` (gegenereerd) | Mount van `streaming_files_to_lakehouse.py` + `lakehouse_io.py`. |
-| `SparkHistoryServer history` | Permanente Spark-UI op port 18080. Leest event-logs van alle voltooide jobs uit `s3a://uwv-checkpoints/spark-events/`. Bereikbaar via `https://spark.<domain>/`. |
+| `SparkHistoryServer history` | Permanente Spark-UI op port 18080. Leest event-logs van alle voltooide jobs uit `s3a://odap-checkpoints/spark-events/`. Bereikbaar via `https://spark.<domain>/`. |
 | `Job spark-events-prefix-init` | One-shot bij deploy: maakt `spark-events/.keep` placeholder in MinIO zodat history-server kan starten (S3 heeft geen leeg-directory concept). |
 
 ## Architectuur
 
 ```
-data-generation/load_to_s3.py  →  s3://uwv-raw/<domain>/<entity>/dt=YYYY-MM-DD/*.jsonl
+data-generation/load_to_s3.py  →  s3://odap-raw/<domain>/<entity>/dt=YYYY-MM-DD/*.jsonl
                                               ↓ (Spark file source)
                                   streaming_files_to_lakehouse.py
                                               ↓
@@ -33,7 +33,7 @@ Canonical bron: [`spark-jobs/`](../../spark-jobs/) — daar staan
 ## Voorvereisten
 
 - `platform/01-secrets/` — `minio-s3-credentials` Secret aanwezig.
-- `platform/03-storage/` — `S3Connection s3-minio`; bucket `uwv-raw` bestaat in MinIO.
+- `platform/03-storage/` — `S3Connection s3-minio`; bucket `odap-raw` bestaat in MinIO.
 - `platform/05-hive-metastore/` — HMS Ready.
 
 ## Apply
@@ -47,8 +47,8 @@ kubectl apply -k platform/08-spark/
 ## Validatie
 
 ```bash
-kubectl -n uwv-platform get sparkapplication
-kubectl -n uwv-platform logs -l app.kubernetes.io/instance=streaming-bronze --tail=50
+kubectl -n odap-platform get sparkapplication
+kubectl -n odap-platform logs -l app.kubernetes.io/instance=streaming-bronze --tail=50
 ```
 
 In Spark UI: lijst van actieve streaming queries en batch-stats.
@@ -57,14 +57,14 @@ In Spark UI: lijst van actieve streaming queries en batch-stats.
 
 | File-pad | Bronze-tabel |
 |---|---|
-| `s3a://uwv-raw/uwv/persona/created/...` | `bronze.uwv.persona_created` |
-| `s3a://uwv-raw/uwv/polisadm/ikv/...` | `bronze.uwv.polisadm_ikv` |
-| `s3a://uwv-raw/uwv/ww/aanvraag/...` | `bronze.uwv.ww_aanvraag` |
-| `s3a://uwv-raw/uwv/wia/aanvraag/...` | `bronze.uwv.wia_aanvraag` |
-| `s3a://uwv-raw/uwv/wajong/dossier/...` | `bronze.uwv.wajong_dossier` |
-| `s3a://uwv-raw/uwv/zw/melding/...` | `bronze.uwv.zw_melding` |
-| `s3a://uwv-raw/uwv/crm/contact/...` | `bronze.uwv.crm_contact` |
-| `s3a://uwv-raw/uwv/fez/uitkeringslast/...` | `bronze.uwv.fez_uitkeringslast` |
+| `s3a://odap-raw/uwv/persona/created/...` | `bronze.uwv.persona_created` |
+| `s3a://odap-raw/uwv/polisadm/ikv/...` | `bronze.uwv.polisadm_ikv` |
+| `s3a://odap-raw/uwv/ww/aanvraag/...` | `bronze.uwv.ww_aanvraag` |
+| `s3a://odap-raw/uwv/wia/aanvraag/...` | `bronze.uwv.wia_aanvraag` |
+| `s3a://odap-raw/uwv/wajong/dossier/...` | `bronze.uwv.wajong_dossier` |
+| `s3a://odap-raw/uwv/zw/melding/...` | `bronze.uwv.zw_melding` |
+| `s3a://odap-raw/uwv/crm/contact/...` | `bronze.uwv.crm_contact` |
+| `s3a://odap-raw/uwv/fez/uitkeringslast/...` | `bronze.uwv.fez_uitkeringslast` |
 
 ## Format-switch
 
@@ -96,7 +96,7 @@ HMS-schemas, dus ze raken elkaar niet.
 | bronze  | `bronze.uwv.wia_aanvraag`                   | `bronze.uwv.wia_aanvraag` (gedeeld)       |
 | silver  | `silver.wia.stg_wia_aanvraag`               | `silver.wia_spark.aanvraag`               |
 | gold    | `gold.uc01_wia_funnel.mart_uc01_wia_funnel_daily` | `gold.uc01_wia_spark.funnel_daily` |
-| S3-pad  | `s3a://uwv-silver/wia/...`                  | `s3a://uwv-silver/wia_spark/...`          |
+| S3-pad  | `s3a://odap-silver/wia/...`                  | `s3a://odap-silver/wia_spark/...`          |
 
 ### Componenten
 
@@ -154,7 +154,7 @@ de silver+gold DAG werkt onveranderd op de daadwerkelijke bronze-tabel.
 | `driver.memory.limit` | `1500Mi` | Onder ~1.2Gi crasht Spark met `INVALID_DRIVER_MEMORY` — System memory < 472MB minimum. |
 | `executor.memory.limit` | `1500Mi` | Idem voor executor (`INVALID_EXECUTOR_MEMORY`). |
 | `enableVectorAgent` | `false` | Vector aggregator ConfigMap bestaat niet op deze cluster; `true` blokkeert SparkApplication-reconcile met `VectorAggregatorConfigMapMissing`. |
-| `seed`-write | géén `partitionBy` | Bestaande `s3a://uwv-bronze/uwv/wia_aanvraag/` Delta-tabel is niet-gepartitioneerd (streaming-bronze conventie); append met partitionering geeft `_LEGACY_ERROR_TEMP_DELTA_0007`. |
+| `seed`-write | géén `partitionBy` | Bestaande `s3a://odap-bronze/uwv/wia_aanvraag/` Delta-tabel is niet-gepartitioneerd (streaming-bronze conventie); append met partitionering geeft `_LEGACY_ERROR_TEMP_DELTA_0007`. |
 
 Failure-debugging tip: Stackable-operator delete'd driver-pod direct bij
 `Failed` ongeacht `spark.kubernetes.driver.deleteOnTermination`. Voor logs:

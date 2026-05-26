@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-CLUSTER_NAME="${CLUSTER_NAME:-uwv-platform}"
+CLUSTER_NAME="${CLUSTER_NAME:-odap-platform}"
 CONFIG="$ROOT/infrastructure/k3d/k3d-cluster.yaml"
 
 if ! command -v k3d >/dev/null 2>&1; then

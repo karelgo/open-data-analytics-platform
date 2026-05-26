@@ -1,8 +1,8 @@
 # OpenMetadata — catalog / governance / lineage / DQ.
 #
 # Wordt in fase 8 geïnstalleerd. Hier alleen de values-template.
-# Hergebruikt de gedeelde Postgres (uwv-data) en deelt het OpenSearch-
-# cluster met Vector (uwv-meta).
+# Hergebruikt de gedeelde Postgres (odap-data) en deelt het OpenSearch-
+# cluster met Vector (odap-meta).
 #
 # Chart: open-metadata/openmetadata (huidig geïnstalleerd: 1.12.8)
 #
@@ -10,11 +10,11 @@
 # --------------------
 # OpenMetadata 1.3+ verwacht de Pac4j OIDC-flow met `clientType: confidential`
 # en het complete `oidcConfiguration` block. De client `openmetadata` staat
-# in realm-uwv.json (clientId/secret + redirectUris); het secret wordt hier
+# in realm.json (clientId/secret + redirectUris); het secret wordt hier
 # uit Kubernetes-secret openmetadata-oidc-client gelezen.
 #
-# Browser-redirects gaan naar de externe URL (https://keycloak.uwv-platform.local:8443),
-# server-side token-exchange ook — daarom mountt de pod het uwv-ca-bundle
+# Browser-redirects gaan naar de externe URL (https://keycloak.odap.local:8443),
+# server-side token-exchange ook — daarom mountt de pod het platform-ca-bundle
 # (zelf-signed CA van ingress-nginx) in zijn Java truststore via een
 # initContainer (zie `extraInitContainers` onderaan).
 
@@ -31,16 +31,16 @@ openmetadata:
     upgradeMigrationConfigs:
       debug: false
 
-    # Externe Postgres (gedeeld in uwv-data)
+    # Externe Postgres (gedeeld in odap-data)
     database:
       enabled: true
-      host: postgres-postgresql.uwv-data.svc.cluster.local
+      host: postgres-postgresql.odap-data.svc.cluster.local
       port: 5432
       driverClass: org.postgresql.Driver
       dbScheme: postgresql
       databaseName: openmetadata
       auth:
-        username: uwvplatform
+        username: odap
         password:
           secretRef: mysql-secrets               # chart-template hardcoded naam
           secretKey: openmetadata-mysql-password # idem
@@ -48,7 +48,7 @@ openmetadata:
     # Externe OpenSearch (gedeeld met Vector)
     elasticsearch:
       enabled: true
-      host: opensearch-uwv.uwv-meta.svc.cluster.local
+      host: opensearch.odap-meta.svc.cluster.local
       port: 9200
       scheme: http
       searchType: opensearch
@@ -61,7 +61,7 @@ openmetadata:
       provider: custom-oidc
       # Authority / callbackUrl / publicKeys / discoveryUri zijn mode-specifiek
       # — zie values-{k3d,aks}.yaml. Op k3d wijzen ze naar
-      # keycloak.uwv-platform.local:8443 (via CoreDNS hosts-override); op AKS
+      # keycloak.odap.local:8443 (via CoreDNS hosts-override); op AKS
       # wijzen ze naar de publieke keycloak.${PLATFORM_DOMAIN} (Let's Encrypt).
       clientId: openmetadata
       responseType: code
@@ -115,13 +115,13 @@ openmetadata:
     pipelineServiceClientConfig:
       enabled: false
 
-# Java truststore-uitbreiding: voeg uwv-platform CA toe zodat OM-pod TLS
+# Java truststore-uitbreiding: voeg odap-platform CA toe zodat OM-pod TLS
 # van ingress-nginx (waarachter Keycloak draait) kan verifieren bij de
 # server-side token-exchange. Truststore wordt in een emptyDir geschreven
 # door een initContainer en daarna door de OM-container ingelezen via
 # JAVA_OPTS_APPEND (key/store-pass = changeit; alleen dev).
 extraInitContainers:
-  - name: import-uwv-ca
+  - name: import-platform-ca
     image: eclipse-temurin:17-jre-jammy
     command:
       - bash
@@ -130,34 +130,34 @@ extraInitContainers:
         set -eu
         cp "$JAVA_HOME/lib/security/cacerts" /shared-truststore/cacerts
         chmod u+w /shared-truststore/cacerts
-        # uwv-ca-bundle is een GECONCATENEERDE PEM (Mozilla public roots +
-        # uwv-platform-CA). `keytool -importcert -alias X -file <multi-pem>`
+        # platform-ca-bundle is een GECONCATENEERDE PEM (Mozilla public roots +
+        # odap-platform-CA). `keytool -importcert -alias X -file <multi-pem>`
         # importeert ALLEEN de eerste cert — alle andere worden genegeerd
         # zonder warning. Daarom split én loop, met een unieke alias per cert.
         cd /tmp
-        csplit -z -f om-cert- -b "%03d.pem" /uwv-ca/ca.crt '/-----BEGIN CERTIFICATE-----/' '{*}' >/dev/null
+        csplit -z -f om-cert- -b "%03d.pem" /platform-ca/ca.crt '/-----BEGIN CERTIFICATE-----/' '{*}' >/dev/null
         i=0
         for cert in om-cert-*.pem; do
           [ -s "$cert" ] || continue
           keytool -importcert -noprompt -trustcacerts \
             -keystore /shared-truststore/cacerts \
             -storepass changeit \
-            -alias "uwv-ca-$i" \
+            -alias "platform-ca-$i" \
             -file "$cert" >/dev/null 2>&1 || true
           i=$((i+1))
         done
         echo "Imported $i certificates into truststore"
     volumeMounts:
-      - name: uwv-ca
-        mountPath: /uwv-ca
+      - name: platform-ca
+        mountPath: /platform-ca
         readOnly: true
       - name: shared-truststore
         mountPath: /shared-truststore
 
 extraVolumes:
-  - name: uwv-ca
+  - name: platform-ca
     configMap:
-      name: uwv-ca-bundle
+      name: platform-ca-bundle
   - name: shared-truststore
     emptyDir: {}
 
@@ -203,15 +203,15 @@ startupProbe:
 
 replicaCount: 1
 
-# Chart-managed ingress on .uwv-platform.local for in-cluster routing.
-# Public AKS access at openmetadata.eu-sovereigndataplatform.com is in
+# Chart-managed ingress on .odap.local for in-cluster routing.
+# Public AKS access at openmetadata.example.com is in
 # infrastructure/azure/public-ingresses.yaml (`openmetadata-public`).
 #
 # OpenMetadata 1.x heeft geen configureerbare context-path; daarom blijft
 # 'ie op een eigen subdomein i.p.v. mee te gaan in path-routing. Voor de
 # portal embed-shell (cross-origin iframe) strippen we eventuele
 # X-Frame-Options en zetten we een frame-ancestors-CSP zodat
-# platform.uwv-platform.local (en de cloud-TLDs) de OM-UI mogen iframen.
+# platform.odap.local (en de cloud-TLDs) de OM-UI mogen iframen.
 # Cookies: OM Dropwizard server.applicationContextPath defaults — als
 # SameSite-issues in iframe-context optreden, los je dat op met
 # applicationConnectors.responseCookieSameSite=None (vereist HTTPS).
@@ -219,18 +219,18 @@ ingress:
   enabled: true
   className: nginx
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
   hosts:
-    - host: openmetadata.uwv-platform.local
+    - host: openmetadata.odap.local
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
     - hosts:
-        - openmetadata.uwv-platform.local
+        - openmetadata.odap.local
       secretName: openmetadata-tls
 
 # Persistentie van logs/configs — storageClass per-mode in values-{k3d,aks}.yaml.

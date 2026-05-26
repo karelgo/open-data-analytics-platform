@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Patch redirect-URIs + web-origins van bestaande Keycloak-clients in een
-# *live* uwv-realm zodat ze de nieuwe path-routed callbacks accepteren
-# (https://platform.uwv-platform.local:8443/<service>/...).
+# *live* odap-realm zodat ze de nieuwe path-routed callbacks accepteren
+# (https://platform.odap.local:8443/<service>/...).
 #
-# De realm-uwv.json configmap is de bron voor verse Keycloak-installs;
+# De realm.json configmap is de bron voor verse Keycloak-installs;
 # voor een lopende cluster moeten we via de admin API patchen want
 # Keycloak importeert de realm alleen op first-start.
 #
@@ -12,23 +12,23 @@
 #
 # Voorbeeld:
 #   bash scripts/patch-keycloak-embed-redirects.sh
-#   KC_HOST=https://keycloak.eu-sovereigndataplatform.com \
+#   KC_HOST=https://keycloak.example.com \
 #     bash scripts/patch-keycloak-embed-redirects.sh
 
 set -euo pipefail
 
-KC_NAMESPACE="${KC_NAMESPACE:-uwv-auth}"
+KC_NAMESPACE="${KC_NAMESPACE:-odap-auth}"
 KC_ADMIN_USER="${KC_ADMIN_USER:-kcadmin}"
-KC_ADMIN_PASS="${KC_ADMIN_PASS:-uwv-dev-only-CHANGE-ME-2026}"
+KC_ADMIN_PASS="${KC_ADMIN_PASS:-odap-dev-only-CHANGE-ME}"
 KC_HOST="${KC_HOST:-}"
 REALM="${REALM:-uwv}"
 
 # Per-client extra redirects + web origins. Telkens: clientId|redirectUri,...|origin,...
 PATCHES=(
-  "superset|https://platform.uwv-platform.local:8443/superset/*,https://platform.eu-sovereigndataplatform.com/superset/*,https://platform.freshstackable.com/superset/*|https://platform.uwv-platform.local:8443,https://platform.eu-sovereigndataplatform.com,https://platform.freshstackable.com"
-  "airflow|https://platform.uwv-platform.local:8443/airflow/*,https://platform.eu-sovereigndataplatform.com/airflow/*,https://platform.freshstackable.com/airflow/*|https://platform.uwv-platform.local:8443,https://platform.eu-sovereigndataplatform.com,https://platform.freshstackable.com"
-  "jupyter|https://platform.uwv-platform.local:8443/jupyter/hub/oauth_callback,https://platform.eu-sovereigndataplatform.com/jupyter/hub/oauth_callback,https://platform.freshstackable.com/jupyter/hub/oauth_callback|https://platform.uwv-platform.local:8443,https://platform.eu-sovereigndataplatform.com,https://platform.freshstackable.com"
-  "grafana|https://platform.uwv-platform.local:8443/grafana/login/generic_oauth,https://platform.eu-sovereigndataplatform.com/grafana/login/generic_oauth,https://platform.freshstackable.com/grafana/login/generic_oauth|https://platform.uwv-platform.local:8443,https://platform.eu-sovereigndataplatform.com,https://platform.freshstackable.com"
+  "superset|https://platform.odap.local:8443/superset/*,https://platform.example.com/superset/*,https://platform.example.com/superset/*|https://platform.odap.local:8443,https://platform.example.com,https://platform.example.com"
+  "airflow|https://platform.odap.local:8443/airflow/*,https://platform.example.com/airflow/*,https://platform.example.com/airflow/*|https://platform.odap.local:8443,https://platform.example.com,https://platform.example.com"
+  "jupyter|https://platform.odap.local:8443/jupyter/hub/oauth_callback,https://platform.example.com/jupyter/hub/oauth_callback,https://platform.example.com/jupyter/hub/oauth_callback|https://platform.odap.local:8443,https://platform.example.com,https://platform.example.com"
+  "grafana|https://platform.odap.local:8443/grafana/login/generic_oauth,https://platform.example.com/grafana/login/generic_oauth,https://platform.example.com/grafana/login/generic_oauth|https://platform.odap.local:8443,https://platform.example.com,https://platform.example.com"
 )
 
 step() { printf '\033[1;36m==>\033[0m %s\n' "$*"; }

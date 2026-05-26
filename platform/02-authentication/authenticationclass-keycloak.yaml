@@ -7,7 +7,7 @@
 # Hostname/poort komen overeen met Helm-deployed Keycloak + ingress-nginx
 # (port 8443 op de host loopt naar ingress-nginx → Keycloak).
 #
-# Voor in-cluster service-discovery zou je `keycloak.uwv-auth.svc.cluster.local`
+# Voor in-cluster service-discovery zou je `keycloak.odap-auth.svc.cluster.local`
 # kiezen, maar OIDC-redirects worden door de browser uitgevoerd; daarom is
 # het externe DNS-pad nodig (hostname must match issuer URL in tokens).
 #
@@ -17,19 +17,19 @@
 apiVersion: authentication.stackable.tech/v1alpha1
 kind: AuthenticationClass
 metadata:
-  name: keycloak-uwv
+  name: keycloak
 spec:
   provider:
     oidc:
       # In-cluster service-DNS voor server-side OIDC discovery.
-      # Keycloak draait met proxy=edge + hostname=keycloak.uwv-platform.local
+      # Keycloak draait met proxy=edge + hostname=keycloak.odap.local
       # (zie helm/keycloak/values.yaml) zodat issuer-claim de externe URL
       # blijft — browser-redirects gaan dus naar de externe ingress.
-      # Pod kan keycloak.uwv-platform.local niet resolveren (k3d /etc/hosts
+      # Pod kan keycloak.odap.local niet resolveren (k3d /etc/hosts
       # zit alleen op de host) → daarom de svc.cluster.local-naam.
-      hostname: keycloak.uwv-auth.svc.cluster.local
+      hostname: keycloak.odap-auth.svc.cluster.local
       port: 80
-      rootPath: /realms/uwv
+      rootPath: /realms/odap
       principalClaim: preferred_username
       scopes:
         - openid

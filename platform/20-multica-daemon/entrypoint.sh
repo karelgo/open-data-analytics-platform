@@ -26,7 +26,7 @@ mkdir -p "$HOME/.codex"
 cp /etc/codex/config.toml.template "$HOME/.codex/config.toml"
 
 # --- 2. Point CLI at the Multica server ------------------------------------
-: "${MULTICA_SERVER_URL:?MULTICA_SERVER_URL must be set (e.g. http://multica-backend.uwv-platform:80)}"
+: "${MULTICA_SERVER_URL:?MULTICA_SERVER_URL must be set (e.g. http://multica-backend.odap-platform:80)}"
 : "${MULTICA_APP_URL:?MULTICA_APP_URL must be set (used in OAuth callbacks)}"
 
 multica config set server_url "$MULTICA_SERVER_URL"

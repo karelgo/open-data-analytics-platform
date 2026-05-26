@@ -17,18 +17,18 @@ Falen op stap 1-3 = de shortcut zal niet werken, ongeacht credentials.
 Gebruik:
     # Met defaults voor de StackIT-cloud:
     python3 scripts/fabric-probe-minio.py \\
-        --endpoint https://minio.freshstackable.com
+        --endpoint https://minio.example.com
 
     # Tegen lokale k3d (zal stap 1 falen — 127.0.0.1):
     python3 scripts/fabric-probe-minio.py \\
-        --endpoint https://minio.uwv-platform.local:8443 --insecure
+        --endpoint https://minio.odap.local:8443 --insecure
 
     # Tegen AKS:
     python3 scripts/fabric-probe-minio.py \\
-        --endpoint https://minio.eu-sovereigndataplatform.com
+        --endpoint https://minio.example.com
 
 Credentials komen uit env-vars MINIO_ACCESS_KEY / MINIO_SECRET_KEY
-(default access-key is 'uwvadmin' — het platform dev-default).
+(default access-key is 'platformadmin' — het platform dev-default).
 
 Exit codes:
   0 — alle 4 stappen geslaagd; veilig om een shortcut aan te maken
@@ -51,7 +51,7 @@ OK = "\033[32m✓\033[0m"
 FAIL = "\033[31m✗\033[0m"
 WARN = "\033[33m!\033[0m"
 
-DEFAULT_BUCKETS = ("uwv-bronze", "uwv-silver", "uwv-gold", "uwv-sensitive")
+DEFAULT_BUCKETS = ("odap-bronze", "odap-silver", "odap-gold", "sensitive")
 PRIVATE_CIDRS = [
     ipaddress.ip_network("10.0.0.0/8"),
     ipaddress.ip_network("172.16.0.0/12"),
@@ -200,7 +200,7 @@ def main() -> None:
     ap.add_argument(
         "--endpoint",
         required=True,
-        help="MinIO HTTPS endpoint, bv. https://minio.freshstackable.com",
+        help="MinIO HTTPS endpoint, bv. https://minio.example.com",
     )
     ap.add_argument(
         "--buckets",
@@ -209,8 +209,8 @@ def main() -> None:
     )
     ap.add_argument(
         "--access-key",
-        default=os.environ.get("MINIO_ACCESS_KEY", "uwvadmin"),
-        help="MinIO access key (default: env MINIO_ACCESS_KEY of 'uwvadmin')",
+        default=os.environ.get("MINIO_ACCESS_KEY", "platformadmin"),
+        help="MinIO access key (default: env MINIO_ACCESS_KEY of 'platformadmin')",
     )
     ap.add_argument(
         "--secret-key",

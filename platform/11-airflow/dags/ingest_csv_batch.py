@@ -6,7 +6,7 @@ via de Airflow UI ("Trigger DAG w/ config") met:
     {"object_key": "incoming/<bron>/<bestand>.csv"}
 
 Zie docs/handleidingen/csv-upload.md voor de end-to-end runbook.
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations

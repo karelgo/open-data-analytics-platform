@@ -69,7 +69,7 @@ test_grant_does_not_bypass_doelbinding if {
 			}},
 		},
 	}
-		with data.configmap as {"opa-trino-bundle": {"uwv-platform": {"uwv_role_mappings": {
+		with data.configmap as {"opa-trino-bundle": {"odap-platform": {"role_mappings": {
 			"resource_purposes": {"gold.uc05_client_360.*": ["klantcontact", "behandeling"]},
 			"roles": {"researcher": {
 				"purposes": ["statistisch_onderzoek"],
@@ -96,7 +96,7 @@ test_grant_with_matching_purpose_permits_doelbinding if {
 			}},
 		},
 	}
-		with data.configmap as {"opa-trino-bundle": {"uwv-platform": {"uwv_role_mappings": {
+		with data.configmap as {"opa-trino-bundle": {"odap-platform": {"role_mappings": {
 			"resource_purposes": {"gold.uc05_client_360.*": ["klantcontact", "behandeling"]},
 			"roles": {"researcher": {
 				"purposes": ["statistisch_onderzoek"],

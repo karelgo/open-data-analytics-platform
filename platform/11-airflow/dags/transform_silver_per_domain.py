@@ -10,7 +10,7 @@ Elke DAG:
   - Output: silver-Dataset (triggert gold-DAGs)
 
 Zie docs/adr/0007-airflow-pipeline-architecture.md.
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations

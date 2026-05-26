@@ -28,7 +28,7 @@ ok()   { printf '\033[1;32mOK\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m!!\033[0m %s\n' "$*"; }
 fail() { printf '\033[1;31mFAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
-NAMESPACE="${NAMESPACE:-uwv-meta}"
+NAMESPACE="${NAMESPACE:-odap-meta}"
 JOB_NAME="om-glossary-link"
 MANIFEST="${MANIFEST:-platform/13-openmetadata-config/glossary-link-job.yaml}"
 TIMEOUT="${TIMEOUT:-300s}"

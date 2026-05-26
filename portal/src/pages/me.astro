@@ -12,8 +12,8 @@ import { DOCS_URL } from '../data/external-links';
 // alle 11 rollen + componenten + shortcuts in één JSON, en de browser
 // kiest op basis van Keycloak-claim of ?role=<id> wat zichtbaar wordt.
 
-const capabilities = (roleMappings as { uwv_role_mappings: { roles: Record<string, unknown> } })
-  .uwv_role_mappings.roles;
+const capabilities = (roleMappings as { role_mappings: { roles: Record<string, unknown> } })
+  .role_mappings.roles;
 
 // Wikkel shortcut-hrefs in /embed/<id>?path=... zodat klikken in de portal
 // shell landt voor iframe-bare services; niet-embed-bare componenten en
@@ -217,7 +217,7 @@ const payload = {
       // Voorrang: Keycloak-rol uit sessionStorage (gevuld door Layout.astro).
       // Daarna: ?role=… uit URL (demo-modus).
       const urlRole = new URLSearchParams(location.search).get('role');
-      const ssoRole = sessionStorage.getItem('uwv-portal-role');
+      const ssoRole = sessionStorage.getItem('odap-portal-role');
       const role = ssoRole || urlRole;
       if (role) showRole(role);
       else showPicker();

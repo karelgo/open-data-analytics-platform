@@ -184,7 +184,7 @@ const payload = all.map((m) => ({
   }
 
   render();
-  document.addEventListener('uwv-learn:progress', render);
+  document.addEventListener('odap-learn:progress', render);
 
   document.querySelector<HTMLButtonElement>('[data-progress-reset]')?.addEventListener('click', () => {
     if (!confirm('Mijn voortgang wissen? Dit verwijdert lokaal opgeslagen Academy-voortgang.')) return;

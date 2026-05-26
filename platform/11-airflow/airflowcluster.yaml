@@ -3,15 +3,15 @@
 #
 # Architectuur: docs/adr/0007-airflow-pipeline-architecture.md
 #
-# DB: gedeelde Postgres `uwv-data/postgres-postgresql.uwv-data.svc.cluster.local`
+# DB: gedeelde Postgres `odap-data/postgres-postgresql.odap-data.svc.cluster.local`
 #     database `airflow` (init-script in fase 1 maakt deze aan).
-# Auth: OIDC via keycloak-uwv (productie). Voor dev is admin-flow ook open.
+# Auth: OIDC via keycloak (productie). Voor dev is admin-flow ook open.
 #
 # Mounts (zie kustomization.yaml configMapGenerator):
 #   - /stackable/airflow/dags/  ← airflow-dags     (DAG-aanroepers)
-#   - /opt/uwv/airflow/include/ ← airflow-include  (factories + helpers, op PYTHONPATH)
-#   - /opt/uwv/airflow/sources/ ← airflow-sources  (YAML source-registry)
-#   - /opt/uwv/dbt/             ← dbt-manifest     (manifest.json voor Cosmos)
+#   - /opt/odap/airflow/include/ ← airflow-include  (factories + helpers, op PYTHONPATH)
+#   - /opt/odap/airflow/sources/ ← airflow-sources  (YAML source-registry)
+#   - /opt/odap/dbt/             ← dbt-manifest     (manifest.json voor Cosmos)
 #
 # Cosmos (astronomer-cosmos) wordt door een initContainer pip-geïnstalleerd
 # in een emptyDir-volume `/cosmos-pkgs`, dat ook op PYTHONPATH komt.
@@ -20,8 +20,8 @@
 apiVersion: airflow.stackable.tech/v1alpha1
 kind: AirflowCluster
 metadata:
-  name: uwv-airflow
-  namespace: uwv-platform
+  name: airflow
+  namespace: odap-platform
 spec:
   image:
     productVersion: "3.0.6"
@@ -33,7 +33,7 @@ spec:
     exposeConfig: false
     credentialsSecret: airflow-postgres-credentials
     authentication:
-      - authenticationClass: keycloak-uwv
+      - authenticationClass: keycloak
         oidc:
           clientCredentialsSecret: airflow-oidc-client
 
@@ -46,21 +46,21 @@ spec:
     # Zonder die twee bouwt Flask de OAuth redirect_uri als
     # http://...:8443 → nginx 400 "plain HTTP request was sent to HTTPS
     # port". REQUESTS_CA_BUNDLE/SSL_CERT_FILE zijn voor de OAuth
-    # token-exchange naar https://keycloak.uwv-platform.local:8443
+    # token-exchange naar https://keycloak.odap.local:8443
     # (cert-manager self-signed CA).
     # NB: airflow.cfg dump op disk toont nog defaults; env-vars
     # overschrijven cfg op runtime. Verifieer met
     # `airflow config get-value api base_url` in een verse pod.
     envOverrides:
-      REQUESTS_CA_BUNDLE: "/etc/uwv-ca/ca.crt"
-      SSL_CERT_FILE: "/etc/uwv-ca/ca.crt"
-      # Path-routing onder platform.uwv-platform.local/airflow (same-origin
+      REQUESTS_CA_BUNDLE: "/etc/platform-ca/ca.crt"
+      SSL_CERT_FILE: "/etc/platform-ca/ca.crt"
+      # Path-routing onder platform.odap.local/airflow (same-origin
       # voor de portal embed-shell). De ingress voegt X-Forwarded-Prefix
       # toe; PROXY_FIX_X_PREFIX=1 hieronder zorgt dat FAB de prefix in z'n
       # redirect_uri-opbouw verwerkt. Zonder dit landt OAuth-redirect op
       # /oauth-authorized i.p.v. /airflow/oauth-authorized → 404.
-      AIRFLOW__API__BASE_URL: "https://platform.uwv-platform.local:8443/airflow"
-      AIRFLOW__FAB__BASE_URL: "https://platform.uwv-platform.local:8443/airflow"
+      AIRFLOW__API__BASE_URL: "https://platform.odap.local:8443/airflow"
+      AIRFLOW__FAB__BASE_URL: "https://platform.odap.local:8443/airflow"
       AIRFLOW__FAB__ENABLE_PROXY_FIX: "True"
       AIRFLOW__FAB__PROXY_FIX_X_PROTO: "1"
       AIRFLOW__FAB__PROXY_FIX_X_HOST: "1"
@@ -69,15 +69,15 @@ spec:
       # ADR-0007: include/ + cosmos op PYTHONPATH zodat factory-imports werken.
       # Include zelf + cosmos VOOR system-paths zodat factory-imports voorrang hebben.
       # Stackable's eigen log_config + dags-folder achteraan om defaults te behouden.
-      PYTHONPATH: "/opt/uwv/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
+      PYTHONPATH: "/opt/odap/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
       # Stackable 26.3 detecteert executor uit *Executors-block, maar voor onze
       # setup expliciet zetten zodat tasks via KubernetesExecutor een eigen pod krijgen.
       AIRFLOW__CORE__EXECUTOR: "KubernetesExecutor"
-      AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "uwv-platform"
+      AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "odap-platform"
       # Geen pod_template_file — laat Airflow de defaults gebruiken; podOverrides
       # in kubernetesExecutors-blok hierboven definiëren de mounts + initContainers.
-      UWV_SOURCES_DIR: "/opt/uwv/airflow/sources"
-      UWV_DBT_MANIFEST_PATH: "/opt/uwv/dbt/manifest.json"
+      SOURCES_DIR: "/opt/odap/airflow/sources"
+      DBT_MANIFEST_PATH: "/opt/odap/dbt/manifest.json"
     # NB: configOverrides voor `webserver_config.py` werkt NIET in
     # Stackable Airflow 26.3 — de operator accepteert de keys in de CRD
     # maar rendert ze niet in de gegenereerde file. Daarom doen we de
@@ -191,35 +191,35 @@ spec:
                             [ -f /stackable/airflow/webserver_config.py ] && break
                             sleep 0.1
                           done
-                          cp -L /uwv-airflow-config/webserver_config.py \
+                          cp -L /airflow-config/webserver_config.py \
                                 /stackable/airflow/webserver_config.py
                 volumeMounts:
-                  - name: uwv-ca
-                    mountPath: /etc/uwv-ca
+                  - name: platform-ca
+                    mountPath: /etc/platform-ca
                     readOnly: true
                   - name: cosmos-pkgs
                     mountPath: /cosmos-pkgs
                     readOnly: true
                   - name: airflow-include
-                    mountPath: /opt/uwv/airflow/include
+                    mountPath: /opt/odap/airflow/include
                     readOnly: true
                   - name: airflow-sources
-                    mountPath: /opt/uwv/airflow/sources
+                    mountPath: /opt/odap/airflow/sources
                     readOnly: true
                   - name: dbt-manifest-decompressed
-                    mountPath: /opt/uwv/dbt
+                    mountPath: /opt/odap/dbt
                     readOnly: true
                   - name: airflow-dags
                     mountPath: /stackable/airflow/dags
                     readOnly: true
                   # ConfigMap-bron voor de postStart-hook (zie hierboven).
                   - name: webserver-config
-                    mountPath: /uwv-airflow-config
+                    mountPath: /airflow-config
                     readOnly: true
             volumes:
-              - name: uwv-ca
+              - name: platform-ca
                 configMap:
-                  name: uwv-ca-bundle
+                  name: platform-ca-bundle
               - name: cosmos-pkgs
                 emptyDir: {}
               - name: airflow-dags
@@ -243,14 +243,14 @@ spec:
 
   schedulers:
     envOverrides:
-      REQUESTS_CA_BUNDLE: "/etc/uwv-ca/ca.crt"
-      SSL_CERT_FILE: "/etc/uwv-ca/ca.crt"
+      REQUESTS_CA_BUNDLE: "/etc/platform-ca/ca.crt"
+      SSL_CERT_FILE: "/etc/platform-ca/ca.crt"
       # Airflow 3.x: [webserver] is gesplitst in [api] + [fab]. Zelfde
       # set als webservers — de scheduler genereert ook redirect_uri's
       # voor task-logs / Cosmos-callbacks die door nginx terug komen.
-      # Path-routing onder platform.uwv-platform.local/airflow.
-      AIRFLOW__API__BASE_URL: "https://platform.uwv-platform.local:8443/airflow"
-      AIRFLOW__FAB__BASE_URL: "https://platform.uwv-platform.local:8443/airflow"
+      # Path-routing onder platform.odap.local/airflow.
+      AIRFLOW__API__BASE_URL: "https://platform.odap.local:8443/airflow"
+      AIRFLOW__FAB__BASE_URL: "https://platform.odap.local:8443/airflow"
       AIRFLOW__FAB__ENABLE_PROXY_FIX: "True"
       AIRFLOW__FAB__PROXY_FIX_X_PROTO: "1"
       AIRFLOW__FAB__PROXY_FIX_X_HOST: "1"
@@ -260,15 +260,15 @@ spec:
       # heeft cosmos + sources_loader nodig.
       # Include zelf + cosmos VOOR system-paths zodat factory-imports voorrang hebben.
       # Stackable's eigen log_config + dags-folder achteraan om defaults te behouden.
-      PYTHONPATH: "/opt/uwv/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
+      PYTHONPATH: "/opt/odap/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
       # Stackable 26.3 detecteert executor uit *Executors-block, maar voor onze
       # setup expliciet zetten zodat tasks via KubernetesExecutor een eigen pod krijgen.
       AIRFLOW__CORE__EXECUTOR: "KubernetesExecutor"
-      AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "uwv-platform"
+      AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "odap-platform"
       # Geen pod_template_file — laat Airflow de defaults gebruiken; podOverrides
       # in kubernetesExecutors-blok hierboven definiëren de mounts + initContainers.
-      UWV_SOURCES_DIR: "/opt/uwv/airflow/sources"
-      UWV_DBT_MANIFEST_PATH: "/opt/uwv/dbt/manifest.json"
+      SOURCES_DIR: "/opt/odap/airflow/sources"
+      DBT_MANIFEST_PATH: "/opt/odap/dbt/manifest.json"
     config:
       logging:
         enableVectorAgent: false
@@ -336,28 +336,28 @@ spec:
             containers:
               - name: airflow
                 volumeMounts:
-                  - name: uwv-ca
-                    mountPath: /etc/uwv-ca
+                  - name: platform-ca
+                    mountPath: /etc/platform-ca
                     readOnly: true
                   - name: cosmos-pkgs
                     mountPath: /cosmos-pkgs
                     readOnly: true
                   - name: airflow-include
-                    mountPath: /opt/uwv/airflow/include
+                    mountPath: /opt/odap/airflow/include
                     readOnly: true
                   - name: airflow-sources
-                    mountPath: /opt/uwv/airflow/sources
+                    mountPath: /opt/odap/airflow/sources
                     readOnly: true
                   - name: dbt-manifest-decompressed
-                    mountPath: /opt/uwv/dbt
+                    mountPath: /opt/odap/dbt
                     readOnly: true
                   - name: airflow-dags
                     mountPath: /stackable/airflow/dags
                     readOnly: true
             volumes:
-              - name: uwv-ca
+              - name: platform-ca
                 configMap:
-                  name: uwv-ca-bundle
+                  name: platform-ca-bundle
               - name: cosmos-pkgs
                 emptyDir: {}
               - name: airflow-dags
@@ -391,11 +391,11 @@ spec:
         memory:
           limit: "1Gi"
     envOverrides:
-      REQUESTS_CA_BUNDLE: "/etc/uwv-ca/ca.crt"
-      SSL_CERT_FILE: "/etc/uwv-ca/ca.crt"
-      PYTHONPATH: "/opt/uwv/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
-      UWV_SOURCES_DIR: "/opt/uwv/airflow/sources"
-      UWV_DBT_MANIFEST_PATH: "/opt/uwv/dbt/manifest.json"
+      REQUESTS_CA_BUNDLE: "/etc/platform-ca/ca.crt"
+      SSL_CERT_FILE: "/etc/platform-ca/ca.crt"
+      PYTHONPATH: "/opt/odap/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
+      SOURCES_DIR: "/opt/odap/airflow/sources"
+      DBT_MANIFEST_PATH: "/opt/odap/dbt/manifest.json"
     podOverrides:
       spec:
         initContainers:
@@ -448,8 +448,8 @@ spec:
                   name: uc11-multiplatform-creds
                   optional: true
             volumeMounts:
-              - name: uwv-ca
-                mountPath: /etc/uwv-ca
+              - name: platform-ca
+                mountPath: /etc/platform-ca
                 readOnly: true
               - name: cosmos-pkgs
                 mountPath: /cosmos-pkgs
@@ -458,18 +458,18 @@ spec:
                 mountPath: /stackable/airflow/dags
                 readOnly: true
               - name: airflow-include
-                mountPath: /opt/uwv/airflow/include
+                mountPath: /opt/odap/airflow/include
                 readOnly: true
               - name: airflow-sources
-                mountPath: /opt/uwv/airflow/sources
+                mountPath: /opt/odap/airflow/sources
                 readOnly: true
               - name: dbt-manifest-decompressed
-                mountPath: /opt/uwv/dbt
+                mountPath: /opt/odap/dbt
                 readOnly: true
         volumes:
-          - name: uwv-ca
+          - name: platform-ca
             configMap:
-              name: uwv-ca-bundle
+              name: platform-ca-bundle
           - name: cosmos-pkgs
             emptyDir: {}
           - name: airflow-dags

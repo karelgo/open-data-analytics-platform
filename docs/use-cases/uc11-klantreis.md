@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1e (publieke taak) — gecombineerd uit wettelijke grondslag per bron |
 | Bewaartermijn | Erft langste bewaartermijn van bronnen (30 jaar — polisadm) |
 
-Bron-aanvulling: deze UC is **niet** in `referentiearchitectuur-uwv-data-analytics.md`
+Bron-aanvulling: deze UC is **niet** in `referentiearchitectuur-odap-data-analytics.md`
 beschreven. Toegevoegd in deze referentie-implementatie als **integrale demo**
 die alle platform-facetten in één klantverhaal samenbrengt.
 
@@ -15,7 +15,7 @@ die alle platform-facetten in één klantverhaal samenbrengt.
 
 ## Probleem
 
-UWV-cliënten doorlopen vaak meerdere wetten en domeinen: werknemer → ziek →
+platform-cliënten doorlopen vaak meerdere wetten en domeinen: werknemer → ziek →
 WIA-aanvraag → re-integratie → werkhervatting → bezwaar. Vandaag zien
 medewerkers **fragmenten** per systeem (Werkmap, polisadm, CRM, WIA-claim).
 Een **temporele**, **cross-domein** klantreis bestaat niet — terwijl die

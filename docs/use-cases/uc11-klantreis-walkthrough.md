@@ -12,19 +12,19 @@ heen wandelen op het draaiende platform, met directe links naar elk onderdeel.
 
 ### 0.1 Hosts-file
 
-Het platform draait op `*.uwv-platform.local:8443` (k3d-cluster met
+Het platform draait op `*.odap.local:8443` (k3d-cluster met
 self-signed certs). Zorg dat je `/etc/hosts` deze entries heeft (één regel
 volstaat — IP wijst naar de ingress-controller):
 
 ```
-127.0.0.1   platform.uwv-platform.local:8443 keycloak.uwv-platform.local:8443 airflow.uwv-platform.local:8443 superset.uwv-platform.local:8443 openmetadata.uwv-platform.local:8443 minio.uwv-platform.local:8443 minio-console.uwv-platform.local:8443 grafana.uwv-platform.local:8443 prometheus.uwv-platform.local:8443 opensearch.uwv-platform.local:8443
+127.0.0.1   platform.odap.local:8443 keycloak.odap.local:8443 airflow.odap.local:8443 superset.odap.local:8443 openmetadata.odap.local:8443 minio.odap.local:8443 minio-console.odap.local:8443 grafana.odap.local:8443 prometheus.odap.local:8443 opensearch.odap.local:8443
 ```
 
 Cluster up? Check via `kubectl get ingress -A` of:
 
 ```bash
 make doctor                 # tooling-check
-kubectl -n uwv-platform get pods | grep -v Running   # alles Running?
+kubectl -n odap-platform get pods | grep -v Running   # alles Running?
 ```
 
 ### 0.2 Demo-rollen (Keycloak)
@@ -40,7 +40,7 @@ deel van dezelfde mart zien:
 | `data.steward` | `data_steward` | aggregated view voor DQ-reviews |
 | `smoketest` | `smoketest` | technische runner — schrijft de marts |
 
-Wachtwoorden in [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json)
+Wachtwoorden in [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json)
 (dev-only).
 
 ---
@@ -49,15 +49,15 @@ Wachtwoorden in [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastruc
 
 | Onderdeel | URL (lokaal) | UC-11 rol |
 |---|---|---|
-| **Portal** (deze docs + dbt-docs + architecture) | https://platform.uwv-platform.local:8443/ | startpunt; lineage-viewer |
-| **dbt docs** (lineage, kolom-metadata, tests) | https://platform.uwv-platform.local:8443/dbt-docs.html | toon graaf van `mart_uc11_*` ← intermediate ← 7 staging |
-| **OpenMetadata** (catalog, glossary, tags, lineage) | https://openmetadata.uwv-platform.local:8443 | CGM-glossary `Klantreis`, doelbinding-tags |
-| **Superset** (BI / dashboards) | https://superset.uwv-platform.local:8443 | klantreis-tijdlijn-dashboard |
-| **Airflow** (orkestratie) | https://airflow.uwv-platform.local:8443 | DAG `gold_uc11_klantreis` |
-| **Keycloak** (SSO + rollen) | https://keycloak.uwv-platform.local:8443 | rol-switch, realm-export |
-| **MinIO console** (lakehouse buckets) | https://minio-console.uwv-platform.local:8443 | bronze/silver/gold/sensitive Delta-bestanden |
-| **Grafana** (metrics) | https://grafana.uwv-platform.local:8443 | Trino/OPA latency tijdens demo |
-| **OpenSearch** (audit-logs) | https://opensearch.uwv-platform.local:8443 | "wie keek wanneer" |
+| **Portal** (deze docs + dbt-docs + architecture) | https://platform.odap.local:8443/ | startpunt; lineage-viewer |
+| **dbt docs** (lineage, kolom-metadata, tests) | https://platform.odap.local:8443/dbt-docs.html | toon graaf van `mart_uc11_*` ← intermediate ← 7 staging |
+| **OpenMetadata** (catalog, glossary, tags, lineage) | https://openmetadata.odap.local:8443 | CGM-glossary `Klantreis`, doelbinding-tags |
+| **Superset** (BI / dashboards) | https://superset.odap.local:8443 | klantreis-tijdlijn-dashboard |
+| **Airflow** (orkestratie) | https://airflow.odap.local:8443 | DAG `gold_uc11_klantreis` |
+| **Keycloak** (SSO + rollen) | https://keycloak.odap.local:8443 | rol-switch, realm-export |
+| **MinIO console** (lakehouse buckets) | https://minio-console.odap.local:8443 | bronze/silver/gold/sensitive Delta-bestanden |
+| **Grafana** (metrics) | https://grafana.odap.local:8443 | Trino/OPA latency tijdens demo |
+| **OpenSearch** (audit-logs) | https://opensearch.odap.local:8443 | "wie keek wanneer" |
 
 > Niet bereikbaar in browser? Zie [Troubleshooting](#7-troubleshooting).
 
@@ -76,13 +76,13 @@ Geen technologie — alleen het probleem.
 
 ### Stap 2 — De architectuur op één pagina
 
-Open https://platform.uwv-platform.local:8443/architecture. Wijs aan: 7
+Open https://platform.odap.local:8443/architecture. Wijs aan: 7
 domeinen, medallion, sensitive bucket, cross-cutting auth/audit. Sluit af
 met "alles wat we straks zien is dit plaatje in detail".
 
 ### Stap 3 — De data-graaf in dbt docs
 
-Open https://platform.uwv-platform.local:8443/dbt-docs.html. Zoek
+Open https://platform.odap.local:8443/dbt-docs.html. Zoek
 `mart_uc11_klantreis_events` → klik linksonder op het **lineage-icoon**.
 De graaf toont:
 
@@ -101,7 +101,7 @@ de tijdlijn reconstrueert."
 
 ### Stap 4 — Catalog & doelbinding-tags in OpenMetadata
 
-Open https://openmetadata.uwv-platform.local:8443. Navigeer:
+Open https://openmetadata.odap.local:8443. Navigeer:
 **Glossaries → CGM → Klantreis**. Toon de relatie tussen `Klantreis`,
 `Fase`, `EventStream` en bestaande CGM-termen (`Cliënt`, `IKV`, `Contact`...).
 
@@ -111,7 +111,7 @@ tool). Tabblad **Sample Data** toont een paar rijen.
 
 ### Stap 5 — Eén query, zes brillen (live OPA-demo)
 
-Zet eerst een port-forward op: `kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443`.
+Zet eerst een port-forward op: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443`.
 Open vervolgens https://localhost:8443. Login als `smoketest`. Run:
 
 ```sql
@@ -146,7 +146,7 @@ met doorlooptijden in dagen.
 
 ### Stap 7 — Orchestratie in Airflow
 
-Open https://airflow.uwv-platform.local:8443. Zoek DAG
+Open https://airflow.odap.local:8443. Zoek DAG
 `gold_uc11_klantreis`. Toon:
 - Cosmos heeft per dbt-model een task gegenereerd
 - Triggers: 7 silver-datasets (één per staging-domein)
@@ -161,13 +161,13 @@ Demo-foutpoging: laat `crm.medewerker` proberen `numeric_value` op een
 WIA-event te selecteren (waar `arbeidsongeschikt_pct` in zou zitten).
 Of: query `sensitive.wia.medisch_dossier`. → OPA `deny`.
 
-Open https://opensearch.uwv-platform.local:8443 (of de Vector-index in
+Open https://opensearch.odap.local:8443 (of de Vector-index in
 OpenMetadata) → zoek op `crm.medewerker` in de laatste minuut → de poging
 staat geregistreerd met user, rol, queried table, denied=true.
 
 ### Stap 9 — Self-service access-request
 
-Open https://openmetadata.uwv-platform.local:8443 →
+Open https://openmetadata.odap.local:8443 →
 **trino.gold.uc11_klantreis** → knop **Request Access**. Toon de
 [access-request-guide](../access-request-guide.md): vraag wordt door
 data-steward goedgekeurd → de
@@ -204,15 +204,15 @@ Geen nieuwe generator voor UC-11; we hergebruiken de bestaande:
 Loader: [data-generation/load_to_kafka.py](../../data-generation/load_to_kafka.py).
 Aanroepen via `make seed` (zie [scripts/seed.sh](../../scripts/seed.sh)).
 
-Live verkennen: `kubectl -n uwv-platform port-forward svc/uwv-nifi-node-default 8443:8443` en open `https://localhost:8443/` → flow per topic.
+Live verkennen: `kubectl -n odap-platform port-forward svc/nifi-node-default 8443:8443` en open `https://localhost:8443/` → flow per topic.
 
 ### 3.2 Kafka → bronze Delta — Spark Structured Streaming
 
 [spark-jobs/streaming_kafka_to_lakehouse.py](../../spark-jobs/streaming_kafka_to_lakehouse.py)
 schrijft elke topic in een Delta-tabel onder `bronze.uwv.*`.
 
-Live verkennen: https://minio-console.uwv-platform.local:8443 →
-bucket `uwv-bronze` → onder `<domain>_<event>/` zie je Delta `_delta_log/`
+Live verkennen: https://minio-console.odap.local:8443 →
+bucket `odap-bronze` → onder `<domain>_<event>/` zie je Delta `_delta_log/`
 + parquet-files.
 
 ### 3.3 bronze → silver — dbt staging (views)
@@ -393,7 +393,7 @@ make opa-bundle && kubectl apply -k platform/10-opa/
 ### Kan de portal niet openen / certificaatwaarschuwing
 
 Self-signed CA. Eenmalig accepteren in de browser, of importeer
-`~/.uwv-platform-ca.crt` in je systeem-keystore. Zie
+`~/.odap-platform-ca.crt` in je systeem-keystore. Zie
 [docs/runbook.md](../runbook.md).
 
 ### dbt-docs op het platform is verouderd
@@ -418,7 +418,7 @@ diff platform/10-opa/policies/trino-row-filters.rego \
 
 Geen diff = bundle in repo gesynced. Cluster-side:
 ```bash
-kubectl -n uwv-platform get cm opa-trino-bundle -o jsonpath='{.metadata.annotations}'
+kubectl -n odap-platform get cm opa-trino-bundle -o jsonpath='{.metadata.annotations}'
 ```
 
 Vergelijk `kubectl.kubernetes.io/last-applied-configuration` timestamp met
@@ -430,8 +430,8 @@ bundle-loader herpolt elke 20s; geef het een halve minuut.
 ```bash
 # Pad-issue tussen test-env en Stackable productie-bundle.
 # De wrapper script lost dit op:
-python3 scripts/opa-test-data-wrap.py --dst /tmp/uwv-opa-test-data.json
-opa test opa-policies-src/trino/ /tmp/uwv-opa-test-data.json -v
+python3 scripts/opa-test-data-wrap.py --dst /tmp/opa-test-data.json
+opa test opa-policies-src/trino/ /tmp/opa-test-data.json -v
 ```
 
 Verwacht `PASS: 33/33`.

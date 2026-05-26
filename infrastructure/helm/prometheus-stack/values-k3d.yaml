@@ -14,11 +14,11 @@ alertmanager:
       limits:
         memory: 128Mi
     # Pak alle AlertmanagerConfig CRs uit alle namespaces met label
-    # alertmanagerConfig: uwv-platform. Zonder dit is operator-style
+    # alertmanagerConfig: odap-platform. Zonder dit is operator-style
     # discovery uit.
     alertmanagerConfigSelector:
       matchLabels:
-        alertmanagerConfig: uwv-platform
+        alertmanagerConfig: odap-platform
     alertmanagerConfigMatcherStrategy:
       type: None
     storage:

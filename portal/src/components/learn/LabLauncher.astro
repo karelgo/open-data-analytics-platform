@@ -13,7 +13,7 @@ interface Props {
 
 const { title, hint, href, vscodePath } = Astro.props;
 
-// Default repo. Klant kan dit overriden per omgeving via window.UWV_REPO.
+// Default repo. Klant kan dit overriden per omgeving via window.REPO.
 const defaultRepo = 'github.com/UWV/UDP_Stackable';
 const isExternal = href.startsWith('http');
 ---
@@ -64,12 +64,12 @@ const isExternal = href.startsWith('http');
 </style>
 
 <script>
-  // vscode.dev URL bouwen. We respecteren window.UWV_REPO override (kan in
+  // vscode.dev URL bouwen. We respecteren window.REPO override (kan in
   // dev gezet worden zodat de knop naar je eigen fork wijst), anders fallback
   // naar de default uit het data-attribute.
   function buildVscodeUrl(path: string, defaultRepo: string): string {
-    const repo = (window as any).UWV_REPO ?? defaultRepo;
-    const branch = (window as any).UWV_BRANCH ?? 'main';
+    const repo = (window as any).REPO ?? defaultRepo;
+    const branch = (window as any).BRANCH ?? 'main';
     // vscode.dev opent een directory of bestand vanuit github.
     // Patroon: https://vscode.dev/<repo-host>/<owner>/<name>/blob/<branch>/<path>
     return `https://vscode.dev/${repo}/blob/${branch}/${path}`;

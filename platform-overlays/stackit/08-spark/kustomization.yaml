@@ -16,7 +16,7 @@ patches:
         value: letsencrypt-prod
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: spark.freshstackable.com
+        value: spark.example.com
       - op: replace
         path: /spec/rules/0/host
-        value: spark.freshstackable.com
+        value: spark.example.com

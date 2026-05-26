@@ -1,4 +1,4 @@
-# UWV Classifications voor OpenMetadata.
+# Platform Classifications for OpenMetadata.
 #
 # Deze YAML wordt door de init-Job (`init-job.yaml`) via de OpenMetadata REST API
 # (POST /api/v1/classifications) toegepast. De init-script leest dit bestand

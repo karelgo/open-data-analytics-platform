@@ -6,13 +6,13 @@
 # Quota's zijn **conservatief voor scaled-down k3d**. Productie-overlay
 # verhoogt deze waarden 5-10x.
 
-# ─── uwv-platform — Stackable workloads (zwaarst) ────────────────────
+# ─── odap-platform — Stackable workloads (zwaarst) ────────────────────
 ---
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: uwv-platform-quota
-  namespace: uwv-platform
+  name: odap-platform-quota
+  namespace: odap-platform
 spec:
   hard:
     requests.cpu: "8"
@@ -26,8 +26,8 @@ spec:
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: uwv-platform-limits
-  namespace: uwv-platform
+  name: odap-platform-limits
+  namespace: odap-platform
 spec:
   limits:
     - type: Container
@@ -44,13 +44,13 @@ spec:
         cpu: "10m"
         memory: 32Mi
 
-# ─── uwv-data — gedeelde Postgres ──────────────────────────────────────
+# ─── odap-data — gedeelde Postgres ──────────────────────────────────────
 ---
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: uwv-data-quota
-  namespace: uwv-data
+  name: odap-data-quota
+  namespace: odap-data
 spec:
   hard:
     requests.cpu: "2"
@@ -64,8 +64,8 @@ spec:
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: uwv-data-limits
-  namespace: uwv-data
+  name: odap-data-limits
+  namespace: odap-data
 spec:
   limits:
     - type: Container
@@ -76,13 +76,13 @@ spec:
         cpu: "100m"
         memory: 256Mi
 
-# ─── uwv-meta — OpenMetadata + OpenSearch ──────────────────────────────
+# ─── odap-meta — OpenMetadata + OpenSearch ──────────────────────────────
 ---
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: uwv-meta-quota
-  namespace: uwv-meta
+  name: odap-meta-quota
+  namespace: odap-meta
 spec:
   hard:
     requests.cpu: "4"
@@ -96,8 +96,8 @@ spec:
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: uwv-meta-limits
-  namespace: uwv-meta
+  name: odap-meta-limits
+  namespace: odap-meta
 spec:
   limits:
     - type: Container
@@ -108,13 +108,13 @@ spec:
         cpu: "100m"
         memory: 256Mi
 
-# ─── uwv-monitoring — Prometheus + Grafana + Vector ────────────────────
+# ─── odap-monitoring — Prometheus + Grafana + Vector ────────────────────
 ---
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: uwv-monitoring-quota
-  namespace: uwv-monitoring
+  name: odap-monitoring-quota
+  namespace: odap-monitoring
 spec:
   hard:
     requests.cpu: "2"
@@ -125,13 +125,13 @@ spec:
     pods: "20"
     persistentvolumeclaims: "5"
 
-# ─── uwv-auth — Keycloak ───────────────────────────────────────────────
+# ─── odap-auth — Keycloak ───────────────────────────────────────────────
 ---
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: uwv-auth-quota
-  namespace: uwv-auth
+  name: odap-auth-quota
+  namespace: odap-auth
 spec:
   hard:
     requests.cpu: "1"

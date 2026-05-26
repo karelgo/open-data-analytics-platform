@@ -11,11 +11,11 @@ apiVersion: spark.stackable.tech/v1alpha1
 kind: SparkApplication
 metadata:
   name: gold-wia-${RUN_ID}
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    uwv.nl/zone: gold
-    uwv.nl/use-case: wia-spark-demo
-    uwv.nl/dag: transform_wia_spark
+    odap.io/zone: gold
+    odap.io/use-case: wia-spark-demo
+    odap.io/dag: transform_wia_spark
 spec:
   sparkImage:
     productVersion: "3.5.8"
@@ -34,7 +34,7 @@ spec:
     spark.kubernetes.executor.deleteOnTermination: "true"
     # Event-logs → SparkHistoryServer (zie platform/08-spark/history-server.yaml).
     spark.eventLog.enabled: "true"
-    spark.eventLog.dir: "s3a://uwv-checkpoints/spark-events/"
+    spark.eventLog.dir: "s3a://odap-checkpoints/spark-events/"
   driver:
     config:
       logging:

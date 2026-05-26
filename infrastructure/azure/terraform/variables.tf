@@ -23,13 +23,13 @@ variable "location" {
 variable "cluster_name" {
   description = "AKS cluster name."
   type        = string
-  default     = "uwv-platform-aks"
+  default     = "odap-platform-aks"
 }
 
 variable "dns_prefix" {
   description = "DNS prefix for the AKS API server."
   type        = string
-  default     = "uwv-platform"
+  default     = "odap-platform"
 }
 
 variable "node_count" {
@@ -133,7 +133,7 @@ variable "tags" {
   description = "Tags applied to all created resources."
   type        = map(string)
   default = {
-    project     = "uwv-data-platform"
+    project     = "odap-data-platform"
     environment = "dev"
     managed_by  = "terraform"
     purpose     = "reference-implementation"

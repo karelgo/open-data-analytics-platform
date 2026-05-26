@@ -18,18 +18,18 @@ Voorvereisten (eerste deploy):
   - Service Principal met workspace-contributor op de Fabric workspace
     (env-vars FABRIC_*; in-cluster via Kubernetes Secret 'uc11-multiplatform-creds').
     Aanmaken: `kubectl create secret generic uc11-multiplatform-creds
-              --namespace uwv-platform
+              --namespace odap-platform
               --from-env-file=secrets/local/uc11-multiplatform.env`
   - Twee notebooks in de workspace met displayName uit NOTEBOOK_NAMES.
     Eerste bootstrap stelt vast welke ontbreken — upload via Fabric UI of REST.
     `uc11_dbt_gold.ipynb` is vervangen door fabric_dbt_gold KPO; notebook
     bestaat nog als doc-stub maar wordt niet meer getriggered.
-  - dbt-fabricspark zit in de uwv/dbt-trino:1.9.0-uwv image (pip-install
+  - dbt-fabricspark zit in de odap/dbt-trino:1.9.0 image (pip-install
     in infrastructure/airflow/dbt/Dockerfile).
   - Optioneel: Airflow Variable 'fabric_uc11_notebooks' (JSON dict
     {displayName: itemId}) om automatische resolution te overrulen.
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -69,9 +69,9 @@ GOLD_MART = "mart_uc11_klantreis_events"
 
 # Image die zowel dbt-trino als dbt-fabricspark heeft (zie
 # infrastructure/airflow/dbt/Dockerfile). Bevat het hele dbt-project op
-# /opt/uwv/dbt/ en profiles.yml op /root/.dbt/profiles.yml met `fabric_dev`
+# /opt/odap/dbt/ en profiles.yml op /root/.dbt/profiles.yml met `fabric_dev`
 # target die env-vars uit het Secret hieronder leest.
-DBT_IMAGE = "uwv/dbt-trino:1.9.0-uwv"
+DBT_IMAGE = "odap/dbt-trino:1.9.0"
 DBT_SECRET = "uc11-multiplatform-creds"
 
 
@@ -147,13 +147,13 @@ def _verify_gold_mart(**_) -> None:
     )
 
 
-# dbt-fabricspark run-script voor de KPO. Werkdir is /opt/uwv/dbt (zie image);
+# dbt-fabricspark run-script voor de KPO. Werkdir is /opt/odap/dbt (zie image);
 # profiles.yml zit op /root/.dbt/profiles.yml. `--no-partial-parse` voorkomt
 # stale manifest-issues in een verse pod. `--select int_klantreis_events+`
 # bouwt alleen wat we voor Fabric nodig hebben — staging blijft op Trino.
 DBT_RUN_SCRIPT = (
     "set -euo pipefail\n"
-    "cd /opt/uwv/dbt\n"
+    "cd /opt/odap/dbt\n"
     "echo '=== dbt debug ==='\n"
     "dbt debug --target fabric_dev || echo '(debug-warning negeerd; ga door naar run)'\n"
     "echo '=== dbt run ==='\n"
@@ -190,7 +190,7 @@ with DAG(
     # als Trino executeert, demonstreert dbt-portabiliteit.
     gold = KubernetesPodOperator(
         task_id="fabric_dbt_gold",
-        namespace="uwv-platform",
+        namespace="odap-platform",
         image=DBT_IMAGE,
         cmds=["bash", "-c"],
         arguments=[DBT_RUN_SCRIPT],

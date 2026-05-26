@@ -3,20 +3,20 @@
 # Template: connector-block wordt door scripts/render-trino-catalogs.py
 # vervangen op basis van platform-config.yaml::table_format.
 #
-# Selector: het label `trino: uwv-trino` koppelt deze catalog aan de
+# Selector: het label `trino: trino` koppelt deze catalog aan de
 # TrinoCluster met dezelfde label-selector (zie 09-trino/trinocluster.yaml).
 ---
 apiVersion: trino.stackable.tech/v1alpha1
 kind: TrinoCatalog
 metadata:
   name: bronze
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    trino: uwv-trino
-    uwv.nl/zone: bronze
-    uwv.nl/format: __TABLE_FORMAT__
+    trino: trino
+    odap.io/zone: bronze
+    odap.io/format: __TABLE_FORMAT__
   annotations:
-    uwv.nl/description: "Bronze layer — raw, immutable. Includes PII; OPA enforces strict access (TODO fase 9)."
+    odap.io/description: "Bronze layer — raw, immutable. Includes PII; OPA enforces strict access (TODO fase 9)."
 spec:
   configOverrides:
     # CSV-batch flow (csv_to_bronze.py) schrijft Delta via deltalake-rs en

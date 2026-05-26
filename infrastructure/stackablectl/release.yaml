@@ -9,7 +9,7 @@
 # Per operator één regel; alle versies zijn gepind voor reproduceerbare deploys.
 # Updates: bewust en via PR (R-BIO-19 change management, R-NIS2-03 supply chain).
 
-releaseName: uwv-platform-26.3
+releaseName: odap-platform-26.3
 releaseVersion: 26.3.0
 
 products:

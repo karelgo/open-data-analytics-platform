@@ -7,21 +7,21 @@
 # dus method=none wat alleen X-Trino-User stuurt).
 #
 # Voor lokale `dbt` runs gebruik je profiles.yml.template in dbt/.
-uwv_trino:
+trino_default:
   target: dev
   outputs:
     dev:
       type: trino
       method: none
       user: smoketest
-      host: uwv-trino-coordinator.uwv-platform.svc.cluster.local
+      host: trino-coordinator.odap-platform.svc.cluster.local
       # 8443 is hardgecodeerd: TRINO_PORT mag niet via env worden overschreven
       # (sommige Trino-clients/Cosmos zetten 'm op 443).
       port: 8443
       http_scheme: https
       # cert=false → geen TLS-verify. OK voor in-cluster dev (cert-manager
       # self-signed CA niet aanwezig in dbt-image). Productie injecteert
-      # /etc/ssl/uwv-platform-ca.crt via volume + extraLoad-config.
+      # /etc/ssl/odap-platform-ca.crt via volume + extraLoad-config.
       cert: false
       database: silver
       schema: dbt_default
@@ -44,7 +44,7 @@ uwv_trino:
       endpoint: "{{ env_var('FABRIC_ENDPOINT', 'https://api.fabric.microsoft.com/v1') }}"
       schema: "{{ env_var('FABRIC_SCHEMA', 'uc11_lakehouse') }}"
       spark_config:
-        name: "dbt-uwv-uc11"
+        name: "dbt-uc11"
       threads: 4
       connect_retries: 5
       connect_timeout: 60

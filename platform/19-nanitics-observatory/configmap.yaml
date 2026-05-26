@@ -12,7 +12,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nanitics-observatory-config
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   LLM_PROVIDER: "azure-foundry"
   # Must match a deployment name in the Foundry project. Probed via
@@ -37,20 +37,20 @@ data:
   # 'approved' before any coding agent claims the work.
 
   # Read-only metrics + alerts (kube-prometheus-stack).
-  PROMETHEUS_URL: "http://prometheus-kube-prometheus-prometheus.uwv-monitoring:9090"
-  ALERTMANAGER_URL: "http://prometheus-kube-prometheus-alertmanager.uwv-monitoring:9093"
+  PROMETHEUS_URL: "http://prometheus-kube-prometheus-prometheus.odap-monitoring:9090"
+  ALERTMANAGER_URL: "http://prometheus-kube-prometheus-alertmanager.odap-monitoring:9093"
 
   # Read-only log search (Vector → OpenSearch indices defined in
   # platform/14-monitoring/opensearch-ilm-job.yaml).
-  OPENSEARCH_URL: "http://opensearch-uwv.uwv-meta.svc.cluster.local:9200"
-  OPENSEARCH_INDEX_PATTERN: "uwv-logs-*"
+  OPENSEARCH_URL: "http://opensearch.odap-meta.svc.cluster.local:9200"
+  OPENSEARCH_INDEX_PATTERN: "logs-*"
 
   # Multica task surface. multica-backend exposes its REST on Service
   # port 80 (not 8080 — the backend container's :8080 is fronted by the
   # Service). MULTICA_WORKSPACE is the slug of the workspace the watcher
   # files into; must exist on Multica AND be visible to the user that
   # owns MULTICA_API_TOKEN.
-  MULTICA_API_URL: "http://multica-backend.uwv-platform:80"
+  MULTICA_API_URL: "http://multica-backend.odap-platform:80"
   MULTICA_WORKSPACE: "testing"
   # Dry-run mode logs the payload and returns a synthetic task_id instead
   # of POSTing to Multica. Flip to 'true' to A/B a prompt change without

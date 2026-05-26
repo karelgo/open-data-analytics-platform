@@ -3,14 +3,14 @@ apiVersion: trino.stackable.tech/v1alpha1
 kind: TrinoCatalog
 metadata:
   name: sensitive
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    trino: uwv-trino
-    uwv.nl/zone: sensitive
-    uwv.nl/format: __TABLE_FORMAT__
+    trino: trino
+    odap.io/zone: sensitive
+    odap.io/format: __TABLE_FORMAT__
   annotations:
-    uwv.nl/description: "Sensitive Vault — bijzondere persoonsgegevens (art. 9 AVG, medisch). 4-eyes; default-deny in OPA (fase 9)."
-    uwv.nl/avg-art9: "true"
+    odap.io/description: "Sensitive Vault — bijzondere persoonsgegevens (art. 9 AVG, medisch). 4-eyes; default-deny in OPA (fase 9)."
+    odap.io/avg-art9: "true"
 spec:
   connector:
 __TABLE_FORMAT_CONNECTOR_BLOCK__

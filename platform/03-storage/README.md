@@ -15,7 +15,7 @@ kubectl apply -k platform/03-storage/
 ## Validatie
 
 ```bash
-kubectl -n uwv-platform get s3connection s3-minio -o yaml
+kubectl -n odap-platform get s3connection s3-minio -o yaml
 ```
 
 ## Productie-overwegingen

@@ -2,11 +2,11 @@
 # Smoke test 07 — OpenMetadata draait, classifications + glossary geladen.
 #
 # Voorwaarden:
-#   - infrastructure/helm/opensearch + openmetadata Helm installed (uwv-meta ns)
+#   - infrastructure/helm/opensearch + openmetadata Helm installed (odap-meta ns)
 #   - platform/13-openmetadata-config applied → init-Job complete
 set -euo pipefail
 
-NS="${NS:-uwv-meta}"
+NS="${NS:-odap-meta}"
 
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 pass() { printf '\033[1;32m  OK\033[0m  %s\n' "$*"; }
@@ -14,14 +14,14 @@ fail() { printf '\033[1;31m  FAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
 # 1. OpenSearch Ready
 log "OpenSearch single-node Ready"
-kubectl -n "$NS" rollout status statefulset/opensearch-uwv-master --timeout=10m >/dev/null 2>&1 \
-  || fail "OpenSearch (statefulset opensearch-uwv-master) niet Ready"
+kubectl -n "$NS" rollout status statefulset/opensearch-master --timeout=10m >/dev/null 2>&1 \
+  || fail "OpenSearch (statefulset opensearch-master) niet Ready"
 pass "OpenSearch Ready"
 
 # 1a. OpenSearch Dashboards Ready
 log "OpenSearch Dashboards Ready"
-kubectl -n "$NS" rollout status deploy/opensearch-dashboards-uwv --timeout=10m >/dev/null 2>&1 \
-  || fail "OpenSearch Dashboards (deploy/opensearch-dashboards-uwv) niet Ready"
+kubectl -n "$NS" rollout status deploy/opensearch-dashboards --timeout=10m >/dev/null 2>&1 \
+  || fail "OpenSearch Dashboards (deploy/opensearch-dashboards) niet Ready"
 pass "OpenSearch Dashboards Ready"
 
 # 2. OpenMetadata Ready
@@ -52,7 +52,7 @@ om_curl() {
   kubectl -n "$NS" run om-smoke-$RANDOM \
     --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
     curl -fsS --max-time 30 \
-      "http://openmetadata.uwv-meta.svc.cluster.local:8585${path}" \
+      "http://openmetadata.odap-meta.svc.cluster.local:8585${path}" \
       -H "Authorization: Bearer ${token}" 2>/dev/null || echo "{}"
 }
 

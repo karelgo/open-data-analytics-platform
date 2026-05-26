@@ -20,7 +20,7 @@ Dashboards bouwen we vervolgens **interactief** in Superset's UI; export via
 cp ~/Downloads/dashboard_export.zip platform/12-superset/dashboards/uc01-wia-funnel.zip
 
 # Re-import op een nieuw cluster:
-kubectl -n uwv-platform exec deploy/uwv-superset-node-default -c superset -- \
+kubectl -n odap-platform exec deploy/superset-node-default -c superset -- \
   superset import-dashboards -p /tmp/uc01-wia-funnel.zip
 ```
 

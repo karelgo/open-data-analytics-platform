@@ -65,12 +65,12 @@ from pydantic import BaseModel, Field
 LOG = logging.getLogger("om-access-bridge")
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 
-KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL", "http://keycloak.uwv-auth.svc.cluster.local:80")
+KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL", "http://keycloak.odap-auth.svc.cluster.local:80")
 KEYCLOAK_REALM = os.environ.get("KEYCLOAK_REALM", "uwv")
 KEYCLOAK_CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID", "om-access-bridge")
 KEYCLOAK_CLIENT_SECRET = os.environ.get("KEYCLOAK_CLIENT_SECRET", "")
 OM_WEBHOOK_SECRET = os.environ.get("OM_WEBHOOK_SECRET", "")
-OM_BASE_URL = os.environ.get("OM_BASE_URL", "http://openmetadata.uwv-meta.svc.cluster.local:8585")
+OM_BASE_URL = os.environ.get("OM_BASE_URL", "http://openmetadata.odap-meta.svc.cluster.local:8585")
 OM_ADMIN_TOKEN = os.environ.get("OM_ADMIN_TOKEN", "")
 CORS_ALLOWED_ORIGINS = [
     o.strip() for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()
@@ -81,13 +81,13 @@ REPLAY_WINDOW_SECONDS = int(os.environ.get("REPLAY_WINDOW_SECONDS", "300"))
 # service. Een aanvraag op een glossary-term zonder asset-link wordt
 # afgewezen (kan niet naar concrete schema mappen).
 #
-# OM ingest registreert Trino als service "uwv-trino" (zie
+# OM ingest registreert Trino als service "trino" (zie
 # platform/13-openmetadata-config/services/). Oude conventie "trino"
 # blijft als backward-compat — beide herkenbaar.
-SUPPORTED_SERVICES = {"trino", "uwv-trino"}
+SUPPORTED_SERVICES = {"trino", "trino"}
 
 # OM ChangeEvent's `about` field wraps the entity FQN in an entity-ref
-# token, e.g. `<#E::table::uwv-trino.gold.uc11.tbl>`. The bridge accepts
+# token, e.g. `<#E::table::trino.gold.uc11.tbl>`. The bridge accepts
 # both wrapped and bare FQNs; this regex extracts the bare form when
 # wrapped. The entityType segment (`table` here) is not used — the
 # bridge already enforces the parent event's entityType separately.
@@ -342,7 +342,7 @@ class OpenMetadata:
             f"{self._base}/api/v1/users",
             json={
                 "name": username,
-                "email": f"{username}@uwv-platform.local",
+                "email": f"{username}@odap.local",
                 "isBot": False,
                 "isAdmin": False,
             },

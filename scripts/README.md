@@ -26,7 +26,7 @@ draaien doet geen schade.
 | Script | Make-target | Doel |
 |---|---|---|
 | [`doctor.sh`](doctor.sh) | `make doctor` | Check vereiste tooling op de host (docker, k3d, kubectl, helm, stackablectl, opa, yq, …). |
-| [`port-forward.sh`](port-forward.sh) | `make forward` | Start `kubectl port-forward` voor service-UI's die niet via ingress lopen. PIDs in `/tmp/uwv-pf-*.pid`. |
+| [`port-forward.sh`](port-forward.sh) | `make forward` | Start `kubectl port-forward` voor service-UI's die niet via ingress lopen. PIDs in `/tmp/pf-*.pid`. |
 
 ## AKS (Azure)
 

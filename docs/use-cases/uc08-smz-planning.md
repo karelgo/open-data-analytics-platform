@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1b (arbeidsovereenkomst medewerker) + 1f (gerechtvaardigd belang) |
 | Bewaartermijn | 5 jaar (planning-historie) |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-08](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-08](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 

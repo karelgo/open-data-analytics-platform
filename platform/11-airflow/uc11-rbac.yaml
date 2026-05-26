@@ -6,19 +6,19 @@
 #   - rebuild_superset_dashboard: read/create/delete Jobs
 #
 # We binden deze tasks aan ServiceAccount `uc11-orchestrator` ipv de
-# default-SA in uwv-platform (die heeft alleen configmap-leesrechten).
+# default-SA in odap-platform (die heeft alleen configmap-leesrechten).
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: uc11-orchestrator
-  namespace: uwv-platform
+  namespace: odap-platform
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: uc11-orchestrator
-  namespace: uwv-platform
+  namespace: odap-platform
 rules:
   # Jobs: read + manage (rebuild_superset_dashboard, ensure_seed).
   - apiGroups: ["batch"]
@@ -37,11 +37,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: uc11-orchestrator
-  namespace: uwv-platform
+  namespace: odap-platform
 subjects:
   - kind: ServiceAccount
     name: uc11-orchestrator
-    namespace: uwv-platform
+    namespace: odap-platform
 roleRef:
   kind: Role
   name: uc11-orchestrator
@@ -58,7 +58,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: airflow-kpo-events
-  namespace: uwv-platform
+  namespace: odap-platform
 rules:
   - apiGroups: [""]
     resources: ["events"]
@@ -68,11 +68,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: airflow-kpo-events
-  namespace: uwv-platform
+  namespace: odap-platform
 subjects:
   - kind: ServiceAccount
-    name: uwv-airflow-serviceaccount
-    namespace: uwv-platform
+    name: airflow-serviceaccount
+    namespace: odap-platform
 roleRef:
   kind: Role
   name: airflow-kpo-events

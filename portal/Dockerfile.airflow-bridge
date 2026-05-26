@@ -4,7 +4,7 @@
 #
 # Build vanuit repo-root:
 #   docker build -f portal/Dockerfile.airflow-bridge \
-#                -t uwv-platform/portal-airflow-bridge:dev .
+#                -t odap/portal-airflow-bridge:dev .
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -35,5 +35,5 @@ EXPOSE 8089
 # readiness/liveness HTTP-probes op de pod-IP kan doen. Binnen het pod
 # wordt 127.0.0.1:8089 gebruikt door nginx. De Service expose-set géén
 # port 8089 dus alleen pods met de pod-IP kunnen contact maken; voor
-# prod hoort hier een NetworkPolicy bij die uwv-platform ingress beperkt.
+# prod hoort hier een NetworkPolicy bij die odap-platform ingress beperkt.
 CMD ["uvicorn", "portal.scripts.airflow_bridge:app", "--host", "0.0.0.0", "--port", "8089"]

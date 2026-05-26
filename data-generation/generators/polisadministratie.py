@@ -1,6 +1,6 @@
 """Polisadministratie-stub — IKV's, dienstverbanden, lonen.
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 
 Productie-volwaardige generator komt in fase 5 zodra dbt staging-models
 de structuur eisen (UC-07 datakwaliteit als anchor).

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Maak OneLake S3-shortcuts voor de UC-12 marts → s3://uwv-gold/uc12_focus_finops/...
+"""Maak OneLake S3-shortcuts voor de UC-12 marts → s3://odap-gold/uc12_focus_finops/...
 
 End-state architectuur: data leeft in MinIO, Power BI Direct Lake leest via een
 OneLake-shortcut alsof het lokaal in `uc11_lakehouse` staat. Nul data-copy.
@@ -19,8 +19,8 @@ Voorvereisten:
 Gebruik:
     set -a; source secrets/local/uc11-multiplatform.env; set +a
     python3 scripts/fabric-create-shortcut-uc12.py \\
-        --endpoint https://minio.freshstackable.com \\
-        --bucket   uwv-gold \\
+        --endpoint https://minio.example.com \\
+        --bucket   odap-gold \\
         --prefix   uc12_focus_finops \\
         --connection-id  <guid-uit-fabric-UI>
 
@@ -113,12 +113,12 @@ def main() -> None:
     ap.add_argument(
         "--endpoint",
         required=True,
-        help="MinIO HTTPS endpoint, bv. https://minio.freshstackable.com",
+        help="MinIO HTTPS endpoint, bv. https://minio.example.com",
     )
     ap.add_argument(
         "--bucket",
-        default="uwv-gold",
-        help="S3-bucket (default: uwv-gold)",
+        default="odap-gold",
+        help="S3-bucket (default: odap-gold)",
     )
     ap.add_argument(
         "--prefix",

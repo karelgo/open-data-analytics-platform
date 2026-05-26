@@ -30,8 +30,8 @@ pass()   { printf '\033[1;32mPASS\033[0m %s\n' "$*"; }
 warn()   { printf '\033[1;33mWARN\033[0m %s\n' "$*"; }
 fail()   { printf '\033[1;31mFAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
-NS="${NS:-uwv-platform}"
-TRINO_SVC="${TRINO_SVC:-uwv-trino-coordinator}"
+NS="${NS:-odap-platform}"
+TRINO_SVC="${TRINO_SVC:-trino-coordinator}"
 
 # ─── Stage 1: dbt parse — cluster-vrij ────────────────────────────────
 section "Stage 1/5: dbt parse + UC-11 model-detectie"

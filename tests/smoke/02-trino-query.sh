@@ -11,9 +11,9 @@
 #   5. SELECT 1 werkt
 set -euo pipefail
 
-NS="${NS:-uwv-platform}"
+NS="${NS:-odap-platform}"
 SMOKE_USER="${SMOKE_USER:-smoketest}"
-SMOKE_PASSWORD="${SMOKE_PASSWORD:-uwv-dev-only-CHANGE-ME-Smoke2026}"
+SMOKE_PASSWORD="${SMOKE_PASSWORD:-odap-dev-only-CHANGE-ME-Smoke2026}"
 
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 pass() { printf '\033[1;32m  OK\033[0m  %s\n' "$*"; }
@@ -21,16 +21,16 @@ fail() { printf '\033[1;31m  FAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
 # 1. Pods Ready
 log "Trino-coordinator + worker Ready"
-kubectl -n "$NS" rollout status statefulset/uwv-trino-coordinator-default --timeout=5m >/dev/null \
+kubectl -n "$NS" rollout status statefulset/trino-coordinator-default --timeout=5m >/dev/null \
   || fail "Trino-coordinator niet Ready"
-kubectl -n "$NS" rollout status statefulset/uwv-trino-worker-default --timeout=5m >/dev/null \
+kubectl -n "$NS" rollout status statefulset/trino-worker-default --timeout=5m >/dev/null \
   || fail "Trino-worker niet Ready"
 pass "Trino-coordinator + worker pods Ready"
 
 log "OPA cluster Ready"
-kubectl -n "$NS" rollout status daemonset/uwv-opa-server-default --timeout=5m >/dev/null 2>&1 \
-  || kubectl -n "$NS" rollout status statefulset/uwv-opa-server-default --timeout=5m >/dev/null \
-  || fail "OPA niet Ready (geen daemonset of statefulset uwv-opa-server-default)"
+kubectl -n "$NS" rollout status daemonset/opa-server-default --timeout=5m >/dev/null 2>&1 \
+  || kubectl -n "$NS" rollout status statefulset/opa-server-default --timeout=5m >/dev/null \
+  || fail "OPA niet Ready (geen daemonset of statefulset opa-server-default)"
 pass "OPA pods Ready"
 
 # 2. Bundle-ConfigMap aanwezig + correct gelabeld
@@ -49,7 +49,7 @@ opa_result=$(kubectl -n "$NS" run opa-smoke-$RANDOM \
   --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
   curl -fsS --max-time 10 \
     -H 'Content-Type: application/json' \
-    -X POST "http://uwv-opa-server.${NS}.svc.cluster.local:8081/v1/data/trino/allow" \
+    -X POST "http://opa-server.${NS}.svc.cluster.local:8081/v1/data/trino/allow" \
     -d '{"input":{"context":{"identity":{"user":"smoketest"}},"action":{"operation":"ExecuteQuery"}}}' \
   2>/dev/null || true)
 if echo "$opa_result" | grep -q '"result": *true'; then
@@ -63,7 +63,7 @@ opa_anon=$(kubectl -n "$NS" run opa-smoke-anon-$RANDOM \
   --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
   curl -fsS --max-time 10 \
     -H 'Content-Type: application/json' \
-    -X POST "http://uwv-opa-server.${NS}.svc.cluster.local:8081/v1/data/trino/allow" \
+    -X POST "http://opa-server.${NS}.svc.cluster.local:8081/v1/data/trino/allow" \
     -d '{"input":{"context":{"identity":{"user":""}},"action":{"operation":"ExecuteQuery"}}}' \
   2>/dev/null || true)
 if echo "$opa_anon" | grep -q '"result": *false'; then
@@ -78,7 +78,7 @@ fi
 # X-Trino-User; geen TRINO_PASSWORD doorgeven.
 TRINO_HELPER="$(dirname "$0")/_trino_query.py"
 trino_exec() {
-  kubectl -n "$NS" exec -i statefulset/uwv-trino-coordinator-default -c trino -- \
+  kubectl -n "$NS" exec -i statefulset/trino-coordinator-default -c trino -- \
     env TRINO_USER="$SMOKE_USER" TRINO_SERVER="https://localhost:8443" \
     python3 - "$1" <"$TRINO_HELPER"
 }

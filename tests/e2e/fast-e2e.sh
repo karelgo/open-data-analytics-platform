@@ -24,8 +24,8 @@ section "Pre-checks (cluster reachability)"
 kubectl cluster-info >/dev/null 2>&1 \
   || fail "geen kubectl-context — run 'make cluster && make bootstrap && make deploy-platform' eerst"
 
-if ! kubectl get ns uwv-platform >/dev/null 2>&1; then
-    fail "namespace uwv-platform ontbreekt — bootstrap niet gedraaid?"
+if ! kubectl get ns odap-platform >/dev/null 2>&1; then
+    fail "namespace odap-platform ontbreekt — bootstrap niet gedraaid?"
 fi
 
 # ─── Stage 1: smoke 01-08 ───────────────────────────────────────────────
@@ -35,11 +35,11 @@ make smoke || fail "smoke tests"
 # ─── Stage 2: UC-01 quick verify ────────────────────────────────────────
 section "Stage 2/2: UC-01 quick verify (BSN + bronze rij-count)"
 
-NS="uwv-platform"
-SMOKE_PW="${SMOKE_PW:-uwv-dev-only-CHANGE-ME-Smoke2026}"
+NS="odap-platform"
+SMOKE_PW="${SMOKE_PW:-odap-dev-only-CHANGE-ME-Smoke2026}"
 
 trino_exec() {
-    kubectl -n "$NS" exec statefulset/uwv-trino-coordinator-default -c trino -- \
+    kubectl -n "$NS" exec statefulset/trino-coordinator-default -c trino -- \
         bash -lc "TRINO_PASSWORD='$SMOKE_PW' /stackable/trino-cli/trino \
             --server https://localhost:8443 --insecure \
             --user smoketest --password \

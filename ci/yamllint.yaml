@@ -1,5 +1,5 @@
 ---
-# yamllint config voor het UWV-platform.
+# yamllint config voor het ODAP platform.
 # Strengheid: pragmatisch dev-niveau; geen hard-stop op cosmetische zaken.
 
 extends: default

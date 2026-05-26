@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1e (Wet proactieve dienstverlening SZW, 2025) |
 | Bewaartermijn | 7 jaar |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-04](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-04](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 

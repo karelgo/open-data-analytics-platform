@@ -28,23 +28,23 @@
 #   OF: kubectl apply -f platform/13-openmetadata-config/demo-synth-marts-job.yaml
 #
 # Pre-conditions die de Job verwacht (allemaal door init-Job aangelegd):
-#   - databaseSchemas onder uwv-trino (bronze + gold per UC)
-#   - Teams (divisie_*, kenniscentrum_uwv, data_steward_*)
+#   - databaseSchemas onder trino (bronze + gold per UC)
+#   - Teams (divisie_*, knowledge_center, data_steward_*)
 #   - Domains (AG, WW, CRM, FEZ, Polisadm, Klantcontact, Governance)
 #   - DataProducts (uc01_wia_funnel, uc04_..., ...)
 #   - Classifications + Glossary CGM
 #   - Custom-property types geregistreerd op Table-entity
 #
-# SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: om-demo-seed-script
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: openmetadata-demo-seed
-    uwv.nl/dev-only: "true"
+    odap.io/component: openmetadata-demo-seed
+    odap.io/dev-only: "true"
 data:
   synth.py: |
     """Synthetiseer demo-mart tabellen + verrijking in OpenMetadata."""
@@ -187,7 +187,7 @@ data:
           col("huidige_status", V(32)),
           col("traject_start_dt", DT),
         ],
-        "domain": "AG", "owner": "kenniscentrum_uwv", "dataProduct": "uc09_reint_effect",
+        "domain": "AG", "owner": "knowledge_center", "dataProduct": "uc09_reint_effect",
         "tags": ["Tier.Tier3","Doelbinding.Statistisch_Onderzoek","LegalBasis.Art5_1b_VerenigbaarGebruik","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": ["Traject"],
         "ext": {"bewaartermijn_jaren": 10, "legal_basis_text": "art_5_1b_verenigbaar_gebruik", "dbt_domain": "ag", "sandbox_only": ["true"], "pseudonymized": ["true"]},
@@ -269,7 +269,7 @@ data:
     def put_table(database, schema, name, cols, description):
         body = {
             "name": name,
-            "databaseSchema": f"uwv-trino.{database}.{schema}",
+            "databaseSchema": f"trino.{database}.{schema}",
             "columns": cols,
             "description": description,
         }
@@ -327,7 +327,7 @@ data:
         # Beide zones — gold is wat testsuites + Superset gebruiken; bronze
         # spiegelt de dbt-manifest realiteit (alles materialiseert daar).
         for db in ("bronze", "gold"):
-            fqn = f"uwv-trino.{db}.{m['schema']}.{m['name']}"
+            fqn = f"trino.{db}.{m['schema']}.{m['name']}"
             existing = get_table(fqn)
             if existing:
                 print(f"  = {fqn} (bestaat al — {len(existing.get('columns') or [])} kolommen)")
@@ -352,17 +352,17 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: om-demo-seed
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: openmetadata-demo-seed
-    uwv.nl/dev-only: "true"
+    odap.io/component: openmetadata-demo-seed
+    odap.io/dev-only: "true"
 spec:
   ttlSecondsAfterFinished: 1800
   backoffLimit: 0
   template:
     metadata:
       labels:
-        uwv.nl/component: openmetadata-demo-seed
+        odap.io/component: openmetadata-demo-seed
     spec:
       restartPolicy: Never
       containers:
@@ -375,7 +375,7 @@ spec:
               python /scripts/synth.py
           env:
             - name: OM_URL
-              value: "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+              value: "http://openmetadata.odap-meta.svc.cluster.local:8585"
             - name: OM_JWT_TOKEN
               valueFrom:
                 secretKeyRef:

@@ -24,13 +24,13 @@ Vereiste env
 ------------
 PORTAL_DB_PATH       /var/lib/portal-backend/portal.db   (default)
 PORT                 8089                                (default)
-OPENMETADATA_URL     http://openmetadata-server.uwv-platform.svc:8585  (optional)
+OPENMETADATA_URL     http://openmetadata-server.odap-platform.svc:8585  (optional)
 OPENMETADATA_TOKEN   <jwt>                               (optional bot-token)
-AIRFLOW_URL          http://uwv-airflow-webserver.uwv-platform.svc:8080 (optional)
+AIRFLOW_URL          http://airflow-webserver.odap-platform.svc:8080 (optional)
 AIRFLOW_USER         <user>                              (optional)
 AIRFLOW_PASS         <pass>                              (optional)
-SUPERSET_URL         http://superset.uwv-platform.svc:8088  (optional)
-GRAFANA_URL          http://prometheus-grafana.uwv-monitoring.svc  (optional)
+SUPERSET_URL         http://superset.odap-platform.svc:8088  (optional)
+GRAFANA_URL          http://prometheus-grafana.odap-monitoring.svc  (optional)
 GRAFANA_API_KEY      <key>                               (optional)
 
 Run lokaal
@@ -670,7 +670,7 @@ async def events_stream(req: Request) -> StreamingResponse:
 # de Keycloak-Entra-IdP-broker (ADR-0008) ge-federeerde Entra-mail is wanneer
 # de user via Entra inlogt.
 #
-# Env-vars (uit K8s Secret `powerbi-embed-creds` in uwv-platform):
+# Env-vars (uit K8s Secret `powerbi-embed-creds` in odap-platform):
 #   FABRIC_TENANT_ID, FABRIC_CLIENT_ID, FABRIC_CLIENT_SECRET, FABRIC_WORKSPACE_ID
 
 PBI_AUTHORITY_TPL = "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"

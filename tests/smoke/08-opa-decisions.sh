@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Smoke test 08 — OPA-decisions kloppen met de UWV-policies.
+# Smoke test 08 — OPA-decisions kloppen met de platform policies.
 #
 # Runt OPA-decision-calls (in-cluster via curl-pod) tegen een paar key-scenarios:
 #
@@ -13,13 +13,13 @@
 # Vereist: fase 0+1+2+3+9 (OpaCluster + bundle uit fase 9 deployed).
 set -euo pipefail
 
-NS="${NS:-uwv-platform}"
+NS="${NS:-odap-platform}"
 
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 pass() { printf '\033[1;32m  OK\033[0m  %s\n' "$*"; }
 fail() { printf '\033[1;31m  FAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
-OPA_URL="http://uwv-opa-server.${NS}.svc.cluster.local:8081"
+OPA_URL="http://opa-server.${NS}.svc.cluster.local:8081"
 
 curl_decide() {
   local path="$1"

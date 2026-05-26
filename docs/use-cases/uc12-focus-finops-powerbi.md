@@ -15,7 +15,7 @@ verschijnen voor Direct Lake kan lezen.
 ## 1. Waarom een tweede variant
 
 Superset blijft de open-source baseline van het referentieplatform — generiek,
-embeddable, geen vendor-lock. Voor UWV-rollen die al een Microsoft 365 / Entra
+embeddable, geen vendor-lock. Voor ODAP roles die al een Microsoft 365 / Entra
 ID-account hebben (en dus al een Power BI Pro-licentie via de tenant) is Power
 BI vaak de comfortabelere consumption-UI:
 
@@ -36,7 +36,7 @@ voor de bredere keuze tussen Superset en Power BI in het referentieplatform.
 Finance medewerker
    │  Upload focus-yyyymm.csv via mc CLI of MinIO Console
    ▼
-MinIO  s3://uwv-staging/incoming/focus/<ts>-<file>.csv
+MinIO  s3://odap-staging/incoming/focus/<ts>-<file>.csv
    │
    ▼
 ingest_csv_focus DAG (Airflow)
@@ -240,7 +240,7 @@ testen kunnen al beginnen.)
 
 ### Optie C — OneLake shortcut naar de MinIO-marts
 
-Cross-cloud shortcut van `s3://uwv-warehouse/gold/uc12_focus_finops/*` naar
+Cross-cloud shortcut van `s3://warehouse/gold/uc12_focus_finops/*` naar
 `Tables/uc12_focus_finops/*` in `uc11_lakehouse`. Voorbeeld in
 [FreshLakehouse/docs/research](https://github.com/FreshMinds_Programming/FreshDataPlatform/blob/main/FreshLakehouse/docs/research/powerbi-as-bi-and-self-service-layer.md).
 

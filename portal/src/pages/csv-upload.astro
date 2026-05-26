@@ -6,7 +6,7 @@ import ShellLayout from '../layouts/ShellLayout.astro';
 // Flow:
 //   1. GET /api/auth/token      → access-token uit oauth2-proxy.
 //   2. POST minio/?Action=AssumeRoleWithWebIdentity → temp S3-creds.
-//   3. PUT  minio/uwv-staging/uploads/<email>/<ts>/<filename>.
+//   3. PUT  minio/odap-staging/uploads/<email>/<ts>/<filename>.
 //   4. (Tabulair) POST /api/airflow/trigger-convert → bridge sidecar
 //      valideert + roept Airflow REST aan voor convert_to_delta.
 //
@@ -58,25 +58,25 @@ import ShellLayout from '../layouts/ShellLayout.astro';
     import { AwsClient } from 'aws4fetch';
 
     const MINIO_S3_API_MAP: Record<string, string> = {
-      'platform.uwv-platform.local':           'https://minio.uwv-platform.local:8443',
-      'platform.eu-sovereigndataplatform.com': 'https://minio-api.eu-sovereigndataplatform.com',
-      'platform.freshstackable.com':           'https://minio-api.freshstackable.com',
+      'platform.odap.local':           'https://minio.odap.local:8443',
+      'platform.example.com': 'https://minio-api.example.com',
+      'platform.example.com':           'https://minio-api.example.com',
     };
     const MINIO_CONSOLE_MAP: Record<string, string> = {
-      'platform.uwv-platform.local':           'https://minio-console.uwv-platform.local:8443',
-      'platform.eu-sovereigndataplatform.com': 'https://minio-console.eu-sovereigndataplatform.com',
-      'platform.freshstackable.com':           'https://minio.freshstackable.com',
+      'platform.odap.local':           'https://minio-console.odap.local:8443',
+      'platform.example.com': 'https://minio-console.example.com',
+      'platform.example.com':           'https://minio.example.com',
     };
     const AIRFLOW_MAP: Record<string, string> = {
-      'platform.uwv-platform.local':           'https://platform.uwv-platform.local:8443/airflow',
-      'platform.eu-sovereigndataplatform.com': 'https://platform.eu-sovereigndataplatform.com/airflow',
-      'platform.freshstackable.com':           'https://platform.freshstackable.com/airflow',
+      'platform.odap.local':           'https://platform.odap.local:8443/airflow',
+      'platform.example.com': 'https://platform.example.com/airflow',
+      'platform.example.com':           'https://platform.example.com/airflow',
     };
-    const minioApi     = MINIO_S3_API_MAP[window.location.hostname]    ?? MINIO_S3_API_MAP['platform.uwv-platform.local'];
-    const minioConsole = MINIO_CONSOLE_MAP[window.location.hostname]   ?? MINIO_CONSOLE_MAP['platform.uwv-platform.local'];
-    const airflowBase  = AIRFLOW_MAP[window.location.hostname]         ?? AIRFLOW_MAP['platform.uwv-platform.local'];
+    const minioApi     = MINIO_S3_API_MAP[window.location.hostname]    ?? MINIO_S3_API_MAP['platform.odap.local'];
+    const minioConsole = MINIO_CONSOLE_MAP[window.location.hostname]   ?? MINIO_CONSOLE_MAP['platform.odap.local'];
+    const airflowBase  = AIRFLOW_MAP[window.location.hostname]         ?? AIRFLOW_MAP['platform.odap.local'];
 
-    const STAGING_BUCKET = 'uwv-staging';
+    const STAGING_BUCKET = 'odap-staging';
     const MAX_BYTES = 500 * 1024 * 1024;
     const CONVERT_DAG_ID = 'convert_to_delta';
 

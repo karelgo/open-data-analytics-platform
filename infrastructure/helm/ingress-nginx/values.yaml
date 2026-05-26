@@ -1,4 +1,4 @@
-# ingress-nginx — controller voor *.uwv-platform.local
+# ingress-nginx — controller voor *.odap.local
 #
 # Ingress voor Helm-deployed services (Keycloak, OpenMetadata, MinIO Console,
 # Grafana). Stackable services gebruiken Stackable's listener-operator;

@@ -1,4 +1,4 @@
-"""Verrijk OpenMetadata-tables met UWV-compliance-meta uit dbt manifest.json.
+"""Verrijk OpenMetadata-tables met compliance meta uit dbt manifest.json.
 
 Loopt nadat `metadata ingest -c dbt-workflow.yaml` heeft gedraaid en de
 tabellen in OM bestaan. Per dbt-model:
@@ -22,13 +22,13 @@ OM 1.5-specifieke gotchas die in deze code zijn afgevangen:
   - Owner-toewijzing alleen aan Team-type `Group` (niet `BusinessUnit`).
 
 Env-vars:
-  OM_URL              http://openmetadata.uwv-meta.svc.cluster.local:8585
+  OM_URL              http://openmetadata.odap-meta.svc.cluster.local:8585
   OM_JWT_TOKEN        admin/bot JWT
-  OM_TRINO_SERVICE    uwv-trino (default)
-  DBT_BUCKET          uwv-meta
+  OM_TRINO_SERVICE    trino (default)
+  DBT_BUCKET          odap-meta
   DBT_PREFIX          dbt/latest/
-  MINIO_ENDPOINT      https://minio.uwv-platform.svc.cluster.local:9000
-  MINIO_ACCESS_KEY    uwvadmin
+  MINIO_ENDPOINT      https://minio.odap-platform.svc.cluster.local:9000
+  MINIO_ACCESS_KEY    platformadmin
   MINIO_SECRET_KEY    <secret>
 """
 from __future__ import annotations
@@ -56,17 +56,17 @@ def _strip_accents(value: str) -> str:
 
 
 OM_URL = os.environ.get(
-    "OM_URL", "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+    "OM_URL", "http://openmetadata.odap-meta.svc.cluster.local:8585"
 ).rstrip("/")
 OM_TOKEN = os.environ["OM_JWT_TOKEN"]
-SERVICE_NAME = os.environ.get("OM_TRINO_SERVICE", "uwv-trino")
+SERVICE_NAME = os.environ.get("OM_TRINO_SERVICE", "trino")
 
-DBT_BUCKET = os.environ.get("DBT_BUCKET", "uwv-meta")
+DBT_BUCKET = os.environ.get("DBT_BUCKET", "odap-meta")
 DBT_PREFIX = os.environ.get("DBT_PREFIX", "dbt/latest/").rstrip("/") + "/"
 MINIO_ENDPOINT = os.environ.get(
-    "MINIO_ENDPOINT", "https://minio.uwv-platform.svc.cluster.local:9000"
+    "MINIO_ENDPOINT", "https://minio.odap-platform.svc.cluster.local:9000"
 )
-MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY", "uwvadmin")
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY", "platformadmin")
 MINIO_SECRET_KEY = os.environ["MINIO_SECRET_KEY"]
 MINIO_REGION = os.environ.get("MINIO_REGION", "eu-nl-1")
 

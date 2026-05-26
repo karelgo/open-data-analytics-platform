@@ -6,35 +6,35 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: platform-public-tls
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   secretName: platform-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: platform.freshstackable.com
+  commonName: platform.example.com
   dnsNames:
-    - platform.freshstackable.com
-    - freshstackable.com
-    - www.freshstackable.com
+    - platform.example.com
+    - example.com
+    - www.example.com
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: platform-public
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - platform.freshstackable.com
-        - freshstackable.com
-        - www.freshstackable.com
+        - platform.example.com
+        - example.com
+        - www.example.com
       secretName: platform-public-tls
   rules:
-    - host: platform.freshstackable.com
+    - host: platform.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: platform-landing, port: { number: 80 } } } }] }
-    - host: freshstackable.com
+    - host: example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: platform-landing, port: { number: 80 } } } }] }
-    - host: www.freshstackable.com
+    - host: www.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: platform-landing, port: { number: 80 } } } }] }

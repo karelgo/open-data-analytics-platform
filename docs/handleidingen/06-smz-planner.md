@@ -27,8 +27,8 @@ waar je op werkt. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Capaciteits-dashboards | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Definities | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Capaciteits-dashboards | https://superset.odap.local:8443 |
+| **OpenMetadata** | Definities | https://openmetadata.odap.local:8443 |
 
 ---
 

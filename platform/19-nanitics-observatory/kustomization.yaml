@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: uwv-platform
+namespace: odap-platform
 
 resources:
   - configmap.yaml
@@ -16,5 +16,5 @@ resources:
   - cronjob-watcher.yaml
 
 commonLabels:
-  app.kubernetes.io/part-of: uwv-platform
+  app.kubernetes.io/part-of: odap-platform
   app.kubernetes.io/component: nanitics-observatory

@@ -1,11 +1,11 @@
-# OpenSearch Dashboards — UI tegenover de single-node OpenSearch in uwv-meta.
+# OpenSearch Dashboards — UI tegenover de single-node OpenSearch in odap-meta.
 # Geeft platform_admin/data_steward een browser-bare zoekinterface op de
-# `uwv-logs-*` indices die Vector schrijft.
+# `logs-*` indices die Vector schrijft.
 #
 # Chart: opensearch-project/opensearch-dashboards
 # Productie: schaal naar ≥ 2 replicas + enable security-plugin (TLS naar OS).
 ---
-opensearchHosts: "http://opensearch-uwv.uwv-meta.svc.cluster.local:9200"
+opensearchHosts: "http://opensearch.odap-meta.svc.cluster.local:9200"
 
 replicaCount: 1
 
@@ -31,6 +31,6 @@ service:
 config:
   opensearch_dashboards.yml: |
     server.host: "0.0.0.0"
-    opensearch.hosts: ["http://opensearch-uwv.uwv-meta.svc.cluster.local:9200"]
+    opensearch.hosts: ["http://opensearch.odap-meta.svc.cluster.local:9200"]
     opensearch.ssl.verificationMode: none
     opensearch.requestHeadersWhitelist: ["authorization", "securitytenant"]

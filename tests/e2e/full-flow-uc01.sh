@@ -68,7 +68,7 @@ if [[ "$SKIP_DEPLOY" != "true" ]]; then
     log "Wachten tot alle Stackable workloads Ready zijn (max 8 min)..."
     for kind_name in zookeepercluster hivecluster kafkacluster nificluster trinocluster opacluster; do
         log "  - waiting on $kind_name"
-        kubectl -n uwv-platform wait --for=condition=Ready pod \
+        kubectl -n odap-platform wait --for=condition=Ready pod \
             -l "app.kubernetes.io/name=${kind_name%cluster}" \
             --timeout=8m \
             || log "  ! ${kind_name} niet (volledig) Ready binnen 8m — verder met smoke"
@@ -95,12 +95,12 @@ make smoke || fail "smoke tests"
 # ─── Stage 7: UC-01 specifieke verificatie ────────────────────────────
 section "Stage 7/7: UC-01 specifieke verificatie via Trino"
 
-NS="uwv-platform"
+NS="odap-platform"
 SMOKE_USER="${SMOKE_USER:-smoketest}"
-SMOKE_PW="${SMOKE_PW:-uwv-dev-only-CHANGE-ME-Smoke2026}"
+SMOKE_PW="${SMOKE_PW:-odap-dev-only-CHANGE-ME-Smoke2026}"
 
 trino_exec() {
-    kubectl -n "$NS" exec statefulset/uwv-trino-coordinator-default -c trino -- \
+    kubectl -n "$NS" exec statefulset/trino-coordinator-default -c trino -- \
         bash -lc "TRINO_PASSWORD='$SMOKE_PW' /stackable/trino-cli/trino \
             --server https://localhost:8443 --insecure \
             --user $SMOKE_USER --password \
@@ -116,7 +116,7 @@ if [[ "$silver_count" =~ ^[0-9]+$ ]] && [[ "$silver_count" -gt 0 ]]; then
     pass "silver.wia.stg_wia_aanvraag: $silver_count records"
 else
     log "  [SKIP] silver-tabel niet gevuld (dbt-run nog niet gedraaid; trigger via Airflow UI of:"
-    log "  kubectl -n $NS exec deploy/uwv-airflow-webserver-default -c airflow -- airflow dags trigger dbt_run_per_domain"
+    log "  kubectl -n $NS exec deploy/airflow-webserver-default -c airflow -- airflow dags trigger dbt_run_per_domain"
     log "  Cooldown ~3 min daarna deze e2e opnieuw."
 fi
 
@@ -142,6 +142,6 @@ fi
 section "E2E full-flow-uc01: ALLE STAGES GROEN"
 echo
 pass "Compleet. UC-01 dashboard kan nu interactief gebouwd worden in Superset"
-echo "  https://superset.uwv-platform.local:8443"
-echo "  Login: uwvplatform / uwv-dev-only-CHANGE-ME-2026"
+echo "  https://superset.odap.local:8443"
+echo "  Login: odap / odap-dev-only-CHANGE-ME"
 echo "  Dataset: gold.uc01_wia_funnel.mart_uc01_wia_funnel_daily (na dbt-run)"

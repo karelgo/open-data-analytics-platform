@@ -6,7 +6,7 @@ Draait in een KubernetesPodOperator (zie dags/convert_to_delta.py).
 Stappen:
   1. Lees env-conf (object_key, source_format, target_*, partition_col).
   2. Veiligheidscheck: object_key MOET onder `uploads/` prefix vallen.
-  3. Download bestand uit s3://uwv-staging/<object_key>.
+  3. Download bestand uit s3://odap-staging/<object_key>.
   4. Parse op basis van source_format → pyarrow.Table.
   5. Voeg ingestion_ts + source_file metadata-kolommen toe; als geen
      partition_col is opgegeven, voeg `event_date` toe en gebruik dat.
@@ -14,7 +14,7 @@ Stappen:
   7. Registreer Delta-tabel in Hive Metastore via Trino `system.register_table`.
   8. Verplaats bron-bestand naar processed/uploads/<oorspronkelijk-pad>.
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 from __future__ import annotations
 
@@ -37,15 +37,15 @@ from trino.dbapi import connect as trino_connect
 # ---------------------------------------------------------------------------
 # Config — uit env (gezet door dag_run.conf via Jinja).
 # ---------------------------------------------------------------------------
-OBJECT_KEY     = os.environ["UWV_OBJECT_KEY"]
-SOURCE_FORMAT  = os.environ["UWV_SOURCE_FORMAT"].strip().lower()
-TARGET_CATALOG = os.environ.get("UWV_TARGET_CATALOG", "bronze").strip().lower()
-TARGET_SCHEMA  = os.environ["UWV_TARGET_SCHEMA"].strip().lower()
-TARGET_TABLE   = os.environ["UWV_TARGET_TABLE"].strip().lower()
-PARTITION_COL  = os.environ.get("UWV_PARTITION_COL", "").strip()
-SOURCE_EMAIL   = os.environ.get("UWV_SOURCE_EMAIL", "")
+OBJECT_KEY     = os.environ["OBJECT_KEY"]
+SOURCE_FORMAT  = os.environ["SOURCE_FORMAT"].strip().lower()
+TARGET_CATALOG = os.environ.get("TARGET_CATALOG", "bronze").strip().lower()
+TARGET_SCHEMA  = os.environ["TARGET_SCHEMA"].strip().lower()
+TARGET_TABLE   = os.environ["TARGET_TABLE"].strip().lower()
+PARTITION_COL  = os.environ.get("PARTITION_COL", "").strip()
+SOURCE_EMAIL   = os.environ.get("SOURCE_EMAIL", "")
 
-STAGING_BUCKET = os.environ.get("UWV_STAGING_BUCKET", "uwv-staging")
+STAGING_BUCKET = os.environ.get("STAGING_BUCKET", "odap-staging")
 
 S3_ENDPOINT   = os.environ["S3_ENDPOINT"]
 S3_ACCESS_KEY = os.environ["S3_ACCESS_KEY"]
@@ -56,7 +56,7 @@ TRINO_HOST        = os.environ["TRINO_HOST"]
 TRINO_PORT        = int(os.environ.get("TRINO_PORT", "8443"))
 TRINO_USER        = os.environ["TRINO_USER"]
 TRINO_HTTP_SCHEME = os.environ.get("TRINO_HTTP_SCHEME", "https")
-TRINO_VERIFY      = os.environ.get("TRINO_VERIFY", "/etc/uwv-ca/ca.crt")
+TRINO_VERIFY      = os.environ.get("TRINO_VERIFY", "/etc/platform-ca/ca.crt")
 
 ALLOWED_FORMATS = {"csv", "tsv", "json", "ndjson", "parquet"}
 IDENTIFIER_RE = re.compile(r"^[a-z][a-z0-9_]{0,62}$")

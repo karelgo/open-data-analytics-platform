@@ -3,12 +3,12 @@
 # Creëer in AKS met (van repo-root, met de SP-creds in je env):
 #
 #   set -a; source secrets/local/uc11-multiplatform.env; set +a
-#   kubectl -n uwv-platform create secret generic powerbi-embed-creds \
+#   kubectl -n odap-platform create secret generic powerbi-embed-creds \
 #     --from-literal=FABRIC_TENANT_ID="$FABRIC_TENANT_ID" \
 #     --from-literal=FABRIC_CLIENT_ID="$FABRIC_CLIENT_ID" \
 #     --from-literal=FABRIC_CLIENT_SECRET="$FABRIC_CLIENT_SECRET" \
 #     --from-literal=FABRIC_WORKSPACE_ID="$FABRIC_WORKSPACE_ID"
-#   kubectl -n uwv-platform rollout restart deploy/udp-portal-backend
+#   kubectl -n odap-platform rollout restart deploy/udp-portal-backend
 #
 # Het Secret is `optional: true` in de Deployment (zie portal-backend.yaml),
 # dus zonder dit Secret start de portal-backend wel maar faalt de
@@ -21,10 +21,10 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: powerbi-embed-creds
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    uwv.nl/powerbi-embed: "true"
-    uwv.nl/dev-only: "true"
+    odap.io/powerbi-embed: "true"
+    odap.io/dev-only: "true"
 type: Opaque
 stringData:
   FABRIC_TENANT_ID:     "REPLACE_ME"

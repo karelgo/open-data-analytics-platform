@@ -1,25 +1,25 @@
 # 02-authentication
 
-Stackable AuthenticationClass voor de UWV Keycloak-realm + interne TLS-CA-secretclass.
+Stackable AuthenticationClass voor de ODAP Keycloak realm + interne TLS-CA-secretclass.
 
 | Resource | Doel |
 |---|---|
-| `AuthenticationClass keycloak-uwv` | OIDC-config voor Trino/Superset/Airflow/NiFi/OpenMetadata. Issuer: `https://keycloak.uwv-platform.local:8443/realms/uwv`. |
+| `AuthenticationClass keycloak` | OIDC-config voor Trino/Superset/Airflow/NiFi/OpenMetadata. Issuer: `https://keycloak.odap.local:8443/realms/odap`. |
 | `SecretClass tls-internal` | Locatie voor het CA-cert dat de Keycloak-OIDC-endpoint heeft getekend. |
 
 ## CA distribution (TODO fase-1+)
 
-Het CA-cert (`uwv-platform-ca` Secret in `cert-manager`-namespace) moet
-worden gekopieerd naar een Secret in `uwv-platform`-namespace met label
+Het CA-cert (`odap-platform-ca` Secret in `cert-manager`-namespace) moet
+worden gekopieerd naar een Secret in `odap-platform`-namespace met label
 `secrets.stackable.tech/class: tls-internal`. Twee opties:
 
 1. **trust-manager** (`cert-manager.io/trust-manager`) Bundle-resource — propere oplossing; commit volgt in fase 3 zodra Trino het echt nodig heeft.
 2. Tijdelijk: handmatige Secret-kopie in bootstrap.sh:
 
    ```bash
-   kubectl get secret -n cert-manager uwv-platform-ca -o jsonpath='{.data.ca\.crt}' \
+   kubectl get secret -n cert-manager odap-platform-ca -o jsonpath='{.data.ca\.crt}' \
      | base64 -d > /tmp/ca.crt
-   kubectl -n uwv-platform create secret generic uwv-platform-ca-trust \
+   kubectl -n odap-platform create secret generic odap-platform-ca-trust \
      --from-file=ca.crt=/tmp/ca.crt \
      --dry-run=client -o yaml \
      | kubectl label --local -f - secrets.stackable.tech/class=tls-internal -o yaml \
@@ -52,9 +52,9 @@ voor de architectuurkeuze (broker vs. parallelle IDPs).
 
 | Bestand | Wijziging |
 |---|---|
-| [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json) | `identityProviders[0]` (alias `entra`, OIDC v2.0) + 13 `identityProviderMappers` (11 group→role, 1 username, 1 TOTP-trigger) |
+| [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json) | `identityProviders[0]` (alias `entra`, OIDC v2.0) + 13 `identityProviderMappers` (11 group→role, 1 username, 1 TOTP-trigger) |
 | [`infrastructure/helm/keycloak/values.yaml`](../../infrastructure/helm/keycloak/values.yaml) | `extraEnvVars` uitgebreid met `ENTRA_TENANT_ID` / `ENTRA_CLIENT_ID` / `ENTRA_CLIENT_SECRET` (uit Secret) |
-| [`platform/01-secrets/dev-secrets.yaml`](../01-secrets/dev-secrets.yaml) | `Secret keycloak-entra-broker` in `uwv-auth` (placeholders) |
+| [`platform/01-secrets/dev-secrets.yaml`](../01-secrets/dev-secrets.yaml) | `Secret keycloak-entra-broker` in `odap-auth` (placeholders) |
 
 ### Setup-stappen (eenmalig per omgeving)
 
@@ -63,9 +63,9 @@ voor de architectuurkeuze (broker vs. parallelle IDPs).
 In de Azure portal (of via `az ad app create`):
 
 ```
-Naam:           UWV Reference Platform — Keycloak broker
+Naam:           Open Data & Analytics Platform — Keycloak broker
 Type:           Web
-Redirect URI:   https://keycloak.uwv-platform.local:8443/realms/uwv/broker/entra/endpoint
+Redirect URI:   https://keycloak.odap.local:8443/realms/odap/broker/entra/endpoint
 ID-token:       Aan (impliciet niet nodig; auth-code flow met PKCE)
 ```
 
@@ -90,10 +90,10 @@ Maak een client secret aan onder **Certificates & secrets** en noteer de
 #### 2. Group-GUIDs ophalen
 
 Voor elke van de 11 platform-rollen moet er één Entra security-group
-bestaan (idealiter `uwv-role-{rolename}`). Vraag de GUIDs op:
+bestaan (idealiter `platform-role-{rolename}`). Vraag de GUIDs op:
 
 ```bash
-az ad group show --group "uwv-role-wia_beoordelaar" --query id -o tsv
+az ad group show --group "platform-role-wia_beoordelaar" --query id -o tsv
 # herhaal voor de andere 10 rollen
 ```
 
@@ -109,32 +109,32 @@ sed -i.bak \
   -e "s/REPLACE_ME_ENTRA_TENANT_ID/$AZ_TENANT_ID/g" \
   -e "s/REPLACE_ME_ENTRA_CLIENT_ID/$AZ_CLIENT_ID/g" \
   -e "s/REPLACE_ME_ENTRA_CLIENT_SECRET/$AZ_CLIENT_SECRET/g" \
-  infrastructure/helm/keycloak/realm-uwv.json
+  infrastructure/helm/keycloak/realm.json
 
 # group-GUIDs (één regel per rol)
 for ROLE in wia_beoordelaar ww_handhaver wajong_arbeidsdeskundige \
             crm_medewerker fez_analist data_steward data_engineer \
             platform_admin researcher smz_planner proactief_dienstverlener; do
-  GUID=$(az ad group show --group "uwv-role-$ROLE" --query id -o tsv)
+  GUID=$(az ad group show --group "platform-role-$ROLE" --query id -o tsv)
   sed -i.bak "s/REPLACE_ME_GROUP_GUID_$ROLE/$GUID/g" \
-    infrastructure/helm/keycloak/realm-uwv.json
+    infrastructure/helm/keycloak/realm.json
 done
 
-rm infrastructure/helm/keycloak/realm-uwv.json.bak
+rm infrastructure/helm/keycloak/realm.json.bak
 ```
 
 > **Productie:** vervang dit door een SealedSecret of External Secrets +
 > Vault-injection, en gebruik de Keycloak Admin REST API (`PUT
-> /admin/realms/uwv/identity-provider/instances/entra`) om de IdP-config
+> /admin/realms/odap/identity-provider/instances/entra`) om de IdP-config
 > roterend bij te werken zonder realm-re-import.
 
 #### 4. Deploy
 
 ```bash
 helm upgrade --install keycloak bitnami/keycloak \
-  -n uwv-auth \
+  -n odap-auth \
   -f infrastructure/helm/keycloak/values.yaml \
-  --set-file extraDeploy[0]=infrastructure/helm/keycloak/realm-uwv.json
+  --set-file extraDeploy[0]=infrastructure/helm/keycloak/realm.json
 # of via je gebruikelijke 'make redeploy-keycloak'
 ```
 
@@ -152,15 +152,15 @@ Smoke-test:
 
 Manueel:
 
-1. Browse naar `https://platform.uwv-platform.local/` — oauth2-proxy
+1. Browse naar `https://platform.odap.local/` — oauth2-proxy
    redirect je naar Keycloak.
 2. De Keycloak-loginpagina toont nu twee opties: username/password
-   (interne UWV-accounts) of de knop **"Microsoft Entra ID"**.
+   (interne platform accounts) of de knop **"Microsoft Entra ID"**.
 3. Kies "Microsoft Entra ID" — wordt geredirect naar
    `login.microsoftonline.com`. Log in met een Entra-testaccount dat lid
-   is van een van de 11 `uwv-role-*` security-groups.
+   is van een van de 11 `platform-role-*` security-groups.
 4. Eerste login: Keycloak's "first broker login"-flow vraagt of je het
-   account wil koppelen aan een bestaand UWV-account (op email-match) of
+   account wil koppelen aan een bestaand platform account (op email-match) of
    een nieuw lokaal account wil aanmaken. Voor een schone Entra-only flow:
    kies "Add to existing account" alleen als je dezelfde gebruiker al in
    de realm hebt; anders "Review profile" en doorgaan.

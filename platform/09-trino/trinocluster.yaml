@@ -1,13 +1,13 @@
 # TrinoCluster — centrale SQL query-engine.
 #
 # Authenticatie:
-#   - keycloak-uwv (OIDC) — primaire flow voor users/UI's
-#   - trino-static-uwv (static) — voor smoke-tests + break-glass
+#   - keycloak (OIDC) — primaire flow voor users/UI's
+#   - trino-static (static) — voor smoke-tests + break-glass
 #
 # Authorisatie:
-#   - OPA (Stackable OpaCluster `uwv-opa`), package `trino`
+#   - OPA (Stackable OpaCluster `opa`), package `trino`
 #
-# Catalogs: alle TrinoCatalog-resources met label `trino: uwv-trino` worden
+# Catalogs: alle TrinoCatalog-resources met label `trino: trino` worden
 # automatisch opgepikt. Zie `catalogs/`.
 #
 # Schaal: 1 coordinator + 1 worker (k3d scaled-down). Productie: meerdere
@@ -16,25 +16,25 @@
 apiVersion: trino.stackable.tech/v1alpha1
 kind: TrinoCluster
 metadata:
-  name: uwv-trino
-  namespace: uwv-platform
+  name: trino
+  namespace: odap-platform
 spec:
   image:
     productVersion: "477"
   clusterConfig:
     catalogLabelSelector:
       matchLabels:
-        trino: uwv-trino
+        trino: trino
     # Authentication uitgeschakeld voor demo:
-    # - trino-static-uwv: password-file-updater sidecar crashloop
-    # - keycloak-uwv OIDC: issuer-mismatch tussen interne discovery-URL
+    # - trino-static: password-file-updater sidecar crashloop
+    # - keycloak OIDC: issuer-mismatch tussen interne discovery-URL
     #   en externe issuer-claim die Keycloak adverteert (KC_HOSTNAME=:8443).
     # Productie: of Keycloak issuer in-cluster resolvable maken (CoreDNS
     # rewrite + 443:443 port-mapping in k3d), of mTLS via SecretClass tls.
     authentication: []
     authorization:
       opa:
-        configMapName: uwv-opa
+        configMapName: opa
         package: trino
   coordinators:
     # 26.3: listenerClass per role

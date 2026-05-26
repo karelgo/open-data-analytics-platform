@@ -26,16 +26,16 @@
 #   - Tabellen waarop gekoppeld wordt bestaan al in OM (via Trino-catalog-
 #     ingest of via 'make om-demo-seed').
 #
-# SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: om-glossary-link-script
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: openmetadata-glossary-link
-    uwv.nl/dev-only: "true"
+    odap.io/component: openmetadata-glossary-link
+    odap.io/dev-only: "true"
 data:
   link.py: |
     """Koppel CGM-glossary-termen aan logisch passende tables in OM."""
@@ -45,7 +45,7 @@ data:
     OM = os.environ["OM_URL"].rstrip("/")
     H = {"Authorization": f"Bearer {os.environ['OM_JWT_TOKEN']}", "Accept": "application/json"}
     PH = {"Authorization": f"Bearer {os.environ['OM_JWT_TOKEN']}", "Content-Type": "application/json-patch+json"}
-    SERVICE = os.environ.get("OM_TRINO_SERVICE", "uwv-trino")
+    SERVICE = os.environ.get("OM_TRINO_SERVICE", "trino")
     ZONES = ("bronze", "silver", "gold")
 
     # CGM-term → lijst (schema, table)-paren. Script propageert elke koppel
@@ -196,17 +196,17 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: om-glossary-link
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: openmetadata-glossary-link
-    uwv.nl/dev-only: "true"
+    odap.io/component: openmetadata-glossary-link
+    odap.io/dev-only: "true"
 spec:
   ttlSecondsAfterFinished: 1800
   backoffLimit: 0
   template:
     metadata:
       labels:
-        uwv.nl/component: openmetadata-glossary-link
+        odap.io/component: openmetadata-glossary-link
     spec:
       restartPolicy: Never
       containers:
@@ -219,7 +219,7 @@ spec:
               python /scripts/link.py
           env:
             - name: OM_URL
-              value: "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+              value: "http://openmetadata.odap-meta.svc.cluster.local:8585"
             - name: OM_JWT_TOKEN
               valueFrom:
                 secretKeyRef:

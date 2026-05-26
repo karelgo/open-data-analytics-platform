@@ -7,7 +7,7 @@
 export type ModuleStatus = 'done' | 'in-progress';
 export type ProgressMap = Record<string, ModuleStatus>;
 
-const LS_KEY = 'uwv-learn-progress';
+const LS_KEY = 'odap-learn-progress';
 const SYNC_URL = '/api/learn/progress';
 let cache: ProgressMap | null = null;
 let syncAvailable: boolean | null = null;
@@ -30,14 +30,14 @@ export function setProgress(key: string, status: ModuleStatus): void {
   try { localStorage.setItem(LS_KEY, JSON.stringify(p)); } catch {}
   void trySync(p);
   // Notify rest van pagina (eigen event, geen storage-event nodig).
-  document.dispatchEvent(new CustomEvent('uwv-learn:progress', { detail: p }));
+  document.dispatchEvent(new CustomEvent('odap-learn:progress', { detail: p }));
 }
 
 export function clearProgress(): void {
   cache = {};
   try { localStorage.removeItem(LS_KEY); } catch {}
   void trySync({});
-  document.dispatchEvent(new CustomEvent('uwv-learn:progress', { detail: {} }));
+  document.dispatchEvent(new CustomEvent('odap-learn:progress', { detail: {} }));
 }
 
 export function statusOf(key: string): ModuleStatus | undefined {
@@ -98,5 +98,5 @@ export async function pullRemote(): Promise<void> {
 export function bootstrap(): void {
   if (typeof document === 'undefined') return;
   void pullRemote().finally(renderDots);
-  document.addEventListener('uwv-learn:progress', renderDots as EventListener);
+  document.addEventListener('odap-learn:progress', renderDots as EventListener);
 }

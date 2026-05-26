@@ -1,12 +1,12 @@
 // UC-11 Integrale Klantreis — deck generator
-// Dark UWV-amber theme matching the portal aesthetic.
+// Dark platform-amber theme matching the portal aesthetic.
 const pptxgen = require("pptxgenjs");
 
 const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE"; // 13.3 x 7.5
 pres.author = "UWV Referentie Platform";
 pres.title = "UC-11 — Integrale Klantreis";
-pres.subject = "Demo-deck voor het UWV Reference Data Platform";
+pres.subject = "Demo-deck voor het Open Data & Analytics Platform";
 
 // ── palette (matches portal CSS) ─────────────────────────────────────
 const BG = "14110C";         // near-black with warm tint
@@ -16,7 +16,7 @@ const LINE_2 = "3D3525";     // stronger border
 const INK_1 = "F2EDDD";      // primary text
 const INK_2 = "C7BFA9";      // muted text
 const INK_3 = "8A8068";      // very muted
-const AMBER = "F59E0B";      // UWV-style accent
+const AMBER = "F59E0B";      // platform style accent
 const AMBER_SOFT = "FBBF24"; // lighter amber
 const RED = "E2675C";        // for deny/warn
 const GREEN = "6BB47C";      // for allow/ok
@@ -103,7 +103,7 @@ function subtitle(slide, text) {
   });
 
   s.addText(
-    "Eén synthetische cliënt door alle facetten van het UWV-platform.",
+    "Eén synthetische cliënt door alle facetten van het ODAP platform.",
     {
       x: 1.0, y: 3.7, w: 10.5, h: 0.7,
       fontFace: F_HEAD, fontSize: 22, color: INK_2,
@@ -1066,11 +1066,11 @@ function subtitle(slide, text) {
     },
     {
       label: "Live lineage",
-      path: "https://platform.uwv-platform.local:8443/dbt-docs.html",
+      path: "https://platform.odap.local:8443/dbt-docs.html",
     },
     {
       label: "Architectuur",
-      path: "https://platform.uwv-platform.local:8443/architecture",
+      path: "https://platform.odap.local:8443/architecture",
     },
   ];
   links.forEach((l, i) => {

@@ -1,4 +1,4 @@
-# UWV Reference Data Platform — centrale configuratie
+# Open Data & Analytics Platform — centrale configuratie
 #
 # Eén bron van waarheid voor implementatie-keuzes die door meerdere componenten
 # worden gelezen (Trino-catalogs, dbt-macros, Spark-env, NiFi-templates, Airflow-DAGs).
@@ -8,7 +8,7 @@
 # achter `table_format`.
 
 platform:
-  name: uwv-data-platform
+  name: odap-data-platform
   version: 0.1.0
 
   # Open table format. Toegestaan: "delta" | "iceberg".
@@ -38,26 +38,26 @@ platform:
 # DNS-suffix voor Listener-operator + ingresses.
 #
 # Mode-aware (zie scripts/lib/mode.sh — DEPLOYMENT_MODE / --mode):
-#   k3d  -> uwv-platform.local  (port :8443 via serverlb/portmap)
-#   aks  -> eu-sovereigndataplatform.com  (port 443, public DNS)
+#   k3d  -> odap.local  (port :8443 via serverlb/portmap)
+#   aks  -> example.com  (port 443, public DNS)
 #
 # Overridable per invocation via PLATFORM_DOMAIN env var. Het veld `suffix`
 # hieronder is de lokale default (k3d); voor AKS wordt het overschreven.
 # Voor lokaal verwacht in /etc/hosts:
-#   127.0.0.1 keycloak.uwv-platform.local ...
+#   127.0.0.1 keycloak.odap.local ...
 dns:
-  suffix: uwv-platform.local
+  suffix: odap.local
   modes:
-    k3d:  uwv-platform.local
-    kind: uwv-platform.local
-    aks:  eu-sovereigndataplatform.com
+    k3d:  odap.local
+    kind: odap.local
+    aks:  example.com
 
 # Persistentie-pads in MinIO buckets.
 buckets:
-  bronze: uwv-bronze
-  silver: uwv-silver
-  gold: uwv-gold
-  sensitive: uwv-sensitive
-  staging: uwv-staging
-  checkpoints: uwv-checkpoints
-  meta: uwv-meta
+  bronze: odap-bronze
+  silver: odap-silver
+  gold: odap-gold
+  sensitive: sensitive
+  staging: odap-staging
+  checkpoints: odap-checkpoints
+  meta: odap-meta

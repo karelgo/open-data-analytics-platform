@@ -20,15 +20,15 @@ skip() { printf '  [SKIP] %s\n' "$*"; }
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 
 DEPLOYMENT_MODE="${DEPLOYMENT_MODE:-${MODE:-k3d}}"
-PLATFORM_DOMAIN="${PLATFORM_DOMAIN:-uwv-platform.local}"
+PLATFORM_DOMAIN="${PLATFORM_DOMAIN:-odap.local}"
 case "$DEPLOYMENT_MODE" in
   k3d)             PORT_SUFFIX=":8443" ;;
   aks|stackit|*)   PORT_SUFFIX="" ;;
 esac
 
 # Cloud-modes hebben hun eigen TLD; values voor PLATFORM_DOMAIN worden
-# door scripts/lib/mode.sh gezet (eu-sovereigndataplatform.com /
-# freshstackable.com). De TLD-rewrite in Layout.astro doet hetzelfde
+# door scripts/lib/mode.sh gezet (example.com /
+# example.com). De TLD-rewrite in Layout.astro doet hetzelfde
 # voor de browser; deze test gebruikt PLATFORM_DOMAIN direct.
 PORTAL="https://platform.${PLATFORM_DOMAIN}${PORT_SUFFIX}"
 
@@ -125,10 +125,10 @@ fi
 # Check direct op nginx in de pod omdat oauth2-proxy 302't en headers
 # niet doorzet aan unauthenticated requests.
 log "6/6 Portal CSP whitelist't data: in font-src (dbt-docs fonts)"
-PORTAL_POD=$(kubectl -n uwv-platform get pod -l app.kubernetes.io/name=portal \
+PORTAL_POD=$(kubectl -n odap-platform get pod -l app.kubernetes.io/name=portal \
   -o jsonpath="{.items[0].metadata.name}" 2>/dev/null)
 if [[ -n "$PORTAL_POD" ]]; then
-  font_src=$(kubectl -n uwv-platform exec "$PORTAL_POD" -c portal-web -- \
+  font_src=$(kubectl -n odap-platform exec "$PORTAL_POD" -c portal-web -- \
     curl -sk -I "http://localhost:8080/dbt-docs.html" 2>/dev/null \
     | grep -i "content-security-policy" | grep -oE "font-src[^;]+" | head -1)
   if echo "$font_src" | grep -q "data:"; then

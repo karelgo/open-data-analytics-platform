@@ -6,18 +6,18 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: om-access-bridge-config
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   # The Stackable Keycloak Service exposes :80 (svc.spec.ports[0].port=80,
   # targetPort=http=8080 on the pod). The cluster-internal call must go
   # to :80 — :8080 would hit the headless metrics Service instead and
   # times out on the admin REST API. See bug surfaced in E2E test 2026-05-25.
-  KEYCLOAK_URL: "http://keycloak.uwv-auth.svc.cluster.local:80"
+  KEYCLOAK_URL: "http://keycloak.odap-auth.svc.cluster.local:80"
   KEYCLOAK_REALM: "uwv"
   KEYCLOAK_CLIENT_ID: "om-access-bridge"
   REPLAY_WINDOW_SECONDS: "300"
   LOG_LEVEL: "INFO"
-  OM_BASE_URL: "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+  OM_BASE_URL: "http://openmetadata.odap-meta.svc.cluster.local:8585"
   # Browser-origin van het portal-formulier dat POST naar /api/request.
   # In dev: same-origin via ingress-route, dus alleen platform.* whitelist.
-  CORS_ALLOWED_ORIGINS: "https://platform.uwv-platform.local:8443,https://platform.uwv-platform.local"
+  CORS_ALLOWED_ORIGINS: "https://platform.odap.local:8443,https://platform.odap.local"

@@ -56,7 +56,7 @@ app = FastAPI(title="UWV portal Airflow bridge", version="0.1.0")
 
 AIRFLOW_BASE_URL = os.environ.get(
     "AIRFLOW_BASE_URL",
-    "http://uwv-airflow-webserver.uwv-platform.svc.cluster.local:8080",
+    "http://airflow-webserver.odap-platform.svc.cluster.local:8080",
 )
 AIRFLOW_USERNAME = os.environ.get("AIRFLOW_USERNAME", "")
 AIRFLOW_PASSWORD = os.environ.get("AIRFLOW_PASSWORD", "")
@@ -65,7 +65,7 @@ AIRFLOW_PASSWORD = os.environ.get("AIRFLOW_PASSWORD", "")
 # The portal embed mounts Airflow at platform.<host>/airflow.
 AIRFLOW_PUBLIC_URL = os.environ.get(
     "AIRFLOW_PUBLIC_URL",
-    "https://platform.uwv-platform.local:8443/airflow",
+    "https://platform.odap.local:8443/airflow",
 )
 
 CONVERT_DAG_ID = "convert_to_delta"

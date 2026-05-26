@@ -10,13 +10,13 @@ description: Het bronvoorstel waarvan deze repo de implementatie is.
 
 De huidige implementatie volgt:
 
-- [`referentiearchitectuur-uwv-data-analytics.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/referentiearchitectuur-uwv-data-analytics.md)
+- [`referentiearchitectuur-odap-data-analytics.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/referentiearchitectuur-odap-data-analytics.md)
   — 12 architectuurprincipes, 10 use-cases, CGM-entiteiten, Sensitive Vault,
   data-mesh, wettelijke mappen.
 - [`requirements-compliant-data-analyseplatform.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/requirements-compliant-data-analyseplatform.md)
   — Volledige requirements-matrix: NORA, AVG, BIO/BIO2, NIS2, AI Act met
   R-* codes (70+ rules).
-- [`uwv-platform-mapping-research.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/uwv-platform-mapping-research.md)
+- [`odap-platform-mapping-research.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/odap-platform-mapping-research.md)
   — Technische blauwdruk: component-mapping Stackable → Kubernetes.
 
 Deze pagina is een **navigatie-stub** — de bron-documenten staan in de

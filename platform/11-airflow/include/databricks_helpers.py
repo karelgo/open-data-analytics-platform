@@ -28,7 +28,7 @@ DATABRICKS_HOST = os.environ.get("DATABRICKS_HOST", "").replace("https://", "").
 DATABRICKS_TOKEN = os.environ.get("DATABRICKS_TOKEN", "")
 DATABRICKS_HTTP_PATH = os.environ.get("DATABRICKS_HTTP_PATH", "")
 DATABRICKS_WAREHOUSE_ID = os.environ.get("DATABRICKS_WAREHOUSE_ID", "")
-DATABRICKS_CATALOG = os.environ.get("DATABRICKS_CATALOG", "uwv_databricks")
+DATABRICKS_CATALOG = os.environ.get("DATABRICKS_CATALOG", "databricks")
 
 
 def _check_creds() -> None:

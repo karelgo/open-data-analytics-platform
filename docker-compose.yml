@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: portal/Dockerfile
-    image: uwv-platform/portal:dev
+    image: odap/portal:dev
     container_name: udp-portal
     ports:
       - "8090:8080"
@@ -24,7 +24,7 @@ services:
     build:
       context: ./portal
       dockerfile: Dockerfile.academy
-    image: uwv-platform/academy-backend:dev
+    image: odap/academy-backend:dev
     container_name: udp-academy
     # Geen Keycloak in compose — env's blijven leeg, /api/learn/check/_ping
     # werkt; voortgang-sync ('PUT /api/learn/progress') faalt met 401, en

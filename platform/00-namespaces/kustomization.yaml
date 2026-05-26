@@ -4,6 +4,6 @@ resources:
   - namespaces.yaml
   - platform-config-cm.yaml
   # resourcequota-limitrange.yaml uitgeschakeld voor lokale k3d/MacBook:
-  # de hard caps + ontbrekende LimitRanges voor uwv-monitoring/uwv-auth
+  # de hard caps + ontbrekende LimitRanges voor odap-monitoring/odap-auth
   # blokkeerden helm-charts (Prometheus admission jobs zonder requests/limits).
   # Productie-overlay zet ze terug aan met ruimere caps.

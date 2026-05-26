@@ -34,7 +34,7 @@ terraform apply
 After apply completes:
 
 ```bash
-# Floating IP — paste into Azure DNS A records for freshstackable.com + *.freshstackable.com
+# Floating IP — paste into Azure DNS A records for example.com + *.example.com
 terraform output floating_ip
 
 # Use the generated kubeconfig
@@ -67,7 +67,7 @@ node_availability_zones = ["eu01-1","eu01-2","eu01-3"] # 3-AZ spread, nodes-per-
 
 ## What this module does NOT create
 
-- DNS zone (lives in Azure — `dev-stackable-rg` / `freshstackable.com`)
+- DNS zone (lives in Azure — `dev-stackable-rg` / `example.com`)
 - Object storage (Phase 2 deploys MinIO in-cluster, same pattern as AKS)
 - Container registry (use `ghcr.io` or push to StackIT registry separately)
 - Observability instance (Phase 2 deploys Prometheus + OpenSearch in-cluster)

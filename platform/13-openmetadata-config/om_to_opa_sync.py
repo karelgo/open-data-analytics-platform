@@ -3,7 +3,7 @@
 OM 1.5 heeft geen native Reverse Metadata (community feature pas vanaf
 1.7+). We implementeren het hier custom: deze CronJob leest de
 `Doelbinding.*` tags van elke Trino-tabel in OM en updatet
-`uwv_role_mappings.resource_purposes` in de OPA-bundle ConfigMap.
+`role_mappings.resource_purposes` in de OPA-bundle ConfigMap.
 Stackable's OPA-operator herlaadt automatisch via de
 `opa.stackable.tech/bundle: true` label.
 
@@ -20,10 +20,10 @@ Strategy:
   6. PATCH de ConfigMap.
 
 Env-vars:
-  OM_URL                http://openmetadata.uwv-meta.svc.cluster.local:8585
+  OM_URL                http://openmetadata.odap-meta.svc.cluster.local:8585
   OM_JWT_TOKEN          admin/bot JWT (ViewAll op tables)
-  OM_TRINO_SERVICE      uwv-trino (default — beperkt scan tot deze service)
-  OPA_CONFIGMAP_NS      uwv-platform (default)
+  OM_TRINO_SERVICE      trino (default — beperkt scan tot deze service)
+  OPA_CONFIGMAP_NS      odap-platform (default)
   OPA_CONFIGMAP_NAME    opa-trino-bundle (default)
   DRY_RUN               "true" om alleen logging zonder PATCH
 """
@@ -38,12 +38,12 @@ from urllib.parse import urlencode
 import requests
 
 OM_URL = os.environ.get(
-    "OM_URL", "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+    "OM_URL", "http://openmetadata.odap-meta.svc.cluster.local:8585"
 ).rstrip("/")
 OM_TOKEN = os.environ["OM_JWT_TOKEN"]
-TRINO_SERVICE = os.environ.get("OM_TRINO_SERVICE", "uwv-trino")
+TRINO_SERVICE = os.environ.get("OM_TRINO_SERVICE", "trino")
 
-CM_NS = os.environ.get("OPA_CONFIGMAP_NS", "uwv-platform")
+CM_NS = os.environ.get("OPA_CONFIGMAP_NS", "odap-platform")
 CM_NAME = os.environ.get("OPA_CONFIGMAP_NAME", "opa-trino-bundle")
 DRY_RUN = os.environ.get("DRY_RUN", "false").lower() in ("1", "true", "yes")
 
@@ -86,7 +86,7 @@ def list_tables() -> list[dict]:
 
 
 def _glob_from_fqn(fqn: str) -> str | None:
-    """uwv-trino.gold.uc01_wia_funnel.mart_x → gold.uc01_wia_funnel.*
+    """trino.gold.uc01_wia_funnel.mart_x → gold.uc01_wia_funnel.*
 
     Service-prefix verwijderen, schema-glob bouwen. FQN-segmenten met
     quotes worden gestript (OM kwoot soms namen met punten/dashes).
@@ -194,7 +194,7 @@ def main() -> int:
         log(f"  ! data.json niet geldige JSON: {e}")
         return 1
 
-    role_mappings = opa_data.setdefault("uwv_role_mappings", {})
+    role_mappings = opa_data.setdefault("role_mappings", {})
     existing = role_mappings.get("resource_purposes", {})
     merged = dict(existing)  # behoud entries die OM niet bestrijkt
     for glob, purposes in om_map.items():

@@ -57,5 +57,5 @@ test_user_with_no_role_denied if {
 		"alice", [], "SelectFromColumns",
 		"gold", "uc01_wia_funnel", "mart_uc01_wia_funnel_daily",
 	)
-		with data.uwv_role_mappings as data.uwv_role_mappings
+		with data.role_mappings as data.role_mappings
 }

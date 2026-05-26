@@ -19,7 +19,7 @@ opgesplitst per rol. Elke rol heeft zijn eigen handleiding met:
 
 > **Belangrijk.** Dit platform is een **fictieve, illustratieve referentie-implementatie**.
 > Alle datasets zijn synthetisch (alleen 9-prefix BSN's, `meta.synthetic: true`).
-> De handleidingen beschrijven hoe het platform *werkt*, niet hoe productie-UWV werkt.
+> De handleidingen beschrijven hoe het platform *werkt*, niet hoe production werkt.
 > Productie-installaties verwijzen naar dit document als blauwdruk, niet als procedure.
 
 ---
@@ -29,8 +29,8 @@ opgesplitst per rol. Elke rol heeft zijn eigen handleiding met:
 ## Overzicht van rollen
 
 Het platform onderscheidt **11 menselijke rollen** + **1 systeemrol**, gemodelleerd
-in [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json)
-en [`opa-policies-src/data/uwv_role_mappings.json`](../../opa-policies-src/data/uwv_role_mappings.json).
+in [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json)
+en [`opa-policies-src/data/role_mappings.json`](../../opa-policies-src/data/role_mappings.json).
 
 ### Business-rollen (eindgebruikers)
 
@@ -61,7 +61,7 @@ Voor distributie of offline lezen is er een **gebundeld handboek** met alle
 rollen achter elkaar:
 
 - Markdown: [00-handboek.md](00-handboek.md)
-- Word (.docx): `UWV_Platform_Handboek_per_rol.docx` in de hoofdmap
+- Word (.docx): `ODAP_Platform_Handbook_per_role.docx` in de hoofdmap
 
 ---
 
@@ -99,7 +99,7 @@ Werkt iets niet? In deze volgorde:
 
 1. **Lees** de sectie *Hulp, fouten & escalatie* in jouw rol-handleiding.
 2. **Vraag** een collega met dezelfde rol.
-3. **Mail** de data-steward (`data.steward@uwv-platform.local:8443`).
+3. **Mail** de data-steward (`data.steward@odap.local:8443`).
 4. **Voor incidenten** (rare meldingen, plotse toegang verloren, vermoede inbreuk):
    bel de platform-admin direct, niet via e-mail.
 
@@ -138,7 +138,7 @@ tot de Sensitive Vault (`sensitive.*`) — die is voor de Wajong-arbeidsdeskundi
 
 ### 2.1 Account
 
-Je accountnaam is `wia.beoordelaar` (in productie: je eigen UWV-account, gefedereerd via SSO).
+Je accountnaam is `wia.beoordelaar` (in productie: je eigen platform account, gefedereerd via SSO).
 Het wachtwoord wijzig je bij eerste inlog. **MFA is verplicht** —
 configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Password etc.).
 
@@ -146,14 +146,14 @@ configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Passwo
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards bekijken: WIA-funnel, doorlooptijden | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Opzoeken welke kolom wat betekent, wie eigenaar is | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Dashboards bekijken: WIA-funnel, doorlooptijden | https://superset.odap.local:8443 |
+| **OpenMetadata** | Opzoeken welke kolom wat betekent, wie eigenaar is | https://openmetadata.odap.local:8443 |
 
 > Je gebruikt **niet**: NiFi (ingestion), Airflow (orchestratie). Die zijn voor het platform-team.
 
 ### 2.3 Eerste keer inloggen — stappen
 
-1. Open https://superset.uwv-platform.local:8443
+1. Open https://superset.odap.local:8443
 2. Klik **Inloggen via Keycloak (UWV)**
 3. Vul gebruikersnaam + wachtwoord; bij eerste login wijzig je het wachtwoord
 4. Scan de QR-code met je TOTP-app en bevestig de eerste 6-cijferige code
@@ -283,7 +283,7 @@ ORDER BY gem_doorlooptijd DESC;
 
 **Scenario.** Wat is precies "datum_aanvraag" versus "datum_eerste_dag"? Welke is leidend?
 
-1. Open https://openmetadata.uwv-platform.local:8443
+1. Open https://openmetadata.odap.local:8443
 2. Zoek op `mart_uc01_wia_funnel_daily` of op kolomnaam
 3. Bij elke kolom zie je: **definitie**, **eigenaar** (data-steward), **bron-tabel**,
    **bewaartermijn**, **classificatie**
@@ -331,7 +331,7 @@ je niet zou mogen zien?
 
 1. **Stop met kijken** — niet doorklikken, niet downloaden
 2. Maak **één** screenshot van je scherm voor bewijsvoering (geen BSN's expliciet)
-3. **Bel** de platform-admin (`platform.admin@uwv-platform.local:8443`, niet via mail)
+3. **Bel** de platform-admin (`platform.admin@odap.local:8443`, niet via mail)
 4. Schrijf binnen 24 uur een korte notitie van wat, wanneer, waar
 
 ### 6.3 Wie helpt waarbij?
@@ -410,8 +410,8 @@ voor andere rollen. Wachtwoord wijzigen bij eerste login.
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards: WW-risico, caseload, signalen | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Begrippen, eigenaarschap, lineage | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Dashboards: WW-risico, caseload, signalen | https://superset.odap.local:8443 |
+| **OpenMetadata** | Begrippen, eigenaarschap, lineage | https://openmetadata.odap.local:8443 |
 
 > Je gebruikt **niet**: NiFi, Airflow, sensitive vault.
 
@@ -621,8 +621,8 @@ gelogd en periodiek gereviewd."
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards: caseload, trajecten | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Begrippen, glossary, lineage | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Dashboards: caseload, trajecten | https://superset.odap.local:8443 |
+| **OpenMetadata** | Begrippen, glossary, lineage | https://openmetadata.odap.local:8443 |
 
 ### 2.3 Vier-ogen-principe
 
@@ -775,7 +775,7 @@ Als je per ongeluk gegevens ziet die niet bedoeld zijn voor jouw doel,
 of als je een incident opmerkt:
 
 1. **Niet verder kijken.** Sluit het scherm.
-2. **Bel** platform-admin direct (binnen werktijd) of de UWV CISO (buiten werktijd).
+2. **Bel** platform-admin direct (binnen werktijd) of de Platform CISO (buiten werktijd).
 3. **Schrijf** een notitie binnen 24 uur (datum, tijd, query, omschrijving).
 
 Dit valt onder de **NIS2-meldplicht 24 uur vroegsignalering**.
@@ -787,7 +787,7 @@ Dit valt onder de **NIS2-meldplicht 24 uur vroegsignalering**.
 | Inloggen / MFA | Platform-admin |
 | Vraag over diagnose-codes | Data-steward → glossary in OpenMetadata |
 | "Ik twijfel of ik dit mag zien" | Data-steward — vraag het vóór je het doet |
-| Vermoeden van inbreuk | Platform-admin telefonisch + UWV CISO |
+| Vermoeden van inbreuk | Platform-admin telefonisch + Platform CISO |
 
 ---
 
@@ -851,8 +851,8 @@ wachtwoord wijzigen.
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Cliënt-360-dashboard, contact-trends | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Begrippen opzoeken | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Cliënt-360-dashboard, contact-trends | https://superset.odap.local:8443 |
+| **OpenMetadata** | Begrippen opzoeken | https://openmetadata.odap.local:8443 |
 
 Voor productie: meestal werk je vanuit een **Werkmap-frontend** die UC-05
 via Trino REST API consumeert. Het platform is dan onzichtbaar; deze
@@ -946,7 +946,7 @@ In Superset → dashboard "CRM Trends" → filteren op je team → exporteer als
 
 Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
-1. Wat **jij** ziet in het 360°-beeld (= een **deel** van het volledige UWV-beeld)
+1. Wat **jij** ziet in het 360°-beeld (= een **deel** van het volledige platform image)
 2. Verwijs voor volledige inzage naar het AVG-inzageformulier (out-of-platform proces)
 3. Geef nooit een uitprint van het scherm — laat zien op het scherm en lees voor
 
@@ -1014,8 +1014,8 @@ input voor begrotingen. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards: schadelast, prognoses | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Definities, eigenaarschap | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Dashboards: schadelast, prognoses | https://superset.odap.local:8443 |
+| **OpenMetadata** | Definities, eigenaarschap | https://openmetadata.odap.local:8443 |
 
 ---
 
@@ -1180,8 +1180,8 @@ waar je op werkt. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Capaciteits-dashboards | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Definities | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Capaciteits-dashboards | https://superset.odap.local:8443 |
+| **OpenMetadata** | Definities | https://openmetadata.odap.local:8443 |
 
 ---
 
@@ -1340,8 +1340,8 @@ case en initieert proactief contact. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Werklijst-dashboard | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Definities, model-info | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Werklijst-dashboard | https://superset.odap.local:8443 |
+| **OpenMetadata** | Definities, model-info | https://openmetadata.odap.local:8443 |
 
 ---
 
@@ -1482,7 +1482,7 @@ ORDER  BY conversie_pct DESC;
 > Rol-key: `researcher` · Domein: Statistisch onderzoek (sandbox) · Risiconiveau toegang: laag (alleen sandbox, gepseudonimiseerd)
 
 Deze handleiding is voor **onderzoekers** die statistisch onderzoek doen
-op UWV-data. Je werkt **uitsluitend in de sandbox-zone** met
+op ODAP data. Je werkt **uitsluitend in de sandbox-zone** met
 gepseudonimiseerde panels — geen productie-PII, geen rauwe BSN's.
 
 ---
@@ -1506,12 +1506,12 @@ en vergelijkbare studies). Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards en SQL Lab | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Definities, lineage van panels | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Dashboards en SQL Lab | https://superset.odap.local:8443 |
+| **OpenMetadata** | Definities, lineage van panels | https://openmetadata.odap.local:8443 |
 
 Tip: Trino integreert met Python-notebooks via `trino-python-client`. Voor
 reproduceerbaar onderzoek: bewaar je notebook + queries bij je publicatie.
-Voor ad-hoc gebruik van Trino: `kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443` en verbind op `localhost:8443`.
+Voor ad-hoc gebruik van Trino: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443` en verbind op `localhost:8443`.
 
 ---
 
@@ -1575,7 +1575,7 @@ ORDER  BY slaag_pct DESC;
 ### 4.3 Workflow C — Regressie via Python-notebook
 
 ```python
-# Eerst port-forwarden: kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443
+# Eerst port-forwarden: kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443
 import trino, pandas as pd, statsmodels.api as sm
 
 conn = trino.dbapi.connect(
@@ -1684,10 +1684,10 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **OpenMetadata** | Hoofdwerkplek: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.uwv-platform.local:8443 |
-| **Apache Superset** | Dashboards reviewen, ownership-overzichten | https://superset.uwv-platform.local:8443 |
-| **Apache Airflow** | DQ-DAGs draaien | https://airflow.uwv-platform.local:8443 |
-| **OpenSearch (Kibana-achtig)** | OPA-decision-logs reviewen | https://opensearch.uwv-platform.local:8443/logs |
+| **OpenMetadata** | Hoofdwerkplek: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.odap.local:8443 |
+| **Apache Superset** | Dashboards reviewen, ownership-overzichten | https://superset.odap.local:8443 |
+| **Apache Airflow** | DQ-DAGs draaien | https://airflow.odap.local:8443 |
+| **OpenSearch (Kibana-achtig)** | OPA-decision-logs reviewen | https://opensearch.odap.local:8443/logs |
 | **dbt CLI / docs** | dbt-tests + lineage-docs | lokaal of via VS Code remote |
 
 ---
@@ -1884,15 +1884,15 @@ platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Airflow** | DAGs maken, runs monitoren | https://airflow.uwv-platform.local:8443 |
+| **Apache Airflow** | DAGs maken, runs monitoren | https://airflow.odap.local:8443 |
 | **dbt CLI** | Lokaal of in CI | terminal |
 | **kubectl + k9s** | Spark-jobs, pod-status, Hive Metastore | terminal |
-| **Apache Superset** | Eigen build-dashboards reviewen | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Service-config, lineage publishing | https://openmetadata.uwv-platform.local:8443 |
-| **MinIO Console** | Bucket-debugging | https://minio.uwv-platform.local:8443 |
+| **Apache Superset** | Eigen build-dashboards reviewen | https://superset.odap.local:8443 |
+| **OpenMetadata** | Service-config, lineage publishing | https://openmetadata.odap.local:8443 |
+| **MinIO Console** | Bucket-debugging | https://minio.odap.local:8443 |
 
 - NiFi-flows worden as-code beheerd in `nifi-flows/templates/` en geïmporteerd via `kubectl port-forward` (zie `nifi-flows/templates/delta/README.md`).
-- dbt en Airflow benaderen Trino in-cluster; voor ad-hoc debug: `kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443`.
+- dbt en Airflow benaderen Trino in-cluster; voor ad-hoc debug: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443`.
 
 ---
 
@@ -1930,9 +1930,9 @@ zuinig: **kijk niet meer dan nodig**.
 2. **NiFi-flow**: kopieer template `nifi-flows/templates/delta/source-xyz/` aan, pas processors aan.
 3. **Kafka-topic**: definieer `uwv.xyz.event` in `platform/06-kafka/topics.yaml`.
 4. **Spark-job**: voeg `streaming-bronze-xyz.yaml` toe; gebruik helper `lakehouse_io.write_delta()`.
-5. **Schema in HMS**: `CREATE TABLE bronze.uwv.xyz_events (...) USING DELTA LOCATION 's3a://uwv-bronze/xyz/'`.
+5. **Schema in HMS**: `CREATE TABLE bronze.uwv.xyz_events (...) USING DELTA LOCATION 's3a://odap-bronze/xyz/'`.
 6. **dbt-stg**: `dbt/models/staging/stg_xyz.sql` met basisvalidatie.
-7. **OPA-update**: voeg purpose toe in `data/uwv_role_mappings.json::resource_purposes`.
+7. **OPA-update**: voeg purpose toe in `data/role_mappings.json::resource_purposes`.
 8. **OpenMetadata**: voeg service-config toe (auto-discovery).
 9. **CI**: `make opa-test`, `dbt parse`, smoke tests.
 10. **PR review** door data-steward + platform-admin.
@@ -1964,7 +1964,7 @@ version: 2
 models:
   - name: mart_xyz_daily
     meta:
-      eigenaar: data.steward@uwv-platform.local:8443
+      eigenaar: data.steward@odap.local:8443
       domain: xyz
       legal_basis: art_6_1e
       doelbinding: [sturingsinfo]
@@ -1983,14 +1983,14 @@ Run: `dbt run --select mart_xyz_daily && dbt test --select mart_xyz_daily`.
 
 **Scenario.** Spark-job hangt in `streaming-bronze-wia`.
 
-1. `kubectl get sparkapp -n uwv-platform`
-2. `kubectl logs -n uwv-platform <driver-pod>`
+1. `kubectl get sparkapp -n odap-platform`
+2. `kubectl logs -n odap-platform <driver-pod>`
 3. Spark UI port-forwarden:
    ```
-   kubectl port-forward -n uwv-platform svc/spark-streaming-ui 4040:4040
+   kubectl port-forward -n odap-platform svc/spark-streaming-ui 4040:4040
    ```
    Open http://localhost:4040
-4. Checkpoint-bucket inspecteren via MinIO Console: `s3://uwv-checkpoints/<job>/`
+4. Checkpoint-bucket inspecteren via MinIO Console: `s3://odap-checkpoints/<job>/`
 5. Zie [`docs/runbook.md` § 4.3](../runbook.md) voor scenario-stappen.
 
 ### 4.4 Workflow D — Pipeline-falen patchen
@@ -2110,15 +2110,15 @@ platform. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Keycloak Admin** | Rolbeheer, gebruikers, MFA-policies | https://keycloak.uwv-platform.local:8443/admin |
+| **Keycloak Admin** | Rolbeheer, gebruikers, MFA-policies | https://keycloak.odap.local:8443/admin |
 | **kubectl + k9s** | Alle clusters, alle pods | terminal |
-| **Apache Airflow** | Maintenance-DAGs | https://airflow.uwv-platform.local:8443 |
+| **Apache Airflow** | Maintenance-DAGs | https://airflow.odap.local:8443 |
 | **OpenSearch / OPA-logs** | Audit-log review | via Vector ingestion |
-| **OpenMetadata** | Service-config, governance | https://openmetadata.uwv-platform.local:8443 |
-| **Prometheus + Grafana** | Metrics, alerts | https://grafana.uwv-platform.local:8443 |
-| **MinIO Console** | Bucket-beheer | https://minio.uwv-platform.local:8443 |
+| **OpenMetadata** | Service-config, governance | https://openmetadata.odap.local:8443 |
+| **Prometheus + Grafana** | Metrics, alerts | https://grafana.odap.local:8443 |
+| **MinIO Console** | Bucket-beheer | https://minio.odap.local:8443 |
 
-- Trino break-glass queries: `kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443` en dan via DBeaver op `localhost:8443`.
+- Trino break-glass queries: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443` en dan via DBeaver op `localhost:8443`.
 
 > **MFA verplicht en hardware-gebonden.** Voor productie: WebAuthn-passkey of
 > hardware-token (YubiKey). Geen TOTP-app op een mobiel.
@@ -2162,11 +2162,11 @@ De data-steward valideert de volgende ochtend dat deze comments er zijn.
 make doctor
 
 # Per Stackable-laag
-kubectl get pods -n uwv-platform
-kubectl get pods -n uwv-data
-kubectl get pods -n uwv-meta
-kubectl get pods -n uwv-monitoring
-kubectl get pods -n uwv-auth
+kubectl get pods -n odap-platform
+kubectl get pods -n odap-data
+kubectl get pods -n odap-meta
+kubectl get pods -n odap-monitoring
+kubectl get pods -n odap-auth
 
 # Custom resources
 kubectl get trinocluster,kafkacluster,hivecluster,opacluster,airflowcluster,supersetcluster,nificluster -A
@@ -2174,10 +2174,10 @@ kubectl get trinocluster,kafkacluster,hivecluster,opacluster,airflowcluster,supe
 
 ### 4.2 Workflow B — Nieuwe gebruiker toevoegen
 
-> In productie: gebeurt via SSO-federatie (DigiD/eHerkenning of UWV-AD).
+> In productie: gebeurt via SSO-federatie (DigiD/eHerkenning of Entra ID).
 > In deze referentie via Keycloak Admin.
 
-1. Open https://keycloak.uwv-platform.local:8443/admin → realm `uwv` → **Users → Add user**.
+1. Open https://keycloak.odap.local:8443/admin → realm `uwv` → **Users → Add user**.
 2. Vul username, email, voornaam, achternaam.
 3. Tab **Credentials** → temporary password.
 4. Tab **Role mappings** → wijs de juiste rol toe (één rol per persoon!).
@@ -2206,7 +2206,7 @@ scripts/build-opa-bundle.sh       # rendert ConfigMap
 kubectl apply -f platform/10-opa/
 
 # 4. Verifieer
-kubectl logs -n uwv-platform <opa-pod>
+kubectl logs -n odap-platform <opa-pod>
 # en draai smoke test:
 tests/smoke/08-opa-decisions.sh
 ```
@@ -2220,21 +2220,21 @@ Volgens [`docs/runbook.md` § 5](../runbook.md):
 
 ```bash
 # MinIO mirror
-mc mirror local/uwv-bronze backup-bucket/uwv-bronze/$(date -I)/
-mc mirror local/uwv-silver backup-bucket/uwv-silver/$(date -I)/
-mc mirror local/uwv-gold backup-bucket/uwv-gold/$(date -I)/
-mc mirror local/uwv-sensitive backup-bucket/uwv-sensitive/$(date -I)/
+mc mirror local/odap-bronze backup-bucket/odap-bronze/$(date -I)/
+mc mirror local/odap-silver backup-bucket/odap-silver/$(date -I)/
+mc mirror local/odap-gold backup-bucket/odap-gold/$(date -I)/
+mc mirror local/sensitive backup-bucket/sensitive/$(date -I)/
 
 # Postgres dumps (Hive Metastore, Airflow, Superset, OpenMetadata)
 for db in hive airflow superset openmetadata; do
-  kubectl exec -n uwv-platform postgres-$db-0 -- \
+  kubectl exec -n odap-platform postgres-$db-0 -- \
     pg_dump -U $db $db > backups/$db-$(date -I).sql
 done
 
 # Keycloak realm export
-kubectl exec -n uwv-auth keycloak-0 -- \
-  /opt/keycloak/bin/kc.sh export --file /tmp/uwv-realm.json --realm uwv
-kubectl cp uwv-auth/keycloak-0:/tmp/uwv-realm.json backups/uwv-realm-$(date -I).json
+kubectl exec -n odap-auth keycloak-0 -- \
+  /opt/keycloak/bin/kc.sh export --file /tmp/odap-realm.json --realm uwv
+kubectl cp odap-auth/keycloak-0:/tmp/odap-realm.json backups/odap-realm-$(date -I).json
 ```
 
 ### 4.6 Workflow F — Incident-response (cluster down)
@@ -2242,7 +2242,7 @@ kubectl cp uwv-auth/keycloak-0:/tmp/uwv-realm.json backups/uwv-realm-$(date -I).
 Volgens [`docs/runbook.md` § 4](../runbook.md):
 
 1. **Triage**: `make doctor`, lees recente alerts in Grafana.
-2. **Communicatie**: meld incident in Slack `#uwv-incidents`; zet status-page.
+2. **Communicatie**: meld incident in Slack `#incidents`; zet status-page.
 3. **Stabilize**: rolling restart van het falende component (`kubectl rollout restart`).
 4. **Diagnose**: pod-logs, OPA-decision-log, OpenSearch.
 5. **Resolve**: pas patch toe; als infra-niveau, escaleer naar SRE.
@@ -2258,14 +2258,14 @@ make opa-test > evidence/opa-test-$(date -I).log
 
 # OpenMetadata classifications
 curl -H "Authorization: Bearer $TOKEN" \
-  https://openmetadata.uwv-platform.local:8443/api/v1/tags?fields=classifications \
+  https://openmetadata.odap.local:8443/api/v1/tags?fields=classifications \
   > evidence/om-classifications-$(date -I).json
 
 # dbt test history
 dbt run --select metadata.dbt_test_results > evidence/dbt-tests-$(date -I).log
 
 # OPA decision-log statistieken
-opensearch-curl /uwv-logs-*/_search?q=opa.decision&size=0&_source=false \
+opensearch-curl /logs-*/_search?q=opa.decision&size=0&_source=false \
   > evidence/opa-decisions-stats-$(date -I).json
 ```
 
@@ -2279,7 +2279,7 @@ Bij ernstig incident:
 2. **Binnen 72u**: officieel incident-rapport met scope, oorzaak, impact, mitigatie.
 3. **Binnen 1 maand**: definitief evaluatierapport.
 
-Templates en escalatie-paden: out-of-platform via UWV CISO.
+Templates en escalatie-paden: out-of-platform via Platform CISO.
 
 ---
 
@@ -2301,7 +2301,7 @@ In volgorde van prioriteit:
 | Probleem | Contact |
 |---|---|
 | Productie-incident | Volg runbook + UWV SRE-team |
-| Beleidsvraag | UWV CISO + Data Office |
+| Beleidsvraag | Platform CISO + Data Office |
 | Wettelijke vraag | Privacy Officer (FG) |
 | Burnout / overbelasting | Manager + collega-admin (rol moet redundant zijn!) |
 
@@ -2314,7 +2314,7 @@ In volgorde van prioriteit:
 - Direct `kubectl edit` op productie-CRDs — altijd via GitOps.
 - Een wachtwoord in plaintext doorsturen, ook niet "tijdelijk".
 - MFA disable-en voor "even debuggen".
-- Nieuwe rollen creëren zonder vermelding in `uwv_role_mappings.json` + ADR.
+- Nieuwe rollen creëren zonder vermelding in `role_mappings.json` + ADR.
 
 ---
 
@@ -2464,7 +2464,7 @@ Als CI-runs failen met `401 Unauthorized` voor `smoketest`:
 1. Secret is verlopen of geroteerd zonder propagatie.
 2. Vernieuw via secret-operator:
    ```bash
-   kubectl annotate secret smoketest-oidc-secret -n uwv-platform \
+   kubectl annotate secret smoketest-oidc-secret -n odap-platform \
      stackable.tech/refresh=$(date +%s)
    ```
 3. Restart de DAG / smoke-test.

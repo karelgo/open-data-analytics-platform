@@ -16,7 +16,7 @@
 # Pre-conditions:
 #   - openmetadata-init Job heeft gedraaid (teams + domains + dataProducts
 #     + custom-property types geseed).
-#   - Trino-catalog ingest heeft de bronze/gold schemas onder uwv-trino
+#   - Trino-catalog ingest heeft de bronze/gold schemas onder trino
 #     aangelegd.
 
 set -euo pipefail
@@ -26,7 +26,7 @@ ok()   { printf '\033[1;32mOK\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m!!\033[0m %s\n' "$*"; }
 fail() { printf '\033[1;31mFAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
-NAMESPACE="${NAMESPACE:-uwv-meta}"
+NAMESPACE="${NAMESPACE:-odap-meta}"
 JOB_NAME="om-demo-seed"
 MANIFEST="${MANIFEST:-platform/13-openmetadata-config/demo-synth-marts-job.yaml}"
 TIMEOUT="${TIMEOUT:-300s}"

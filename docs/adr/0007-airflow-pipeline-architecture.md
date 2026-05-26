@@ -21,7 +21,7 @@
 >
 > **2026-05-18 update**: Kafka + NiFi zijn verwijderd uit de referentie-stack.
 > De `kafka:` blokken in `platform/11-airflow/sources/*.yml` heten nu `stream:`,
-> de Spark-streaming-job leest JSONL uit `s3a://uwv-raw/` i.p.v. Kafka-topics,
+> de Spark-streaming-job leest JSONL uit `s3a://odap-raw/` i.p.v. Kafka-topics,
 > en de bronze-tabellen hebben `source_ts`/`source_file` i.p.v.
 > `kafka_ts`/`kafka_partition`/`kafka_offset`. Alle Cosmos/Dataset/YAML-registry-
 > mechanismen blijven ongewijzigd.
@@ -179,9 +179,9 @@ platform/11-airflow/
 
 Mounts in pod:
 - `/stackable/airflow/dags/` ← ConfigMap `airflow-dags` (DAG-aanroepers)
-- `/opt/uwv/airflow/include/` ← ConfigMap `airflow-include` (factories) — op `PYTHONPATH`
-- `/opt/uwv/airflow/sources/` ← ConfigMap `airflow-sources` (YAML's) — gelezen via env `UWV_SOURCES_DIR`
-- `/opt/uwv/dbt/manifest.json` ← ConfigMap `dbt-manifest` (single-key)
+- `/opt/odap/airflow/include/` ← ConfigMap `airflow-include` (factories) — op `PYTHONPATH`
+- `/opt/odap/airflow/sources/` ← ConfigMap `airflow-sources` (YAML's) — gelezen via env `SOURCES_DIR`
+- `/opt/odap/dbt/manifest.json` ← ConfigMap `dbt-manifest` (single-key)
 
 ## Gevolgen
 

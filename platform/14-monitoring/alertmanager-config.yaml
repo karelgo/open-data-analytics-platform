@@ -7,15 +7,15 @@
 # zodat ze niet in code komen. In k3d wijzen de SMTP-defaults naar de
 # in-cluster MailHog (zie mailhog.yaml); in AKS patcht
 # `platform-overlays/aks/14-monitoring/` smarthost + credentials naar de
-# echte UWV-SMTP-relay.
+# echte Platform SMTP relay.
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: alertmanager-receivers
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   labels:
-    uwv.nl/dev-only: "true"
+    odap.io/dev-only: "true"
 type: Opaque
 stringData:
   # Slack — vervang door echte webhook-URL (productie via External Secrets).
@@ -25,18 +25,18 @@ stringData:
   # SMTP — MailHog accepteert alles in dev. AKS-overlay patcht dit met
   # de echte relay-credentials.
   smtp_username: "alertmanager"
-  smtp_password: "uwv-dev-only-no-auth"
+  smtp_password: "odap-dev-only-no-auth"
 ---
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
-  name: uwv-platform-receivers
-  namespace: uwv-monitoring
+  name: odap-platform-receivers
+  namespace: odap-monitoring
   labels:
-    alertmanagerConfig: uwv-platform
+    alertmanagerConfig: odap-platform
 spec:
   route:
-    receiver: email-uwv-alerts
+    receiver: email-alerts
     groupBy: [alertname, cluster, namespace]
     groupWait: 30s
     groupInterval: 5m
@@ -44,37 +44,37 @@ spec:
     routes:
       # Critical alerts: email + Slack. PagerDuty is uitgeschakeld
       # (schema-incompat in operator-CRD, zie onder).
-      - receiver: email-uwv-alerts
+      - receiver: email-alerts
         matchers:
           - name: severity
             value: critical
         continue: true
-      - receiver: slack-uwv-warning
+      - receiver: slack-warning
         matchers:
           - name: severity
             value: critical
         continue: false
 
       # Warning alerts: email + Slack.
-      - receiver: email-uwv-alerts
+      - receiver: email-alerts
         matchers:
           - name: severity
             value: warning
         continue: true
-      - receiver: slack-uwv-warning
+      - receiver: slack-warning
         matchers:
           - name: severity
             value: warning
 
   receivers:
-    - name: email-uwv-alerts
+    - name: email-alerts
       emailConfigs:
         # In k3d wijst smarthost naar MailHog (Service in zelfde namespace,
         # poort 1025, geen TLS, geen auth-check). AKS-overlay vervangt
         # smarthost + zet `requireTLS: true` + auth via secret.
-        - to: platform-alerts@uwv-platform.local
-          from: alertmanager@uwv-platform.local
-          smarthost: mailhog.uwv-monitoring.svc.cluster.local:1025
+        - to: platform-alerts@odap.local
+          from: alertmanager@odap.local
+          smarthost: mailhog.odap-monitoring.svc.cluster.local:1025
           requireTLS: false
           authUsername: ""
           authPassword:
@@ -106,12 +106,12 @@ spec:
             {{ end }}
             </body></html>
 
-    - name: slack-uwv-warning
+    - name: slack-warning
       slackConfigs:
         - apiURL:
             name: alertmanager-receivers
             key: slack_webhook
-          channel: "#uwv-data-platform"
+          channel: "#odap-data-platform"
           sendResolved: true
           title: "{{ .Status | toUpper }} — {{ .CommonLabels.alertname }}"
           text: |

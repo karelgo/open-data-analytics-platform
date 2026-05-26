@@ -18,9 +18,9 @@ require_context
 
 bash "$ROOT/scripts/bootstrap.sh" --mode=aks
 
-# Postgres reconcile + uwvplatform-role + databases nu in bootstrap.sh
+# Postgres reconcile + odap-role + databases nu in bootstrap.sh
 # zelf (tussen postgres-install en keycloak-install), zodat Keycloak's
-# chart de uwvplatform user vindt en niet --atomic-rollback geeft op een
+# chart de odap user vindt en niet --atomic-rollback geeft op een
 # fresh cluster. Hier alleen de OpenMetadata-mysql-secrets workaround.
 
 # AKS-specific: OpenMetadata's helm chart hardcodes the database-credential
@@ -28,9 +28,9 @@ bash "$ROOT/scripts/bootstrap.sh" --mode=aks
 # even when the configured driver is postgres. Create it here so
 # the openmetadata Deployment can finish init.
 log "Create OpenMetadata mysql-secrets (workaround for chart's hardcoded name)"
-PG_PW=$(kubectl -n uwv-data get secret postgres-postgresql -o jsonpath='{.data.postgres-password}' | base64 -d)
-kubectl create namespace uwv-meta --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-kubectl -n uwv-meta create secret generic mysql-secrets \
+PG_PW=$(kubectl -n odap-data get secret postgres-postgresql -o jsonpath='{.data.postgres-password}' | base64 -d)
+kubectl create namespace odap-meta --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+kubectl -n odap-meta create secret generic mysql-secrets \
   --from-literal=openmetadata-mysql-password="${PG_PW}" \
   --dry-run=client -o yaml | kubectl apply -f -
 
@@ -50,7 +50,7 @@ done
 if [[ -n "${LB_IP:-}" ]]; then
   log "Ingress LoadBalancer IP: $LB_IP"
   echo "Add to /etc/hosts:"
-  echo "  $LB_IP keycloak.uwv-platform.local minio-console.uwv-platform.local grafana.uwv-platform.local openmetadata.uwv-platform.local airflow.uwv-platform.local superset.uwv-platform.local spark.uwv-platform.local"
+  echo "  $LB_IP keycloak.odap.local minio-console.odap.local grafana.odap.local openmetadata.odap.local airflow.odap.local superset.odap.local spark.odap.local"
 else
   warn "LoadBalancer IP not yet allocated; run 'kubectl -n ingress-nginx get svc' later."
 fi

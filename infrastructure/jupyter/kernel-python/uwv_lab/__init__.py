@@ -1,15 +1,15 @@
-"""UWV Lab — one-line access to every platform data layer from a notebook.
+"""ODAP Lab — one-line access to every platform data layer from a notebook.
 
 Quick start in a notebook cell::
 
-    from uwv_lab import trino, s3, hms, om
+    from odap_lab import trino, s3, hms, om
 
     # SQL against the Bronze / Silver / Gold / Sensitive Trino catalogs
     # (OPA evaluates row filters and column masks for your Keycloak role).
     df = trino.query("SELECT * FROM silver.wia.aanvraag LIMIT 100")
 
     # Browse raw objects in MinIO.
-    s3.ls("uwv-bronze/")
+    s3.ls("odap-bronze/")
 
     # Inspect the Hive Metastore catalog directly.
     hms.list_tables("uwv")
@@ -25,7 +25,7 @@ The helper reads env vars set by the JupyterHub spawner (see
     HMS_URI
     KAFKA_BOOTSTRAP_SERVERS
     OPENMETADATA_HOST, OPENMETADATA_JWT
-    UWV_CA_BUNDLE  (combined CA file mounted into the pod)
+    CA_BUNDLE  (combined CA file mounted into the pod)
 
 Everything respects the user's Keycloak identity: Trino queries set
 ``X-Trino-User`` to ``TRINO_USER`` (= ``preferred_username``), and OPA enforces
@@ -53,6 +53,6 @@ def env() -> dict[str, str | None]:
         "HMS_URI",
         "KAFKA_BOOTSTRAP_SERVERS",
         "OPENMETADATA_HOST",
-        "UWV_CA_BUNDLE",
+        "CA_BUNDLE",
     ]
     return {k: os.environ.get(k) for k in keys}

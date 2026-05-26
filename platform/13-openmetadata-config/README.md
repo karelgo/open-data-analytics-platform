@@ -8,20 +8,20 @@ service-connection definities voor Trino / dbt / Superset / Airflow / Kafka.
 
 | Bestand | Doel |
 |---|---|
-| [classifications-uwv.yaml](classifications-uwv.yaml) | 7 classifications met ~50 tags totaal — PII, Health.Article9, BIO.BIV, LegalBasis, Doelbinding, AI.Risk-\*. |
+| [classifications.yaml](classifications.yaml) | 7 classifications met ~50 tags totaal — PII, Health.Article9, BIO.BIV, LegalBasis, Doelbinding, AI.Risk-\*. |
 | [glossary-cgm.yaml](glossary-cgm.yaml) | CGM-glossary met ~22 termen uit referentiearchitectuur Bijlage B. |
-| [services/trino-service.yaml](services/trino-service.yaml) | Trino DatabaseService config — schema-filter dekt alle UWV-catalogs. |
+| [services/trino-service.yaml](services/trino-service.yaml) | Trino DatabaseService config — schema-filter dekt alle platform catalogs. |
 | [services/trino-lineage.yaml](services/trino-lineage.yaml) | Lineage-workflow uit Trino query-history. |
 | [services/trino-profiler.yaml](services/trino-profiler.yaml) | Profiler op silver.\* (kolom-statistieken voor UC-07). |
-| [services/dbt-workflow.yaml](services/dbt-workflow.yaml) | dbt-manifest workflow (leest s3://uwv-meta/dbt/latest/). |
+| [services/dbt-workflow.yaml](services/dbt-workflow.yaml) | dbt-manifest workflow (leest s3://odap-meta/dbt/latest/). |
 | [services/superset-service.yaml](services/superset-service.yaml) | Dashboard-ingestion. |
 | [services/airflow-service.yaml](services/airflow-service.yaml) | Pipeline-ingestion. |
 | [init-job.yaml](init-job.yaml) | ConfigMap + Job die classifications + glossary toepast via OM REST API. |
-| [kustomization.yaml](kustomization.yaml) | Bundelt alles + bouwt ConfigMap `openmetadata-uwv-config`. |
+| [kustomization.yaml](kustomization.yaml) | Bundelt alles + bouwt ConfigMap `openmetadata-platform-config`. |
 
 ## Pre-requisites
 
-- OpenMetadata Helm-installed in `uwv-meta` (zie `infrastructure/helm/openmetadata/`).
+- OpenMetadata Helm-installed in `odap-meta` (zie `infrastructure/helm/openmetadata/`).
 - OpenSearch single-node draait (gedeeld met Vector logs).
 - Postgres `openmetadata` database init (via fase 1 init-script).
 - JWT-token voor admin: `metadata generate-token` na bootstrap; resultaat in Secret `openmetadata-admin.jwtToken`.
@@ -29,21 +29,21 @@ service-connection definities voor Trino / dbt / Superset / Airflow / Kafka.
 ## SSO via Keycloak
 
 OpenMetadata is gekoppeld aan Keycloak met de `openmetadata` confidential
-client (zie [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json) regel ~458).
+client (zie [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json) regel ~458).
 Configuratie zit in [`infrastructure/helm/openmetadata/values.yaml`](../../infrastructure/helm/openmetadata/values.yaml) onder `openmetadata.config.authentication`:
 
 | Veld | Waarde |
 |---|---|
 | `clientType` | `confidential` |
 | `provider` | `custom-oidc` |
-| `authority` | `https://keycloak.uwv-platform.local:8443/realms/uwv` |
-| `callbackUrl` | `https://openmetadata.uwv-platform.local:8443/callback` |
+| `authority` | `https://keycloak.odap.local:8443/realms/odap` |
+| `callbackUrl` | `https://openmetadata.odap.local:8443/callback` |
 | `clientId` | `openmetadata` |
 | `oidcConfiguration.secret` | refereert naar Secret `openmetadata-oidc-client` |
 
-Het client-secret zit in K8s Secret `openmetadata-oidc-client` (NS `uwv-meta`,
+Het client-secret zit in K8s Secret `openmetadata-oidc-client` (NS `odap-meta`,
 zie [`platform/01-secrets/dev-secrets.yaml`](../01-secrets/dev-secrets.yaml)) en moet identiek zijn
-aan de `secret`-waarde in `realm-uwv.json` voor de `openmetadata` client.
+aan de `secret`-waarde in `realm.json` voor de `openmetadata` client.
 
 Initial admins (aangemaakt bij eerste login via Keycloak): `data.steward`,
 `platform.admin`. Andere users krijgen viewer-rechten — promoten via OM UI.
@@ -52,7 +52,7 @@ Initial admins (aangemaakt bij eerste login via Keycloak): `data.steward`,
 
 De OM-pod doet server-side een token-exchange tegen het ingress-nginx
 TLS-endpoint (zelf-signed CA via cert-manager). Een initContainer mountt
-[`uwv-ca-bundle`](../../scripts/bootstrap.sh) (kopie uit `uwv-platform` NS) en
+[`platform-ca-bundle`](../../scripts/bootstrap.sh) (kopie uit `odap-platform` NS) en
 importeert `ca.crt` in een fresh JKS truststore op `/shared-truststore/cacerts`,
 die de OM-container via `JAVA_TOOL_OPTIONS` activeert. Op AKS is dit niet nodig
 (zie [`infrastructure/azure/helm-overrides/openmetadata-values-aks.yaml`](../../infrastructure/azure/helm-overrides/openmetadata-values-aks.yaml) — de CA is van een echte CA).
@@ -81,7 +81,7 @@ na de install moet opvangen:
 
 ```bash
 kubectl apply -k platform/13-openmetadata-config/
-kubectl -n uwv-meta wait --for=condition=complete job/openmetadata-init --timeout=10m
+kubectl -n odap-meta wait --for=condition=complete job/openmetadata-init --timeout=10m
 ```
 
 ## Wat doet de init-Job
@@ -98,8 +98,8 @@ Die zijn in de `services/*.yaml` configs gedefinieerd en worden door Airflow-DAG
 
 ```bash
 # Lijst classifications
-TOKEN=$(kubectl -n uwv-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' | base64 -d)
-kubectl -n uwv-meta port-forward svc/openmetadata 8585:8585 &
+TOKEN=$(kubectl -n odap-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' | base64 -d)
+kubectl -n odap-meta port-forward svc/openmetadata 8585:8585 &
 curl -s -H "Authorization: Bearer $TOKEN" \
   "http://localhost:8585/api/v1/classifications" | jq '.data[].name'
 

@@ -36,14 +36,14 @@ fi
 # Data wordt gewrapped onder data.configmap[<name>][<ns>] zodat `opa test`
 # dezelfde paden ziet als de Stackable OpaCluster in productie.
 if command -v opa >/dev/null 2>&1; then
-  log "Render wrapped test-data → /tmp/uwv-opa-test-data.json"
+  log "Render wrapped test-data → /tmp/opa-test-data.json"
   python3 "$ROOT/scripts/opa-test-data-wrap.py" \
-    --src "$SRC_DATA/uwv_role_mappings.json" \
-    --dst /tmp/uwv-opa-test-data.json \
+    --src "$SRC_DATA/role_mappings.json" \
+    --dst /tmp/opa-test-data.json \
     || fail "Wrapper-render gefaald"
 
-  log "opa test $SRC_REGO/ + /tmp/uwv-opa-test-data.json"
-  opa test "$SRC_REGO/" /tmp/uwv-opa-test-data.json -v \
+  log "opa test $SRC_REGO/ + /tmp/opa-test-data.json"
+  opa test "$SRC_REGO/" /tmp/opa-test-data.json -v \
     || fail "opa test gefaald — fix de tests voor je verder gaat"
 fi
 
@@ -64,13 +64,13 @@ for f in "$SRC_REGO"/*.rego; do
 done
 
 # --- 4. Sync data ------------------------------------------------------
-# Source-JSON is reeds onder top-level key `uwv_role_mappings` gestructureerd
-# zodat opa-test (raw load → data.uwv_role_mappings.*) en productie-bundle
+# Source-JSON is reeds onder top-level key `role_mappings` gestructureerd
+# zodat opa-test (raw load → data.role_mappings.*) en productie-bundle
 # (zelfde structuur) consistent zijn. We strippen alleen _-prefixed comments.
 log "Sync data → $DST_POLICIES/data.json"
 python3 - <<PY
 import json
-src = "$SRC_DATA/uwv_role_mappings.json"
+src = "$SRC_DATA/role_mappings.json"
 dst = "$DST_POLICIES/data.json"
 
 def strip_underscored(obj):

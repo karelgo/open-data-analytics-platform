@@ -1,6 +1,6 @@
 # Portal redesign — Step 1 inventory
 
-Audit of the existing UWV Platform Portal in `portal/` against the design
+Audit of the existing ODAP Portal in `portal/` against the design
 system in the redesign brief. The aim of this document is to enumerate
 **what exists**, **where styling lives**, and **what behavior must be
 preserved** before any code is touched.
@@ -90,7 +90,7 @@ This is the deliverable for **Step 1 (Audit)**. No code is changed yet.
 | `ProgressDot` | [src/components/learn/ProgressDot.astro](portal/src/components/learn/ProgressDot.astro) | Small status glyph; class is set client-side from `learn-progress.ts`. |
 | `LabLauncher` | [src/components/learn/LabLauncher.astro](portal/src/components/learn/LabLauncher.astro) | "Open in X / vscode.dev" button group inside a module. |
 | `ChecksBlock` | [src/components/learn/ChecksBlock.astro](portal/src/components/learn/ChecksBlock.astro) | Auto-check list calling `/api/learn/check/<id>`. |
-| `QuizBlock` | [src/components/learn/QuizBlock.astro](portal/src/components/learn/QuizBlock.astro) | Multiple-choice quiz, marks module `done` on full pass, dispatches `uwv-learn:cert` when `certifies=true`. |
+| `QuizBlock` | [src/components/learn/QuizBlock.astro](portal/src/components/learn/QuizBlock.astro) | Multiple-choice quiz, marks module `done` on full pass, dispatches `odap-learn:cert` when `certifies=true`. |
 
 ### Cross-cutting
 
@@ -234,24 +234,24 @@ visual layer must be rebuilt around it, not over it.
 - `<script>` in [Layout.astro:92–112](portal/src/layouts/Layout.astro:92)
   calls `/oauth2/userinfo` (oauth2-proxy sidecar), reads
   `me.groups | me.roles`, picks the first known role, persists it in
-  `sessionStorage` under `uwv-portal-role` / `uwv-portal-user`, and
+  `sessionStorage` under `odap-portal-role` / `odap-portal-user`, and
   re-renders the topbar `[data-who]` slot.
 - Logout link is dynamically built and routes via `/oauth2/sign_out` with
   a Keycloak `post_logout_redirect_uri` that switches between
-  `uwv-platform.local` and `uwv-platform.cloud` based on hostname.
+  `odap.local` and `odap-platform.cloud` based on hostname.
 - **Preserve:** the `[data-who]` element, the `.who / .who-role / .who-user / .who-logout` class hooks (renamed is fine, but the JS that writes them must be updated in lock-step), the `sessionStorage` keys, the `/oauth2/userinfo` and `/oauth2/sign_out` endpoints.
 
 ### 7.2 Theme toggle
 
 - Pre-paint script in [Layout.astro:18–28](portal/src/layouts/Layout.astro:18)
-  reads `localStorage['uwv-portal-theme']` (or falls back to
+  reads `localStorage['odap-portal-theme']` (or falls back to
   `prefers-color-scheme: light`) and sets
   `document.documentElement.dataset.theme` **before** body paint to
   avoid flash-of-wrong-theme.
 - Toggle button uses `[data-theme-toggle]` attribute selector
   ([Layout.astro:64](portal/src/layouts/Layout.astro:64)) and flips
   `data-theme` between `dark` / `light`.
-- **Preserve:** the `localStorage` key `uwv-portal-theme`, the
+- **Preserve:** the `localStorage` key `odap-portal-theme`, the
   pre-paint script, the `data-theme` attribute switching mechanism, and
   the icon-based toggle (sun/moon SVGs swapped via CSS). Dark must
   remain the default for unauthenticated visitors.
@@ -259,8 +259,8 @@ visual layer must be rebuilt around it, not over it.
 ### 7.3 Cross-environment URL rewrite
 
 - [Layout.astro:34–51](portal/src/layouts/Layout.astro:34) — runs on every
-  page, rewrites `uwv-platform.local` → `uwv-platform.cloud` whenever
-  hostname ends with `.uwv-platform.cloud`. Uses a `MutationObserver` so
+  page, rewrites `odap.local` → `odap-platform.cloud` whenever
+  hostname ends with `.odap-platform.cloud`. Uses a `MutationObserver` so
   links injected by client-side JS (e.g. `/me/`, `/architecture/` status
   refresh) get rewritten too.
 - **Preserve as-is** — must be in `Layout.astro` `<head>` and run before
@@ -287,7 +287,7 @@ visual layer must be rebuilt around it, not over it.
 - Capabilities come from
   [src/data/role-mappings.generated.json](portal/src/data/role-mappings.generated.json),
   which is **regenerated at build time** from
-  `opa-policies-src/data/uwv_role_mappings.json` by
+  `opa-policies-src/data/role_mappings.json` by
   [scripts/sync-data.mjs](portal/scripts/sync-data.mjs) (see
   `package.json:9`). Don't manually edit the generated JSON.
 - `me.astro` injects the full payload as JSON in a `<script type="application/json">`,
@@ -299,14 +299,14 @@ visual layer must be rebuilt around it, not over it.
 ### 7.6 Academy progress
 
 - [src/scripts/learn-progress.ts](portal/src/scripts/learn-progress.ts) —
-  `localStorage['uwv-learn-progress']`, optional sync to
+  `localStorage['odap-learn-progress']`, optional sync to
   `/api/learn/progress` (Academy backend sidecar; nginx falls through to
   503 if not running).
 - `[data-progress-key]` on every `ProgressDot` and `[data-track-progress]`
   on every `TrackCard` are read by `renderDots()` in the script.
-- Quiz pass dispatches `document` event `uwv-learn:cert` with
+- Quiz pass dispatches `document` event `odap-learn:cert` with
   `{detail:{key}}`.
-- Module progress event: `uwv-learn:progress`.
+- Module progress event: `odap-learn:progress`.
 - **Preserve:** the localStorage key, the data attributes, the two custom
   events, the `.pdot.done / .pdot.in-progress` class hooks (rename is
   fine but coordinate with `learn-progress.ts:50–63` and
@@ -334,7 +334,7 @@ visual layer must be rebuilt around it, not over it.
 
 ### 7.9 Routes / data shapes
 
-- All component URLs (`https://*.uwv-platform.local:8443`) are **build-time
+- All component URLs (`https://*.odap.local:8443`) are **build-time
   constants** in [src/data/components.ts](portal/src/data/components.ts:62).
   Do not change them without re-checking the cross-env rewrite in 7.3.
 - 11 role IDs are pinned in [src/data/roles.ts:7–18](portal/src/data/roles.ts:7)

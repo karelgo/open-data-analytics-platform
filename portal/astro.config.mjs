@@ -5,7 +5,7 @@ import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 
 export default defineConfig({
-  site: 'https://platform.uwv-platform.local',
+  site: 'https://platform.odap.local',
   output: 'static',
   build: {
     format: 'directory',

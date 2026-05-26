@@ -5,16 +5,16 @@
 # bouwen we het project één keer in een image; rebuild bij dbt-wijzigingen.
 #
 # Build (vanuit repo-root):
-#   docker build -t uwv/dbt-trino:1.9.0-uwv -f infrastructure/airflow/dbt/Dockerfile dbt
-#   k3d image import uwv/dbt-trino:1.9.0-uwv -c uwv-platform
+#   docker build -t odap/dbt-trino:1.9.0 -f infrastructure/airflow/dbt/Dockerfile dbt
+#   k3d image import odap/dbt-trino:1.9.0 -c odap-platform
 #
 # of via de Makefile:  make dbt-image
 #
-# SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 #
-# Base-image: lokaal gebakken `uwv/dbt-trino:1.9.0` (al aanwezig na bootstrap;
+# Base-image: lokaal gebakken `odap/dbt-trino:1.9.0` (al aanwezig na bootstrap;
 # upstream `ghcr.io/dbt-labs/dbt-trino:1.9.0` vereist auth bij anonymous pull).
-FROM uwv/dbt-trino:1.9.0
+FROM odap/dbt-trino:1.9.0
 
 # dbt-fabricspark voor de UC-11 multi-platform demo (gold-marts op Fabric
 # Lakehouse via Livy). 1.12 hangt op dbt-core>=1.8 wat compatibel is met de
@@ -22,17 +22,17 @@ FROM uwv/dbt-trino:1.9.0
 # reïnstalleren.
 RUN pip install --no-cache-dir 'dbt-fabricspark==1.12.*'
 
-# Project komt op /opt/uwv/dbt/ — zelfde pad als waarvoor silver_factory en
-# gold_factory's ProjectConfig zijn geconfigureerd (UWV_DBT_PROJECT_PATH).
-WORKDIR /opt/uwv/dbt
+# Project komt op /opt/odap/dbt/ — zelfde pad als waarvoor silver_factory en
+# gold_factory's ProjectConfig zijn geconfigureerd (DBT_PROJECT_PATH).
+WORKDIR /opt/odap/dbt
 
 # Kopieer de dbt-project bron (incl. dbt_packages/ en profiles.yml.template).
 # .dockerignore zorgt dat target/ en logs/ niet meegaan.
-COPY . /opt/uwv/dbt/
+COPY . /opt/odap/dbt/
 
 # profiles.yml is omgevings-specifiek — Cosmos genereert deze on-the-fly via
 # TrinoCertificateProfileMapping. Verwijderen om verwarring te voorkomen.
-RUN rm -f /opt/uwv/dbt/profiles.yml || true
+RUN rm -f /opt/odap/dbt/profiles.yml || true
 
 # Cosmos LoadMode.DBT_MANIFEST verwacht een vooraf gerenderd manifest.json.
 # Dit is omgevings-specifiek (env_vars resolven), dus niet bakken in image.

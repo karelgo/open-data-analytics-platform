@@ -29,7 +29,7 @@ interface Props {
 const { component, deepLink = null } = Astro.props;
 
 // Build-time resolutie. De ShellLayout's runtime TLD-rewrite swap't
-// *.uwv-platform.local op cloud-hosts naar de juiste TLD voor <a>
+// *.odap.local op cloud-hosts naar de juiste TLD voor <a>
 // links; we doen hetzelfde voor iframe-src in <script> hieronder.
 const embedSrc = resolveEmbedSrc(component, deepLink);
 const externalUrl = resolveExternalUrl(component, deepLink);
@@ -111,7 +111,7 @@ const trackHref = deepLink
 
 <ShellLayout
   title={component.name}
-  description={`${component.name} · embedded in UWV Platform Portal`}
+  description={`${component.name} · embedded in ODAP Portal`}
   activeSection={activeSection}
   activeSubsection={component.id}
   embedMode={true}
@@ -254,12 +254,12 @@ const trackHref = deepLink
 <script>
   // ─── TLD-rewrite voor iframe-src ───
   // ShellLayout's rewrite swap't alleen <a href> waarden. De iframe-src
-  // op cloud-hosts (*.eu-sovereigndataplatform.com, *.freshstackable.com)
+  // op cloud-hosts (*.example.com, *.example.com)
   // moet ook bijgewerkt — anders probeert de iframe een onbereikbare
-  // *.uwv-platform.local:8443 host te laden.
+  // *.odap.local:8443 host te laden.
   (function () {
     const host = window.location.hostname;
-    const CLOUD_TLDS = ['eu-sovereigndataplatform.com', 'freshstackable.com'];
+    const CLOUD_TLDS = ['example.com', 'example.com'];
     let targetTld: string | null = null;
     for (const t of CLOUD_TLDS) {
       if (host === t || host.endsWith('.' + t)) { targetTld = t; break; }
@@ -268,10 +268,10 @@ const trackHref = deepLink
     const KEEP_LOCAL = ['multica', 'nanitics'];
 
     function rewriteHref(href: string): string {
-      const m = href.match(/:\/\/([a-z0-9-]+)\.uwv-platform\.local(:8443)?/);
+      const m = href.match(/:\/\/([a-z0-9-]+)\.odap-platform\.local(:8443)?/);
       if (m && KEEP_LOCAL.indexOf(m[1]) !== -1) return href;
       return href.replace(
-        /:\/\/([a-z0-9-]+)\.uwv-platform\.local(:8443)?/g,
+        /:\/\/([a-z0-9-]+)\.odap-platform\.local(:8443)?/g,
         '://$1.' + targetTld,
       );
     }

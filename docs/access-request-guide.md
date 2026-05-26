@@ -7,7 +7,7 @@ Bridge-service: zie [platform/18-om-access-bridge/](../platform/18-om-access-bri
 > **De bridge wordt automatisch meegedeployd** als laatste stap van
 > `make deploy-platform` (zodra OpenMetadata het admin-JWT-secret heeft
 > gepubliceerd). Op een verse k3d/AKS-cluster verwacht je hem live te
-> zien als `kubectl -n uwv-platform get deploy om-access-bridge`.
+> zien als `kubectl -n odap-platform get deploy om-access-bridge`.
 > Bij een hibernated SKE-cluster of als je `SKIP_OM_BRIDGE=1` hebt
 > gezet, draai 'm los met `make deploy-om-bridge` (zie
 > [scripts/deploy-platform.sh](../scripts/deploy-platform.sh)). Het
@@ -24,7 +24,7 @@ Bridge-service: zie [platform/18-om-access-bridge/](../platform/18-om-access-bri
 3. Submit. De portal maakt namens jou een Task aan in OpenMetadata en stuurt 'm naar de owner.
 4. Bij approval krijg je automatisch de rol `data_access:<catalog>.<schema>` toegekend.
 
-Direct: `https://platform.uwv-platform.local:8443/access-request`.
+Direct: `https://platform.odap.local:8443/access-request`.
 
 > Liever handmatig in OpenMetadata? Dat kan ook — zie [§ Handmatige variant](#handmatige-variant-direct-in-openmetadata) onderaan.
 
@@ -32,7 +32,7 @@ Direct: `https://platform.uwv-platform.local:8443/access-request`.
 
 ## Wat is "toegang aanvragen" hier?
 
-Het UWV-platform gebruikt **default-deny** met doelbinding (R-AVG-06). Jouw
+Het ODAP platform gebruikt **default-deny** met doelbinding (R-AVG-06). Jouw
 primaire rol (`wia_beoordelaar`, `crm_medewerker`, `researcher`, …)
 bepaalt welke catalogs/schemas je *standaard* mag zien. Als je daarnaast
 toegang nodig hebt tot een andere zone — bv. `gold.uc05_client_360` —
@@ -54,13 +54,13 @@ De grant geldt op **schema-niveau** (catalog.schema), niet per tabel.
 ### 1. Open het access-request-formulier
 
 Via Mijn werkplek → sectie *"Andere data nodig?"* → knop **"Vraag
-toegang aan"**. Of direct: <https://platform.uwv-platform.local:8443/access-request>.
+toegang aan"**. Of direct: <https://platform.odap.local:8443/access-request>.
 
 ### 2. Vul de velden in
 
 | Veld | Wat je invult |
 |---|---|
-| **Welke dataset?** | OM-FQN — bv. `uwv-trino.gold.uc11_klantreis.mart_uc11_klantreis_events`. Vind 'm via OpenMetadata → Explore → klik op het asset → kopieer de FQN onder de titel. |
+| **Welke dataset?** | OM-FQN — bv. `trino.gold.uc11_klantreis.mart_uc11_klantreis_events`. Vind 'm via OpenMetadata → Explore → klik op het asset → kopieer de FQN onder de titel. |
 | **Wie ben je?** | Je Keycloak-gebruikersnaam (eerste deel van je e-mail, bv. `researcher`, `fez.analist`). |
 | **Voor welk doel?** | Kies een doelbinding (AVG art. 5 lid 1b). |
 | **Hoe lang?** | Optioneel — bv. "2 maanden, t/m 2026-08-01". |
@@ -93,7 +93,7 @@ De Owner/Reviewer:
 ### Voorbeeld 1 — Researcher wil naar UC-11 klantreis-mart
 
 ```
-Asset:      uwv-trino.gold.uc11_klantreis.mart_uc11_klantreis_events
+Asset:      trino.gold.uc11_klantreis.mart_uc11_klantreis_events
 Requester:  researcher
 Purpose:    onderzoek
 Duration:   2 maanden, t/m 2026-08-01
@@ -113,7 +113,7 @@ Grant na approval: realm-role `data_access:gold.uc11_klantreis`.
 ### Voorbeeld 2 — FEZ-analist wil bronze-data voor reconciliatie
 
 ```
-Asset:      uwv-trino.bronze.uwv.polisadm_ikv
+Asset:      trino.bronze.uwv.polisadm_ikv
 Requester:  fez.analist
 Purpose:    kwaliteitscontrole
 Duration:   2 weken
@@ -130,7 +130,7 @@ Grant: `data_access:bronze.uwv`.
 Voor wie liever in OM blijft, of voor scriptbare scenario's: dezelfde
 flow handmatig.
 
-1. Open <https://openmetadata.uwv-platform.local:8443>.
+1. Open <https://openmetadata.odap.local:8443>.
 2. Sidebar links → **Explore** → filter Tables → zoek dataset.
 3. Op asset-pagina: tab **Activity Feed** → **+ Add Task** → **Request Description**.
 4. **Description (of message of taskName) bevat ergens `Request Access`** —
@@ -154,7 +154,7 @@ binnen één JWT-refresh in Trino (≤ 15 min, of forceer met logout-login).
 
 **Kan ik mijn grants zien?**
 Ja — in OpenMetadata onder je profiel zie je je rollen (via SSO). Of in
-Keycloak: open `/realms/uwv/account/` en bekijk de "Roles" sectie.
+Keycloak: open `/realms/odap/account/` en bekijk de "Roles" sectie.
 
 **Hoe trek ik een grant in?**
 Vraag een platform-admin om de `data_access:<...>`-rol uit Keycloak te

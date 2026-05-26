@@ -10,7 +10,7 @@ opgesplitst per rol. Elke rol heeft zijn eigen handleiding met:
 
 > **Belangrijk.** Dit platform is een **fictieve, illustratieve referentie-implementatie**.
 > Alle datasets zijn synthetisch (alleen 9-prefix BSN's, `meta.synthetic: true`).
-> De handleidingen beschrijven hoe het platform *werkt*, niet hoe productie-UWV werkt.
+> De handleidingen beschrijven hoe het platform *werkt*, niet hoe production werkt.
 > Productie-installaties verwijzen naar dit document als blauwdruk, niet als procedure.
 
 ---
@@ -18,8 +18,8 @@ opgesplitst per rol. Elke rol heeft zijn eigen handleiding met:
 ## Overzicht van rollen
 
 Het platform onderscheidt **11 menselijke rollen** + **1 systeemrol**, gemodelleerd
-in [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json)
-en [`opa-policies-src/data/uwv_role_mappings.json`](../../opa-policies-src/data/uwv_role_mappings.json).
+in [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json)
+en [`opa-policies-src/data/role_mappings.json`](../../opa-policies-src/data/role_mappings.json).
 
 ### Business-rollen (eindgebruikers)
 
@@ -56,7 +56,7 @@ Voor distributie of offline lezen is er een **gebundeld handboek** met alle
 rollen achter elkaar:
 
 - Markdown: [00-handboek.md](00-handboek.md)
-- Word (.docx): `UWV_Platform_Handboek_per_rol.docx` in de hoofdmap
+- Word (.docx): `ODAP_Platform_Handbook_per_role.docx` in de hoofdmap
 
 ---
 
@@ -94,6 +94,6 @@ Werkt iets niet? In deze volgorde:
 
 1. **Lees** de sectie *Hulp, fouten & escalatie* in jouw rol-handleiding.
 2. **Vraag** een collega met dezelfde rol.
-3. **Mail** de data-steward (`data.steward@uwv-platform.local:8443`).
+3. **Mail** de data-steward (`data.steward@odap.local:8443`).
 4. **Voor incidenten** (rare meldingen, plotse toegang verloren, vermoede inbreuk):
    bel de platform-admin direct, niet via e-mail.

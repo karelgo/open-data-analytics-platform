@@ -1,26 +1,26 @@
 # OpenMetadata — k3d-specific overrides.
 #
-# Browser-redirects gaan naar de externe URL (https://keycloak.uwv-platform.local:8443),
-# server-side token-exchange ook — daarom mountt de pod het uwv-ca-bundle
+# Browser-redirects gaan naar de externe URL (https://keycloak.odap.local:8443),
+# server-side token-exchange ook — daarom mountt de pod het platform-ca-bundle
 # (zelf-signed CA van ingress-nginx) in zijn Java truststore via een
 # initContainer (gedefinieerd in de base values.yaml).
 
 openmetadata:
   config:
     authentication:
-      authority: https://keycloak.uwv-platform.local:8443/realms/uwv
-      callbackUrl: https://openmetadata.uwv-platform.local:8443/callback
+      authority: https://keycloak.odap.local:8443/realms/odap
+      callbackUrl: https://openmetadata.odap.local:8443/callback
       publicKeys:
-        - http://openmetadata.uwv-meta.svc.cluster.local:8585/api/v1/system/config/jwks
-        - https://keycloak.uwv-platform.local:8443/realms/uwv/protocol/openid-connect/certs
+        - http://openmetadata.odap-meta.svc.cluster.local:8585/api/v1/system/config/jwks
+        - https://keycloak.odap.local:8443/realms/odap/protocol/openid-connect/certs
 
       oidcConfiguration:
-        discoveryUri: https://keycloak.uwv-platform.local:8443/realms/uwv/.well-known/openid-configuration
-        callbackUrl: https://openmetadata.uwv-platform.local:8443/callback
-        serverUrl: https://openmetadata.uwv-platform.local:8443
+        discoveryUri: https://keycloak.odap.local:8443/realms/odap/.well-known/openid-configuration
+        callbackUrl: https://openmetadata.odap.local:8443/callback
+        serverUrl: https://openmetadata.odap.local:8443
 
     authorizer:
-      principalDomain: uwv-platform.local
+      principalDomain: odap.local
 
 # Chart-managed ingress.hosts is now in the base values.yaml.
 

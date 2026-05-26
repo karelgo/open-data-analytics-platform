@@ -2,11 +2,11 @@
 
 Bouwt twee soorten governance-DAGs:
 
-  - om_ingest:    OpenMetadata-ingestion voor alle UWV-services
+  - om_ingest:    OpenMetadata-ingestion voor alle platform services
                   (Trino catalog + lineage + profiler, Superset, Airflow,
                   MinIO storage, dbt-artifacts + enricher).
                   Service-/workflow-YAMLs komen uit ConfigMap
-                  `openmetadata-uwv-config` (zie
+                  `openmetadata-platform-config` (zie
                   platform/13-openmetadata-config/kustomization.yaml).
   - bewaartermijn: R-AVG-08 enforcement per tabel met meta.bewaartermijn_jaren.
 
@@ -53,8 +53,8 @@ OM_INGESTION_IMAGE = "openmetadata/ingestion:1.12.8"
 def _om_env_vars() -> list[V1EnvVar]:
     """Env-vars die de service-YAMLs envsubst'en (zie platform/13-openmetadata-config/services/).
 
-    Alle Secrets moeten in de uwv-platform namespace bestaan — de KPO draait
-    daar. Bootstrap kopieert openmetadata-admin naar uwv-platform zodat
+    Alle Secrets moeten in de odap-platform namespace bestaan — de KPO draait
+    daar. Bootstrap kopieert openmetadata-admin naar odap-platform zodat
     OM_JWT_TOKEN cross-namespace bereikbaar is.
     """
     return [
@@ -76,8 +76,8 @@ def _om_env_vars() -> list[V1EnvVar]:
             "adminUser.password",
         ),
         # CA-bundle voor TLS-verify naar Trino + OM ingress.
-        V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/uwv-ca/ca.crt"),
-        V1EnvVar(name="SSL_CERT_FILE", value="/etc/uwv-ca/ca.crt"),
+        V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/platform-ca/ca.crt"),
+        V1EnvVar(name="SSL_CERT_FILE", value="/etc/platform-ca/ca.crt"),
     ]
 
 
@@ -86,14 +86,14 @@ def _om_ingest_task(
 ) -> KubernetesPodOperator:
     """KPO die `metadata <subcommand> -c <workflow_yaml>` draait.
 
-    workflow_yaml is het pad in de pod (gemount uit `openmetadata-uwv-config`
+    workflow_yaml is het pad in de pod (gemount uit `openmetadata-platform-config`
     ConfigMap op /config). `subcommand` is "ingest" voor de meeste workflow-
     types (DatabaseMetadata/Lineage, Dashboard, Pipeline, Messaging, DBT) en
     "profile" voor type=Profiler.
     """
     return KubernetesPodOperator(
         task_id=task_id,
-        namespace="uwv-platform",
+        namespace="odap-platform",
         image=OM_INGESTION_IMAGE,
         cmds=["bash", "-c"],
         # envsubst rendert ${VAR}-references uit de YAML op runtime.
@@ -119,7 +119,7 @@ def _om_enrich_task() -> KubernetesPodOperator:
     pyyaml standaard). Script + mapping zitten in dezelfde /config-mount."""
     return KubernetesPodOperator(
         task_id="enrich_om_from_dbt_meta",
-        namespace="uwv-platform",
+        namespace="odap-platform",
         image=OM_INGESTION_IMAGE,
         cmds=["bash", "-c"],
         arguments=["python /config/enrich_from_dbt_meta.py"],
@@ -144,7 +144,7 @@ def build_om_ingest_dag() -> DAG:
         (must-succeed)    ├─ ingest_minio_storage
                           └─ ingest_dbt_artifacts ──▶ enrich_om_from_dbt_meta
 
-    Workflow-YAMLs in `openmetadata-uwv-config` ConfigMap (zie
+    Workflow-YAMLs in `openmetadata-platform-config` ConfigMap (zie
     platform/13-openmetadata-config/services/).
 
     Catalog is de gedeelde voorwaarde: lineage/profiler hebben tabellen
@@ -165,7 +165,7 @@ def build_om_ingest_dag() -> DAG:
     with DAG(
         dag_id="governance_om_ingest",
         description=(
-            "OpenMetadata-ingest van alle UWV-services: Trino (catalog + "
+            "OpenMetadata-ingest van alle platform services: Trino (catalog + "
             "lineage + profiler), Superset, Airflow, MinIO en dbt-artifacts "
             "+ dbt-meta enricher."
         ),

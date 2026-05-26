@@ -1,5 +1,5 @@
 /* ============================================================
-   UWV Platform Portal — design tokens v2 (shell-specific)
+   ODAP Portal — design tokens v2 (shell-specific)
    ============================================================
    Additive layer on top of tokens.css. Defines shell-specific
    dimensions, persona/item-type hues, and chrome for the
@@ -33,7 +33,7 @@
   --type-query:     oklch(0.55 0.18 25);   /* red    — SQLLab */
   --type-pipeline:  oklch(0.58 0.16 70);   /* amber  — dbt */
 
-  /* Secondary accent — UWV-blauw, for info / shared / link tones.
+  /* Secondary accent — platform blue, for info / shared / link tones.
      Keeps the warm-orange --accent as the primary CTA color. */
   --accent-info:      oklch(0.55 0.14 230);
   --accent-info-soft: oklch(0.95 0.04 230);

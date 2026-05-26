@@ -4,7 +4,7 @@
    - Trino:        `ref('stg_<name>')` — staging-view met JSON-extractie uit bronze.
    - Fabricspark:  `source('silver', <name>)` — flat Delta in Lakehouse (uc11_silver notebook).
    - Databricks:   `source('silver_uc', <name>)` — flat Delta in Unity Catalog
-                   (uc11_silver notebook, schrijft naar uwv_databricks.silver.*).
+                   (uc11_silver notebook, schrijft naar databricks.silver.*).
 
    `name` is de entity-naam zonder prefix:
      - persona, polisadm_ikv, ww_aanvraag, zw_melding,

@@ -4,7 +4,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: jupyterhub-db
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:

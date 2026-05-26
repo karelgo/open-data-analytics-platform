@@ -239,21 +239,21 @@ def render_index(stages: list[Stage], comps: list[Component]) -> str:
 
     return f"""---
 title: Home
-description: UWV referentie-implementatie van een compliant data- en analyticsplatform.
+description: ODAP reference implementation van een compliant data- en analyticsplatform.
 hide:
   - navigation
 ---
 
-# UWV Reference Data Platform
+# Open Data & Analytics Platform
 
 Een **fictieve, illustratieve** referentie-implementatie van een modern data-
 en analyticsplatform voor UWV, gebouwd op open source en gericht op compliance
 met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
 
-!!! warning "Geen echte UWV-data"
+!!! warning "Geen echte ODAP data"
     Geen echte BSN's, geen echte productiecode. Alle datasets zijn synthetisch
-    en gemarkeerd met `# SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE`.
-    Deze repo is geen UWV-product en geen aanbestedingsstuk.
+    en gemarkeerd met `# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`.
+    Deze repo is geen ODAP product en geen aanbestedingsstuk.
 
 ## Wat vind je hier?
 
@@ -328,9 +328,9 @@ git clone https://github.com/fresh-minds/FreshStackableDataPlatform.git
 cd FreshStackableDataPlatform
 
 # DNS-injectie voor lokale toegang
-echo "127.0.0.1 keycloak.uwv-platform.local \\
-  superset.uwv-platform.local airflow.uwv-platform.local \\
-  minio.uwv-platform.local openmetadata.uwv-platform.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1 keycloak.odap.local \\
+  superset.odap.local airflow.odap.local \\
+  minio.odap.local openmetadata.odap.local" | sudo tee -a /etc/hosts
 
 # Cluster + platform deployen (~15-30 min op de eerste run)
 make cluster        # k3d cluster create
@@ -413,7 +413,7 @@ def render_architectuur_index(stages: list[Stage], comps: list[Component]) -> st
 
     return f"""---
 title: Architectuur
-description: Overzicht van de UWV-platformarchitectuur — lagen, dataflow, cross-cutting zorgen.
+description: Overzicht van de ODAP platformarchitectuur — lagen, dataflow, cross-cutting zorgen.
 ---
 
 # Architectuur
@@ -572,11 +572,11 @@ de OPA-policies zijn 1-op-1.
 
 | Catalog | Bucket | Inhoud | Toegang (default) |
 |---|---|---|---|
-| `bronze` | `uwv-bronze` | Onveranderbare brondata (incl. raw PII) | data-engineers (JIT) |
-| `silver` | `uwv-silver` | Geconformeerd, gepseudonimiseerd waar mogelijk | analisten + engineers |
-| `gold` | `uwv-gold` | CGM-conforme business products | domein-rollen via RBAC |
-| `sensitive` | `uwv-sensitive` | Bijzondere persoonsgegevens (art. 9 AVG, medisch) | strikt; 4-eyes principe |
-| `sandbox` | `uwv-sandbox` | Gepseudonimiseerd — voor researchers | researcher (read-only) |
+| `bronze` | `odap-bronze` | Onveranderbare brondata (incl. raw PII) | data-engineers (JIT) |
+| `silver` | `odap-silver` | Geconformeerd, gepseudonimiseerd waar mogelijk | analisten + engineers |
+| `gold` | `odap-gold` | CGM-conforme business products | domein-rollen via RBAC |
+| `sensitive` | `sensitive` | Bijzondere persoonsgegevens (art. 9 AVG, medisch) | strikt; 4-eyes principe |
+| `sandbox` | `sandbox` | Gepseudonimiseerd — voor researchers | researcher (read-only) |
 
 ## Toegangsstrategie
 
@@ -652,7 +652,7 @@ sequenceDiagram
 
 ## Identity provider — Keycloak
 
-- **Realm:** `uwv` in [`infrastructure/helm/keycloak/realm-uwv.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm-uwv.json)
+- **Realm:** `uwv` in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
 - **Mock-rollen** in deze referentie:
     - Business: `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`,
       `crm_medewerker`, `fez_analist`, `smz_planner`, `proactief_dienstverlener`,
@@ -683,7 +683,7 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 | `trino-doelbinding.rego` | Doelbinding (purpose) afdwingen op gold-tabellen |
 | `trino-row-filters.rego` | Rij-filters per rol (bijv. WW-handhaver ziet alleen WW-claims) |
 | `trino-column-masks.rego` | Kolom-maskering (PII, gezondheid → hash of `***`) |
-| `trino-uwv-roles.rego` | UWV-rol-definities (single source) |
+| `trino-platform-roles.rego` | UWV-rol-definities (single source) |
 
 Build van de bundle: `scripts/build-opa-bundle.sh`, geïntegreerd in
 `make deploy-platform`.
@@ -752,7 +752,7 @@ flowchart LR
     Bron[Bron-mock] --> NiFi[NiFi<br/>PublishKafka]
     NiFi --> Kafka[Kafka topic<br/>uwv.&lt;domain&gt;.&lt;event&gt;]
     Kafka --> Spark[Spark Structured Streaming<br/>SparkApplication, K8s]
-    Spark --> Delta[Delta-tabel in MinIO<br/>s3a://uwv-bronze/...]
+    Spark --> Delta[Delta-tabel in MinIO<br/>s3a://odap-bronze/...]
     Delta --> Hive[Hive Metastore registreert tabel]
 ```
 
@@ -776,11 +776,11 @@ en logs een stuk eenvoudiger. Alle componenten houden zich hieraan.
 
 | Namespace | Inhoud |
 |---|---|
-| `uwv-platform` | Stackable workloads (Trino, Spark, Kafka, NiFi, OPA, …) |
-| `uwv-data` | Synthetic data jobs, dbt-runners |
-| `uwv-meta` | OpenMetadata stack |
-| `uwv-monitoring` | Prometheus, Grafana, Vector |
-| `uwv-auth` | Keycloak |
+| `odap-platform` | Stackable workloads (Trino, Spark, Kafka, NiFi, OPA, …) |
+| `odap-data` | Synthetic data jobs, dbt-runners |
+| `odap-meta` | OpenMetadata stack |
+| `odap-monitoring` | Prometheus, Grafana, Vector |
+| `odap-auth` | Keycloak |
 
 ## Trino-schemas
 
@@ -820,10 +820,10 @@ Voorbeelden:
 ## DNS
 
 ```
-<service>.uwv-platform.local
+<service>.odap.local
 ```
 
-Voor lokale k3d-clusters. In AKS-deploys (`eu-sovereigndataplatform.com`)
+Voor lokale k3d-clusters. In AKS-deploys (`example.com`)
 rewrite de portal client-side; zie
 [`portal/src/layouts/Layout.astro`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/portal/src/layouts/Layout.astro).
 
@@ -832,10 +832,10 @@ rewrite de portal client-side; zie
 | Service-naam | Inhoud |
 |---|---|
 | `trino-prod` | Trino-instance met alle catalogs (bronze/silver/gold/sensitive/sandbox) |
-| `dbt-uwv` | dbt-project (lineage + tests) |
+| `dbt` | dbt-project (lineage + tests) |
 | `superset-prod` | Superset BI (dashboards) |
-| `airflow-uwv` | Airflow (pipeline-runs) |
-| `kafka-uwv` | Kafka (event-topics + schemas) |
+| `airflow` | Airflow (pipeline-runs) |
+| `kafka` | Kafka (event-topics + schemas) |
 """
 
 
@@ -849,13 +849,13 @@ description: Het bronvoorstel waarvan deze repo de implementatie is.
 
 De huidige implementatie volgt:
 
-- [`referentiearchitectuur-uwv-data-analytics.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/referentiearchitectuur-uwv-data-analytics.md)
+- [`referentiearchitectuur-odap-data-analytics.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/referentiearchitectuur-odap-data-analytics.md)
   — 12 architectuurprincipes, 10 use-cases, CGM-entiteiten, Sensitive Vault,
   data-mesh, wettelijke mappen.
 - [`requirements-compliant-data-analyseplatform.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/requirements-compliant-data-analyseplatform.md)
   — Volledige requirements-matrix: NORA, AVG, BIO/BIO2, NIS2, AI Act met
   R-* codes (70+ rules).
-- [`uwv-platform-mapping-research.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/uwv-platform-mapping-research.md)
+- [`odap-platform-mapping-research.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/odap-platform-mapping-research.md)
   — Technische blauwdruk: component-mapping Stackable → Kubernetes.
 
 Deze pagina is een **navigatie-stub** — de bron-documenten staan in de
@@ -897,8 +897,8 @@ description: Welke rollen het platform onderscheidt en wie wat ziet.
 # Rollen op het platform
 
 Het platform onderscheidt **11 menselijke rollen** + **1 systeemrol**,
-gemodelleerd in [`infrastructure/helm/keycloak/realm-uwv.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm-uwv.json)
-en [`opa-policies-src/data/uwv_role_mappings.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/opa-policies-src/data/uwv_role_mappings.json).
+gemodelleerd in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
+en [`opa-policies-src/data/role_mappings.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/opa-policies-src/data/role_mappings.json).
 
 ## Business-rollen (eindgebruikers)
 
@@ -1087,7 +1087,7 @@ def render_extra_css() -> str:
     return """/* Auto-generated door scripts/docs_gen.py.
    Aanpassingen overleven niet — wijzig in de generator. */
 
-/* UWV-amber accent override op het Material amber-palet zodat het exact de
+/* platform-amber accent override op het Material amber-palet zodat het exact de
    portal-amber matcht (oklch(0.78 0.18 76) in de portal tokens). */
 :root {
   --md-primary-fg-color:        #d68f00;

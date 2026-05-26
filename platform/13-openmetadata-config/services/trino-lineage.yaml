@@ -2,7 +2,7 @@
 ---
 source:
   type: trino-lineage
-  serviceName: uwv-trino
+  serviceName: trino
   sourceConfig:
     config:
       type: DatabaseLineage
@@ -14,7 +14,7 @@ sink:
 workflowConfig:
   loggerLevel: INFO
   openMetadataServerConfig:
-    hostPort: http://openmetadata.uwv-meta.svc.cluster.local:8585/api
+    hostPort: http://openmetadata.odap-meta.svc.cluster.local:8585/api
     authProvider: openmetadata
     securityConfig:
       jwtToken: ${OM_JWT_TOKEN}

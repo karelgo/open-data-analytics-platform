@@ -38,7 +38,7 @@ doorgaat omdat zijn env-var niet meekomt.
 ## Beslissing
 
 We maken `platform-config.yaml` runtime-consumeerbaar via een gespiegelde
-ConfigMap **`platform-config`** in namespace `uwv-platform`. Bron en
+ConfigMap **`platform-config`** in namespace `odap-platform`. Bron en
 spiegel hebben gelijke keys; **bij wijziging update je beide**.
 
 ```

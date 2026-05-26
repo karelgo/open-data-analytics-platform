@@ -1,13 +1,13 @@
 # Public-DNS Ingresses for the UWV reference platform on AKS.
 #
-# Domain: eu-sovereigndataplatform.com (Azure DNS in ai-trial-rg).
-# Apex A record points at the static Public IP `uwv-platform-ingress-pip`
+# Domain: example.com (Azure DNS in ai-trial-rg).
+# Apex A record points at the static Public IP `odap-platform-ingress-pip`
 # (20.56.116.97) bound to the ingress-nginx Service. All sub-domains are
 # CNAMEs to apex.
 #
 # TLS: real Let's Encrypt certs via the `letsencrypt-prod` ClusterIssuer
 # (DNS-01 challenge through Azure DNS — see letsencrypt-issuer.yaml).
-# No more browser warnings; cookie domains are set on .eu-sovereigndataplatform.com.
+# No more browser warnings; cookie domains are set on .example.com.
 #
 # Architecture in this file:
 #   - One Cert + Ingress per service (keycloak, grafana, openmetadata,
@@ -34,27 +34,27 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: keycloak-public-tls
-  namespace: uwv-auth
+  namespace: odap-auth
 spec:
   secretName: keycloak-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: keycloak.eu-sovereigndataplatform.com
-  dnsNames: [keycloak.eu-sovereigndataplatform.com]
+  commonName: keycloak.example.com
+  dnsNames: [keycloak.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: keycloak-public
-  namespace: uwv-auth
+  namespace: odap-auth
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [keycloak.eu-sovereigndataplatform.com]
+    - hosts: [keycloak.example.com]
       secretName: keycloak-public-tls
   rules:
-    - host: keycloak.eu-sovereigndataplatform.com
+    - host: keycloak.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: keycloak, port: { number: 80 } } } }] }
 ---
 # --- Grafana ---
@@ -62,27 +62,27 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: grafana-public-tls
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
 spec:
   secretName: grafana-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: grafana.eu-sovereigndataplatform.com
-  dnsNames: [grafana.eu-sovereigndataplatform.com]
+  commonName: grafana.example.com
+  dnsNames: [grafana.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: grafana-public
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [grafana.eu-sovereigndataplatform.com]
+    - hosts: [grafana.example.com]
       secretName: grafana-public-tls
   rules:
-    - host: grafana.eu-sovereigndataplatform.com
+    - host: grafana.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: prometheus-grafana, port: { number: 80 } } } }] }
 ---
 # --- Prometheus ---
@@ -90,27 +90,27 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: prometheus-public-tls
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
 spec:
   secretName: prometheus-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: prometheus.eu-sovereigndataplatform.com
-  dnsNames: [prometheus.eu-sovereigndataplatform.com]
+  commonName: prometheus.example.com
+  dnsNames: [prometheus.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: prometheus-public
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [prometheus.eu-sovereigndataplatform.com]
+    - hosts: [prometheus.example.com]
       secretName: prometheus-public-tls
   rules:
-    - host: prometheus.eu-sovereigndataplatform.com
+    - host: prometheus.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: prometheus-kube-prometheus-prometheus, port: { number: 9090 } } } }] }
 ---
 # Note: Alertmanager intentionally disabled in helm-overrides for AKS
@@ -124,18 +124,18 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: minio-public-tls
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   secretName: minio-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: minio.eu-sovereigndataplatform.com
-  dnsNames: [minio.eu-sovereigndataplatform.com]
+  commonName: minio.example.com
+  dnsNames: [minio.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: minio-public
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     # MinIO console listens on HTTPS:9001 with its own self-signed cert.
@@ -151,10 +151,10 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [minio.eu-sovereigndataplatform.com]
+    - hosts: [minio.example.com]
       secretName: minio-public-tls
   rules:
-    - host: minio.eu-sovereigndataplatform.com
+    - host: minio.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: minio-console, port: { number: 9001 } } } }] }
 ---
 # --- MinIO S3 API ---
@@ -162,18 +162,18 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: minio-api-public-tls
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   secretName: minio-api-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: minio-api.eu-sovereigndataplatform.com
-  dnsNames: [minio-api.eu-sovereigndataplatform.com]
+  commonName: minio-api.example.com
+  dnsNames: [minio-api.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: minio-api-public
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     # MinIO S3 API listens on HTTPS:9000. Same HTTPS-backend treatment as the
@@ -186,10 +186,10 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [minio-api.eu-sovereigndataplatform.com]
+    - hosts: [minio-api.example.com]
       secretName: minio-api-public-tls
   rules:
-    - host: minio-api.eu-sovereigndataplatform.com
+    - host: minio-api.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: minio, port: { number: 9000 } } } }] }
 ---
 # --- Superset ---
@@ -197,27 +197,27 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: superset-public-tls
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   secretName: superset-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: superset.eu-sovereigndataplatform.com
-  dnsNames: [superset.eu-sovereigndataplatform.com]
+  commonName: superset.example.com
+  dnsNames: [superset.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: superset-public
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [superset.eu-sovereigndataplatform.com]
+    - hosts: [superset.example.com]
       secretName: superset-public-tls
   rules:
-    - host: superset.eu-sovereigndataplatform.com
+    - host: superset.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: superset, port: { number: 8088 } } } }] }
 ---
 # --- Airflow ---
@@ -225,81 +225,81 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: airflow-public-tls
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   secretName: airflow-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: airflow.eu-sovereigndataplatform.com
-  dnsNames: [airflow.eu-sovereigndataplatform.com]
+  commonName: airflow.example.com
+  dnsNames: [airflow.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: airflow-public
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [airflow.eu-sovereigndataplatform.com]
+    - hosts: [airflow.example.com]
       secretName: airflow-public-tls
   rules:
-    - host: airflow.eu-sovereigndataplatform.com
-      http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: uwv-airflow-webserver, port: { number: 8080 } } } }] }
+    - host: airflow.example.com
+      http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: airflow-webserver, port: { number: 8080 } } } }] }
 ---
 # --- dbt-docs subdomain — permanent redirect to platform/dbt-docs.html ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: dbt-docs-public-tls
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   secretName: dbt-docs-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: dbt-docs.eu-sovereigndataplatform.com
-  dnsNames: [dbt-docs.eu-sovereigndataplatform.com]
+  commonName: dbt-docs.example.com
+  dnsNames: [dbt-docs.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: dbt-docs-public
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/permanent-redirect: https://platform.eu-sovereigndataplatform.com/dbt-docs.html
+    nginx.ingress.kubernetes.io/permanent-redirect: https://platform.example.com/dbt-docs.html
     nginx.ingress.kubernetes.io/permanent-redirect-code: "308"
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [dbt-docs.eu-sovereigndataplatform.com]
+    - hosts: [dbt-docs.example.com]
       secretName: dbt-docs-public-tls
   rules:
-    - host: dbt-docs.eu-sovereigndataplatform.com
+    - host: dbt-docs.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: platform-landing, port: { number: 80 } } } }] }
 ---
 # --- OpenMetadata (data catalog) ---
 # Plain HTTP backend on :8585. OpenMetadata has its own login screen that
 # integrates with Keycloak via OIDC client `openmetadata` (server-side
-# token exchange against keycloak.eu-sovereigndataplatform.com — Java
-# truststore is loaded from /etc/uwv-ca/ca.crt which now contains the
+# token exchange against keycloak.example.com — Java
+# truststore is loaded from /etc/platform-ca/ca.crt which now contains the
 # Mozilla public-root bundle, so LE certs validate).
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: openmetadata-public-tls
-  namespace: uwv-meta
+  namespace: odap-meta
 spec:
   secretName: openmetadata-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: openmetadata.eu-sovereigndataplatform.com
-  dnsNames: [openmetadata.eu-sovereigndataplatform.com]
+  commonName: openmetadata.example.com
+  dnsNames: [openmetadata.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: openmetadata-public
-  namespace: uwv-meta
+  namespace: odap-meta
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
@@ -311,10 +311,10 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [openmetadata.eu-sovereigndataplatform.com]
+    - hosts: [openmetadata.example.com]
       secretName: openmetadata-public-tls
   rules:
-    - host: openmetadata.eu-sovereigndataplatform.com
+    - host: openmetadata.example.com
       http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: openmetadata, port: { number: 8585 } } } }] }
 ---
 # --- OpenSearch Dashboards (Kibana-like UI for log/index browsing) ---
@@ -322,28 +322,28 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: opensearch-public-tls
-  namespace: uwv-meta
+  namespace: odap-meta
 spec:
   secretName: opensearch-public-tls
   issuerRef: { name: letsencrypt-prod, kind: ClusterIssuer }
-  commonName: opensearch.eu-sovereigndataplatform.com
-  dnsNames: [opensearch.eu-sovereigndataplatform.com]
+  commonName: opensearch.example.com
+  dnsNames: [opensearch.example.com]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: opensearch-public
-  namespace: uwv-meta
+  namespace: odap-meta
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [opensearch.eu-sovereigndataplatform.com]
+    - hosts: [opensearch.example.com]
       secretName: opensearch-public-tls
   rules:
-    - host: opensearch.eu-sovereigndataplatform.com
-      http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: opensearch-dashboards-uwv, port: { number: 5601 } } } }] }
+    - host: opensearch.example.com
+      http: { paths: [{ path: /, pathType: Prefix, backend: { service: { name: opensearch-dashboards, port: { number: 5601 } } } }] }
 # NiFi en Trino hadden hier ook publieke Ingresses, maar zijn verwijderd:
 # beide worden as-code aangestuurd (NiFi flows via REST-import op port-forward,
 # Trino via Superset/Jupyter/dbt/Airflow). Geen UI-exposure meer.

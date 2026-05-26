@@ -5,7 +5,7 @@ tests previously called `/stackable/trino-cli/trino`. This helper runs the
 same queries via the REST API using only stdlib (urllib + ssl + base64).
 
 Invoked from a smoke test as:
-  kubectl -n NS exec sts/uwv-trino-coordinator-default -c trino -- \
+  kubectl -n NS exec sts/trino-coordinator-default -c trino -- \
     python3 /tmp/_trino_query.py "SHOW CATALOGS"
 or piped via stdin from kubectl cp + exec.
 """

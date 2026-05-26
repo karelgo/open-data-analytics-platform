@@ -1,4 +1,4 @@
-# Let's Encrypt ClusterIssuer for *.eu-sovereigndataplatform.com.
+# Let's Encrypt ClusterIssuer for *.example.com.
 #
 # Uses DNS-01 challenge via Azure DNS — HTTP-01 would need port 80 reachable
 # from the public internet, which isn't useful when the user accessing the
@@ -28,7 +28,7 @@ spec:
           azureDNS:
             subscriptionID: 4910a5a6-aec6-405d-9294-c7f2845512a4
             resourceGroupName: ai-trial-rg
-            hostedZoneName: eu-sovereigndataplatform.com
+            hostedZoneName: example.com
             environment: AzurePublicCloud
             tenantID: fedcef2f-0c85-40dd-8f55-e23143dcb367
             clientID: 7e14e768-6dac-44f4-886f-ba2990447f1f
@@ -37,7 +37,7 @@ spec:
               key: client-secret
         selector:
           dnsZones:
-            - eu-sovereigndataplatform.com
+            - example.com
 ---
 # Staging issuer for testing (rate-limit friendly, but cert is not trusted
 # by browsers — useful while iterating on Ingress configs).
@@ -56,7 +56,7 @@ spec:
           azureDNS:
             subscriptionID: 4910a5a6-aec6-405d-9294-c7f2845512a4
             resourceGroupName: ai-trial-rg
-            hostedZoneName: eu-sovereigndataplatform.com
+            hostedZoneName: example.com
             environment: AzurePublicCloud
             tenantID: fedcef2f-0c85-40dd-8f55-e23143dcb367
             clientID: 7e14e768-6dac-44f4-886f-ba2990447f1f
@@ -65,4 +65,4 @@ spec:
               key: client-secret
         selector:
           dnsZones:
-            - eu-sovereigndataplatform.com
+            - example.com

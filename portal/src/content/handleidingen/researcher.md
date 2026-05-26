@@ -6,7 +6,7 @@ role: researcher
 > Rol-key: `researcher` · Domein: Statistisch onderzoek (sandbox) · Risiconiveau toegang: laag (alleen sandbox, gepseudonimiseerd)
 
 Deze handleiding is voor **onderzoekers** die statistisch onderzoek doen
-op UWV-data. Je werkt **uitsluitend in de sandbox-zone** met
+op ODAP data. Je werkt **uitsluitend in de sandbox-zone** met
 gepseudonimiseerde panels — geen productie-PII, geen rauwe BSN's.
 
 ---
@@ -30,12 +30,12 @@ en vergelijkbare studies). Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards en SQL Lab | https://superset.uwv-platform.local |
-| **OpenMetadata** | Definities, lineage van panels | https://openmetadata.uwv-platform.local |
+| **Apache Superset** | Dashboards en SQL Lab | https://superset.odap.local |
+| **OpenMetadata** | Definities, lineage van panels | https://openmetadata.odap.local |
 
 Tip: Trino integreert met Python-notebooks via `trino-python-client`. Voor
 reproduceerbaar onderzoek: bewaar je notebook + queries bij je publicatie.
-Voor ad-hoc gebruik van Trino: `kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443` en verbind op `localhost:8443`.
+Voor ad-hoc gebruik van Trino: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443` en verbind op `localhost:8443`.
 
 ---
 
@@ -99,7 +99,7 @@ ORDER  BY slaag_pct DESC;
 ### 4.3 Workflow C — Regressie via Python-notebook
 
 ```python
-# Eerst port-forwarden: kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443
+# Eerst port-forwarden: kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443
 import trino, pandas as pd, statsmodels.api as sm
 
 conn = trino.dbapi.connect(

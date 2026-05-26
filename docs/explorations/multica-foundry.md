@@ -114,8 +114,8 @@ Foundry:
 brew install multica-ai/tap/multica
 
 # 2) Point the CLI at the in-cluster server.
-multica config set server_url https://multica.uwv-platform.local:8443
-multica config set app_url    https://multica.uwv-platform.local:8443
+multica config set server_url https://multica.odap.local:8443
+multica config set app_url    https://multica.odap.local:8443
 multica login          # opens browser, completes email-code dance
 
 # 3) Tell the codex sub-shell which Foundry deployment to use.

@@ -1,5 +1,5 @@
 # Exposes de access-request-API onder hetzelfde origin als de portal
-# (https://platform.uwv-platform.local) zodat browser-form-POSTs same-origin
+# (https://platform.odap.local) zodat browser-form-POSTs same-origin
 # zijn (geen CORS-preflight nodig). Webhook + replay-endpoints blijven
 # *intern* — alleen /api/request wordt extern bereikbaar.
 #
@@ -12,7 +12,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: om-access-bridge
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/proxy-body-size: 64k
@@ -20,7 +20,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: platform.uwv-platform.local
+    - host: platform.odap.local
       http:
         paths:
           - path: /access-request-api(/|$)(.*)
@@ -32,5 +32,5 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - platform.uwv-platform.local
+        - platform.odap.local
       secretName: portal-tls

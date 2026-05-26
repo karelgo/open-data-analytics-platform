@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Smoke test 12 — UWV Lab (JupyterHub).
+# Smoke test 12 — ODAP Lab (JupyterHub).
 #
 # Checkt:
 #   1. Deployment `jupyterhub` is Available
@@ -7,12 +7,12 @@
 #   3. configurable-http-proxy luistert op :8000
 #   4. Service `jupyter` mapt 80 → 8000
 #   5. Service `hub` mapt 8081 → 8081
-#   6. Ingress jupyter.uwv-platform.local bestaat met TLS-secret
+#   6. Ingress jupyter.odap.local bestaat met TLS-secret
 #   7. ConfigMap `jupyterhub-config` bevat de oauthenticator-config
 #   8. ConfigMap `jupyter-starter-notebooks` bestaat met >=5 notebooks
 #   9. Singleuser ServiceAccount + Role + RoleBinding aanwezig
 #  10. Keycloak realm 'uwv' OIDC-discovery werkt (sanity, niet client-enum)
-#  11. uwv_lab Python-helper importeert in een kernel-test-pod
+#  11. odap_lab Python-helper importeert in een kernel-test-pod
 #
 # Skipt elegant als JupyterHub nog niet gedeployd is.
 set -euo pipefail
@@ -23,9 +23,9 @@ skip() { printf '  [SKIP] %s\n' "$*"; }
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 
 DEPLOYMENT_MODE="${DEPLOYMENT_MODE:-${MODE:-k3d}}"
-PLATFORM_DOMAIN="${PLATFORM_DOMAIN:-uwv-platform.local}"
+PLATFORM_DOMAIN="${PLATFORM_DOMAIN:-odap.local}"
 
-NS=uwv-platform
+NS=odap-platform
 DEP=jupyterhub
 
 if ! kubectl -n "$NS" get deployment "$DEP" >/dev/null 2>&1; then
@@ -128,10 +128,10 @@ pass "RBAC voor Hub + singleuser correct opgezet"
 
 # 10. Keycloak realm answers OIDC discovery (sanity)
 log "Keycloak realm 'uwv' OIDC-discovery"
-KC=$(kubectl -n uwv-auth run kc-jupyter-check-$RANDOM \
+KC=$(kubectl -n odap-auth run kc-jupyter-check-$RANDOM \
        --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
        curl -fsSL --max-time 10 \
-         "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/.well-known/openid-configuration" \
+         "http://keycloak.odap-auth.svc.cluster.local/realms/odap/.well-known/openid-configuration" \
        2>/dev/null || true)
 if echo "$KC" | grep -q '"issuer"'; then
   pass "Keycloak realm 'uwv' OIDC-discovery werkt"
@@ -139,30 +139,30 @@ else
   fail "Keycloak realm 'uwv' beantwoordt geen OIDC-discovery"
 fi
 
-# 11. uwv_lab helper importeert in een kernel-test-pod (lichtgewicht — pod
+# 11. odap_lab helper importeert in een kernel-test-pod (lichtgewicht — pod
 #     runt python -c en sluit weer af).
 #
-# Op AKS is `uwv-platform/jupyter-kernel:dev` niet pullable zonder dat het
+# Op AKS is `odap/jupyter-kernel:dev` niet pullable zonder dat het
 # image naar een registry is gepusht (geen `k3d image import` beschikbaar).
 # Sla de check over tot er een registry-push-flow is.
 if [[ "$DEPLOYMENT_MODE" == "aks" ]]; then
-  skip "uwv_lab kernel-import — kernel-image staat niet op een registry die AKS kan pullen (TODO: ACR-push)"
+  skip "odap_lab kernel-import — kernel-image staat niet op een registry die AKS kan pullen (TODO: ACR-push)"
 else
-  log "uwv_lab helper import in kernel-image"
+  log "odap_lab helper import in kernel-image"
   if kubectl -n "$NS" get pod kernel-smoketest >/dev/null 2>&1; then
     kubectl -n "$NS" delete pod kernel-smoketest --ignore-not-found >/dev/null 2>&1 || true
   fi
   IMG=$(kubectl -n "$NS" get deployment "$DEP" -o jsonpath='{.spec.template.spec.containers[?(@.name=="hub")].env[?(@.name=="SINGLEUSER_IMAGE")].value}')
-  [[ -z "$IMG" ]] && IMG="uwv-platform/jupyter-kernel:dev"
+  [[ -z "$IMG" ]] && IMG="odap/jupyter-kernel:dev"
   KERNEL_OUT=$(kubectl -n "$NS" run kernel-smoketest \
                  --image="$IMG" --image-pull-policy=IfNotPresent \
                  --restart=Never --rm -i --quiet --command -- \
-                 python -c "import uwv_lab; print('uwv_lab', 'OK', list(uwv_lab.env().keys())[:3])" \
+                 python -c "import odap_lab; print('odap_lab', 'OK', list(odap_lab.env().keys())[:3])" \
                  2>/dev/null || true)
-  if echo "$KERNEL_OUT" | grep -q "uwv_lab OK"; then
-    pass "kernel-image kan 'import uwv_lab' (output: $KERNEL_OUT)"
+  if echo "$KERNEL_OUT" | grep -q "odap_lab OK"; then
+    pass "kernel-image kan 'import odap_lab' (output: $KERNEL_OUT)"
   else
-    fail "kernel-image kon 'uwv_lab' niet importeren — image-build of import-error. Output: ${KERNEL_OUT:-leeg}"
+    fail "kernel-image kon 'odap_lab' niet importeren — image-build of import-error. Output: ${KERNEL_OUT:-leeg}"
   fi
 fi
 

@@ -1,4 +1,4 @@
-# Declaratieve DataQuality TestSuites + TestCases voor de UWV-gold-marts.
+# Declaratieve DataQuality TestSuites + TestCases voor de gold marts.
 #
 # Wordt door de init-Job (apply_test_suites) toegepast via OM REST API:
 #   PUT  /api/v1/dataQuality/testSuites/basic         — per (entity)
@@ -17,7 +17,7 @@ test_suites:
   - name: uc01_wia_funnel_dq
     displayName: "UC-01 WIA Funnel — Data Quality"
     description: "Dagelijkse DQ-checks op de WIA Funnel-mart (Tier1, DoD-anchor)."
-    entityFQN: uwv-trino.gold.uc01_wia_funnel.mart_uc01_wia_funnel_daily
+    entityFQN: trino.gold.uc01_wia_funnel.mart_uc01_wia_funnel_daily
     test_cases:
       - name: row_count_not_empty
         displayName: "Niet-lege funnel"
@@ -52,7 +52,7 @@ test_suites:
   - name: uc04_tw_eligibility_dq
     displayName: "UC-04 TW Eligibility — Data Quality"
     description: "Regel-gebaseerde TW-aanvulling, geen profilering. Tier1."
-    entityFQN: uwv-trino.gold.uc04_tw_eligibility.mart_uc04_tw_eligibility
+    entityFQN: trino.gold.uc04_tw_eligibility.mart_uc04_tw_eligibility
     test_cases:
       - name: row_count_not_empty
         testDefinition: tableRowCountToBeBetween
@@ -80,7 +80,7 @@ test_suites:
   - name: uc05_client_360_dq
     displayName: "UC-05 Cliënt 360° — Data Quality"
     description: "Volledige cliënt-profielen, OPA-masking per rol. Tier1."
-    entityFQN: uwv-trino.gold.uc05_client_360.mart_uc05_client_360
+    entityFQN: trino.gold.uc05_client_360.mart_uc05_client_360
     test_cases:
       - name: row_count_not_empty
         testDefinition: tableRowCountToBeBetween
@@ -113,7 +113,7 @@ test_suites:
   - name: uc06_uitkeringslast_dq
     displayName: "UC-06 Lastprognose 5y — Data Quality"
     description: "5-jaars baseline-projectie uitkeringslast."
-    entityFQN: uwv-trino.gold.uc06_lastprognose.mart_uc06_uitkeringslast_5y
+    entityFQN: trino.gold.uc06_lastprognose.mart_uc06_uitkeringslast_5y
     test_cases:
       - name: row_count_not_empty
         testDefinition: tableRowCountToBeBetween
@@ -155,7 +155,7 @@ test_suites:
   - name: uc07_dq_meta
     displayName: "UC-07 DQ Polisadm — Meta-DQ"
     description: "Datakwaliteit van het dq-dagrapport zelf."
-    entityFQN: uwv-trino.gold.uc07_dq_polisadm.mart_uc07_dq_dagrapport
+    entityFQN: trino.gold.uc07_dq_polisadm.mart_uc07_dq_dagrapport
     test_cases:
       - name: rapport_datum_not_null
         column: rapport_datum
@@ -186,7 +186,7 @@ test_suites:
   - name: uc09_reint_effect_dq
     displayName: "UC-09 Re-integratie Effect — Data Quality"
     description: "Gepseudonimiseerd onderzoekspanel. Sandbox-zone."
-    entityFQN: uwv-trino.gold.uc09_reint_effect.mart_uc09_effect_panel
+    entityFQN: trino.gold.uc09_reint_effect.mart_uc09_effect_panel
     test_cases:
       - name: row_count_not_empty
         testDefinition: tableRowCountToBeBetween
@@ -216,7 +216,7 @@ test_suites:
   - name: uc_klant_tev_dq
     displayName: "Klanttevredenheid — Data Quality"
     description: "Gewogen score per kanaal × maand."
-    entityFQN: uwv-trino.gold.uc_klant_tev.mart_uc_klant_tev_kanaal_maand
+    entityFQN: trino.gold.uc_klant_tev.mart_uc_klant_tev_kanaal_maand
     test_cases:
       - name: row_count_not_empty
         testDefinition: tableRowCountToBeBetween
@@ -249,7 +249,7 @@ test_suites:
   - name: dq_overview_dq
     displayName: "DQ Overview — Self-check"
     description: "DQ-mart die alle UCs samenvat; checkt dat output zelf gevuld + valide is."
-    entityFQN: uwv-trino.gold.dq_overview.mart_dq_overview
+    entityFQN: trino.gold.dq_overview.mart_dq_overview
     test_cases:
       - name: row_count_not_empty
         testDefinition: tableRowCountToBeBetween
@@ -279,7 +279,7 @@ test_suites:
   - name: uc11_klantreis_events_dq
     displayName: "UC-11 Klantreis Events — Data Quality"
     description: "Integriteitschecks op de cross-domein event-stream."
-    entityFQN: uwv-trino.gold.uc11_klantreis.mart_uc11_klantreis_events
+    entityFQN: trino.gold.uc11_klantreis.mart_uc11_klantreis_events
     test_cases:
       - name: row_count_not_empty
         displayName: "Niet-lege event-stream"
@@ -326,7 +326,7 @@ test_suites:
   - name: uc11_klantreis_phases_dq
     displayName: "UC-11 Klantreis Phases — Data Quality"
     description: "Checks op de fase-reconstructie (BSN × fase × periode)."
-    entityFQN: uwv-trino.gold.uc11_klantreis.mart_uc11_klantreis_phases
+    entityFQN: trino.gold.uc11_klantreis.mart_uc11_klantreis_phases
     test_cases:
       - name: row_count_not_empty
         displayName: "Niet-lege fase-tabel"
@@ -373,7 +373,7 @@ test_suites:
   - name: uc07_dq_meta
     displayName: "UC-07 DQ Polisadm — Meta-DQ"
     description: "Datakwaliteit van het dq-dagrapport zelf."
-    entityFQN: uwv-trino.gold.uc07_dq_polisadm.mart_uc07_dq_dagrapport
+    entityFQN: trino.gold.uc07_dq_polisadm.mart_uc07_dq_dagrapport
     test_cases:
       - name: rapport_datum_not_null
         column: rapport_datum
@@ -403,4 +403,4 @@ alerts:
       type: Webhook
       # k3d-locale endpoint die requests slikt en logt — productie vervangt
       # dit met de daadwerkelijke Slack/Teams webhook.
-      endpoint: http://openmetadata.uwv-meta.svc.cluster.local:8585/api/v1/system/healthz
+      endpoint: http://openmetadata.odap-meta.svc.cluster.local:8585/api/v1/system/healthz

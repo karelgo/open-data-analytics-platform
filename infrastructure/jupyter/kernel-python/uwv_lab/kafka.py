@@ -13,7 +13,7 @@ from typing import Iterable
 def _bootstrap() -> str:
     return os.environ.get(
         "KAFKA_BOOTSTRAP_SERVERS",
-        "uwv-kafka-broker-default-bootstrap.uwv-platform.svc.cluster.local:9093",
+        "kafka-broker-default-bootstrap.odap-platform.svc.cluster.local:9093",
     )
 
 
@@ -24,7 +24,7 @@ def consumer(topic: str, group_id: str | None = None):
     return KafkaConsumer(
         topic,
         bootstrap_servers=_bootstrap(),
-        group_id=group_id or "uwv-lab-notebook",
+        group_id=group_id or "odap-lab-notebook",
         auto_offset_reset="earliest",
         enable_auto_commit=False,
         consumer_timeout_ms=5000,

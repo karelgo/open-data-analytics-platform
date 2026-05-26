@@ -6,9 +6,9 @@ package trino
 # Per rol:      welke purposes mag de rol declareren?
 #
 # Allow-rule: er is overlap tussen
-#   resource_required_purposes  (uit data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.resource_purposes)
+#   resource_required_purposes  (uit data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.resource_purposes)
 #   user_purpose                (uit input.context.identity.extraCredentials.purpose)
-#   role_allowed_purposes       (uit data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.roles[r].purposes)
+#   role_allowed_purposes       (uit data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.roles[r].purposes)
 
 import rego.v1
 
@@ -20,17 +20,17 @@ import rego.v1
 resource_required_purposes := purposes if {
 	# Exact match op tabel-niveau krijgt voorrang.
 	key := concat(".", [resource_catalog, resource_schema, resource_table])
-	purposes := data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.resource_purposes[key]
+	purposes := data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.resource_purposes[key]
 }
 
 resource_required_purposes := purposes if {
 	# Wildcard match op schema-niveau.
 	key := concat(".", [resource_catalog, resource_schema, "*"])
-	purposes := data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.resource_purposes[key]
+	purposes := data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.resource_purposes[key]
 
 	# Voorkom dubbele resolution: alleen als geen exact match.
 	exact_key := concat(".", [resource_catalog, resource_schema, resource_table])
-	not data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.resource_purposes[exact_key]
+	not data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.resource_purposes[exact_key]
 }
 
 # Default — geen restrictie als resource niet in mapping.
@@ -40,12 +40,12 @@ resource_required_purposes := [] if {
 
 _has_purpose_mapping if {
 	exact := concat(".", [resource_catalog, resource_schema, resource_table])
-	data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.resource_purposes[exact]
+	data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.resource_purposes[exact]
 }
 
 _has_purpose_mapping if {
 	wild := concat(".", [resource_catalog, resource_schema, "*"])
-	data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.resource_purposes[wild]
+	data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.resource_purposes[wild]
 }
 
 # Helper voor table-naam.
@@ -56,7 +56,7 @@ resource_table := t if {
 # Welke purposes mag deze user declareren? Som per rol.
 user_allowed_purposes contains p if {
 	some r in user_roles
-	role := data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.roles[r]
+	role := data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.roles[r]
 	some p in role.purposes
 }
 

@@ -1,4 +1,4 @@
-# Let's Encrypt ClusterIssuers for *.freshstackable.com (StackIT SKE).
+# Let's Encrypt ClusterIssuers for *.example.com (StackIT SKE).
 #
 # We use the HTTP-01 challenge instead of the DNS-01 path used on AKS:
 #  - HTTP-01 just needs port 80 reachable from the public internet — which

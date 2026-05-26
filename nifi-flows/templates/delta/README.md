@@ -59,13 +59,13 @@ tegen `https://localhost:8443/`.
 
 ```bash
 # Terminal 1: port-forward (laat openstaan)
-kubectl -n uwv-platform port-forward svc/uwv-nifi-node-default 8443:8443
+kubectl -n odap-platform port-forward svc/nifi-node-default 8443:8443
 
 # Terminal 2: eenmalig — registreer NiFi Registry-bucket
 curl -k -u "data.engineer:..." \
   -X POST https://localhost:8443/nifi-registry-api/buckets \
   -H "Content-Type: application/json" \
-  -d '{"name":"uwv-flows-delta","description":"UWV reference flows (Delta variant)"}'
+  -d '{"name":"flows-delta","description":"UWV reference flows (Delta variant)"}'
 
 # Per flow: import process group via JSON
 curl -k -u "data.engineer:..." \

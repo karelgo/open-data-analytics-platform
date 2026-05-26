@@ -85,7 +85,7 @@ variable "labels" {
   description = "Labels applied to created StackIT resources."
   type        = map(string)
   default = {
-    project     = "uwv-data-platform"
+    project     = "odap-data-platform"
     environment = "dev"
     managed_by  = "terraform"
   }

@@ -1,19 +1,19 @@
 # PodMonitor — laat Prometheus de Vector log-events-counter scrape'n.
 #
 # Vector draait als DaemonSet (één pod per node) in namespace
-# uwv-monitoring. De Prometheus-exporter sink (zie infrastructure/helm/
-# vector/values.yaml) exposes uwv_alert_event_total op poort 9598.
+# odap-monitoring. De Prometheus-exporter sink (zie infrastructure/helm/
+# vector/values.yaml) exposes alert_event_total op poort 9598.
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: vector-log-events
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   labels:
     prometheus: kube-prometheus
 spec:
   namespaceSelector:
-    matchNames: [uwv-monitoring]
+    matchNames: [odap-monitoring]
   selector:
     matchLabels:
       app.kubernetes.io/name: vector

@@ -1,13 +1,13 @@
-# UWV Reference Data & Analytics Platform
+# Open Data & Analytics Platform
 
 Een **fictieve, illustratieve** referentie-implementatie van een modern data-
 en analyticsplatform voor UWV, gebouwd op open source en gericht op compliance
 met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
 
-> **Disclaimer.** Geen echte UWV-data, geen echte BSN's, geen echte productiecode.
+> **Disclaimer.** Geen echte ODAP data, geen echte BSN's, geen echte productiecode.
 > Alle datasets zijn synthetisch en gemarkeerd met
-> `# SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE`.
-> Deze repo is geen UWV-product en geen aanbestedingsstuk.
+> `# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`.
+> Deze repo is geen ODAP product en geen aanbestedingsstuk.
 
 ---
 
@@ -23,7 +23,7 @@ Een Kubernetes-native lakehouse + analytics-stack:
 - **Transformatie**: dbt-trino, format-agnostisch via macro `table_format()`.
 - **Orchestratie**: Apache Airflow 3 + astronomer-cosmos voor dbt-DAGs.
 - **BI**: Apache Superset.
-- **Notebooks**: JupyterHub + KubeSpawner (UWV Lab) — Python/SQL op alle data-lagen, Git-integratie. Zie [`platform/16-jupyter/`](platform/16-jupyter/).
+- **Notebooks**: JupyterHub + KubeSpawner (ODAP Lab) — Python/SQL op alle data-lagen, Git-integratie. Zie [`platform/16-jupyter/`](platform/16-jupyter/).
 - **Catalog/governance/lineage/DQ**: OpenMetadata, met een self-service [om-access-bridge](platform/18-om-access-bridge/) (OM task-approval → Keycloak realm-role → OPA grant).
 - **AuthN**: Keycloak (OIDC).
 - **Portal**: Astro/React workspace-shell die alle service-UIs embed onder één URL ([`portal/`](portal/), [`platform/15-portal/`](platform/15-portal/)).
@@ -42,7 +42,7 @@ Het platform draait in drie deployment-modes; alle Make-targets accepteren
 | Aspect | k3d (default) | aks | stackit |
 |---|---|---|---|
 | Cluster type | k3d serverlb + local-path | AKS managed-csi + LB | SKE (Gardener) + yawol LB |
-| Domain | `uwv-platform.local:8443` | `eu-sovereigndataplatform.com` | `freshstackable.com` |
+| Domain | `odap.local:8443` | `example.com` | `example.com` |
 | Storage class | `local-path` | `managed-csi` | `storage-class-ske-csi-cinder` |
 | Ingress controller | DaemonSet + hostNetwork | Deployment + LoadBalancer | Deployment + yawol Floating-IP |
 | Helm values | `…/values.yaml` + `values-k3d.yaml` | `…/values-aks.yaml` | `…/values-stackit.yaml` |
@@ -60,10 +60,10 @@ Voorvereisten:
 make doctor MODE=k3d
 
 # 2. /etc/hosts injectie (vereist sudo, eenmalig)
-echo "127.0.0.1 keycloak.uwv-platform.local \
-  superset.uwv-platform.local airflow.uwv-platform.local \
-  minio.uwv-platform.local openmetadata.uwv-platform.local \
-  jupyter.uwv-platform.local platform.uwv-platform.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1 keycloak.odap.local \
+  superset.odap.local airflow.odap.local \
+  minio.odap.local openmetadata.odap.local \
+  jupyter.odap.local platform.odap.local" | sudo tee -a /etc/hosts
 
 # 3. End-to-end deploy (~15-30 min)
 make deploy MODE=k3d   # cluster + bootstrap + platform + portal + smoke
@@ -95,7 +95,7 @@ make aks-all          # bootstrap + deploy + smoke
 
 ```bash
 # Vereist: stackit CLI + STACKIT_SERVICE_ACCOUNT_TOKEN, terraform.
-# Floating IP 188.34.84.39 + DNS-zone freshstackable.com worden door
+# Floating IP 188.34.84.39 + DNS-zone example.com worden door
 # Terraform beheerd (zie infrastructure/stackit/terraform/).
 make doctor MODE=stackit
 make stackit-up                              # terraform: SKE + reserved Floating IP
@@ -116,7 +116,7 @@ make stackit-status                          # HEALTHY / HIBERNATED / RECONCILIN
 de kubectl-context niet matcht met `--mode`. Een typische foutmelding:
 
 ```
-FAIL mode=aks but kubectl context 'k3d-uwv-platform' is not an AKS cluster.
+FAIL mode=aks but kubectl context 'k3d-odap-platform' is not an AKS cluster.
 Run 'make aks-context'.
 ```
 

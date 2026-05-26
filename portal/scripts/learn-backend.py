@@ -12,7 +12,7 @@ GET  /api/learn/check/{check_id}      → {"ok": bool, "msg": str}
 
 Vereiste env
 ------------
-KEYCLOAK_URL                http(s)://keycloak.uwv-platform.local:8443
+KEYCLOAK_URL                http(s)://keycloak.odap.local:8443
 KEYCLOAK_REALM              uwv
 KEYCLOAK_ADMIN_CLIENT_ID    portal-backend
 KEYCLOAK_ADMIN_CLIENT_SEC   <secret>          (service-account)

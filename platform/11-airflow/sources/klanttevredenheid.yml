@@ -14,7 +14,7 @@ domain: klantcontact
 ingest:
   kind: csv
   staging:
-    bucket: uwv-staging
+    bucket: odap-staging
     prefix: incoming/klanttevredenheid
     processed_prefix: processed/klanttevredenheid
   csv:

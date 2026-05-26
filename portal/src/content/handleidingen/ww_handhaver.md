@@ -39,8 +39,8 @@ voor andere rollen. Wachtwoord wijzigen bij eerste login.
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards: WW-risico, caseload, signalen | https://superset.uwv-platform.local |
-| **OpenMetadata** | Begrippen, eigenaarschap, lineage | https://openmetadata.uwv-platform.local |
+| **Apache Superset** | Dashboards: WW-risico, caseload, signalen | https://superset.odap.local |
+| **OpenMetadata** | Begrippen, eigenaarschap, lineage | https://openmetadata.odap.local |
 
 > Je gebruikt **niet**: NiFi, Airflow, sensitive vault.
 

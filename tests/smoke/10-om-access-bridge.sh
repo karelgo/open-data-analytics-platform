@@ -3,8 +3,8 @@
 # ongesigneerde webhooks.
 #
 # Voorwaarden:
-#   - make deploy-om-bridge gedraaid (Deployment + Service in uwv-platform ns)
-#   - Keycloak `om-access-bridge`-client in realm-uwv (realm-uwv.json)
+#   - make deploy-om-bridge gedraaid (Deployment + Service in odap-platform ns)
+#   - Keycloak `om-access-bridge`-client in realm (realm.json)
 #
 # Wat we checken:
 #   1. Deployment Ready
@@ -14,8 +14,8 @@
 #      serviceAccountsEnabled: true (proxy voor "realm-import is gelopen")
 set -euo pipefail
 
-NS="${NS:-uwv-platform}"
-AUTH_NS="${AUTH_NS:-uwv-auth}"
+NS="${NS:-odap-platform}"
+AUTH_NS="${AUTH_NS:-odap-auth}"
 
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 pass() { printf '\033[1;32m  OK\033[0m  %s\n' "$*"; }
@@ -45,9 +45,9 @@ if [[ -z "$health" ]]; then
 fi
 echo "$health" | grep -q '"status":"ok"' \
   || fail "/health onverwacht: $health"
-echo "$health" | grep -q '"realm":"uwv"' \
+echo "$health" | grep -q '"realm":"odap"' \
   || fail "/health mist realm-veld: $health"
-pass "/health = ok (realm=uwv)"
+pass "/health = ok (realm=odap)"
 
 # --- 3. POST zonder HMAC → 401 -------------------------------------------
 log "POST /webhooks/om zonder X-OM-Signature → 401 verwacht"
@@ -70,12 +70,12 @@ if ! kubectl -n "$AUTH_NS" get pod keycloak-0 >/dev/null 2>&1; then
 else
   found=$(kubectl -n "$AUTH_NS" exec keycloak-0 -c keycloak -- bash -c '
     T=$(curl -fsS -d "client_id=admin-cli" -d "username=kcadmin" \
-      -d "password=uwv-dev-only-CHANGE-ME-2026" -d "grant_type=password" \
+      -d "password=odap-dev-only-CHANGE-ME" -d "grant_type=password" \
       http://localhost:8080/realms/master/protocol/openid-connect/token 2>/dev/null \
       | sed "s/.*access_token\":\"\([^\"]*\)\".*/\1/")
     [ -z "$T" ] && { echo "no-token"; exit 0; }
     curl -fsS -H "Authorization: Bearer $T" \
-      "http://localhost:8080/admin/realms/uwv/clients?clientId=om-access-bridge" 2>/dev/null
+      "http://localhost:8080/admin/realms/odap/clients?clientId=om-access-bridge" 2>/dev/null
   ' 2>/dev/null || echo "")
   if echo "$found" | grep -q '"clientId":"om-access-bridge"'; then
     pass "client 'om-access-bridge' aanwezig in realm uwv"

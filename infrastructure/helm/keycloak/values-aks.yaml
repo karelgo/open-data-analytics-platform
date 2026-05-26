@@ -2,7 +2,7 @@
 #
 # Bitnami mirror image (Docker Hub purged bitnami/* mid-2025).
 # Public DNS hostname on standard 443 — browsers get URLs that resolve and
-# load straight off the Azure LB; cookies are set on .eu-sovereigndataplatform.com.
+# load straight off the Azure LB; cookies are set on .example.com.
 
 image:
   repository: bitnamilegacy/keycloak
@@ -13,11 +13,11 @@ postgresql:
 
 auth:
   realm: master
-  frontendUrl: "https://keycloak.eu-sovereigndataplatform.com"
+  frontendUrl: "https://keycloak.example.com"
 
 extraEnvVars:
   - name: KC_HOSTNAME
-    value: "https://keycloak.eu-sovereigndataplatform.com"
+    value: "https://keycloak.example.com"
   - name: KC_HOSTNAME_STRICT
     value: "false"
   - name: KC_HOSTNAME_STRICT_BACKCHANNEL
@@ -26,12 +26,12 @@ extraEnvVars:
     value: "xforwarded"
 
 # NB: we do NOT override ingress.hostname here. The chart-managed ingress
-# stays on keycloak.uwv-platform.local for in-cluster CoreDNS routing
+# stays on keycloak.odap.local for in-cluster CoreDNS routing
 # (apps' OIDC backchannel discovery). The public-facing
-# keycloak.eu-sovereigndataplatform.com ingress with the LE cert is in
+# keycloak.example.com ingress with the LE cert is in
 # infrastructure/azure/public-ingresses.yaml as `keycloak-public`.
 #
-# tokens issued here have iss=https://keycloak.eu-sovereigndataplatform.com/
+# tokens issued here have iss=https://keycloak.example.com/
 # regardless of whether the call came via the public domain (browser) or the
 # in-cluster keycloak Service hostname (apps' backchannel). Apps with .local
 # hardcoded as their OIDC issuer config (Superset, Airflow, OpenMetadata) —

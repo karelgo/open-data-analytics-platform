@@ -1,7 +1,7 @@
 # PostgreSQL — single-instance, gedeeld voor HMS / Airflow / Superset / OpenMetadata.
 #
 # Eén PostgreSQL-pod hoste meerdere databases (één per consumer). Init-script
-# in templates/init-uwv-databases.sql maakt ze aan bij eerste boot.
+# in templates/init-odap-databases.sql maakt ze aan bij eerste boot.
 #
 # Productie: aparte instances met eigen retentie, replicatie, backup-strategie.
 #
@@ -22,9 +22,9 @@ image:
 architecture: standalone
 
 auth:
-  postgresPassword: "uwv-dev-only-CHANGE-ME-2026"
-  username: "uwvplatform"
-  password: "uwv-dev-only-CHANGE-ME-2026"
+  postgresPassword: "odap-dev-only-CHANGE-ME"
+  username: "odap"
+  password: "odap-dev-only-CHANGE-ME"
   database: "platform"
 
 primary:
@@ -42,27 +42,27 @@ primary:
     size: 8Gi
 
   # Init-script maakt extra databases en gebruikers aan voor de consumers.
-  # Draait als 'postgres' superuser (i.p.v. default uwvplatform) zodat
+  # Draait als 'postgres' superuser (i.p.v. default odap) zodat
   # CREATE DATABASE ... OWNER niet faalt op rechten.
   initdb:
     user: postgres
-    password: "uwv-dev-only-CHANGE-ME-2026"
+    password: "odap-dev-only-CHANGE-ME"
     scripts:
-      00-uwv-databases.sql: |
+      00-odap-databases.sql: |
         -- Aanmaken van databases voor elk platform-onderdeel.
         -- Wachtwoorden: zelfde als POSTGRES_PASSWORD (dev only).
-        CREATE DATABASE hivemetastore OWNER uwvplatform;
-        CREATE DATABASE airflow OWNER uwvplatform;
-        CREATE DATABASE superset OWNER uwvplatform;
-        CREATE DATABASE openmetadata OWNER uwvplatform;
-        CREATE DATABASE keycloak OWNER uwvplatform;
+        CREATE DATABASE hivemetastore OWNER odap;
+        CREATE DATABASE airflow OWNER odap;
+        CREATE DATABASE superset OWNER odap;
+        CREATE DATABASE openmetadata OWNER odap;
+        CREATE DATABASE keycloak OWNER odap;
 
         -- Schema-grants per service. Voor referentie alle volledig.
-        GRANT ALL ON DATABASE hivemetastore TO uwvplatform;
-        GRANT ALL ON DATABASE airflow TO uwvplatform;
-        GRANT ALL ON DATABASE superset TO uwvplatform;
-        GRANT ALL ON DATABASE openmetadata TO uwvplatform;
-        GRANT ALL ON DATABASE keycloak TO uwvplatform;
+        GRANT ALL ON DATABASE hivemetastore TO odap;
+        GRANT ALL ON DATABASE airflow TO odap;
+        GRANT ALL ON DATABASE superset TO odap;
+        GRANT ALL ON DATABASE openmetadata TO odap;
+        GRANT ALL ON DATABASE keycloak TO odap;
 
   # NB: pgHbaConfiguration / extendedConfiguration override zijn weggelaten.
   # Bitnami chart 16.0.6 + bitnamilegacy/postgresql:17 mountt die ConfigMaps

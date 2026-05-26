@@ -55,7 +55,7 @@ interface Props {
 
 const {
   title,
-  description = 'UWV Reference Data Platform — v2 shell',
+  description = 'Open Data & Analytics Platform — v2 shell',
   activeSection = 'home',
   activeSubsection,
   persona = 'data_engineer',
@@ -169,13 +169,13 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <title>{title} · UWV Platform Portal v2 (mockup)</title>
+    <title>{title} · ODAP Portal v2 (mockup)</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <script is:inline>
       // No-flash theme — same as legacy Layout.astro.
       (function () {
         try {
-          var saved = localStorage.getItem('uwv-portal-theme');
+          var saved = localStorage.getItem('odap-portal-theme');
           var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
           var theme = saved ?? (prefersLight ? 'light' : 'dark');
           document.documentElement.dataset.theme = theme;
@@ -213,7 +213,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
           'opensearch': 'opensearch',
           'spark': 'spark'
         };
-        var TLD_RE = /^https?:\/\/([a-z0-9-]+)\.(uwv-platform\.local|eu-sovereigndataplatform\.com|freshstackable\.com)(:\d+)?(\/[^\s]*)?$/;
+        var TLD_RE = /^https?:\/\/([a-z0-9-]+)\.(odap-platform\.local|eu-sovereigndataplatform\.com|freshstackable\.com)(:\d+)?(\/[^\s]*)?$/;
 
         function toEmbedHref(href) {
           var m = href.match(TLD_RE);
@@ -265,17 +265,17 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
       })();
 
       // ─── Cross-environment URL rewrite ───
-      // The same Astro build serves k3d (*.uwv-platform.local:8443), AKS
-      // public DNS (*.eu-sovereigndataplatform.com:443), and StackIT SKE
-      // (*.freshstackable.com:443). Component-, role-shortcut, and academy
-      // hrefs are build-time hardcoded as https://<svc>.uwv-platform.local:8443;
+      // The same Astro build serves k3d (*.odap.local:8443), AKS
+      // public DNS (*.example.com:443), and StackIT SKE
+      // (*.example.com:443). Component-, role-shortcut, and academy
+      // hrefs are build-time hardcoded as https://<svc>.odap.local:8443;
       // on a cloud host we rewrite to https://<svc>.<that-cloud-tld> (port 443).
       // Runs AFTER embed-rewrite — only non-embedded URLs (keycloak admin,
       // /go/<svc>/ fallbacks) reach this point.
       (function () {
         var host = window.location.hostname;
 
-        var CLOUD_TLDS = ['eu-sovereigndataplatform.com', 'freshstackable.com'];
+        var CLOUD_TLDS = ['example.com', 'example.com'];
         var targetTld = null;
         for (var t = 0; t < CLOUD_TLDS.length; t++) {
           if (host === CLOUD_TLDS[t] || host.endsWith('.' + CLOUD_TLDS[t])) {
@@ -288,15 +288,15 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
         var KEEP_LOCAL = ['multica', 'nanitics'];
 
         function rewriteHref(href) {
-          var m = href.match(/:\/\/([a-z0-9-]+)\.uwv-platform\.local(:8443)?/);
+          var m = href.match(/:\/\/([a-z0-9-]+)\.odap-platform\.local(:8443)?/);
           if (m && KEEP_LOCAL.indexOf(m[1]) !== -1) return href;
           return href
-            .replace(/:\/\/([a-z0-9-]+)\.uwv-platform\.local(:8443)?/g,
+            .replace(/:\/\/([a-z0-9-]+)\.odap-platform\.local(:8443)?/g,
                      '://$1.' + targetTld);
         }
 
         function rewrite() {
-          var anchors = document.querySelectorAll('a[href*="uwv-platform.local"]');
+          var anchors = document.querySelectorAll('a[href*="odap.local"]');
           for (var i = 0; i < anchors.length; i++) {
             var a = anchors[i];
             if (!/^https?:\/\//i.test(a.href)) continue;
@@ -313,7 +313,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
           { childList: true, subtree: true });
 
         document.addEventListener('click', function (ev) {
-          var a = ev.target && ev.target.closest && ev.target.closest('a[href*="uwv-platform.local"]');
+          var a = ev.target && ev.target.closest && ev.target.closest('a[href*="odap.local"]');
           if (a && /^https?:\/\//i.test(a.href)) a.href = rewriteHref(a.href);
         }, true);
       })();
@@ -323,7 +323,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
   <body class="shell" data-rail="collapsed" data-embed-mode={embedMode ? 'true' : undefined}>
     <!-- ─── LEFT RAIL ─────────────────────────────────────── -->
     <aside class="rail" aria-label="Hoofdnavigatie">
-      <a class="rail-brand" href="/" aria-label="UWV Platform Portal">
+      <a class="rail-brand" href="/" aria-label="ODAP Portal">
         <span class="rail-brand-mark">UWV</span>
         <span class="rail-brand-text"><b>Platform</b> <span class="rail-brand-sub">v2</span></span>
       </a>
@@ -500,7 +500,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
           <div class="shell-footer-inner">
             <span class="mono">Referentie-implementatie · synthetische data</span>
             <span class="shell-footer-links">
-              <a href="/UWV_Platform_Handboek_per_rol.pdf">Handboek</a>
+              <a href="/ODAP_Platform_Handbook_per_role.pdf">Handboek</a>
               <span aria-hidden="true">·</span>
               <a href="https://github.com/fresh-minds/FreshStackableDataPlatform"
                  target="_blank" rel="noopener noreferrer">Repo ↗</a>
@@ -529,7 +529,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
         const cur = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
         const next = cur === 'light' ? 'dark' : 'light';
         document.documentElement.dataset.theme = next;
-        try { localStorage.setItem('uwv-portal-theme', next); } catch {}
+        try { localStorage.setItem('odap-portal-theme', next); } catch {}
       });
 
       // ───────────────────────────────────────────────────
@@ -683,9 +683,9 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
           const me = await r.json();
           const groups: string[] = me.groups ?? me.roles ?? [];
           const role = groups.find((g) => KNOWN_ROLES.includes(g));
-          if (role) sessionStorage.setItem('uwv-portal-role', role);
+          if (role) sessionStorage.setItem('odap-portal-role', role);
           const user = me.email ?? me.user ?? null;
-          if (user) sessionStorage.setItem('uwv-portal-user', user);
+          if (user) sessionStorage.setItem('odap-portal-user', user);
           renderWho();
         } catch {
           /* niet ingelogd / lokale dev — laat de SSR-defaults staan */
@@ -693,8 +693,8 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
       }
 
       function renderWho(): void {
-        const role = sessionStorage.getItem('uwv-portal-role');
-        const user = sessionStorage.getItem('uwv-portal-user');
+        const role = sessionStorage.getItem('odap-portal-role');
+        const user = sessionStorage.getItem('odap-portal-user');
 
         if (user) {
           const initial = user.trim().charAt(0).toUpperCase();
@@ -734,23 +734,23 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
       // ───────────────────────────────────────────────────
       function buildLogoutUrl(): string {
         const host = window.location.hostname;
-        let tld = 'uwv-platform.local';
+        let tld = 'odap.local';
         let port = ':8443';
-        if (host.endsWith('.eu-sovereigndataplatform.com')) {
-          tld = 'eu-sovereigndataplatform.com'; port = '';
-        } else if (host.endsWith('.freshstackable.com')) {
-          tld = 'freshstackable.com'; port = '';
+        if (host.endsWith('.example.com')) {
+          tld = 'example.com'; port = '';
+        } else if (host.endsWith('.example.com')) {
+          tld = 'example.com'; port = '';
         }
         const post = `https://platform.${tld}${port}/`;
-        const ks   = `https://keycloak.${tld}${port}/realms/uwv/protocol/openid-connect/logout` +
+        const ks   = `https://keycloak.${tld}${port}/realms/odap/protocol/openid-connect/logout` +
                      `?client_id=portal&post_logout_redirect_uri=${encodeURIComponent(post)}`;
         return `/oauth2/sign_out?rd=${encodeURIComponent(ks)}`;
       }
       document.querySelectorAll<HTMLAnchorElement>('[data-who-logout]').forEach((a) => {
         a.addEventListener('click', (ev) => {
           ev.preventDefault();
-          sessionStorage.removeItem('uwv-portal-role');
-          sessionStorage.removeItem('uwv-portal-user');
+          sessionStorage.removeItem('odap-portal-role');
+          sessionStorage.removeItem('odap-portal-user');
           window.location.href = buildLogoutUrl();
         });
       });

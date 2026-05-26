@@ -15,7 +15,7 @@ alertmanager:
         memory: 256Mi
     alertmanagerConfigSelector:
       matchLabels:
-        alertmanagerConfig: uwv-platform
+        alertmanagerConfig: odap-platform
     alertmanagerConfigMatcherStrategy:
       type: None
     storage:
@@ -39,21 +39,21 @@ grafana:
     storageClassName: "premium-perf1-stackit"
   # Grafana chart 8.x added a hard guard against plain `client_secret` in values
   # (assertNoLeakedSecrets). Base values.yaml has a CLEARLY-MARKED dev placeholder
-  # (`uwv-dev-only-CHANGE-ME-grafana-secret`) for k3d laptops — not a real secret
+  # (`odap-dev-only-CHANGE-ME-grafana-secret`) for k3d laptops — not a real secret
   # leak. Disabling the assertion lets the chart render; rotate to a real Secret +
   # `$__file{}` interpolation when this leaves dev.
   assertNoLeakedSecrets: false
   # Chart-managed ingress blijft uit (base values.yaml). Public SKE-routing
   # gaat via infrastructure/stackit/public-ingresses.yaml die platform.
-  # freshstackable.com/grafana proxyt naar prometheus-grafana service.
+  # example.com/grafana proxyt naar prometheus-grafana service.
   # OIDC endpoints overridden naar publieke Stackit-keycloak (Let's Encrypt,
   # geen skip-tls-verify nodig). root_url + redirect_uri matchen
-  # platform.<TLD>/grafana subpath uit realm-uwv.json.
+  # platform.<TLD>/grafana subpath uit realm.json.
   grafana.ini:
     server:
-      root_url: "https://platform.freshstackable.com/grafana/"
+      root_url: "https://platform.example.com/grafana/"
     auth.generic_oauth:
-      auth_url: "https://keycloak.freshstackable.com/realms/uwv/protocol/openid-connect/auth"
-      token_url: "https://keycloak.freshstackable.com/realms/uwv/protocol/openid-connect/token"
-      api_url: "https://keycloak.freshstackable.com/realms/uwv/protocol/openid-connect/userinfo"
+      auth_url: "https://keycloak.example.com/realms/odap/protocol/openid-connect/auth"
+      token_url: "https://keycloak.example.com/realms/odap/protocol/openid-connect/token"
+      api_url: "https://keycloak.example.com/realms/odap/protocol/openid-connect/userinfo"
       tls_skip_verify_insecure: false

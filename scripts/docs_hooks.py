@@ -49,11 +49,11 @@ EXTERNAL_REPO_FILES: tuple[str, ...] = (
     "Makefile",
     "platform-config.yaml",
     "docker-compose.yml",
-    "referentiearchitectuur-uwv-data-analytics.md",
+    "referentiearchitectuur-odap-data-analytics.md",
     "requirements-compliant-data-analyseplatform.md",
-    "uwv-platform-adr-0002-iceberg-vs-delta.md",
-    "uwv-platform-mapping-research.md",
-    "uwv-platform-master-agent-prompt-v2.md",
+    "odap-platform-adr-0002-iceberg-vs-delta.md",
+    "odap-platform-mapping-research.md",
+    "odap-platform-master-agent-prompt-v2.md",
 )
 
 

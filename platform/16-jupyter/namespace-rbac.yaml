@@ -1,6 +1,6 @@
 # RBAC for JupyterHub + KubeSpawner.
 #
-# JupyterHub itself runs as ServiceAccount `jupyterhub` in `uwv-platform`.
+# JupyterHub itself runs as ServiceAccount `jupyterhub` in `odap-platform`.
 # KubeSpawner needs to:
 #   - create/delete Pod, Service, PVC, Secret (per-user notebook resources)
 #   - read events for spawn status surfacing
@@ -12,7 +12,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: jupyterhub
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
     app.kubernetes.io/name: jupyterhub
     app.kubernetes.io/component: hub
@@ -21,7 +21,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: jupyterhub-singleuser
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
     app.kubernetes.io/name: jupyterhub
     app.kubernetes.io/component: singleuser
@@ -31,7 +31,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: jupyterhub
-  namespace: uwv-platform
+  namespace: odap-platform
 rules:
   - apiGroups: [""]
     resources: ["pods", "pods/log", "pods/status", "services", "persistentvolumeclaims", "secrets", "events"]
@@ -41,11 +41,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: jupyterhub
-  namespace: uwv-platform
+  namespace: odap-platform
 subjects:
   - kind: ServiceAccount
     name: jupyterhub
-    namespace: uwv-platform
+    namespace: odap-platform
 roleRef:
   kind: Role
   name: jupyterhub

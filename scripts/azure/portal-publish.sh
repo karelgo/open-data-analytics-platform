@@ -17,7 +17,7 @@ error() { printf '\033[1;31mFAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
 ctx="$(kubectl config current-context 2>/dev/null || true)"
 case "$ctx" in
-  uwv-platform-aks|*aks*) ;;
+  odap-platform-aks|*aks*) ;;
   *) error "kubectl context is '$ctx', not the AKS cluster. Run: make aks-context" ;;
 esac
 
@@ -42,13 +42,13 @@ log "Apply ConfigMap platform-landing-dist (binaryData)"
 # kubectl apply records the whole resource as a metadata annotation (limit
 # 256 KB) — so for >256 KB tarballs we delete-and-create instead. The
 # Deployment is rolled in the next step regardless, so the brief gap is fine.
-kubectl -n uwv-platform delete configmap platform-landing-dist --ignore-not-found >/dev/null
-kubectl -n uwv-platform create configmap platform-landing-dist \
+kubectl -n odap-platform delete configmap platform-landing-dist --ignore-not-found >/dev/null
+kubectl -n odap-platform create configmap platform-landing-dist \
   --from-file=portal-dist.tar.gz="$TMP/portal-dist.tar.gz" >/dev/null
 
 log "Roll the Deployment so the initContainer re-extracts the new tarball"
-kubectl -n uwv-platform patch deployment platform-landing \
-  --type=merge -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"portal.uwv-platform/dist-checksum\":\"$CHECKSUM\"}}}}}" >/dev/null
-kubectl -n uwv-platform rollout status deploy/platform-landing --timeout=120s
+kubectl -n odap-platform patch deployment platform-landing \
+  --type=merge -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"portal.odap/dist-checksum\":\"$CHECKSUM\"}}}}}" >/dev/null
+kubectl -n odap-platform rollout status deploy/platform-landing --timeout=120s
 
-log "Done. Browse https://platform.uwv-platform.cloud:8443/"
+log "Done. Browse https://platform.odap-platform.cloud:8443/"

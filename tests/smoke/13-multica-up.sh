@@ -18,9 +18,9 @@ skip() { printf '  [SKIP] %s\n' "$*"; }
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 
 DEPLOYMENT_MODE="${DEPLOYMENT_MODE:-${MODE:-k3d}}"
-PLATFORM_DOMAIN="${PLATFORM_DOMAIN:-uwv-platform.local}"
+PLATFORM_DOMAIN="${PLATFORM_DOMAIN:-odap.local}"
 
-NS=uwv-platform
+NS=odap-platform
 
 if ! kubectl -n "$NS" get deployment multica-backend >/dev/null 2>&1; then
   skip "multica-backend Deployment not in $NS — run 'make deploy-platform' (LAYERS includes 17-multica)"

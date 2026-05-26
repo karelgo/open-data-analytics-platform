@@ -5,7 +5,7 @@
 #   1. Cluster bereikbaar
 #   2. Verwachte namespaces aanwezig
 #   3. Helm-releases up
-#   4. Keycloak UWV-realm imported (HTTP-discovery endpoint reachable)
+#   4. Keycloak ODAP realm imported (HTTP-discovery endpoint reachable)
 #   5. MinIO buckets aangemaakt
 #   6. Stackable operators Ready
 #   7. cert-manager ClusterIssuer Ready
@@ -20,7 +20,7 @@ kubectl cluster-info >/dev/null || fail "kubectl cluster-info werkt niet"
 pass "kubectl cluster bereikbaar ($(kubectl config current-context))"
 
 # 2. Namespaces
-for ns in cert-manager ingress-nginx uwv-platform uwv-data uwv-auth uwv-monitoring stackable-operators; do
+for ns in cert-manager ingress-nginx odap-platform odap-data odap-auth odap-monitoring stackable-operators; do
   kubectl get namespace "$ns" >/dev/null 2>&1 || fail "namespace $ns ontbreekt"
 done
 pass "verwachte namespaces aanwezig"
@@ -29,10 +29,10 @@ pass "verwachte namespaces aanwezig"
 required_releases=(
   "cert-manager:cert-manager"
   "ingress-nginx:ingress-nginx"
-  "uwv-data:postgres"
-  "uwv-platform:minio"
-  "uwv-auth:keycloak"
-  "uwv-monitoring:prometheus"
+  "odap-data:postgres"
+  "odap-platform:minio"
+  "odap-auth:keycloak"
+  "odap-monitoring:prometheus"
 )
 for entry in "${required_releases[@]}"; do
   ns="${entry%%:*}"
@@ -45,26 +45,26 @@ for entry in "${required_releases[@]}"; do
 done
 
 # 4. ClusterIssuer ready
-if kubectl get clusterissuer uwv-platform-issuer >/dev/null 2>&1; then
-  if kubectl get clusterissuer uwv-platform-issuer -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' | grep -q True; then
-    pass "ClusterIssuer uwv-platform-issuer Ready"
+if kubectl get clusterissuer platform-issuer >/dev/null 2>&1; then
+  if kubectl get clusterissuer platform-issuer -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' | grep -q True; then
+    pass "ClusterIssuer platform-issuer Ready"
   else
-    fail "ClusterIssuer uwv-platform-issuer NIET Ready"
+    fail "ClusterIssuer platform-issuer NIET Ready"
   fi
 else
-  fail "ClusterIssuer uwv-platform-issuer ontbreekt"
+  fail "ClusterIssuer platform-issuer ontbreekt"
 fi
 
 # 5. MinIO buckets (via mc-job hook in chart)
 log "Check MinIO buckets via API"
-mc_pod=$(kubectl -n uwv-platform get pod -l app=minio -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+mc_pod=$(kubectl -n odap-platform get pod -l app=minio -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
 if [[ -n "$mc_pod" ]]; then
   # MinIO is TLS-enabled; the in-pod 'local' alias is http and stale. Configure
   # an https alias on the fly using the chart's MINIO_ROOT_USER/PASSWORD env.
-  buckets=$(kubectl -n uwv-platform exec "$mc_pod" -- sh -c \
+  buckets=$(kubectl -n odap-platform exec "$mc_pod" -- sh -c \
     'mc --insecure alias set s3 https://localhost:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null 2>&1; mc --insecure ls s3/' 2>/dev/null \
     | awk '{print $NF}' | tr -d '/' | sort)
-  for b in uwv-bronze uwv-silver uwv-gold uwv-sensitive uwv-staging uwv-checkpoints uwv-meta; do
+  for b in odap-bronze odap-silver odap-gold sensitive odap-staging odap-checkpoints odap-meta; do
     if echo "$buckets" | grep -qx "$b"; then
       pass "bucket $b bestaat"
     else
@@ -89,10 +89,10 @@ fi
 
 # 7. Keycloak OIDC discovery
 log "Keycloak OIDC discovery (in-cluster)"
-discovery=$(kubectl -n uwv-auth run kc-test-$RANDOM \
+discovery=$(kubectl -n odap-auth run kc-test-$RANDOM \
   --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
   curl -fsSL --max-time 10 \
-    "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/.well-known/openid-configuration" \
+    "http://keycloak.odap-auth.svc.cluster.local/realms/odap/.well-known/openid-configuration" \
   2>/dev/null | head -c 200 || true)
 if echo "$discovery" | grep -q '"issuer"'; then
   pass "Keycloak realm 'uwv' beantwoordt OIDC-discovery"
@@ -106,7 +106,7 @@ fi
 log "Foundation services (fase 2) — als reeds applied"
 
 ready_or_skip() {
-  local kind="$1" name="$2" ns="${3:-uwv-platform}"
+  local kind="$1" name="$2" ns="${3:-odap-platform}"
   if ! kubectl -n "$ns" get "$kind" "$name" >/dev/null 2>&1; then
     printf "  [SKIP] %s/%s — nog niet applied (run 'make deploy-platform')\n" "$kind" "$name"
     return 0
@@ -120,9 +120,9 @@ ready_or_skip() {
   fi
 }
 
-ready_or_skip zookeepercluster uwv-zookeeper
-ready_or_skip hivecluster uwv-hive
-ready_or_skip kafkacluster uwv-kafka
+ready_or_skip zookeepercluster zookeeper
+ready_or_skip hivecluster hive
+ready_or_skip kafkacluster kafka
 
 # Stackable-CRDs aanwezig (basisset uit release.yaml)
 log "Stackable CRD-installatie check"
@@ -161,10 +161,10 @@ log "Foundation custom resources (skip indien afwezig)"
 for r in \
   "secretclass/s3-credentials-minio:" \
   "secretclass/oidc-client-credentials:" \
-  "authenticationclass/keycloak-uwv:" \
-  "s3connection/s3-minio:uwv-platform" \
-  "zookeepercluster/uwv-zookeeper:uwv-platform" \
-  "zookeeperznode/uwv-zookeeper-znode-kafka:uwv-platform"
+  "authenticationclass/keycloak:" \
+  "s3connection/s3-minio:odap-platform" \
+  "zookeepercluster/zookeeper:odap-platform" \
+  "zookeeperznode/zookeeper-znode-kafka:odap-platform"
 do
   kind_name="${r%%:*}"
   ns="${r##*:}"

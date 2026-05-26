@@ -1,5 +1,5 @@
 /* ============================================================
-   UWV Platform Portal — design tokens
+   ODAP Portal — design tokens
    ============================================================
    Single source of truth for colors, spacing, radii, typography.
    Components reference these via var(--token-name); never put

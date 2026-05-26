@@ -24,4 +24,4 @@ primary:
   # cloud PVCs). Helm deep-merges maps, so we null the specific key.
   initdb:
     scripts:
-      00-uwv-databases.sql: null
+      00-odap-databases.sql: null

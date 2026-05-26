@@ -1,7 +1,7 @@
 {
-  "realm": "uwv",
-  "displayName": "UWV Reference Platform",
-  "displayNameHtml": "<b>UWV</b> Reference Platform",
+  "realm": "odap",
+  "displayName": "Open Data & Analytics Platform",
+  "displayNameHtml": "<b>ODAP</b> Reference Platform",
   "enabled": true,
   "sslRequired": "external",
   "registrationAllowed": false,
@@ -35,11 +35,11 @@
     "Google Authenticator"
   ],
   "defaultRole": {
-    "name": "default-roles-uwv",
+    "name": "default-roles-odap",
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,
-    "containerId": "uwv"
+    "containerId": "odap"
   },
   "roles": {
     "realm": [
@@ -89,7 +89,7 @@
       },
       {
         "name": "csv_uploader",
-        "description": "Mag CSV-bestanden uploaden naar uwv-staging/incoming/ via de portal. Mapt op MinIO-policy 'csv-uploader'."
+        "description": "Mag CSV-bestanden uploaden naar odap-staging/incoming/ via de portal. Mapt op MinIO-policy 'csv-uploader'."
       }
     ]
   },
@@ -100,11 +100,11 @@
       "emailVerified": true,
       "firstName": "WIA",
       "lastName": "Beoordelaar",
-      "email": "wia.beoordelaar@uwv-platform.local",
+      "email": "wia.beoordelaar@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Wia2026",
+          "value": "odap-dev-only-CHANGE-ME-Wia2026",
           "temporary": false
         }
       ],
@@ -118,11 +118,11 @@
       "emailVerified": true,
       "firstName": "WW",
       "lastName": "Handhaver",
-      "email": "ww.handhaver@uwv-platform.local",
+      "email": "ww.handhaver@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Ww2026",
+          "value": "odap-dev-only-CHANGE-ME-Ww2026",
           "temporary": false
         }
       ],
@@ -136,11 +136,11 @@
       "emailVerified": true,
       "firstName": "Wajong",
       "lastName": "Arbeidsdeskundige",
-      "email": "wajong.arbeidsdeskundige@uwv-platform.local",
+      "email": "wajong.arbeidsdeskundige@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Wajong2026",
+          "value": "odap-dev-only-CHANGE-ME-Wajong2026",
           "temporary": false
         }
       ],
@@ -157,11 +157,11 @@
       "emailVerified": true,
       "firstName": "CRM",
       "lastName": "Medewerker",
-      "email": "crm.medewerker@uwv-platform.local",
+      "email": "crm.medewerker@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Crm2026",
+          "value": "odap-dev-only-CHANGE-ME-Crm2026",
           "temporary": false
         }
       ],
@@ -175,11 +175,11 @@
       "emailVerified": true,
       "firstName": "FEZ",
       "lastName": "Analist",
-      "email": "fez.analist@uwv-platform.local",
+      "email": "fez.analist@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Fez2026",
+          "value": "odap-dev-only-CHANGE-ME-Fez2026",
           "temporary": false
         }
       ],
@@ -193,11 +193,11 @@
       "emailVerified": true,
       "firstName": "Data",
       "lastName": "Steward",
-      "email": "data.steward@uwv-platform.local",
+      "email": "data.steward@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Steward2026",
+          "value": "odap-dev-only-CHANGE-ME-Steward2026",
           "temporary": false
         }
       ],
@@ -215,11 +215,11 @@
       "emailVerified": true,
       "firstName": "Data",
       "lastName": "Engineer",
-      "email": "data.engineer@uwv-platform.local",
+      "email": "data.engineer@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Engineer2026",
+          "value": "odap-dev-only-CHANGE-ME-Engineer2026",
           "temporary": false
         }
       ],
@@ -240,11 +240,11 @@
       "emailVerified": true,
       "firstName": "Platform",
       "lastName": "Admin",
-      "email": "platform.admin@uwv-platform.local",
+      "email": "platform.admin@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Admin2026",
+          "value": "odap-dev-only-CHANGE-ME-Admin2026",
           "temporary": false
         }
       ],
@@ -265,11 +265,11 @@
       "emailVerified": true,
       "firstName": "UC09",
       "lastName": "Researcher",
-      "email": "researcher@uwv-platform.local",
+      "email": "researcher@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Researcher2026",
+          "value": "odap-dev-only-CHANGE-ME-Researcher2026",
           "temporary": false
         }
       ],
@@ -283,11 +283,11 @@
       "emailVerified": true,
       "firstName": "SMZ",
       "lastName": "Planner",
-      "email": "smz.planner@uwv-platform.local",
+      "email": "smz.planner@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Smz2026",
+          "value": "odap-dev-only-CHANGE-ME-Smz2026",
           "temporary": false
         }
       ],
@@ -301,11 +301,11 @@
       "emailVerified": true,
       "firstName": "Proactief",
       "lastName": "Dienstverlener",
-      "email": "proactief.dienstverlener@uwv-platform.local",
+      "email": "proactief.dienstverlener@odap.local",
       "credentials": [
         {
           "type": "password",
-          "value": "uwv-dev-only-CHANGE-ME-Pdv2026",
+          "value": "odap-dev-only-CHANGE-ME-Pdv2026",
           "temporary": false
         }
       ],
@@ -335,12 +335,12 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-minio-secret",
+      "secret": "odap-dev-only-CHANGE-ME-minio-secret",
       "standardFlowEnabled": true,
       "redirectUris": [
-        "https://minio-console.uwv-platform.local:8443/oauth_callback",
-        "https://minio-console.uwv-platform.local:8443/*",
-        "http://minio-console.uwv-platform.local:8443/*"
+        "https://minio-console.odap.local:8443/oauth_callback",
+        "https://minio-console.odap.local:8443/*",
+        "http://minio-console.odap.local:8443/*"
       ],
       "webOrigins": [
         "+"
@@ -385,7 +385,7 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-trino-secret",
+      "secret": "odap-dev-only-CHANGE-ME-trino-secret",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": true,
@@ -412,16 +412,16 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-superset-secret",
+      "secret": "odap-dev-only-CHANGE-ME-superset-secret",
       "standardFlowEnabled": true,
       "redirectUris": [
-        "https://platform.uwv-platform.local:8443/superset/*",
-        "https://platform.eu-sovereigndataplatform.com/superset/*",
-        "https://platform.freshstackable.com/superset/*",
-        "https://superset.uwv-platform.local:8443/*",
-        "https://superset.uwv-platform.local/*",
-        "http://superset.uwv-platform.local:8443/*",
-        "http://superset.uwv-platform.local/*"
+        "https://platform.odap.local:8443/superset/*",
+        "https://platform.example.com/superset/*",
+        "https://platform.example.com/superset/*",
+        "https://superset.odap.local:8443/*",
+        "https://superset.odap.local/*",
+        "http://superset.odap.local:8443/*",
+        "http://superset.odap.local/*"
       ],
       "webOrigins": [
         "+"
@@ -440,16 +440,16 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-airflow-secret",
+      "secret": "odap-dev-only-CHANGE-ME-airflow-secret",
       "standardFlowEnabled": true,
       "redirectUris": [
-        "https://platform.uwv-platform.local:8443/airflow/*",
-        "https://platform.eu-sovereigndataplatform.com/airflow/*",
-        "https://platform.freshstackable.com/airflow/*",
-        "https://airflow.uwv-platform.local:8443/*",
-        "https://airflow.uwv-platform.local/*",
-        "http://airflow.uwv-platform.local:8443/*",
-        "http://airflow.uwv-platform.local/*"
+        "https://platform.odap.local:8443/airflow/*",
+        "https://platform.example.com/airflow/*",
+        "https://platform.example.com/airflow/*",
+        "https://airflow.odap.local:8443/*",
+        "https://airflow.odap.local/*",
+        "http://airflow.odap.local:8443/*",
+        "http://airflow.odap.local/*"
       ],
       "webOrigins": [
         "+"
@@ -468,7 +468,7 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-nifi-secret",
+      "secret": "odap-dev-only-CHANGE-ME-nifi-secret",
       "standardFlowEnabled": true,
       "redirectUris": [
         "https://localhost:8443/*"
@@ -490,13 +490,13 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-openmetadata-secret",
+      "secret": "odap-dev-only-CHANGE-ME-openmetadata-secret",
       "standardFlowEnabled": true,
       "redirectUris": [
-        "https://openmetadata.uwv-platform.local:8443/*",
-        "https://openmetadata.uwv-platform.local/*",
-        "http://openmetadata.uwv-platform.local:8443/*",
-        "http://openmetadata.uwv-platform.local/*"
+        "https://openmetadata.odap.local:8443/*",
+        "https://openmetadata.odap.local/*",
+        "http://openmetadata.odap.local:8443/*",
+        "http://openmetadata.odap.local/*"
       ],
       "webOrigins": [
         "+"
@@ -517,24 +517,24 @@
     },
     {
       "clientId": "portal",
-      "name": "UWV Platform Portal",
+      "name": "ODAP Portal",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-portal-secret",
+      "secret": "odap-dev-only-CHANGE-ME-portal-secret",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
       "redirectUris": [
-        "https://platform.uwv-platform.local:8443/oauth2/callback",
-        "https://platform.uwv-platform.local/oauth2/callback"
+        "https://platform.odap.local:8443/oauth2/callback",
+        "https://platform.odap.local/oauth2/callback"
       ],
       "webOrigins": [
-        "https://platform.uwv-platform.local:8443",
-        "https://platform.uwv-platform.local"
+        "https://platform.odap.local:8443",
+        "https://platform.odap.local"
       ],
       "attributes": {
-        "post.logout.redirect.uris": "https://platform.uwv-platform.local:8443/*##https://platform.uwv-platform.local/*"
+        "post.logout.redirect.uris": "https://platform.odap.local:8443/*##https://platform.odap.local/*"
       },
       "defaultClientScopes": [
         "web-origins",
@@ -615,7 +615,7 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-portal-backend-secret",
+      "secret": "odap-dev-only-CHANGE-ME-portal-backend-secret",
       "standardFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": true,
@@ -637,7 +637,7 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-om-access-bridge-secret",
+      "secret": "odap-dev-only-CHANGE-ME-om-access-bridge-secret",
       "standardFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": true,
@@ -670,31 +670,31 @@
     },
     {
       "clientId": "jupyter",
-      "name": "UWV Lab (Jupyter)",
-      "description": "OIDC-client voor JupyterHub OAuthenticator op https://jupyter.uwv-platform.local — per-user notebook-pods met identiteit gekoppeld aan OPA-policy.",
+      "name": "ODAP Lab (Jupyter)",
+      "description": "OIDC-client voor JupyterHub OAuthenticator op https://jupyter.odap.local — per-user notebook-pods met identiteit gekoppeld aan OPA-policy.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-jupyter-secret",
+      "secret": "odap-dev-only-CHANGE-ME-jupyter-secret",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
       "redirectUris": [
-        "https://platform.uwv-platform.local:8443/jupyter/hub/oauth_callback",
-        "https://platform.eu-sovereigndataplatform.com/jupyter/hub/oauth_callback",
-        "https://platform.freshstackable.com/jupyter/hub/oauth_callback",
-        "https://jupyter.uwv-platform.local:8443/hub/oauth_callback",
-        "https://jupyter.uwv-platform.local/hub/oauth_callback"
+        "https://platform.odap.local:8443/jupyter/hub/oauth_callback",
+        "https://platform.example.com/jupyter/hub/oauth_callback",
+        "https://platform.example.com/jupyter/hub/oauth_callback",
+        "https://jupyter.odap.local:8443/hub/oauth_callback",
+        "https://jupyter.odap.local/hub/oauth_callback"
       ],
       "webOrigins": [
-        "https://platform.uwv-platform.local:8443",
-        "https://platform.eu-sovereigndataplatform.com",
-        "https://platform.freshstackable.com",
-        "https://jupyter.uwv-platform.local:8443",
-        "https://jupyter.uwv-platform.local"
+        "https://platform.odap.local:8443",
+        "https://platform.example.com",
+        "https://platform.example.com",
+        "https://jupyter.odap.local:8443",
+        "https://jupyter.odap.local"
       ],
       "attributes": {
-        "post.logout.redirect.uris": "https://platform.uwv-platform.local:8443/jupyter/*##https://platform.eu-sovereigndataplatform.com/jupyter/*##https://platform.freshstackable.com/jupyter/*##https://jupyter.uwv-platform.local:8443/*##https://jupyter.uwv-platform.local/*"
+        "post.logout.redirect.uris": "https://platform.odap.local:8443/jupyter/*##https://platform.example.com/jupyter/*##https://platform.example.com/jupyter/*##https://jupyter.odap.local:8443/*##https://jupyter.odap.local/*"
       },
       "defaultClientScopes": [
         "web-origins",
@@ -706,25 +706,25 @@
     },
     {
       "clientId": "multica",
-      "name": "UWV Platform — Multica",
-      "description": "OIDC-client voor de oauth2-proxy voor https://multica.uwv-platform.local — gates de Next.js bundle (front-door SSO). Multica's eigen email-code login draait nog op API-niveau.",
+      "name": "ODAP Platform — Multica",
+      "description": "OIDC-client voor de oauth2-proxy voor https://multica.odap.local — gates de Next.js bundle (front-door SSO). Multica's eigen email-code login draait nog op API-niveau.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-multica-secret",
+      "secret": "odap-dev-only-CHANGE-ME-multica-secret",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
       "redirectUris": [
-        "https://multica.uwv-platform.local:8443/oauth2/callback",
-        "https://multica.uwv-platform.local/oauth2/callback"
+        "https://multica.odap.local:8443/oauth2/callback",
+        "https://multica.odap.local/oauth2/callback"
       ],
       "webOrigins": [
-        "https://multica.uwv-platform.local:8443",
-        "https://multica.uwv-platform.local"
+        "https://multica.odap.local:8443",
+        "https://multica.odap.local"
       ],
       "attributes": {
-        "post.logout.redirect.uris": "https://multica.uwv-platform.local:8443/*##https://multica.uwv-platform.local/*"
+        "post.logout.redirect.uris": "https://multica.odap.local:8443/*##https://multica.odap.local/*"
       },
       "defaultClientScopes": [
         "web-origins",
@@ -768,30 +768,30 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "uwv-dev-only-CHANGE-ME-grafana-secret",
+      "secret": "odap-dev-only-CHANGE-ME-grafana-secret",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
       "redirectUris": [
-        "https://platform.uwv-platform.local:8443/grafana/login/generic_oauth",
-        "https://platform.eu-sovereigndataplatform.com/grafana/login/generic_oauth",
-        "https://platform.freshstackable.com/grafana/login/generic_oauth",
-        "https://grafana.uwv-platform.local:8443/login/generic_oauth",
-        "https://grafana.uwv-platform.local/login/generic_oauth",
-        "https://grafana.eu-sovereigndataplatform.com/login/generic_oauth",
-        "https://grafana.freshstackable.com/login/generic_oauth"
+        "https://platform.odap.local:8443/grafana/login/generic_oauth",
+        "https://platform.example.com/grafana/login/generic_oauth",
+        "https://platform.example.com/grafana/login/generic_oauth",
+        "https://grafana.odap.local:8443/login/generic_oauth",
+        "https://grafana.odap.local/login/generic_oauth",
+        "https://grafana.example.com/login/generic_oauth",
+        "https://grafana.example.com/login/generic_oauth"
       ],
       "webOrigins": [
-        "https://platform.uwv-platform.local:8443",
-        "https://platform.eu-sovereigndataplatform.com",
-        "https://platform.freshstackable.com",
-        "https://grafana.uwv-platform.local:8443",
-        "https://grafana.uwv-platform.local",
-        "https://grafana.eu-sovereigndataplatform.com",
-        "https://grafana.freshstackable.com"
+        "https://platform.odap.local:8443",
+        "https://platform.example.com",
+        "https://platform.example.com",
+        "https://grafana.odap.local:8443",
+        "https://grafana.odap.local",
+        "https://grafana.example.com",
+        "https://grafana.example.com"
       ],
       "attributes": {
-        "post.logout.redirect.uris": "https://platform.uwv-platform.local:8443/grafana/*##https://platform.eu-sovereigndataplatform.com/grafana/*##https://platform.freshstackable.com/grafana/*##https://grafana.uwv-platform.local:8443/*##https://grafana.uwv-platform.local/*##https://grafana.eu-sovereigndataplatform.com/*##https://grafana.freshstackable.com/*"
+        "post.logout.redirect.uris": "https://platform.odap.local:8443/grafana/*##https://platform.example.com/grafana/*##https://platform.example.com/grafana/*##https://grafana.odap.local:8443/*##https://grafana.odap.local/*##https://grafana.example.com/*##https://grafana.example.com/*"
       },
       "defaultClientScopes": [
         "web-origins",

@@ -30,8 +30,8 @@ case en initieert proactief contact. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Werklijst-dashboard | https://superset.uwv-platform.local |
-| **OpenMetadata** | Definities, model-info | https://openmetadata.uwv-platform.local |
+| **Apache Superset** | Werklijst-dashboard | https://superset.odap.local |
+| **OpenMetadata** | Definities, model-info | https://openmetadata.odap.local |
 
 ---
 

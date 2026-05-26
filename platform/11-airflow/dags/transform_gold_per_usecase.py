@@ -11,7 +11,7 @@ Genereert 6 DAGs (één per UC met bestaande marts):
 Elke DAG triggert pas wanneer ALLE benodigde silver-Datasets vers zijn.
 
 Zie docs/adr/0007-airflow-pipeline-architecture.md.
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations

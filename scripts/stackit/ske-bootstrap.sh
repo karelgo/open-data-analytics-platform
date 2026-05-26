@@ -2,7 +2,7 @@
 # Bootstrap helm charts + Stackable operators on the StackIT SKE cluster.
 # Thin wrapper around scripts/bootstrap.sh --mode=stackit; the mode flag selects
 # the values-stackit.yaml overlays per chart (premium-perf*-stackit storage,
-# LoadBalancer service pinned to the reserved Floating IP, freshstackable.com
+# LoadBalancer service pinned to the reserved Floating IP, example.com
 # hostnames).
 set -euo pipefail
 
@@ -18,16 +18,16 @@ require_context
 
 bash "$ROOT/scripts/bootstrap.sh" --mode=stackit
 
-# Postgres reconcile + uwvplatform-role + databases nu in bootstrap.sh
+# Postgres reconcile + odap-role + databases nu in bootstrap.sh
 # zelf (tussen postgres-install en keycloak-install), zodat Keycloak's
-# chart de uwvplatform user vindt en niet --atomic-rollback geeft op een
+# chart de odap user vindt en niet --atomic-rollback geeft op een
 # fresh cluster. Hier alleen de OpenMetadata-mysql-secrets workaround.
 
 # Same OpenMetadata mysql-secrets workaround as AKS — the chart hardcodes that
 # secret name even when running on postgres.
 log "Create OpenMetadata mysql-secrets (workaround for chart's hardcoded name)"
-kubectl create namespace uwv-meta --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-kubectl -n uwv-meta create secret generic mysql-secrets \
+kubectl create namespace odap-meta --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+kubectl -n odap-meta create secret generic mysql-secrets \
   --from-literal=openmetadata-mysql-password="${PG_PW}" \
   --dry-run=client -o yaml | kubectl apply -f -
 
@@ -52,7 +52,7 @@ if [[ -n "${LB_IP:-}" ]]; then
     warn "Ingress IP ($LB_IP) does NOT match reserved Floating IP ($EXPECTED_IP)."
     warn "Fix infrastructure/helm/ingress-nginx/values-stackit.yaml: loadBalancerIP must equal the reserved IP."
   else
-    ok "Ingress IP matches reserved Floating IP — DNS records for *.freshstackable.com should resolve."
+    ok "Ingress IP matches reserved Floating IP — DNS records for *.example.com should resolve."
   fi
 else
   warn "LoadBalancer IP not yet allocated; run 'kubectl -n ingress-nginx get svc' later."

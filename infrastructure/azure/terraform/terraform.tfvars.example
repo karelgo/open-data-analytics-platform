@@ -7,8 +7,8 @@ tenant_id           = "REPLACE-WITH-YOUR-TENANT-ID"
 resource_group_name = "dev-stackable-rg"
 location            = "westeurope"
 
-cluster_name = "uwv-platform-aks"
-dns_prefix   = "uwv-platform"
+cluster_name = "odap-platform-aks"
+dns_prefix   = "odap-platform"
 
 # ---- System node pool (kube-system, CoreDNS, metrics-server) ----
 # Burstable B4ms (4 vCPU / 16 GiB) is ample for a dev/test cluster.

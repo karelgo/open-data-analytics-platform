@@ -2,15 +2,15 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: minio-tls-internal
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   secretName: minio-tls-internal
   issuerRef:
-    name: uwv-platform-issuer
+    name: platform-issuer
     kind: ClusterIssuer
-  commonName: minio.uwv-platform.svc.cluster.local
+  commonName: minio.odap-platform.svc.cluster.local
   dnsNames:
-    - minio.uwv-platform.svc.cluster.local
-    - minio.uwv-platform.svc
+    - minio.odap-platform.svc.cluster.local
+    - minio.odap-platform.svc
     - minio
   duration: 8760h

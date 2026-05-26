@@ -2,7 +2,7 @@
 # Add the `multica` OIDC client to the running Keycloak instance.
 #
 # Why this exists:
-#   `infrastructure/helm/keycloak/realm-uwv.json` defines the multica client
+#   `infrastructure/helm/keycloak/realm.json` defines the multica client
 #   declaratively, but Keycloak only imports the realm on FIRST startup.
 #   When the realm already exists (upgrade / re-run scenarios) the import
 #   is skipped, so the new client never lands.
@@ -14,14 +14,14 @@
 # kubectl to be pointed at the cluster.
 #
 # Vars (override if defaults don't fit):
-#   KC_NAMESPACE  default: uwv-auth
+#   KC_NAMESPACE  default: odap-auth
 #   KC_REALM      default: uwv
 #   KC_ADMIN_USER default: admin
 #   KC_ADMIN_PW_SECRET   default: keycloak (key: admin-password)
 
 set -euo pipefail
 
-KC_NAMESPACE="${KC_NAMESPACE:-uwv-auth}"
+KC_NAMESPACE="${KC_NAMESPACE:-odap-auth}"
 KC_REALM="${KC_REALM:-uwv}"
 # Bitnami Keycloak chart defaults to KEYCLOAK_ADMIN=kcadmin (not 'admin').
 # Pinned in infrastructure/helm/keycloak/values.yaml: adminUser: kcadmin.
@@ -68,29 +68,29 @@ if echo "$EXISTING" | grep -q '"clientId":"multica"'; then
   exit 0
 fi
 
-# Build the client payload (mirror of realm-uwv.json entry)
+# Build the client payload (mirror of realm.json entry)
 PAYLOAD=$(cat <<'JSON'
 {
   "clientId": "multica",
-  "name": "UWV Platform — Multica",
-  "description": "OIDC-client voor de oauth2-proxy voor https://multica.uwv-platform.local",
+  "name": "ODAP Platform — Multica",
+  "description": "OIDC-client voor de oauth2-proxy voor https://multica.odap.local",
   "enabled": true,
   "protocol": "openid-connect",
   "publicClient": false,
-  "secret": "uwv-dev-only-CHANGE-ME-multica-secret",
+  "secret": "odap-dev-only-CHANGE-ME-multica-secret",
   "standardFlowEnabled": true,
   "directAccessGrantsEnabled": false,
   "serviceAccountsEnabled": false,
   "redirectUris": [
-    "https://multica.uwv-platform.local:8443/oauth2/callback",
-    "https://multica.uwv-platform.local/oauth2/callback"
+    "https://multica.odap.local:8443/oauth2/callback",
+    "https://multica.odap.local/oauth2/callback"
   ],
   "webOrigins": [
-    "https://multica.uwv-platform.local:8443",
-    "https://multica.uwv-platform.local"
+    "https://multica.odap.local:8443",
+    "https://multica.odap.local"
   ],
   "attributes": {
-    "post.logout.redirect.uris": "https://multica.uwv-platform.local:8443/*##https://multica.uwv-platform.local/*"
+    "post.logout.redirect.uris": "https://multica.odap.local:8443/*##https://multica.odap.local/*"
   },
   "defaultClientScopes": ["web-origins", "profile", "roles", "email"],
   "fullScopeAllowed": true,

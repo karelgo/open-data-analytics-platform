@@ -14,7 +14,7 @@ models:
       doelbinding: ["statistisch_onderzoek"]
       bio_classificatie: intern
       bewaartermijn_jaren: 10
-      eigenaar: kenniscentrum_uwv
+      eigenaar: knowledge_center
       pii_kolommen: []
       risk_tier: laag
       sandbox_only: true

@@ -1,4 +1,4 @@
-# UWV Reference Data Platform — Makefile
+# Open Data & Analytics Platform — Makefile
 #
 # Top-level targets per master agent prompt §5. De zware logica zit in
 # scripts/*.sh; deze Makefile orchestreert alleen.
@@ -9,7 +9,7 @@ SHELL := /bin/bash
 .SHELLFLAGS := -euo pipefail -c
 .DEFAULT_GOAL := help
 
-CLUSTER_NAME ?= uwv-platform
+CLUSTER_NAME ?= odap-platform
 PLATFORM_CONFIG := platform-config.yaml
 
 # Deployment mode (k3d|aks). Override per invocation:  make deploy MODE=aks
@@ -65,27 +65,27 @@ deploy: ## End-to-end deploy: cluster + bootstrap + platform + portal + smoke (m
 	bash scripts/full-deploy.sh --mode=$(MODE)
 
 .PHONY: portal-image
-portal-image: ## Build uwv-platform/portal:dev (Astro static site + nginx) en importeer in lokale cluster (k3d). Skipped voor aks.
+portal-image: ## Build odap/portal:dev (Astro static site + nginx) en importeer in lokale cluster (k3d). Skipped voor aks.
 	@if [ "$(MODE)" = "aks" ]; then echo "[portal-image] mode=aks: image wordt gepublished via 'make aks-portal-publish' (ConfigMap)"; exit 0; fi
-	docker build -f portal/Dockerfile -t uwv-platform/portal:dev .
-	k3d image import uwv-platform/portal:dev -c $(CLUSTER_NAME)
+	docker build -f portal/Dockerfile -t odap/portal:dev .
+	k3d image import odap/portal:dev -c $(CLUSTER_NAME)
 	@echo "[portal-image] image gebouwd + geïmporteerd (mode=$(MODE))."
 
 .PHONY: jupyter-image
-jupyter-image: ## Build uwv-platform/jupyter-kernel:dev (JupyterLab + uwv_lab helper) en importeer in lokale cluster. Skipped voor aks.
+jupyter-image: ## Build odap/jupyter-kernel:dev (JupyterLab + odap_lab helper) en importeer in lokale cluster. Skipped voor aks.
 	@if [ "$(MODE)" = "aks" ]; then echo "[jupyter-image] mode=aks: image wordt uit een registry getrokken — skip lokale build"; exit 0; fi
-	docker build -t uwv-platform/jupyter-kernel:dev -f infrastructure/jupyter/kernel-python/Dockerfile .
-	k3d image import uwv-platform/jupyter-kernel:dev -c $(CLUSTER_NAME)
+	docker build -t odap/jupyter-kernel:dev -f infrastructure/jupyter/kernel-python/Dockerfile .
+	k3d image import odap/jupyter-kernel:dev -c $(CLUSTER_NAME)
 	@echo "[jupyter-image] image gebouwd + geïmporteerd (mode=$(MODE))."
 
 .PHONY: nanitics-image
-nanitics-image: ## Build uwv-platform/nanitics-observatory:dev (FastAPI + nanitics SDK + watcher). Skipped voor aks.
+nanitics-image: ## Build odap/nanitics-observatory:dev (FastAPI + nanitics SDK + watcher). Skipped voor aks.
 	@if [ "$(MODE)" = "aks" ]; then echo "[nanitics-image] mode=aks: skip — pull from registry (TODO: aks-nanitics-publish target)"; exit 0; fi
 	bash platform/19-nanitics-observatory/build-and-load.sh
 	@echo "[nanitics-image] image gebouwd + geïmporteerd (mode=$(MODE))."
 
 .PHONY: multica-daemon-image
-multica-daemon-image: ## Build uwv-platform/multica-daemon:dev (multica CLI + Codex bound to Foundry). Skipped voor aks.
+multica-daemon-image: ## Build odap/multica-daemon:dev (multica CLI + Codex bound to Foundry). Skipped voor aks.
 	@if [ "$(MODE)" = "aks" ]; then echo "[multica-daemon-image] mode=aks: skip — pull from registry (TODO: aks-multica-daemon-publish target)"; exit 0; fi
 	bash platform/20-multica-daemon/build-and-load.sh
 	@echo "[multica-daemon-image] image gebouwd + geïmporteerd (mode=$(MODE))."
@@ -96,9 +96,9 @@ multica-bootstrap: ## Na een Multica-reset: workspace + labels seeden, watcher c
 
 .PHONY: portal-publish-dbt-docs
 portal-publish-dbt-docs: dbt-docs-offline portal-image ## Genereer dbt-docs → bake in portal-image → rollout (k3d)
-	kubectl -n uwv-platform rollout restart deploy/portal
-	kubectl -n uwv-platform rollout status  deploy/portal --timeout=120s
-	@echo "[portal-publish-dbt-docs] klaar — open https://platform.uwv-platform.local:8443/dbt-docs.html"
+	kubectl -n odap-platform rollout restart deploy/portal
+	kubectl -n odap-platform rollout status  deploy/portal --timeout=120s
+	@echo "[portal-publish-dbt-docs] klaar — open https://platform.odap.local:8443/dbt-docs.html"
 
 .PHONY: pdf-uc11
 pdf-uc11: ## Exporteer UC-11 docs (UC-spec + walkthrough) naar PDF (Chrome headless)
@@ -107,7 +107,7 @@ pdf-uc11: ## Exporteer UC-11 docs (UC-spec + walkthrough) naar PDF (Chrome headl
 	@echo "[pdf-uc11] PDFs naast de .md-bronnen in docs/use-cases/"
 
 .PHONY: deck-uc11
-deck-uc11: ## Bouw UC-11 PowerPoint-deck (12 slides, donker UWV-amber thema)
+deck-uc11: ## Bouw UC-11 PowerPoint-deck (12 slides, donker platform-amber thema)
 	@command -v node >/dev/null 2>&1 || { echo "node niet gevonden — installeer Node.js"; exit 1; }
 	@if [ ! -d /tmp/uc11-deck/node_modules/pptxgenjs ]; then \
 	  echo "[deck-uc11] eerste run — pptxgenjs installeren in /tmp/uc11-deck/"; \
@@ -124,19 +124,19 @@ render-catalogs: ## Render Trino-catalog templates op basis van platform-config.
 opa-test: ## Run opa fmt + opa test op opa-policies-src/ (data wrapped onder Stackable bundle-pad)
 	@command -v opa >/dev/null 2>&1 || { echo "opa niet geïnstalleerd — zie scripts/doctor.sh"; exit 1; }
 	opa fmt --diff opa-policies-src/trino/
-	@python3 scripts/opa-test-data-wrap.py --dst /tmp/uwv-opa-test-data.json
-	opa test opa-policies-src/trino/ /tmp/uwv-opa-test-data.json -v
+	@python3 scripts/opa-test-data-wrap.py --dst /tmp/opa-test-data.json
+	opa test opa-policies-src/trino/ /tmp/opa-test-data.json -v
 
 .PHONY: opa-bundle
 opa-bundle: opa-test ## Build OPA-bundle: sync rego + data naar platform/10-opa/policies/
 	bash scripts/build-opa-bundle.sh
 
 .PHONY: dbt-image
-dbt-image: ## Build uwv/dbt-trino:1.9.0-uwv (incl. dbt-fabricspark) en importeer in lokale cluster. Voor aks: gebruik een registry.
+dbt-image: ## Build odap/dbt-trino:1.9.0 (incl. dbt-fabricspark) en importeer in lokale cluster. Voor aks: gebruik een registry.
 	@if [ "$(MODE)" = "aks" ]; then echo "[dbt-image] mode=aks: build + push naar de Azure container registry, daarna 'helm upgrade' op de Cosmos image-tag"; exit 0; fi
 	@cp infrastructure/airflow/dbt/profiles.yml dbt/profiles.yml
-	docker build -t uwv/dbt-trino:1.9.0-uwv -f infrastructure/airflow/dbt/Dockerfile dbt
-	k3d image import uwv/dbt-trino:1.9.0-uwv -c $(CLUSTER_NAME)
+	docker build -t odap/dbt-trino:1.9.0 -f infrastructure/airflow/dbt/Dockerfile dbt
+	k3d image import odap/dbt-trino:1.9.0 -c $(CLUSTER_NAME)
 	@echo "Image geïmporteerd (mode=$(MODE)). Cosmos KPO sub-pods pakken 'm bij volgende dbt-task run."
 
 .PHONY: uc11-multiplatform-secret
@@ -145,37 +145,37 @@ uc11-multiplatform-secret: ## Maak/refresh K8s Secret uc11-multiplatform-creds v
 	  echo "[uc11-multiplatform-secret] secrets/local/uc11-multiplatform.env ontbreekt — kopieer template uit platform/11-airflow/uc11-multiplatform-secret.yaml en vul SP-creds in."; \
 	  exit 1; \
 	fi
-	kubectl -n uwv-platform create secret generic uc11-multiplatform-creds \
+	kubectl -n odap-platform create secret generic uc11-multiplatform-creds \
 	  --from-env-file=secrets/local/uc11-multiplatform.env \
 	  --dry-run=client -o yaml | kubectl apply -f -
-	@echo "Secret uc11-multiplatform-creds bijgewerkt in uwv-platform. fabric_dbt_gold pod leest hier de FABRIC_* env-vars uit."
+	@echo "Secret uc11-multiplatform-creds bijgewerkt in odap-platform. fabric_dbt_gold pod leest hier de FABRIC_* env-vars uit."
 
 .PHONY: om-bridge-image
-om-bridge-image: ## Build uwv-platform/om-access-bridge:dev en importeer in k3d
+om-bridge-image: ## Build odap/om-access-bridge:dev en importeer in k3d
 	bash platform/18-om-access-bridge/build-and-load.sh
 
 .PHONY: deploy-om-bridge
 deploy-om-bridge: om-bridge-image ## Deploy de OM→Keycloak access-bridge (ADR-0008) — incl. Keycloak-client + OM-subscription setup
-	@if ! kubectl -n uwv-platform get secret om-access-bridge-secret >/dev/null 2>&1; then \
+	@if ! kubectl -n odap-platform get secret om-access-bridge-secret >/dev/null 2>&1; then \
 	  echo "[deploy-om-bridge] om-access-bridge-secret bestaat nog niet — bootstrappen met dev-placeholders."; \
 	  echo "                    Voor productie: zie platform/18-om-access-bridge/secret.yaml"; \
-	  OM_JWT="$$(kubectl -n uwv-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' 2>/dev/null | base64 -d)"; \
+	  OM_JWT="$$(kubectl -n odap-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' 2>/dev/null | base64 -d)"; \
 	  if [ -z "$$OM_JWT" ]; then echo "[deploy-om-bridge] WAARSCHUWING: openmetadata-admin secret nog niet aanwezig — OM_ADMIN_TOKEN wordt placeholder; /api/request zal 500 geven tot bridge re-deployed met token."; OM_JWT="REPLACE-WITH-JWT-FROM-openmetadata-admin-SECRET"; fi; \
-	  kubectl -n uwv-platform create secret generic om-access-bridge-secret \
-	    --from-literal=KEYCLOAK_CLIENT_SECRET='uwv-dev-only-CHANGE-ME-om-access-bridge-secret' \
-	    --from-literal=OM_WEBHOOK_SECRET='uwv-dev-only-CHANGE-ME-om-webhook-secret' \
+	  kubectl -n odap-platform create secret generic om-access-bridge-secret \
+	    --from-literal=KEYCLOAK_CLIENT_SECRET='odap-dev-only-CHANGE-ME-om-access-bridge-secret' \
+	    --from-literal=OM_WEBHOOK_SECRET='odap-dev-only-CHANGE-ME-om-webhook-secret' \
 	    --from-literal=OM_ADMIN_TOKEN="$$OM_JWT"; \
-	elif ! kubectl -n uwv-platform get secret om-access-bridge-secret -o jsonpath='{.data.OM_ADMIN_TOKEN}' 2>/dev/null | grep -q .; then \
+	elif ! kubectl -n odap-platform get secret om-access-bridge-secret -o jsonpath='{.data.OM_ADMIN_TOKEN}' 2>/dev/null | grep -q .; then \
 	  echo "[deploy-om-bridge] secret bestaat maar OM_ADMIN_TOKEN ontbreekt — patchen."; \
-	  OM_JWT="$$(kubectl -n uwv-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' | base64 -d)"; \
-	  kubectl -n uwv-platform patch secret om-access-bridge-secret --type=json -p="[{\"op\":\"add\",\"path\":\"/data/OM_ADMIN_TOKEN\",\"value\":\"$$(printf %s "$$OM_JWT" | base64)\"}]"; \
+	  OM_JWT="$$(kubectl -n odap-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' | base64 -d)"; \
+	  kubectl -n odap-platform patch secret om-access-bridge-secret --type=json -p="[{\"op\":\"add\",\"path\":\"/data/OM_ADMIN_TOKEN\",\"value\":\"$$(printf %s "$$OM_JWT" | base64)\"}]"; \
 	fi
 	@if [ -d "platform-overlays/$(MODE)/18-om-access-bridge" ]; then \
 	  kubectl apply -k "platform-overlays/$(MODE)/18-om-access-bridge"; \
 	else \
 	  kubectl apply -k platform/18-om-access-bridge/; \
 	fi
-	kubectl -n uwv-platform rollout status deploy/om-access-bridge --timeout=120s
+	kubectl -n odap-platform rollout status deploy/om-access-bridge --timeout=120s
 	@echo "[deploy-om-bridge] Idempotent setup van Keycloak-client + OM-subscription"
 	bash scripts/setup-om-bridge-keycloak.sh
 	bash scripts/setup-om-bridge-subscription.sh
@@ -265,7 +265,7 @@ DBT ?= $(shell test -x $$HOME/.dbt-core-venv/bin/dbt && echo $$HOME/.dbt-core-ve
 # CA-bundle voor TLS-verify naar Trino. dbt-trino's `cert:`-setting wordt op
 # sommige paden genegeerd; via REQUESTS_CA_BUNDLE/SSL_CERT_FILE gebeurt het
 # zeker. Pad komt overeen met de fallback in dbt/profiles.yml.
-TRINO_TLS_CERT_PATH ?= $$HOME/.uwv-platform-ca.crt
+TRINO_TLS_CERT_PATH ?= $$HOME/.odap-platform-ca.crt
 
 .PHONY: dbt-docs
 dbt-docs: ## dbt docs generate --static, en sync naar portal/public/dbt-docs.html (vereist live Trino)
@@ -296,7 +296,7 @@ forward: ## Start kubectl port-forwards voor UI's (zie scripts)
 	@bash scripts/port-forward.sh
 
 .PHONY: trust-ca
-trust-ca: ## Importeer ~/.config/uwv-platform/ca/tls.crt in de macOS System Keychain (idempotent, eenmalig per machine)
+trust-ca: ## Importeer ~/.config/odap/ca/tls.crt in de macOS System Keychain (idempotent, eenmalig per machine)
 	@bash scripts/trust-ca.sh
 
 ##@ AKS (Azure)
@@ -319,7 +319,7 @@ aks-deploy: render-catalogs ## Deploy platform manifests on AKS
 
 .PHONY: aks-smoke
 aks-smoke: ## Run smoke tests against the AKS context
-	DEPLOYMENT_MODE=aks PLATFORM_DOMAIN=eu-sovereigndataplatform.com bash scripts/run-smoke-tests.sh
+	DEPLOYMENT_MODE=aks PLATFORM_DOMAIN=example.com bash scripts/run-smoke-tests.sh
 
 .PHONY: aks-all
 aks-all: aks-up aks-context aks-bootstrap aks-deploy aks-smoke ## End-to-end AKS lifecycle: up + context + bootstrap + deploy + smoke
@@ -354,7 +354,7 @@ stackit-portal-publish: ## Build portal/dist (if missing) + ship as ConfigMaps t
 
 .PHONY: stackit-smoke
 stackit-smoke: ## Run smoke tests against the StackIT context
-	KUBECONFIG="$(or $(KUBECONFIG),$(STACKIT_KUBECONFIG))" DEPLOYMENT_MODE=stackit PLATFORM_DOMAIN=freshstackable.com bash scripts/run-smoke-tests.sh
+	KUBECONFIG="$(or $(KUBECONFIG),$(STACKIT_KUBECONFIG))" DEPLOYMENT_MODE=stackit PLATFORM_DOMAIN=example.com bash scripts/run-smoke-tests.sh
 
 .PHONY: stackit-all
 stackit-all: stackit-up stackit-bootstrap stackit-deploy stackit-portal-publish stackit-smoke ## End-to-end StackIT lifecycle: cluster + helm + platform + portal + smoke (~40 min from cold)
@@ -428,7 +428,7 @@ aks-vpn-windows: ## Package VPN client cert (.pfx) + Azure profile zip for Windo
 	bash scripts/azure/vpn-windows-setup.sh
 
 .PHONY: aks-pf
-aks-pf: ## Start kubectl port-forward to AKS ingress (127.0.0.2:8443 → *.uwv-platform.cloud)
+aks-pf: ## Start kubectl port-forward to AKS ingress (127.0.0.2:8443 → *.odap-platform.cloud)
 	@bash scripts/azure/aks-pf.sh start
 
 .PHONY: aks-pf-stop

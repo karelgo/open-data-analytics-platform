@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Wrap opa-policies-src/data/uwv_role_mappings.json zodat `opa test` dezelfde
+"""Wrap opa-policies-src/data/role_mappings.json zodat `opa test` dezelfde
 data-paden ziet als de Stackable OpaCluster in productie.
 
 Stackable's opa-bundle-loader mount de ConfigMap onder
 `data.configmap["<configmap-name>"]["<namespace>"]`. Onze rego-regels lezen
-data via `data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.*`.
+data via `data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.*`.
 
 `opa test` weet niets van die conventie en laadt JSON op `data.<root>`. Dit
 script wrapt de bron-JSON in dezelfde structuur als de productie-bundle,
@@ -39,8 +39,8 @@ def main() -> int:
         default=Path(__file__).resolve().parent.parent
         / "opa-policies-src"
         / "data"
-        / "uwv_role_mappings.json",
-        help="Bron-JSON met top-level key `uwv_role_mappings`.",
+        / "role_mappings.json",
+        help="Bron-JSON met top-level key `role_mappings`.",
     )
     parser.add_argument(
         "--dst",
@@ -55,8 +55,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--namespace",
-        default="uwv-platform",
-        help="Kubernetes-namespace (default: uwv-platform).",
+        default="odap-platform",
+        help="Kubernetes-namespace (default: odap-platform).",
     )
     args = parser.parse_args()
 
@@ -71,7 +71,7 @@ def main() -> int:
     # We dubbel-publishen onder twee paden:
     #   - data.configmap[name][namespace].*  (productie-pad; Stackable convention)
     #   - data.<root keys>                   (root-pad; voor legacy tests die
-    #                                         `with data.uwv_role_mappings as ...` gebruiken)
+    #                                         `with data.role_mappings as ...` gebruiken)
     # Beide blijven consistent omdat ze van dezelfde bron komen.
     wrapped: dict = {
         "configmap": {

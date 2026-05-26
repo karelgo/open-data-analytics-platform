@@ -9,17 +9,17 @@
 # all), so it's the reliable fallback when public access is blocked.
 #
 # /etc/hosts mapping (one-time setup — run on your Mac with sudo):
-#   sudo bash -c 'echo "127.0.0.2 platform.eu-sovereigndataplatform.com \\
-#       keycloak.eu-sovereigndataplatform.com \\
-#       grafana.eu-sovereigndataplatform.com \\
-#       prometheus.eu-sovereigndataplatform.com \\
-#       minio.eu-sovereigndataplatform.com \\
-#       minio-api.eu-sovereigndataplatform.com \\
-#       superset.eu-sovereigndataplatform.com \\
-#       airflow.eu-sovereigndataplatform.com \\
-#       dbt-docs.eu-sovereigndataplatform.com" >> /etc/hosts'
+#   sudo bash -c 'echo "127.0.0.2 platform.example.com \\
+#       keycloak.example.com \\
+#       grafana.example.com \\
+#       prometheus.example.com \\
+#       minio.example.com \\
+#       minio-api.example.com \\
+#       superset.example.com \\
+#       airflow.example.com \\
+#       dbt-docs.example.com" >> /etc/hosts'
 #
-# Then browse to https://platform.eu-sovereigndataplatform.com:8443/.
+# Then browse to https://platform.example.com:8443/.
 # (Browsers warn about the cert because it's issued for port 443; accept once.)
 #
 # 127.0.0.2 is not bound to lo0 by default on macOS. This script adds it
@@ -51,7 +51,7 @@ case "$cmd" in
       exit 0
     fi
     ensure_lo_alias
-    nohup kubectl --context uwv-platform-aks -n ingress-nginx port-forward \
+    nohup kubectl --context odap-platform-aks -n ingress-nginx port-forward \
       --address "$ADDR" \
       svc/ingress-nginx-controller 8443:443 8080:80 \
       >"$LOG" 2>&1 &
@@ -60,12 +60,12 @@ case "$cmd" in
     if kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
       printf '\033[1;32mOK\033[0m  AKS port-forward running on %s:8443 / %s:8080 (pid %s)\n' "$ADDR" "$ADDR" "$(cat "$PIDFILE")"
       echo "  log:        $LOG"
-      echo "  hostnames:  https://{platform,keycloak,grafana,prometheus,minio,minio-api,superset,airflow,dbt-docs}.eu-sovereigndataplatform.com:8443"
-      if ! grep -q "eu-sovereigndataplatform.com" /etc/hosts 2>/dev/null; then
+      echo "  hostnames:  https://{platform,keycloak,grafana,prometheus,minio,minio-api,superset,airflow,dbt-docs}.example.com:8443"
+      if ! grep -q "example.com" /etc/hosts 2>/dev/null; then
         echo
         echo "  /etc/hosts is missing the .com entries. Run once:"
         echo
-        echo "    sudo bash -c 'echo \"127.0.0.2 platform.eu-sovereigndataplatform.com keycloak.eu-sovereigndataplatform.com grafana.eu-sovereigndataplatform.com prometheus.eu-sovereigndataplatform.com minio.eu-sovereigndataplatform.com minio-api.eu-sovereigndataplatform.com superset.eu-sovereigndataplatform.com airflow.eu-sovereigndataplatform.com dbt-docs.eu-sovereigndataplatform.com\" >> /etc/hosts'"
+        echo "    sudo bash -c 'echo \"127.0.0.2 platform.example.com keycloak.example.com grafana.example.com prometheus.example.com minio.example.com minio-api.example.com superset.example.com airflow.example.com dbt-docs.example.com\" >> /etc/hosts'"
       fi
     else
       echo "FAIL: port-forward died. See $LOG"

@@ -1,8 +1,8 @@
-name: uwv_data_platform
+name: odap_data_platform
 version: 0.1.0
 config-version: 2
 
-profile: uwv_trino
+profile: trino_default
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
@@ -21,17 +21,17 @@ clean-targets:
 vars:
   table_format: "{{ env_var('TABLE_FORMAT', 'delta') }}"
   # Zout voor pseudonymize-macro. DEV-only; productie via secret.
-  pseudonymize_salt: "{{ env_var('UWV_PSEUDONYMIZE_SALT', 'UWV-DEV-SALT-2026') }}"
+  pseudonymize_salt: "{{ env_var('PSEUDONYMIZE_SALT', 'ODAP-DEV-SALT') }}"
 
 # Schemas met expliciete S3-locatie pre-creëren. Stackable's Hive-Metastore
 # heeft geen globale `warehouse.dir` config; zonder expliciete schema-locatie
 # defaultet HMS naar `file:/stackable/warehouse/...` wat Trino's Delta-Lake-
 # connector niet kan schrijven ("No factory for location: file:..."). De
-# ensure_uwv_schemas() macro genereert per target de juiste statements:
+# ensure_schemas() macro genereert per target de juiste statements:
 # Trino krijgt de WITH-(location)-CREATEs, Databricks/Fabric is een no-op
 # (daar wordt schema-setup elders gedaan).
 on-run-start:
-  - "{{ ensure_uwv_schemas() }}"
+  - "{{ ensure_schemas() }}"
 
 # ----------------------------------------------------------------------
 # Model-config per laag.
@@ -43,7 +43,7 @@ on-run-start:
 # gebruiken `properties=table_format_properties()` via de macro.
 # ----------------------------------------------------------------------
 models:
-  uwv_data_platform:
+  odap_data_platform:
     +on_table_exists: replace
 
     staging:
@@ -103,7 +103,7 @@ models:
 # Seeds
 # ----------------------------------------------------------------------
 seeds:
-  uwv_data_platform:
+  odap_data_platform:
     +database: silver
     +schema: seed
     +quote_columns: false

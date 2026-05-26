@@ -4,13 +4,13 @@
 # Stappen:
 #   1. ConfigMaps maken uit data-generation/generators/ en data-generation/*.py
 #   2. Job submitten (data-generation/k8s/seed-job.yaml) — schrijft JSONL
-#      naar s3a://uwv-raw/ (Spark Structured Streaming pikt het op)
+#      naar s3a://odap-raw/ (Spark Structured Streaming pikt het op)
 #   3. Wachten tot Job complete
 #   4. Logs printen voor inspectie
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-NS="${NS:-uwv-platform}"
+NS="${NS:-odap-platform}"
 COUNT="${COUNT:-10000}"
 
 # shellcheck source=lib/log.sh
@@ -63,4 +63,4 @@ fi
 log "Job-logs:"
 kubectl -n "$NS" logs job/seed-data-generation --tail=50
 
-log "Klaar. Spark file-streaming-job pikt JSONL-files uit s3a://uwv-raw/ op (kan 1-2 min duren voor batch verschijnt)."
+log "Klaar. Spark file-streaming-job pikt JSONL-files uit s3a://odap-raw/ op (kan 1-2 min duren voor batch verschijnt)."

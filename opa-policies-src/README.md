@@ -16,13 +16,13 @@ opa-policies-src/
 ├── Makefile                    # local-test targets (fmt / test / bundle)
 ├── trino/
 │   ├── trino-base.rego         # default-deny + allow-aggregator (fase 9)
-│   ├── trino-uwv-roles.rego    # role → catalog/schema mapping
+│   ├── trino-platform-roles.rego    # role → catalog/schema mapping
 │   ├── trino-doelbinding.rego  # purpose-binding (R-AVG-05/06)
 │   ├── trino-row-filters.rego  # regio-filter, doelbinding-filter (R-BIO-11)
 │   ├── trino-column-masks.rego # PII / medisch maskeren (R-AVG-07)
 │   └── trino-*_test.rego       # rego-unit-tests per laag
 └── data/
-    └── uwv_role_mappings.json  # data-laag — wie mag wat zien
+    └── role_mappings.json  # data-laag — wie mag wat zien
 ```
 
 Trino's OPA-access-controller-spec (v2):
@@ -32,9 +32,9 @@ Trino's OPA-access-controller-spec (v2):
 
 `trino-base.rego` weigert default. `allow` wordt opgebouwd door:
 
-1. **Role-mapping** (`trino-uwv-roles.rego`) — koppelt OIDC-rol uit Keycloak
+1. **Role-mapping** (`trino-platform-roles.rego`) — koppelt OIDC-rol uit Keycloak
    aan toegestane catalogs + schemas. Bron-of-truth in
-   `data/uwv_role_mappings.json`.
+   `data/role_mappings.json`.
 2. **Doelbinding** (`trino-doelbinding.rego`) — query-purpose-claim moet
    overlappen met `meta.doelbinding` van het resource (R-AVG-05/06).
 3. **Row filters** (`trino-row-filters.rego`) — Trino voegt per query een
@@ -57,7 +57,7 @@ make opa-bundle      # test + sync naar platform/10-opa/policies/
 
 `opa` (≥ 0.60) moet op de `PATH` staan — `scripts/doctor.sh` checkt dit.
 
-## Rollen — `data/uwv_role_mappings.json`
+## Rollen — `data/role_mappings.json`
 
 JSON met één key per rol. Per rol:
 
@@ -82,7 +82,7 @@ de `OpaCluster` met de nieuwe bundle (zie
 `scripts/build-opa-bundle.sh` doet:
 
 1. `opa fmt --diff trino/` (faal als format off is).
-2. `opa test trino/ data/uwv_role_mappings.json` (faal als tests rood).
+2. `opa test trino/ data/role_mappings.json` (faal als tests rood).
 3. Sync `trino/*.rego` + `data/*.json` naar `platform/10-opa/policies/`.
 4. ConfigMap-rollout via `kubectl apply -k platform/10-opa/`.
 

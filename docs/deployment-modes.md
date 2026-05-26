@@ -9,12 +9,12 @@ end-to-end.
 |---|---|---|---|
 | Cluster type | k3d serverlb | AKS managed | SKE (Gardener) |
 | Browser port | `:8443` (serverlb→443) | `:443` (no port) | `:443` (no port) |
-| Domain | `*.uwv-platform.local` | `*.eu-sovereigndataplatform.com` | `*.freshstackable.com` |
+| Domain | `*.odap.local` | `*.example.com` | `*.example.com` |
 | Ingress controller | DaemonSet + hostNetwork | Deployment + LoadBalancer | Deployment + yawol-LB on reserved Floating IP 188.34.84.39 |
 | Storage class | `local-path` | `managed-csi` (`managed-csi-premium` for MinIO) | `storage-class-ske-csi-cinder` |
 | TLS | cert-manager + self-signed CA | cert-manager + Let's Encrypt | cert-manager + Let's Encrypt |
-| CoreDNS override | `IN A` + `IN AAAA` template (`*.uwv-platform.local` → host IP) | `coredns-custom` ConfigMap | none needed (public DNS) |
-| Public DNS | `/etc/hosts` | Azure DNS zone (CNAMEs upserted by aks-deploy.sh) | StackIT DNS zone (`freshstackable.com`, managed by Terraform) |
+| CoreDNS override | `IN A` + `IN AAAA` template (`*.odap.local` → host IP) | `coredns-custom` ConfigMap | none needed (public DNS) |
+| Public DNS | `/etc/hosts` | Azure DNS zone (CNAMEs upserted by aks-deploy.sh) | StackIT DNS zone (`example.com`, managed by Terraform) |
 | Hibernate | n/a — destroy + recreate | n/a — SKU-cost-driven | `make stackit-hibernate` / `…-wake` (workers scale to 0, PVCs + IP preserved) |
 
 ## Layers
@@ -77,7 +77,7 @@ host strings.
 ## Adding a new component
 
 1. Drop your manifests in `platform/NN-comp/` with k3d-shaped defaults
-   (`.uwv-platform.local:8443` hostnames if applicable).
+   (`.odap.local:8443` hostnames if applicable).
 2. If the component needs to change shape per mode, create
    `platform-overlays/aks/NN-comp/kustomization.yaml`:
    ```yaml
@@ -90,10 +90,10 @@ host strings.
        patch: |-
          - op: replace
            path: /spec/rules/0/host
-           value: <name>.eu-sovereigndataplatform.com
+           value: <name>.example.com
          - op: replace
            path: /spec/tls/0/hosts/0
-           value: <name>.eu-sovereigndataplatform.com
+           value: <name>.example.com
    ```
 3. Verify with `kubectl kustomize platform-overlays/aks/NN-comp/`.
 4. Add the layer to `LAYERS=` in `scripts/deploy-platform.sh` (it's

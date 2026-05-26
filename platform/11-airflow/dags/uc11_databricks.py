@@ -2,20 +2,20 @@
 
 Draait een batch-only uc11 pijplijn tegen Databricks Unity Catalog. Geen
 streaming bronze. Equivalent van uc11_fabric, maar dan tegen Databricks
-compute en UC-managed Delta tabellen (catalog: `uwv_databricks`).
+compute en UC-managed Delta tabellen (catalog: `databricks`).
 
 Tasks:
   1. databricks_seed_silver — POST /api/2.1/jobs/run-now op de uc11-pipeline
                               Job; wacht tot beide notebook-tasks (seed_bronze +
                               silver) klaar zijn. Schrijft naar
-                              uwv_databricks.bronze.* en uwv_databricks.silver.*.
+                              databricks.bronze.* en databricks.silver.*.
   2. databricks_dbt_gold    — KubernetesPodOperator: `dbt run --target
                               databricks_dev` met dbt-databricks. Bouwt
                               int_klantreis_events + 2 marts uit het échte
                               dbt-project — zelfde SQL als Trino én Fabric
                               executeren (drie engines, één dbt-project).
   3. databricks_verify      — SQL-warehouse query: row-count > 0 op
-                              uwv_databricks.gold.mart_uc11_klantreis_events.
+                              databricks.gold.mart_uc11_klantreis_events.
 
 Voorvereisten (in-cluster):
   - Kubernetes Secret 'uc11-multiplatform-creds' gemount als envFrom (heeft
@@ -24,10 +24,10 @@ Voorvereisten (in-cluster):
   - Airflow Variable 'databricks_uc11_job_id' met de Job-ID (alleen
     seed_bronze + silver tasks; dbt_gold task is verwijderd uit de Job —
     die draait nu via deze DAG's KPO).
-  - dbt-databricks zit in de uwv/dbt-trino:1.9.0-uwv image (zelfde image
+  - dbt-databricks zit in de odap/dbt-trino:1.9.0 image (zelfde image
     als fabric_dbt_gold gebruikt).
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -58,14 +58,14 @@ DEFAULT_ARGS = {
 GOLD_TABLE_FQN = f"{DATABRICKS_CATALOG}.gold.mart_uc11_klantreis_events"
 
 # Zelfde image als fabric_dbt_gold — bevat dbt-trino + dbt-fabricspark + dbt-databricks.
-# /opt/uwv/dbt/ heeft het dbt-project; /root/.dbt/profiles.yml heeft alle drie de
+# /opt/odap/dbt/ heeft het dbt-project; /root/.dbt/profiles.yml heeft alle drie de
 # targets (dev=trino, fabric_dev, databricks_dev) met env_var() substitution.
-DBT_IMAGE = "uwv/dbt-trino:1.9.0-uwv"
+DBT_IMAGE = "odap/dbt-trino:1.9.0"
 DBT_SECRET = "uc11-multiplatform-creds"
 
 # dbt-databricks run-script voor de KPO.
 #
-# Twee dingen die we adhoc fixen omdat de uwv/dbt-trino:1.9.0-uwv image
+# Twee dingen die we adhoc fixen omdat de odap/dbt-trino:1.9.0 image
 # (gedeeld met fabric_dbt_gold) initiëel alleen dbt-trino + dbt-fabricspark
 # heeft:
 #   1. `pip install dbt-databricks~=1.11.0` — komt mee in pip-cache; <15s
@@ -75,7 +75,7 @@ DBT_SECRET = "uc11-multiplatform-creds"
 # stap en kan profiles.yml gewoon de embedded versie gebruiken.
 DBT_RUN_SCRIPT = r"""
 set -euo pipefail
-cd /opt/uwv/dbt
+cd /opt/odap/dbt
 
 echo '=== install dbt-databricks adapter (niet in base image) ==='
 pip install --quiet --disable-pip-version-check 'dbt-databricks~=1.11.0'
@@ -83,7 +83,7 @@ pip install --quiet --disable-pip-version-check 'dbt-databricks~=1.11.0'
 echo '=== schrijf adhoc profiles.yml met databricks_dev target ==='
 mkdir -p /tmp/profiles
 cat > /tmp/profiles/profiles.yml <<EOF
-uwv_trino:
+trino_default:
   target: databricks_dev
   outputs:
     databricks_dev:
@@ -146,7 +146,7 @@ with DAG(
     # Symmetrisch met fabric_dbt_gold in uc11_fabric DAG.
     gold = KubernetesPodOperator(
         task_id="databricks_dbt_gold",
-        namespace="uwv-platform",
+        namespace="odap-platform",
         image=DBT_IMAGE,
         cmds=["bash", "-c"],
         arguments=[DBT_RUN_SCRIPT],

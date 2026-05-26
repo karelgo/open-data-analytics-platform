@@ -1,4 +1,4 @@
-# UWV Reference Platform — stackablectl stack-bestand.
+# Open Data & Analytics Platform — stackablectl stack-bestand.
 #
 # Stelt een herbruikbare "stack"-bundel samen die alle Stackable-CRD-resources
 # combineert. Wordt vanuit scripts/deploy-platform.sh aangeroepen voor een
@@ -8,15 +8,15 @@
 # Tip: stackablectl stack list / install / describe accepteert dit bestand.
 
 stacks:
-  uwv-platform:
+  odap-platform:
     description: |
-      UWV referentie-implementatie van het data- en analyticsplatform.
+      ODAP reference implementation van het data- en analyticsplatform.
       Bevat: Hive Metastore, Spark, Trino, OPA, Airflow, Superset.
       OpenMetadata wordt apart via Helm geïnstalleerd
       (zie infrastructure/helm/openmetadata/values.yaml).
       Kafka/NiFi/ZooKeeper zijn uitgeschakeld; UC11 gebruikt S3 raw zone
       i.p.v. een message bus.
-    stackableRelease: uwv-platform-26.3
+    stackableRelease: odap-platform-26.3
     labels:
       - uwv
       - lakehouse

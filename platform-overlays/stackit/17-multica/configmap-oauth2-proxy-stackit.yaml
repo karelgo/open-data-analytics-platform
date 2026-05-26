@@ -2,42 +2,42 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: multica-oauth2-proxy-config
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   oauth2-proxy.cfg: |
     provider                = "keycloak-oidc"
     client_id               = "multica"
-    oidc_issuer_url         = "https://keycloak.freshstackable.com/realms/uwv"
+    oidc_issuer_url         = "https://keycloak.example.com/realms/odap"
 
     skip_oidc_discovery     = true
-    login_url               = "https://keycloak.freshstackable.com/realms/uwv/protocol/openid-connect/auth"
-    redeem_url              = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/token"
-    profile_url             = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/userinfo"
-    validate_url            = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/userinfo"
-    oidc_jwks_url           = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/certs"
+    login_url               = "https://keycloak.example.com/realms/odap/protocol/openid-connect/auth"
+    redeem_url              = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/token"
+    profile_url             = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/userinfo"
+    validate_url            = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/userinfo"
+    oidc_jwks_url           = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/certs"
 
-    cookie_name             = "_uwv_multica"
+    cookie_name             = "_multica"
     cookie_secure           = true
     cookie_httponly         = true
     cookie_samesite         = "lax"
     cookie_expire           = "8h"
     cookie_refresh          = "30m"
-    cookie_domains          = ["multica.freshstackable.com"]
-    whitelist_domains       = [".freshstackable.com"]
+    cookie_domains          = ["multica.example.com"]
+    whitelist_domains       = [".example.com"]
 
     http_address            = "0.0.0.0:4180"
 
     upstreams = [
-      "http://multica-backend.uwv-platform.svc.cluster.local/api/",
-      "http://multica-backend.uwv-platform.svc.cluster.local/auth/",
-      "http://multica-backend.uwv-platform.svc.cluster.local/uploads/",
-      "http://multica-backend.uwv-platform.svc.cluster.local/ws",
-      "http://multica-backend.uwv-platform.svc.cluster.local/health",
-      "http://multica-backend.uwv-platform.svc.cluster.local/readyz",
-      "http://multica-frontend.uwv-platform.svc.cluster.local/",
+      "http://multica-backend.odap-platform.svc.cluster.local/api/",
+      "http://multica-backend.odap-platform.svc.cluster.local/auth/",
+      "http://multica-backend.odap-platform.svc.cluster.local/uploads/",
+      "http://multica-backend.odap-platform.svc.cluster.local/ws",
+      "http://multica-backend.odap-platform.svc.cluster.local/health",
+      "http://multica-backend.odap-platform.svc.cluster.local/readyz",
+      "http://multica-frontend.odap-platform.svc.cluster.local/",
     ]
 
-    redirect_url            = "https://multica.freshstackable.com/oauth2/callback"
+    redirect_url            = "https://multica.example.com/oauth2/callback"
 
     pass_user_headers       = true
     pass_access_token       = false

@@ -3,8 +3,8 @@
      preserveAspectRatio="xMidYMid meet"
      font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
      role="img"
-     aria-label="UWV Reference Data- en Analyseplatform — visuele referentie-architectuur">
-  <title>UWV Reference Data- en Analyseplatform</title>
+     aria-label="Open Data & Analytics Platform — visuele referentie-architectuur">
+  <title>Open Data & Analytics Platform</title>
   <desc>Reference-architectuur in Monte-Carlo-stijl: bronnen, ingestie, opslag en verwerking, transformatie en modellen, en BI/data-producten — met overlay-lagen voor data-discovery, pipeline-orkestratie en observability, en een identiteit-pijler aan de rechterkant.</desc>
 
   <defs>

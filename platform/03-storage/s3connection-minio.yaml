@@ -10,9 +10,9 @@ apiVersion: s3.stackable.tech/v1alpha1
 kind: S3Connection
 metadata:
   name: s3-minio
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
-  host: minio.uwv-platform.svc.cluster.local
+  host: minio.odap-platform.svc.cluster.local
   port: 9000
   accessStyle: Path   # MinIO/path-style; alternatief: VirtualHosted (AWS-style)
   credentials:

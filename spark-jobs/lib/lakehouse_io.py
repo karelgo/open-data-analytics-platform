@@ -19,11 +19,11 @@ if TYPE_CHECKING:
     from pyspark.sql import DataFrame, SparkSession
 
 TABLE_FORMAT = os.getenv("TABLE_FORMAT", "delta").lower()
-HMS_URI = os.getenv("HIVE_METASTORE_URI", "thrift://uwv-hive:9083")
+HMS_URI = os.getenv("HIVE_METASTORE_URI", "thrift://hive:9083")
 S3_ENDPOINT = os.getenv(
-    "S3_ENDPOINT", "http://minio.uwv-platform.svc.cluster.local:9000"
+    "S3_ENDPOINT", "http://minio.odap-platform.svc.cluster.local:9000"
 )
-S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", "uwvadmin")
+S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", "platformadmin")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", "")
 S3_REGION = os.getenv("S3_REGION", "eu-nl-1")
 
@@ -132,4 +132,4 @@ def ensure_bronze_schema(spark: "SparkSession") -> None:
     database-naam met dot interpreteert (geen catalog-registratie voor
     `bronze` in spark_catalog).
     """
-    spark.sql("CREATE SCHEMA IF NOT EXISTS uwv " "LOCATION 's3a://uwv-bronze/uwv/'")
+    spark.sql("CREATE SCHEMA IF NOT EXISTS uwv " "LOCATION 's3a://odap-bronze/uwv/'")

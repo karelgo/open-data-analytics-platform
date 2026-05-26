@@ -1,6 +1,6 @@
 # Ingress voor OpenSearch Dashboards (poort 5601) — de browser-UI tegenover
-# de single-node OpenSearch in uwv-meta. De REST-API zelf (port 9200) blijft
-# alleen intern bereikbaar via opensearch-uwv.uwv-meta.svc.cluster.local
+# de single-node OpenSearch in odap-meta. De REST-API zelf (port 9200) blijft
+# alleen intern bereikbaar via opensearch.odap-meta.svc.cluster.local
 # (Vector, OpenMetadata en de ILM-job gebruiken die service-DNS direct).
 # Geen auth — security is uit voor dev (zie infrastructure/helm/opensearch/values.yaml).
 ---
@@ -8,26 +8,26 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: opensearch
-  namespace: uwv-meta
+  namespace: odap-meta
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     # Iframe-allow voor portal embed-shell (cross-origin).
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["opensearch.uwv-platform.local"]
+    - hosts: ["opensearch.odap.local"]
       secretName: opensearch-tls
   rules:
-    - host: opensearch.uwv-platform.local
+    - host: opensearch.odap.local
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: opensearch-dashboards-uwv
+                name: opensearch-dashboards
                 port:
                   number: 5601

@@ -139,7 +139,7 @@ Als CI-runs failen met `401 Unauthorized` voor `smoketest`:
 1. Secret is verlopen of geroteerd zonder propagatie.
 2. Vernieuw via secret-operator:
    ```bash
-   kubectl annotate secret smoketest-oidc-secret -n uwv-platform \
+   kubectl annotate secret smoketest-oidc-secret -n odap-platform \
      stackable.tech/refresh=$(date +%s)
    ```
 3. Restart de DAG / smoke-test.

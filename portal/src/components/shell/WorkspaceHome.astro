@@ -117,7 +117,7 @@ const {
 <script>
   // Client-side persona binding for the homepage.
   //   1. SSR paints the default persona label in the hero subtitle.
-  //   2. After load: read uwv-portal-role from sessionStorage (set by
+  //   2. After load: read odap-portal-role from sessionStorage (set by
   //      ShellLayout's loadIdentity() from /oauth2/userinfo) and
   //      rewrite the hero subtitle to the real persona.
   //   3. ?persona=<role> in URL overrides for local-dev previews.
@@ -150,7 +150,7 @@ const {
   // Resolve: URL query (?persona=…) > sessionStorage > default.
   const params = new URLSearchParams(location.search);
   const urlRole = params.get('persona');
-  const storedRole = sessionStorage.getItem('uwv-portal-role');
+  const storedRole = sessionStorage.getItem('odap-portal-role');
   const role = urlRole ?? storedRole ?? 'data_engineer';
   if (PERSONA_LABELS[role]) applyPersona(role);
 
@@ -159,7 +159,7 @@ const {
   // The 'storage' event only fires cross-tab, so we also poll briefly
   // for the same-tab fetch.
   setTimeout(() => {
-    const r = sessionStorage.getItem('uwv-portal-role');
+    const r = sessionStorage.getItem('odap-portal-role');
     if (r && PERSONA_LABELS[r] && r !== role) applyPersona(r);
   }, 250);
 

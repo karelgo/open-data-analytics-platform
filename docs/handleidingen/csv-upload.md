@@ -6,13 +6,13 @@ csv_batch** pad voor bronnen met een vaste schema-spec (klanttevredenheid,
 FOCUS billing). Beide schrijven uiteindelijk Delta in bronze; het verschil zit
 in de schema-validatie en de downstream-keten.
 
-> **SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.**
+> **SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.**
 
 ---
 
 ## Pad A — Generic upload (portal) [aanbevolen voor ad-hoc]
 
-Sinds 2026-05 is [/csv-upload](https://platform.uwv-platform.local:8443/csv-upload/)
+Sinds 2026-05 is [/csv-upload](https://platform.odap.local:8443/csv-upload/)
 een generieke uploader die **elk** bestandstype accepteert. Voor tabulaire
 bestanden (CSV, TSV, JSON, NDJSON, Parquet) verschijnt na de upload een
 "Convert to Delta"-knop die de `convert_to_delta` DAG triggert via de
@@ -23,7 +23,7 @@ bestanden (CSV, TSV, JSON, NDJSON, Parquet) verschijnt na de upload een
 ```
 gebruiker  ─▶ POST /api/auth/token              (oauth2-proxy access-token)
            ─▶ POST minio/?Action=AssumeRoleWithWebIdentity   (temp S3-creds)
-           ─▶ PUT  minio/uwv-staging/uploads/<email>/<ts>/<file>
+           ─▶ PUT  minio/odap-staging/uploads/<email>/<ts>/<file>
            ─▶ POST /api/airflow/trigger-convert (alleen tabulair)
                   │
                   ▼
@@ -35,7 +35,7 @@ gebruiker  ─▶ POST /api/auth/token              (oauth2-proxy access-token)
                   │
                   ▼
            DAG convert_to_delta (KubernetesPodOperator)
-           ├─ leest s3://uwv-staging/<object_key>
+           ├─ leest s3://odap-staging/<object_key>
            ├─ parseert op basis van source_format (pyarrow.csv/json/parquet)
            ├─ voegt event_date + ingestion_ts + source_file metadata-kolommen toe
            ├─ schrijft Delta naar s3://uwv-<catalog>/<schema>/<table>/
@@ -84,14 +84,14 @@ Kafka-pad — zie [ADR-0007](../adr/0007-airflow-pipeline-architecture.md).
 gebruiker
    │  upload CSV
    ▼
-MinIO  s3://uwv-staging/incoming/<bron>/<bestand>.csv
+MinIO  s3://odap-staging/incoming/<bron>/<bestand>.csv
    │  (handmatige Airflow-trigger met object_key)
    ▼
 Airflow DAG  ingest_csv_<bron>
    │  KubernetesPodOperator → csv_to_bronze.py
    │  - leest CSV uit staging
    │  - valideert schema (uit source-YAML)
-   │  - schrijft Delta naar s3://uwv-bronze/uwv/<table>/
+   │  - schrijft Delta naar s3://odap-bronze/uwv/<table>/
    │  - registreert tabel in Trino (CALL system.register_table)
    │  - verplaatst CSV naar processed/
    │  publiceert bronze-Dataset
@@ -134,24 +134,24 @@ DAGs verschijnen na een DAG-parse-cycle (~30s).
 
 ### Optie A — Browser (MinIO Console)
 
-1. Open [MinIO Console](https://minio-console.uwv-platform.local:8443) (SSO via Keycloak, of root `uwvadmin`).
-2. Navigeer naar `uwv-staging` → `incoming/<bron>/`.
+1. Open [MinIO Console](https://minio-console.odap.local:8443) (SSO via Keycloak, of root `platformadmin`).
+2. Navigeer naar `odap-staging` → `incoming/<bron>/`.
 3. Drop het CSV-bestand. Naam mag vrij gekozen worden — bv. `2026-05-01.csv`.
 
 ### Optie B — CLI (`mc`)
 
-Vereist een `uwv-platform` alias in `~/.mc/config.json`:
+Vereist een `odap-platform` alias in `~/.mc/config.json`:
 
 ```bash
 mc cp ./mijn-meting.csv \
-  uwv-platform/uwv-staging/incoming/klanttevredenheid/$(date -u +%Y%m%dT%H%M%S).csv
+  odap/odap-staging/incoming/klanttevredenheid/$(date -u +%Y%m%dT%H%M%S).csv
 ```
 
 ### Optie C — Portal (generic flow)
 
-Open [/csv-upload](https://platform.uwv-platform.local:8443/csv-upload/) — deze
+Open [/csv-upload](https://platform.odap.local:8443/csv-upload/) — deze
 pagina is sinds 2026-05 generiek (zie **Pad A** boven). Het accepteert elk
-bestandstype, maar **schrijft naar `uwv-staging/uploads/<email>/<ts>/`**, niet
+bestandstype, maar **schrijft naar `odap-staging/uploads/<email>/<ts>/`**, niet
 naar `incoming/<bron>/`. Voor `csv_batch`-bronnen (klanttevredenheid, FOCUS)
 upload je naar `incoming/<bron>/` via optie A of B en trigger je daarna de
 ingest-DAG handmatig (zie Stap 3).
@@ -160,7 +160,7 @@ ingest-DAG handmatig (zie Stap 3).
 
 ## Stap 3 — Airflow-DAG triggeren
 
-1. Open [Airflow](https://airflow.uwv-platform.local:8443).
+1. Open [Airflow](https://airflow.odap.local:8443).
 2. Zoek de DAG `ingest_csv_<bron>` (bv. `ingest_csv_klanttevredenheid`).
 3. Klik **Trigger DAG w/ config** en geef:
 
@@ -251,6 +251,6 @@ kolom dan automatisch toe (default-waarde: vandaag in UTC). Voor backfill
 moet `csv_to_bronze.py` een conf-veld krijgen — niet in scope voor MVP.
 
 **Is dit pad geschikt voor PII?**
-Technisch ja, maar wees voorzichtig: de CSV staat in MinIO `uwv-staging`
+Technisch ja, maar wees voorzichtig: de CSV staat in MinIO `odap-staging`
 totdat de DAG draait. Voor PII gebruik je liever het Kafka-pad met
 field-level pseudonymize-macro of de `sensitive` zone — niet `bronze`.

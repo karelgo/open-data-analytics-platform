@@ -58,20 +58,20 @@ CHECKSUM=$(shasum -a 256 "$TMP/portal-dist.tar.gz" | cut -c1-12)
 # 256 KB) — so for >256 KB tarballs we delete-and-create instead. The
 # Deployment is rolled in the next step regardless, so the brief gap is fine.
 log "Apply ConfigMap platform-landing-dist (main tarball)"
-kubectl -n uwv-platform delete configmap platform-landing-dist --ignore-not-found >/dev/null
-kubectl -n uwv-platform create configmap platform-landing-dist \
+kubectl -n odap-platform delete configmap platform-landing-dist --ignore-not-found >/dev/null
+kubectl -n odap-platform create configmap platform-landing-dist \
   --from-file=portal-dist.tar.gz="$TMP/portal-dist.tar.gz" >/dev/null
 
 if (( DBT_SIZE > 0 )); then
   log "Apply ConfigMap platform-landing-dbt-docs (dbt-docs.html tarball)"
-  kubectl -n uwv-platform delete configmap platform-landing-dbt-docs --ignore-not-found >/dev/null
-  kubectl -n uwv-platform create configmap platform-landing-dbt-docs \
+  kubectl -n odap-platform delete configmap platform-landing-dbt-docs --ignore-not-found >/dev/null
+  kubectl -n odap-platform create configmap platform-landing-dbt-docs \
     --from-file=dbt-docs.tar.gz="$TMP/dbt-docs.tar.gz" >/dev/null
 fi
 
 log "Roll the Deployment so the initContainer re-extracts the new tarballs"
-kubectl -n uwv-platform patch deployment platform-landing \
-  --type=merge -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"portal.uwv-platform/dist-checksum\":\"$CHECKSUM\"}}}}}" >/dev/null
-kubectl -n uwv-platform rollout status deploy/platform-landing --timeout=120s
+kubectl -n odap-platform patch deployment platform-landing \
+  --type=merge -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"portal.odap/dist-checksum\":\"$CHECKSUM\"}}}}}" >/dev/null
+kubectl -n odap-platform rollout status deploy/platform-landing --timeout=120s
 
-log "Done. Browse https://platform.freshstackable.com/"
+log "Done. Browse https://platform.example.com/"

@@ -10,7 +10,7 @@
 
 ## Context
 
-Het UWV-platform moet open source zijn, vendor-onafhankelijk, NORA-conform en
+Het ODAP platform moet open source zijn, vendor-onafhankelijk, NORA-conform en
 declaratief op Kubernetes draaien. We hebben een keuze nodig voor de
 "runtime-kit" die NiFi, Kafka, Spark, Trino, Hive Metastore, Airflow,
 Superset, OPA en ZooKeeper als productie-grade workloads op Kubernetes brengt.

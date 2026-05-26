@@ -3,7 +3,7 @@
 # that match what the browser sees on https://airflow.${PLATFORM_DOMAIN}.
 - op: replace
   path: /spec/webservers/envOverrides/AIRFLOW__WEBSERVER__BASE_URL
-  value: "https://airflow.eu-sovereigndataplatform.com"
+  value: "https://airflow.example.com"
 - op: replace
   path: /spec/schedulers/envOverrides/AIRFLOW__WEBSERVER__BASE_URL
-  value: "https://airflow.eu-sovereigndataplatform.com"
+  value: "https://airflow.example.com"

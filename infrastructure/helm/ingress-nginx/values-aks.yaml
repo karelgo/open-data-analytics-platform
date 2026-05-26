@@ -4,7 +4,7 @@
 # serverlb routes host:80/443 straight to node ports. AKS has no such
 # pass-through — we need a real Azure Standard LB.
 #
-# We bind the LB to a *static* Public IP (uwv-platform-ingress-pip) reserved
+# We bind the LB to a *static* Public IP (odap-platform-ingress-pip) reserved
 # in the AKS node RG, so the apex A record on the public DNS zone stays
 # stable across redeploys. Without this, Azure auto-allocates a new IP each
 # time the Service is recreated and DNS would have to be updated.
@@ -15,8 +15,8 @@ controller:
   service:
     type: LoadBalancer
     annotations:
-      service.beta.kubernetes.io/azure-pip-name: uwv-platform-ingress-pip
-      service.beta.kubernetes.io/azure-load-balancer-resource-group: MC_dev-stackable-rg_uwv-platform-aks_westeurope
+      service.beta.kubernetes.io/azure-pip-name: odap-platform-ingress-pip
+      service.beta.kubernetes.io/azure-load-balancer-resource-group: MC_dev-stackable-rg_odap-platform-aks_westeurope
       # Force LB health probe to TCP. Default for AKS Standard LB on a 443
       # service port is HTTPS GET / — but ingress-nginx returns 404 on /
       # without a Host header, so the probe fails, all backends get marked

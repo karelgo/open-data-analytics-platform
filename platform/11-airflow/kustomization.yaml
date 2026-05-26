@@ -1,13 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: uwv-platform
+namespace: odap-platform
 
 # Architectuur: docs/adr/0007-airflow-pipeline-architecture.md.
 #
 # DAGs worden via 3 ConfigMaps gemount:
 #   - airflow-dags     → /stackable/airflow/dags/  (DAG-aanroepers)
-#   - airflow-include  → /opt/uwv/airflow/include/ (factories + helpers, op PYTHONPATH)
-#   - airflow-sources  → /opt/uwv/airflow/sources/ (YAML-registry)
+#   - airflow-include  → /opt/odap/airflow/include/ (factories + helpers, op PYTHONPATH)
+#   - airflow-sources  → /opt/odap/airflow/sources/ (YAML-registry)
 #
 # Productie: vervang door Stackable's `dagsGitSync` met een interne git-mirror.
 
@@ -63,7 +63,7 @@ configMapGenerator:
       - include/fabric_helpers.py
 
   # 3. YAML source-registry — single source of truth voor brondefinities.
-  #    Gelezen via env UWV_SOURCES_DIR.
+  #    Gelezen via env SOURCES_DIR.
   - name: airflow-sources
     files:
       - sources/persoon.yml
@@ -78,7 +78,7 @@ configMapGenerator:
       - sources/focus_billing.yml
 
   # 4. Loader-scripts voor KubernetesPodOperator-tasks (csv_ingest_factory).
-  #    Gemount op /opt/uwv/airflow/jobs/ in de KPO-pod.
+  #    Gemount op /opt/odap/airflow/jobs/ in de KPO-pod.
   - name: airflow-jobs
     files:
       - jobs/csv_to_bronze.py

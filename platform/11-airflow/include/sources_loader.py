@@ -1,12 +1,12 @@
 """YAML-source-registry loader.
 
 Eén bron van waarheid voor alle DAG-factories. Leest YAML's uit
-`UWV_SOURCES_DIR` (default `/opt/uwv/airflow/sources`) en geeft typed
+`SOURCES_DIR` (default `/opt/odap/airflow/sources`) en geeft typed
 SourceSpec objecten terug. Zie docs/adr/0007-airflow-pipeline-architecture.md.
 
 Twee soorten bronnen:
   - Stream/streaming (default): `stream:` blok verplicht, mode = streaming|batch.
-    Producer schrijft JSONL naar s3://uwv-raw/<stream-path>/dt=…, Spark
+    Producer schrijft JSONL naar s3://odap-raw/<stream-path>/dt=…, Spark
     Structured Streaming (file source) leest die en schrijft naar bronze.
   - CSV-upload (mode = csv_batch): `stream:` mag ontbreken, in plaats daarvan
     een `ingest:` blok dat staging-bucket + CSV-schema beschrijft. Wordt door
@@ -22,8 +22,8 @@ from pathlib import Path
 import yaml
 
 
-SOURCES_DIR_ENV = "UWV_SOURCES_DIR"
-DEFAULT_SOURCES_DIR = "/opt/uwv/airflow/sources"
+SOURCES_DIR_ENV = "SOURCES_DIR"
+DEFAULT_SOURCES_DIR = "/opt/odap/airflow/sources"
 
 # SLA-mode constanten — gebruikt door factories om zich anders te gedragen
 # voor csv_batch bronnen (skip stream-paden, eigen ingest-DAG).
@@ -34,7 +34,7 @@ MODE_CSV_BATCH = "csv_batch"
 
 @dataclass(frozen=True)
 class StreamSpec:
-    """Stream-identifier voor JSONL-bestanden in s3://uwv-raw/<path>/.
+    """Stream-identifier voor JSONL-bestanden in s3://odap-raw/<path>/.
 
     `name` is de logische stream (bv. 'uwv.persona.created'); de Spark-job
     leidt het S3-pad af door punten te vervangen door slashes. `key` is het
@@ -207,7 +207,7 @@ def _coerce(d: dict) -> SourceSpec:
 
 @lru_cache(maxsize=1)
 def load_all_sources() -> tuple[SourceSpec, ...]:
-    """Laad alle YAML's uit UWV_SOURCES_DIR. Gecached per Airflow-parse."""
+    """Laad alle YAML's uit SOURCES_DIR. Gecached per Airflow-parse."""
     base = _sources_dir()
     if not base.exists():
         return ()

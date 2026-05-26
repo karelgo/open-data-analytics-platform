@@ -2,7 +2,7 @@
 # oauth2-proxy splitst path-based naar backend/frontend (zie
 # configmap-oauth2-proxy.yaml `upstreams = [...]`) en gates alleen `/`.
 #
-# Browser → multica.uwv-platform.local:8443
+# Browser → multica.odap.local:8443
 #   ingress → multica-oauth2-proxy:80 (oauth2-proxy:4180)
 #     /                → Keycloak SSO check → multica-frontend (Next.js)
 #     /api, /auth, /uploads, /ws, /health, /readyz → multica-backend (skip-auth)
@@ -14,9 +14,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: multica
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/proxy-body-size: "25m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
@@ -30,14 +30,14 @@ metadata:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;
       proxy_hide_header Content-Security-Policy;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["multica.uwv-platform.local"]
+    - hosts: ["multica.odap.local"]
       secretName: multica-tls
   rules:
-    - host: multica.uwv-platform.local
+    - host: multica.odap.local
       http:
         paths:
           - path: /

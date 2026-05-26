@@ -16,10 +16,10 @@ patches:
         value: letsencrypt-prod
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: multica.freshstackable.com
+        value: multica.example.com
       - op: replace
         path: /spec/rules/0/host
-        value: multica.freshstackable.com
+        value: multica.example.com
   - path: configmap-oauth2-proxy-stackit.yaml
     target:
       kind: ConfigMap

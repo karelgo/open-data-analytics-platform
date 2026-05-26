@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1e (wettelijke taak) **+ art. 9 lid 2h** (gezondheid, sociale zekerheid) |
 | Bewaartermijn | 7 jaar besluitvormingsdata; trainingsset apart, onder eigen retentie |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-02](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-02](../../referentiearchitectuur-odap-data-analytics.md).
 
 > **Belangrijk.** Op verzoek van de opdrachtgever wordt UC-02 in deze referentie
 > niet als werkend ML-systeem geïmplementeerd. Reden: een echt hoog-risico
@@ -58,7 +58,7 @@ adviseert, arbeidsdeskundige beslist.
                   ▼
 [MODEL]     SparkApplication training (TODO)
             Algorithm: XGBoost (placeholder)
-            Output: model-artefact in s3://uwv-meta/models/uc02_wajong_v1/
+            Output: model-artefact in s3://odap-meta/models/uc02_wajong_v1/
                   │
                   ▼
 [INFERENCE] Spark batch inference → gold.uc02_wajong.advies (per cliënt: top-3 trajecten + score + SHAP-driver)

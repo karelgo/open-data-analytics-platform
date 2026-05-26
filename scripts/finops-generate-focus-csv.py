@@ -15,7 +15,7 @@ Gebruik:
     # of:
     python3 scripts/finops-generate-focus-csv.py --output /tmp/focus-test.csv
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 from __future__ import annotations
 
@@ -67,10 +67,10 @@ REGIONS = [
 ]
 
 COMPARTMENTS = [
-    ("ocid1.compartment.prod-uwv",   "prod-uwv"),
-    ("ocid1.compartment.acc-uwv",    "acc-uwv"),
-    ("ocid1.compartment.test-uwv",   "test-uwv"),
-    ("ocid1.compartment.shared-uwv", "shared-uwv"),
+    ("ocid1.compartment.prod",   "prod"),
+    ("ocid1.compartment.acc",    "acc"),
+    ("ocid1.compartment.test",   "test"),
+    ("ocid1.compartment.shared", "shared"),
 ]
 
 ENVIRONMENTS = ["prod", "acc", "test"]
@@ -190,8 +190,8 @@ def emit_row(writer: csv.DictWriter, rnd: random.Random, *,
     writer.writerow({
         "AvailabilityZone":  az,
         "BilledCost":        f"{billed_cost:.6f}",
-        "BillingAccountId":  "oci-acct-uwv-001",
-        "BillingAccountName":"UWV Reference Platform — Master",
+        "BillingAccountId":  "oci-acct-odap-001",
+        "BillingAccountName":"Open Data & Analytics Platform — Master",
         "BillingCurrency":   "EUR",
         "BillingPeriodEnd":  iso(month_end),
         "BillingPeriodStart":iso(month_start),

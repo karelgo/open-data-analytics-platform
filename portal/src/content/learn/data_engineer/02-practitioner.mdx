@@ -17,7 +17,7 @@ labs:
     vscodePath: "nifi-flows/templates"
   - title: "Bewerk de role-mapping"
     href: "/go/openmetadata/"
-    vscodePath: "opa-policies-src/data/uwv_role_mappings.json"
+    vscodePath: "opa-policies-src/data/role_mappings.json"
   - title: "Bekijk dbt-staging template"
     href: "/dbt-docs/"
     vscodePath: "dbt/models/staging"
@@ -63,7 +63,7 @@ Synthetisch via een generator in `data-generation/`.
 Open [NiFi](/go/nifi/), navigeer naar `templates/delta/source-xyz/` (we
 kopiëren een bestaand template-paar). Pas processors aan:
 
-- bron-pad in MinIO `s3a://uwv-incoming/xyz/`;
+- bron-pad in MinIO `s3a://incoming/xyz/`;
 - destination Kafka-topic = `uwv.xyz.event`;
 - schema-validatie: `xyz_event.avsc`.
 
@@ -98,8 +98,8 @@ stream = (
 write_delta(
     stream,
     table='bronze.xyz.events',
-    path='s3a://uwv-bronze/xyz/',
-    checkpoint='s3a://uwv-checkpoints/bronze-xyz/',
+    path='s3a://odap-bronze/xyz/',
+    checkpoint='s3a://odap-checkpoints/bronze-xyz/',
     trigger='1 minute',
 )
 ```
@@ -115,7 +115,7 @@ CREATE TABLE bronze.xyz.events (
   ts        TIMESTAMP,
   type      STRING,
   value     DOUBLE
-) USING DELTA LOCATION 's3a://uwv-bronze/xyz/';
+) USING DELTA LOCATION 's3a://odap-bronze/xyz/';
 ```
 
 In `platform/05-hive-metastore/init-schemas.sql`.
@@ -149,7 +149,7 @@ sources:
 models:
   - name: stg_xyz
     meta:
-      eigenaar: data.engineer@uwv-platform.local
+      eigenaar: data.engineer@odap.local
       classification: intern
     columns:
       - name: event_id
@@ -160,7 +160,7 @@ models:
 
 ## Stap 6 — OPA role-mapping
 
-In `opa-policies-src/data/uwv_role_mappings.json` voeg je `bronze.xyz.*`
+In `opa-policies-src/data/role_mappings.json` voeg je `bronze.xyz.*`
 toe aan `roles.data_engineer.catalogs_jit` (JIT-only) en `purposes` met
 `technisch_onderhoud`.
 

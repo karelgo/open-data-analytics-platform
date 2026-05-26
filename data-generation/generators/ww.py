@@ -1,6 +1,6 @@
 """WW-aanvragen stub.
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 Productie-volwaardige generator: fase 5.
 """
 

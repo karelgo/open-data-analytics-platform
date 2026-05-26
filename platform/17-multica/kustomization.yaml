@@ -1,18 +1,18 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: uwv-platform
+namespace: odap-platform
 
 # Note on secrets:
 #   postgres-secret.yaml and backend-secret.yaml are TEMPLATES showing the
 #   expected keys. They are deliberately NOT listed below — same pattern as
 #   19-nanitics-observatory. Apply real values out-of-band:
 #
-#     kubectl -n uwv-platform create secret generic multica-postgres \
+#     kubectl -n odap-platform create secret generic multica-postgres \
 #       --from-literal=POSTGRES_PASSWORD=$(openssl rand -hex 24) \
 #       --dry-run=client -o yaml | kubectl apply -f -
 #
-#     kubectl -n uwv-platform create secret generic multica-backend \
+#     kubectl -n odap-platform create secret generic multica-backend \
 #       --from-literal=JWT_SECRET=$(openssl rand -hex 32) \
 #       --from-literal=DATABASE_URL='postgres://multica:<pw>@multica-postgres:5432/multica?sslmode=disable' \
 #       --dry-run=client -o yaml | kubectl apply -f -
@@ -51,5 +51,5 @@ images:
     newTag: "v0.6.0" # TODO: same
 
 commonLabels:
-  app.kubernetes.io/part-of: uwv-platform
+  app.kubernetes.io/part-of: odap-platform
   app.kubernetes.io/component: multica

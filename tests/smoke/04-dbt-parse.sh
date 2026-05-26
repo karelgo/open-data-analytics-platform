@@ -21,7 +21,7 @@ fail() { printf '\033[1;31m  FAIL\033[0m %s\n' "$*" >&2; exit 1; }
 #   1. $DBT_BIN env-override (gebruiker-controle)
 #   2. ~/.dbt-core-venv/bin/dbt (conventie in deze repo)
 #   3. PATH-dbt mits NIET fusion
-#   4. lokale uwv/dbt-trino:1.9.0-uwv image
+#   4. lokale odap/dbt-trino:1.9.0 image
 #   5. upstream ghcr.io/dbt-labs/dbt-trino:1.9.0
 DBT_BIN="${DBT_BIN:-}"
 if [[ -z "$DBT_BIN" && -x "$HOME/.dbt-core-venv/bin/dbt" ]]; then
@@ -31,7 +31,7 @@ if [[ -z "$DBT_BIN" ]] && command -v dbt >/dev/null 2>&1 && ! dbt --version 2>&1
   DBT_BIN="dbt"
 fi
 if [[ -z "$DBT_BIN" ]] && command -v docker >/dev/null 2>&1; then
-  DBT_IMAGE="${DBT_IMAGE:-uwv/dbt-trino:1.9.0-uwv}"
+  DBT_IMAGE="${DBT_IMAGE:-odap/dbt-trino:1.9.0}"
   if ! docker image inspect "$DBT_IMAGE" >/dev/null 2>&1; then
     DBT_IMAGE="ghcr.io/dbt-labs/dbt-trino:1.9.0"
   fi

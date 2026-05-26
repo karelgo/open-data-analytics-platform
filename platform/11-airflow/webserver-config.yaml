@@ -3,7 +3,7 @@
 # Waarom: Stackable Airflow 26.3 genereert een minimale webserver_config.py
 # zonder role-mapping. `configOverrides.webserver_config.py` op de
 # AirflowCluster CRD wordt geaccepteerd maar door de operator NIET
-# meegerendered (zie kubectl get cm uwv-airflow-webserver-default
+# meegerendered (zie kubectl get cm airflow-webserver-default
 # -o jsonpath='{.data.webserver_config\.py}' — onze keys ontbreken).
 #
 # Bovendien definieert Stackable géén custom get_oauth_user_info() →
@@ -28,7 +28,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: airflow-webserver-config
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   webserver_config.py: |
     """UWV-override van Stackable's gegenereerde webserver_config.py.
@@ -36,7 +36,7 @@ data:
     Voegt toe:
       - AUTH_ROLES_MAPPING — Keycloak realm-roles → FAB-rollen
       - AUTH_ROLES_SYNC_AT_LOGIN — re-sync bij elke login
-      - UWVAirflowSecurityManager — leest `roles` claim uit userinfo
+      - PlatformAirflowSecurityManager — leest `roles` claim uit userinfo
         en geeft die door als role_keys (FAB's default doet dat niet
         voor de keycloak-provider).
     """
@@ -90,14 +90,14 @@ data:
                 "client_id": _OIDC_CLIENT_ID,
                 "client_secret": _OIDC_CLIENT_SECRET,
                 "client_kwargs": {"scope": "openid profile email roles"},
-                "api_base_url": "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/",
-                "server_metadata_url": "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/.well-known/openid-configuration",
+                "api_base_url": "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/",
+                "server_metadata_url": "http://keycloak.odap-auth.svc.cluster.local/realms/odap/.well-known/openid-configuration",
             },
         }
     ]
 
 
-    class UWVAirflowSecurityManager(FabAirflowSecurityManagerOverride):
+    class PlatformAirflowSecurityManager(FabAirflowSecurityManagerOverride):
         """Leest Keycloak's `roles` userinfo-claim als FAB role_keys.
 
         FAB's default get_oauth_user_info kent voor de keycloak-provider
@@ -131,4 +131,4 @@ data:
     # default, onze UWV-override draait niet, role_keys blijft leeg,
     # AUTH_ROLES_MAPPING doet niks, elke OAuth-user landt op Public.
     # Resultaat: 403 op /ui/dashboard/dag_stats etc.
-    SECURITY_MANAGER_CLASS = UWVAirflowSecurityManager
+    SECURITY_MANAGER_CLASS = PlatformAirflowSecurityManager

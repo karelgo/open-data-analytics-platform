@@ -62,7 +62,7 @@ Deze splitsing is bewust — zie `## Risks` voor de motivatie.
 ```
                     ┌──────────────────────── platform/14-monitoring ─────────────────┐
                     │                                                                  │
-   Trino · Spark ──►│ Vector ──► OpenSearch (uwv-logs-*, uwv-logs-audit-*)             │
+   Trino · Spark ──►│ Vector ──► OpenSearch (logs-*, logs-audit-*)             │
    NiFi · Airflow   │ kube-prometheus-stack ──► Prometheus + Alertmanager              │
    OPA · Postgres   │ OpenTelemetry collector ──► (Tempo/Jaeger — improvement #5.5)   │
                     │ OpenMetadata DQ-tests + lineage-events                           │
@@ -126,7 +126,7 @@ op één gemeenschappelijk *incident-record*.
 ### Bron 1 — OpenSearch (logs)
 
 Een scheduled task (elke 60s) draait een set saved searches op
-`uwv-logs-*`:
+`logs-*`:
 
 | Saved search (voorbeeld) | Detectie |
 |---|---|
@@ -146,7 +146,7 @@ Wachter abonneert zich als webhook-receiver in
 `platform/14-monitoring/alertmanager-config.yaml` (parallel aan
 Slack/PagerDuty, niet in plaats van). Ieder firing alert wordt
 1-op-1 geconverteerd naar een incident-record. De bestaande
-`runbook_url`-annotaties uit `prometheusrule-uwv.yaml` zijn de
+`runbook_url`-annotaties uit `prometheusrule.yaml` zijn de
 *ground-truth* die we de agent als context meegeven, zodat de
 voorstellen geen fantasie zijn maar een concrete runbook-stap citeren.
 
@@ -185,7 +185,7 @@ Multica's `issue` + extra velden):
   "hypothesis":  "Coordinator JVM-heap te laag voor concurrent ETL-workload",
   "proposed_action": {
     "kind": "kubectl_scale",
-    "target": "trinocluster/uwv-trino",
+    "target": "trinocluster/trino",
     "args": {"replicas": 4},
     "dry_run_diff": "..."
   } // optional — pas gevuld als allowlist + confidence > drempel
@@ -247,7 +247,7 @@ Waarom Multica als queue en niet zelf bouwen?
 
 ## Van approval naar veilige uitvoering
 
-`wachter-runner` is een aparte Deployment in `uwv-platform`-namespace
+`wachter-runner` is een aparte Deployment in `odap-platform`-namespace
 met een **eigen ServiceAccount** waarvan de RBAC neerkomt op:
 
 | Allowed verb | Allowed resources | Reden |
@@ -259,7 +259,7 @@ met een **eigen ServiceAccount** waarvan de RBAC neerkomt op:
 
 Geen `*`-wildcards. Geen `secrets`, geen `persistentvolumeclaims`,
 geen `roles` of `rolebindings`. RoleBinding zit aan
-`uwv-platform`-namespace; cluster-scope is verboden.
+`odap-platform`-namespace; cluster-scope is verboden.
 
 De allowlist (versie 1) bevat exact deze 8 acties:
 
@@ -267,7 +267,7 @@ De allowlist (versie 1) bevat exact deze 8 acties:
 # platform/18-wachter/actions/allowlist.yaml
 - kind: kubectl_rollout_restart
   resources: [deployment, statefulset]
-  namespaces: [uwv-platform]
+  namespaces: [odap-platform]
   rate_limit: 1 per 10m per resource
 
 - kind: kubectl_scale
@@ -291,7 +291,7 @@ De allowlist (versie 1) bevat exact deze 8 acties:
   max_queue_size_mb: 500
 
 - kind: opensearch_force_rollover
-  index_pattern: "uwv-logs-*"
+  index_pattern: "logs-*"
 ```
 
 Alles wat *niet* in deze YAML staat krijgt nooit een
@@ -306,7 +306,7 @@ dispatch-tabel".
    `EXPLAIN`-equivalent voor Trino). Een actie zonder dry-run-diff
    krijgt nooit `awaiting-approval`.
 2. *Audit hook is non-bypass.* Iedere uitvoering schrijft synchroon
-   naar `uwv-logs-audit-*` (7 jaar bewaartermijn — ILM-policy in
+   naar `logs-audit-*` (7 jaar bewaartermijn — ILM-policy in
    `14-monitoring/opensearch-ilm-job.yaml`). Mislukt het naar OpenSearch
    schrijven, dan vóórdat de actie loopt — dan annuleert de runner.
    Geen audit, geen actie.
@@ -376,7 +376,7 @@ firing alerts), Multica-issues, geen acties. *Geen* runner. Bewijst
 de pipeline.
 
 Acceptatie:
-- Alle bestaande alerts uit `prometheusrule-uwv.yaml` produceren een
+- Alle bestaande alerts uit `prometheusrule.yaml` produceren een
   Multica-issue binnen 60 s.
 - Issue bevat de runbook-link uit de annotation.
 - Closed-issue-rate na een week ≥ 80 % (anders is signal/noise verkeerd).
@@ -395,7 +395,7 @@ waren"? Dat antwoord bepaalt of V3 doorgaat.
 Begin minimaal: alleen `kubectl_rollout_restart` en `kubectl_scale`.
 Runner deployen, RBAC strak, audit-pad aansluiten, dry-run-diff
 verplicht. Eerste week alleen op niet-productie-namespace
-(`uwv-staging` als die bestaat, anders dev-cluster).
+(`odap-staging` als die bestaat, anders dev-cluster).
 
 ### V4 — Allowlist uitbreiden naar 8 acties + Trino/Spark/Airflow/NiFi
 
@@ -414,7 +414,7 @@ groeit.
 ## Open vragen
 
 1. **Wie is de approver?** Single-reviewer? 4-ogen? Per-component
-   eigenaar (`uwv-trino-team` etc.)? Multica's `member` + `team`-tabellen
+   eigenaar (`trino-team` etc.)? Multica's `member` + `team`-tabellen
    ondersteunen dat; we moeten gewoon kiezen.
 2. **PII-filter op logs vóór ze naar het LLM gaan.** OpenMetadata heeft
    een classifier; bruikbaar als pre-processing? Of bouwen we een
@@ -447,7 +447,7 @@ groeit.
       met label `wachter` en correct gefingerprintet.
 - [ ] Een handmatig `awaiting-approval`-issue (allowlist actie:
       `kubectl_rollout_restart` op een dummy Deployment) leidt na
-      Approve tot zichtbare audit-record in `uwv-logs-audit-*` met
+      Approve tot zichtbare audit-record in `logs-audit-*` met
       operator-identiteit (Multica-user) en bot-identiteit
       (Wachter-SA).
 - [ ] Een handmatige poging om buiten de allowlist te executeren

@@ -19,10 +19,10 @@
 #
 # Target name verification: Stackable 26.3 generates StatefulSets named
 # `<cluster>-<role>-<roleGroup>` (singular `role`, e.g.
-# `uwv-superset-node-default`, not `nodes`). If a HPA shows
+# `superset-node-default`, not `nodes`). If a HPA shows
 #   <unknown>/<unknown>   in `kubectl get hpa` after first deploy, the
 # target ref doesn't match the actual workload name — check with
-#   kubectl -n uwv-platform get statefulset,deployment
+#   kubectl -n odap-platform get statefulset,deployment
 # and align the `scaleTargetRef.name` below.
 ---
 # Airflow scheduler — peak CPU during DAG-parse + Cosmos task-deserialization
@@ -30,13 +30,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: uwv-airflow-scheduler-hpa
-  namespace: uwv-platform
+  name: airflow-scheduler-hpa
+  namespace: odap-platform
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
-    name: uwv-airflow-scheduler-default
+    name: airflow-scheduler-default
   minReplicas: 1
   maxReplicas: 2
   metrics:
@@ -71,13 +71,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: uwv-airflow-webserver-hpa
-  namespace: uwv-platform
+  name: airflow-webserver-hpa
+  namespace: odap-platform
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
-    name: uwv-airflow-webserver-default
+    name: airflow-webserver-default
   minReplicas: 1
   maxReplicas: 3
   metrics:
@@ -105,13 +105,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: uwv-superset-hpa
-  namespace: uwv-platform
+  name: superset-hpa
+  namespace: odap-platform
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
-    name: uwv-superset-node-default
+    name: superset-node-default
   minReplicas: 1
   maxReplicas: 3
   metrics:
@@ -141,7 +141,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: portal-hpa
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

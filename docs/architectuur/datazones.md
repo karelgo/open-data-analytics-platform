@@ -16,11 +16,11 @@ de OPA-policies zijn 1-op-1.
 
 | Catalog | Bucket | Inhoud | Toegang (default) |
 |---|---|---|---|
-| `bronze` | `uwv-bronze` | Onveranderbare brondata (incl. raw PII) | data-engineers (JIT) |
-| `silver` | `uwv-silver` | Geconformeerd, gepseudonimiseerd waar mogelijk | analisten + engineers |
-| `gold` | `uwv-gold` | CGM-conforme business products | domein-rollen via RBAC |
-| `sensitive` | `uwv-sensitive` | Bijzondere persoonsgegevens (art. 9 AVG, medisch) | strikt; 4-eyes principe |
-| `sandbox` | `uwv-sandbox` | Gepseudonimiseerd — voor researchers | researcher (read-only) |
+| `bronze` | `odap-bronze` | Onveranderbare brondata (incl. raw PII) | data-engineers (JIT) |
+| `silver` | `odap-silver` | Geconformeerd, gepseudonimiseerd waar mogelijk | analisten + engineers |
+| `gold` | `odap-gold` | CGM-conforme business products | domein-rollen via RBAC |
+| `sensitive` | `sensitive` | Bijzondere persoonsgegevens (art. 9 AVG, medisch) | strikt; 4-eyes principe |
+| `sandbox` | `sandbox` | Gepseudonimiseerd — voor researchers | researcher (read-only) |
 
 ## Toegangsstrategie
 

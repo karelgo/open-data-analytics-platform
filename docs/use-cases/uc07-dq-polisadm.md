@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1c (wettelijke verplichting) + 1e |
 | Juistheidsprincipe | Art. 5 lid 1d AVG — actief invulling |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-07](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-07](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 

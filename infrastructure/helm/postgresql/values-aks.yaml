@@ -21,7 +21,7 @@ primary:
     subPath: "postgresql-data"
 
   # Drop the in-line database-creation SQL from the base values; the Bitnami
-  # init flow on AKS errors at "user uwvplatform does not exist" because the
+  # init flow on AKS errors at "user odap does not exist" because the
   # init script runs before user creation completes on a fresh PVC. A separate
   # post-install Job (postgres-create-databases.yaml) handles database creation
   # after postgres is reachable.
@@ -29,4 +29,4 @@ primary:
   # the base values rather than emptying the parent map.
   initdb:
     scripts:
-      00-uwv-databases.sql: null
+      00-odap-databases.sql: null

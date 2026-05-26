@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nanitics-observatory
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   replicas: 1
   strategy:
@@ -29,7 +29,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: app
-          image: uwv-platform/nanitics-observatory:dev
+          image: odap/nanitics-observatory:dev
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

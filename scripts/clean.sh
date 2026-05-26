@@ -2,7 +2,7 @@
 # Verwijder de k3d-cluster.
 set -euo pipefail
 
-CLUSTER_NAME="${CLUSTER_NAME:-uwv-platform}"
+CLUSTER_NAME="${CLUSTER_NAME:-odap-platform}"
 
 if ! command -v k3d >/dev/null 2>&1; then
   echo "ERROR: k3d niet gevonden." >&2
@@ -18,4 +18,4 @@ fi
 
 echo
 echo "Tip: voor een complete reset (incl. volumes) ook k3d-volume opruimen:"
-echo "  docker volume ls | awk '/uwv-platform-data/ {print \$2}' | xargs -r docker volume rm"
+echo "  docker volume ls | awk '/odap-platform-data/ {print \$2}' | xargs -r docker volume rm"

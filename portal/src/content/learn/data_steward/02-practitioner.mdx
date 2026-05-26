@@ -14,7 +14,7 @@ labs:
     href: "/dbt-docs/"
   - title: "Bewerk role-mappings in vscode.dev"
     href: "/go/openmetadata/"
-    vscodePath: "opa-policies-src/data/uwv_role_mappings.json"
+    vscodePath: "opa-policies-src/data/role_mappings.json"
 checks:
   - id: "steward_practitioner_classify"
     title: "Kolom getagd, glossary-term gekoppeld, lineage gevalideerd"
@@ -83,7 +83,7 @@ Term: branchecode (SBI)
 Definitie: Vier-cijferige code volgens de Standaard Bedrijfsindeling van
    het CBS (2008-versie), aangeleverd door werkgever bij polisinschrijving.
 Bron: silver.ww.aanvraag.werkgever_branchecode
-Eigenaar: data.steward@uwv-platform.local
+Eigenaar: data.steward@odap.local
 Use cases: UC-03 (handhaving), UC-06 (lastprognose) — branche-trends
 ```
 
@@ -99,7 +99,7 @@ Voor jou geen verdere actie hier, maar je hebt het wel gezien.
 ## Stap 5 — OPA role-mappings
 
 Open
-[uwv_role_mappings.json](https://vscode.dev/github.com/UWV/UDP_Stackable/blob/main/opa-policies-src/data/uwv_role_mappings.json)
+[role_mappings.json](https://vscode.dev/github.com/UWV/UDP_Stackable/blob/main/opa-policies-src/data/role_mappings.json)
 in vscode.dev. Onder `roles.ww_handhaver.unmasked_columns` voeg je:
 
 ```json

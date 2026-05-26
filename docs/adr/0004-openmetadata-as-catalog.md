@@ -10,7 +10,7 @@
 
 ## Context
 
-UWV-compliance vereist een data catalog met:
+compliance vereist een data catalog met:
 
 - Technische én business-metadata per data product (R-GOV-02).
 - End-to-end **data lineage** op tabel- én kolomniveau (R-GOV-03).
@@ -81,7 +81,7 @@ Drie open source kandidaten: **DataHub**, **Apache Atlas**, **OpenMetadata**.
   Job in [`init-job.yaml`](../../platform/13-openmetadata-config/init-job.yaml);
   glossary-link + dbt-meta enrichment-jobs draaien als CronJob).
 - `dbt/dbt_project.yml` — exporteer `manifest.json` etc. naar
-  `s3://uwv-meta/dbt/<run_id>/`.
+  `s3://odap-meta/dbt/<run_id>/`.
 - Trino — event-listener config naar Kafka topic `uwv.trino.queries` voor
   lineage capture.
 - Airflow DAGs `om_ingest_*` halen periodiek metadata op.

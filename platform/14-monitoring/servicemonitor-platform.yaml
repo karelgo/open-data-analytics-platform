@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: stackable-platform
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   selector:
     matchLabels:

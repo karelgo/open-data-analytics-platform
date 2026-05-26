@@ -2,7 +2,7 @@
 # definities toe via OM REST API. Idempotent.
 #
 # Het Python-script leest:
-#   /config/classifications-uwv.yaml
+#   /config/classifications.yaml
 #   /config/glossary-cgm.yaml
 # en POSTet de classifications + glossary terms.
 #
@@ -14,9 +14,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: openmetadata-init-config
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: openmetadata-init
+    odap.io/component: openmetadata-init
 data:
   init_openmetadata.py: |
     """Bootstrap OpenMetadata met UWV-specifieke classifications + glossary.
@@ -32,11 +32,11 @@ data:
 
     import requests
 
-    OM_URL = os.environ.get("OM_URL", "http://openmetadata.uwv-meta.svc.cluster.local:8585")
+    OM_URL = os.environ.get("OM_URL", "http://openmetadata.odap-meta.svc.cluster.local:8585")
     OM_TOKEN = os.environ["OM_JWT_TOKEN"]
     HEADERS = {"Authorization": f"Bearer {OM_TOKEN}", "Content-Type": "application/json"}
 
-    CLASSIFICATIONS_PATH = "/config/classifications-uwv.yaml"
+    CLASSIFICATIONS_PATH = "/config/classifications.yaml"
     GLOSSARY_PATH = "/config/glossary-cgm.yaml"
     MAPPING_PATH = "/config/dbt-meta-mapping.yaml"
     TEST_SUITES_PATH = "/config/test-suites.yaml"
@@ -157,7 +157,7 @@ data:
                 {
                     "name": u,
                     "displayName": u.replace(".", " ").title(),
-                    "email": f"{email_local}@uwv-platform.local",
+                    "email": f"{email_local}@odap.local",
                     "isBot": False,
                     "isAdmin": False,
                 },
@@ -520,10 +520,10 @@ data:
             conn = psycopg2.connect(
                 host=os.environ.get(
                     "POSTGRES_HOST",
-                    "postgres-postgresql.uwv-data.svc.cluster.local",
+                    "postgres-postgresql.odap-data.svc.cluster.local",
                 ),
                 port=int(os.environ.get("POSTGRES_PORT", "5432")),
-                user=os.environ.get("POSTGRES_USER", "uwvplatform"),
+                user=os.environ.get("POSTGRES_USER", "odap"),
                 password=pg_pw,
                 dbname="openmetadata",
                 connect_timeout=10,
@@ -570,17 +570,17 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: openmetadata-init
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: openmetadata-init
-    uwv.nl/dev-only: "true"
+    odap.io/component: openmetadata-init
+    odap.io/dev-only: "true"
 spec:
   ttlSecondsAfterFinished: 3600
   backoffLimit: 2
   template:
     metadata:
       labels:
-        uwv.nl/component: openmetadata-init
+        odap.io/component: openmetadata-init
     spec:
       restartPolicy: OnFailure
       containers:
@@ -593,7 +593,7 @@ spec:
               python /scripts/init_openmetadata.py
           env:
             - name: OM_URL
-              value: "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+              value: "http://openmetadata.odap-meta.svc.cluster.local:8585"
             - name: OM_JWT_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -628,4 +628,4 @@ spec:
                 path: init_openmetadata.py
         - name: config
           configMap:
-            name: openmetadata-uwv-config
+            name: openmetadata-platform-config

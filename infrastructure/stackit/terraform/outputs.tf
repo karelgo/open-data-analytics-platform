@@ -12,7 +12,7 @@ output "egress_address_ranges" {
 }
 
 output "floating_ip" {
-  description = "Reserved Floating IP. Paste into DNS A records for freshstackable.com + *.freshstackable.com, and into ingress-nginx values-stackit.yaml as loadBalancerIP."
+  description = "Reserved Floating IP. Paste into DNS A records for example.com + *.example.com, and into ingress-nginx values-stackit.yaml as loadBalancerIP."
   value       = stackit_public_ip.platform_ingress.ip
 }
 

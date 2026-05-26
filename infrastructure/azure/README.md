@@ -13,7 +13,7 @@ Provisioning + deployment of the UWV reference platform on Azure Kubernetes Serv
 ```
 infrastructure/azure/
 ├── terraform/             # IaC for the AKS cluster (uses existing RG)
-├── letsencrypt-issuer.yaml  # cert-manager ClusterIssuer for *.eu-sovereigndataplatform.com
+├── letsencrypt-issuer.yaml  # cert-manager ClusterIssuer for *.example.com
 ├── postgres-create-databases.yaml  # post-bootstrap Job (DB creation workaround)
 └── public-ingresses.yaml  # platform-landing Deployment + LE-issued public ingresses
                            # (the rest is now handled by platform-overlays/aks/)
@@ -127,14 +127,14 @@ created is gone.
 ## DNS
 
 The platform's helm-installed UIs (Keycloak, MinIO Console, Grafana, OpenMetadata)
-are exposed via ingress-nginx with hostnames under `*.uwv-platform.local`.
+are exposed via ingress-nginx with hostnames under `*.odap.local`.
 After bootstrap, point those names at the AKS LoadBalancer IP:
 
 ```bash
 LB_IP=$(kubectl -n ingress-nginx get svc ingress-nginx-controller \
   -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-echo "$LB_IP keycloak.uwv-platform.local minio-console.uwv-platform.local \
-  grafana.uwv-platform.local openmetadata.uwv-platform.local" | sudo tee -a /etc/hosts
+echo "$LB_IP keycloak.odap.local minio-console.odap.local \
+  grafana.odap.local openmetadata.odap.local" | sudo tee -a /etc/hosts
 ```
 
 (Smoke tests use in-cluster DNS and don't depend on /etc/hosts.)

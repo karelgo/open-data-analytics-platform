@@ -13,7 +13,7 @@ warn() { printf '\033[1;33mWARN\033[0m %s\n' "$*" >&2; }
 err()  { printf '\033[1;31mFAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
 RG="${AKS_RESOURCE_GROUP:-dev-stackable-rg}"
-NAME="${AKS_CLUSTER_NAME:-uwv-platform-aks}"
+NAME="${AKS_CLUSTER_NAME:-odap-platform-aks}"
 REGION="${AKS_REGION:-westeurope}"
 NODE_RG="MC_${RG}_${NAME}_${REGION}"
 

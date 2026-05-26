@@ -1,4 +1,4 @@
-# Ingress voor Airflow webserver onder platform.uwv-platform.local/airflow.
+# Ingress voor Airflow webserver onder platform.odap.local/airflow.
 # Same-origin met de portal embed-shell (/embed/airflow).
 #
 # X-Forwarded-Prefix wordt door FAB gelezen (PROXY_FIX_X_PREFIX=1 in
@@ -7,16 +7,16 @@
 # de ingress intern naar :80/:443 forwarded — zonder dit zou Flask
 # de poort uit Host wegrekenen en OAuth redirect_uri zou ontbreken.
 #
-# Service uwv-airflow-webserver bestaat al via Stackable-operator
+# Service airflow-webserver bestaat al via Stackable-operator
 # (ClusterIP op 8080).
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: airflow
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     # Iframe-allow voor portal embed-shell. Airflow zélf zet geen X-Frame-Options
     # of CSP, maar sommige browsers (Brave Shields, Firefox ETP, Chrome
     # cross-origin-isolation) blokkeren iframes default zonder een EXPLICIETE
@@ -26,20 +26,20 @@ metadata:
       proxy_set_header X-Forwarded-Prefix /airflow;
       proxy_hide_header X-Frame-Options;
       proxy_hide_header Content-Security-Policy;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["platform.uwv-platform.local"]
+    - hosts: ["platform.odap.local"]
       secretName: airflow-platform-tls
   rules:
-    - host: platform.uwv-platform.local
+    - host: platform.odap.local
       http:
         paths:
           - path: /airflow
             pathType: Prefix
             backend:
               service:
-                name: uwv-airflow-webserver
+                name: airflow-webserver
                 port:
                   number: 8080

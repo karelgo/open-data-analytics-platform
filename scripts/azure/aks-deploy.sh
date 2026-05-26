@@ -3,7 +3,7 @@
 # Thin wrapper around scripts/deploy-platform.sh --mode=aks with AKS-specific
 # post-steps:
 #  - CoreDNS hosts-override (`coredns-custom` ConfigMap) zodat
-#    keycloak.uwv-platform.local in-cluster routeert naar de keycloak-external
+#    keycloak.odap.local in-cluster routeert naar de keycloak-external
 #    Service in ingress-nginx (zie platform/02-authentication/keycloak-external-svc.yaml).
 #  - Public DNS upsert (CNAME → apex) for every *.${PLATFORM_DOMAIN} subdomain.
 #  - MinIO restart zodat de OIDC-discovery slaagt na de DNS-fix (Console toont
@@ -31,41 +31,41 @@ bash "$ROOT/scripts/deploy-platform.sh" --mode=aks
 # on an older revision without the overlay), explicitly remove it here.
 # Idempotent (`--ignore-not-found`).
 log "AKS-post: remove chart-style portal leftovers (platform-landing owns the public portal on AKS)"
-kubectl -n uwv-platform delete deployment portal --ignore-not-found
-kubectl -n uwv-platform delete service portal --ignore-not-found
-kubectl -n uwv-platform delete ingress portal --ignore-not-found
+kubectl -n odap-platform delete deployment portal --ignore-not-found
+kubectl -n odap-platform delete service portal --ignore-not-found
+kubectl -n odap-platform delete ingress portal --ignore-not-found
 
-# ---- AKS-only: mirror postgres-postgresql secret naar uwv-meta ----
+# ---- AKS-only: mirror postgres-postgresql secret naar odap-meta ----
 # De openmetadata-jwt-rotate + openmetadata-to-opa-sync CronJobs draaien in
-# uwv-meta en hebben de Postgres-creds nodig om de bot-JWT uit user_entity
+# odap-meta en hebben de Postgres-creds nodig om de bot-JWT uit user_entity
 # te lezen / patchen. scripts/bootstrap.sh:537 spiegelt dit secret naar
-# uwv-meta na de Postgres helm-install, maar op een fresh AKS-bootstrap
+# odap-meta na de Postgres helm-install, maar op een fresh AKS-bootstrap
 # valt die spiegeling soms uit (Postgres-secret bestaat dan nog niet in
-# uwv-data) → uwv-meta blijft secret-loos en alle JWT-jobs schieten in
+# odap-data) → odap-meta blijft secret-loos en alle JWT-jobs schieten in
 # CreateContainerConfigError. Hier zelf-helend: idempotent re-mirror op
 # elke deploy.
-log "AKS-post: mirror postgres-postgresql secret naar uwv-meta (voor JWT-rotate + OPA-sync CronJobs)"
-PG_PW=$(kubectl -n uwv-data get secret postgres-postgresql -o jsonpath='{.data.password}' 2>/dev/null | base64 -d || true)
+log "AKS-post: mirror postgres-postgresql secret naar odap-meta (voor JWT-rotate + OPA-sync CronJobs)"
+PG_PW=$(kubectl -n odap-data get secret postgres-postgresql -o jsonpath='{.data.password}' 2>/dev/null | base64 -d || true)
 if [[ -z "${PG_PW:-}" ]]; then
   # Bitnami chart pre-12.x exposeert de root-password onder `postgres-password`.
-  PG_PW=$(kubectl -n uwv-data get secret postgres-postgresql -o jsonpath='{.data.postgres-password}' 2>/dev/null | base64 -d || true)
+  PG_PW=$(kubectl -n odap-data get secret postgres-postgresql -o jsonpath='{.data.postgres-password}' 2>/dev/null | base64 -d || true)
 fi
 if [[ -n "${PG_PW:-}" ]]; then
-  kubectl -n uwv-meta create secret generic postgres-postgresql \
+  kubectl -n odap-meta create secret generic postgres-postgresql \
     --from-literal=password="${PG_PW}" \
     --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 else
-  warn "  postgres-postgresql secret niet gevonden in uwv-data — JWT-rotate + OPA-sync zullen falen"
+  warn "  postgres-postgresql secret niet gevonden in odap-data — JWT-rotate + OPA-sync zullen falen"
 fi
 
 # ---- AKS-only: ensure public-domain DNS records exist ----
-# Every *.eu-sovereigndataplatform.com subdomain needs a CNAME → apex (which
+# Every *.example.com subdomain needs a CNAME → apex (which
 # is an A record at the ingress static IP, set up by terraform/aks-up).
 # Idempotent — `az network dns record-set cname set-record` is upsert.
 # Skipped if `az` cli or the DNS zone resource group isn't available
 # (e.g. running outside the platform Azure tenant).
 DNS_RG="${PUBLIC_DNS_RG:-ai-trial-rg}"
-DNS_ZONE="${PUBLIC_DNS_ZONE:-eu-sovereigndataplatform.com}"
+DNS_ZONE="${PUBLIC_DNS_ZONE:-example.com}"
 if command -v az >/dev/null 2>&1 && az network dns zone show -g "$DNS_RG" -n "$DNS_ZONE" >/dev/null 2>&1; then
   log "AKS-post: ensure CNAMEs for all public subdomains in $DNS_RG/$DNS_ZONE"
   for sub in platform www keycloak airflow grafana prometheus minio minio-api \
@@ -83,7 +83,7 @@ else
 fi
 
 # ---- AKS-only: public-domain ingresses ----
-# Adds Cert + Ingress pairs for every *.eu-sovereigndataplatform.com
+# Adds Cert + Ingress pairs for every *.example.com
 # subdomain (platform, keycloak, airflow, grafana, prometheus, minio,
 # minio-api, superset, dbt-docs, openmetadata, opensearch, nifi, trino).
 # cert-manager solves DNS-01 via the azuredns ClusterIssuer.
@@ -95,9 +95,9 @@ fi
 # ---- AKS-only post-deploy: CoreDNS hosts-override ----
 # AKS CoreDNS gebruikt een 'coredns-custom' ConfigMap met *.override files
 # die geïmporteerd worden via `import custom/*.override` in de hoofd-Corefile.
-# We pinnen `keycloak.uwv-platform.local` op de ClusterIP van de
+# We pinnen `keycloak.odap.local` op de ClusterIP van de
 # keycloak-external Service (zie platform/02-authentication/keycloak-external-svc.yaml).
-log "AKS-post: CoreDNS hosts-override voor keycloak.uwv-platform.local"
+log "AKS-post: CoreDNS hosts-override voor keycloak.odap.local"
 KCEXT_IP=""
 for i in $(seq 1 30); do
   KCEXT_IP=$(kubectl -n ingress-nginx get svc keycloak-external -o jsonpath='{.spec.clusterIP}' 2>/dev/null || true)
@@ -110,7 +110,7 @@ else
   log "  keycloak-external ClusterIP: $KCEXT_IP"
   kubectl -n kube-system create configmap coredns-custom \
     --from-literal=keycloak.override="hosts {
-    $KCEXT_IP keycloak.uwv-platform.local
+    $KCEXT_IP keycloak.odap.local
     fallthrough
 }" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
   kubectl -n kube-system rollout restart deploy coredns >/dev/null
@@ -119,20 +119,20 @@ else
 fi
 
 # ---- Keycloak runtime patches (profile + email scopes, policy attribute) ----
-# realm-uwv.json import skipt deze omdat het IGNORE_EXISTING strategy gebruikt
+# realm.json import skipt deze omdat het IGNORE_EXISTING strategy gebruikt
 # en alleen scopes aanmaakt die expliciet in de JSON staan. Zonder deze patch
 # faalt SSO met `invalid_scope: Invalid scopes: openid profile email roles`.
 log "AKS-post: Keycloak realm patches (profile + email scopes, attach to clients)"
-KCPOD=$(kubectl -n uwv-auth get pods -l app.kubernetes.io/name=keycloak -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+KCPOD=$(kubectl -n odap-auth get pods -l app.kubernetes.io/name=keycloak -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
 if [[ -z "$KCPOD" ]]; then
   warn "Keycloak pod niet gevonden; sla realm-patches over"
 else
   # Wacht tot Keycloak bereikbaar is
   TOKEN=""
   for i in $(seq 1 30); do
-    TOKEN=$(kubectl -n uwv-auth exec "$KCPOD" -c keycloak -- curl -fsS \
+    TOKEN=$(kubectl -n odap-auth exec "$KCPOD" -c keycloak -- curl -fsS \
       -d "client_id=admin-cli" -d "username=kcadmin" \
-      -d "password=uwv-dev-only-CHANGE-ME-2026" -d "grant_type=password" \
+      -d "password=odap-dev-only-CHANGE-ME" -d "grant_type=password" \
       http://localhost:8080/realms/master/protocol/openid-connect/token 2>/dev/null \
       | sed 's/.*access_token":"\([^"]*\)".*/\1/' || true)
     [[ -n "$TOKEN" && "$TOKEN" != *"error"* ]] && break
@@ -142,27 +142,27 @@ else
   if [[ -z "$TOKEN" ]]; then
     warn "Keycloak admin-token niet verkregen; sla realm-patches over"
   else
-    kubectl -n uwv-auth exec "$KCPOD" -c keycloak -- bash -c "
-T=\$(curl -fsS -d 'client_id=admin-cli' -d 'username=kcadmin' -d 'password=uwv-dev-only-CHANGE-ME-2026' -d 'grant_type=password' http://localhost:8080/realms/master/protocol/openid-connect/token | sed 's/.*access_token\":\"\\([^\"]*\\)\".*/\\1/')
+    kubectl -n odap-auth exec "$KCPOD" -c keycloak -- bash -c "
+T=\$(curl -fsS -d 'client_id=admin-cli' -d 'username=kcadmin' -d 'password=odap-dev-only-CHANGE-ME' -d 'grant_type=password' http://localhost:8080/realms/master/protocol/openid-connect/token | sed 's/.*access_token\":\"\\([^\"]*\\)\".*/\\1/')
 KC=http://localhost:8080
 A='Authorization: Bearer '\"\$T\"
 
 # 1. profile + email scopes aanmaken (idempotent; realm-import skipt deze)
-curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/client-scopes\" 2>/dev/null | grep -q '\"name\":\"profile\"' || \\
-  curl -sS -X POST -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/uwv/client-scopes\" -d '{\"name\":\"profile\",\"protocol\":\"openid-connect\",\"attributes\":{\"include.in.token.scope\":\"true\"},\"protocolMappers\":[{\"name\":\"username\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usermodel-property-mapper\",\"config\":{\"user.attribute\":\"username\",\"claim.name\":\"preferred_username\",\"jsonType.label\":\"String\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"userinfo.token.claim\":\"true\"}}]}' -o /dev/null
+curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/client-scopes\" 2>/dev/null | grep -q '\"name\":\"profile\"' || \\
+  curl -sS -X POST -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/client-scopes\" -d '{\"name\":\"profile\",\"protocol\":\"openid-connect\",\"attributes\":{\"include.in.token.scope\":\"true\"},\"protocolMappers\":[{\"name\":\"username\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usermodel-property-mapper\",\"config\":{\"user.attribute\":\"username\",\"claim.name\":\"preferred_username\",\"jsonType.label\":\"String\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"userinfo.token.claim\":\"true\"}}]}' -o /dev/null
 
-curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/client-scopes\" 2>/dev/null | grep -q '\"name\":\"email\"' || \\
-  curl -sS -X POST -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/uwv/client-scopes\" -d '{\"name\":\"email\",\"protocol\":\"openid-connect\",\"attributes\":{\"include.in.token.scope\":\"true\"},\"protocolMappers\":[{\"name\":\"email\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usermodel-property-mapper\",\"config\":{\"user.attribute\":\"email\",\"claim.name\":\"email\",\"jsonType.label\":\"String\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"userinfo.token.claim\":\"true\"}}]}' -o /dev/null
+curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/client-scopes\" 2>/dev/null | grep -q '\"name\":\"email\"' || \\
+  curl -sS -X POST -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/client-scopes\" -d '{\"name\":\"email\",\"protocol\":\"openid-connect\",\"attributes\":{\"include.in.token.scope\":\"true\"},\"protocolMappers\":[{\"name\":\"email\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usermodel-property-mapper\",\"config\":{\"user.attribute\":\"email\",\"claim.name\":\"email\",\"jsonType.label\":\"String\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"userinfo.token.claim\":\"true\"}}]}' -o /dev/null
 
 # 2. scopes assignen aan alle OIDC-clients (idempotent — PUT geeft 204 ook bij re-assign)
-PROFILE=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/client-scopes\" | tr '{' '\\n' | grep '\"name\":\"profile\"' | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
-EMAIL=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/client-scopes\" | tr '{' '\\n' | grep '\"name\":\"email\"' | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
-ROLES=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/client-scopes\" | tr '{' '\\n' | grep '\"name\":\"roles\"' | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
+PROFILE=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/client-scopes\" | tr '{' '\\n' | grep '\"name\":\"profile\"' | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
+EMAIL=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/client-scopes\" | tr '{' '\\n' | grep '\"name\":\"email\"' | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
+ROLES=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/client-scopes\" | tr '{' '\\n' | grep '\"name\":\"roles\"' | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
 for c in superset airflow nifi openmetadata minio; do
-  CID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/clients?clientId=\$c\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
+  CID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/clients?clientId=\$c\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
   [ -z \"\$CID\" ] && continue
   for s in \$PROFILE \$EMAIL \$ROLES; do
-    curl -sS -X PUT -H \"\$A\" \"\$KC/admin/realms/uwv/clients/\$CID/default-client-scopes/\$s\" -o /dev/null
+    curl -sS -X PUT -H \"\$A\" \"\$KC/admin/realms/odap/clients/\$CID/default-client-scopes/\$s\" -o /dev/null
   done
 done
 
@@ -172,99 +172,99 @@ done
 # (Pac4j slaat het refresh-token op in z'n session; bij /api/v1/auth/login
 # raadpleegt het die en faalt loggedInUser met 401 'No refresh token
 # found against session' als refresh-tokens uit staan).
-OM_CID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/clients?clientId=openmetadata\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
+OM_CID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/clients?clientId=openmetadata\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
 if [ -n \"\$OM_CID\" ]; then
   # Idempotent: stuur volledige client-shape — alleen 'attributes' meegeven
   # reset andere fields (redirectUris, publicClient, flows) naar defaults.
-  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/uwv/clients/\$OM_CID\" -d '{\"publicClient\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"redirectUris\":[\"https://openmetadata.uwv-platform.local:8443/*\",\"https://openmetadata.uwv-platform.local/*\",\"http://openmetadata.uwv-platform.local:8443/*\",\"http://openmetadata.uwv-platform.local/*\"],\"attributes\":{\"access.token.lifespan\":\"86400\",\"client.session.max.lifespan\":\"86400\",\"client.session.idle.timeout\":\"28800\",\"use.refresh.tokens\":\"true\",\"post.logout.redirect.uris\":\"+\"}}' -o /dev/null
+  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/clients/\$OM_CID\" -d '{\"publicClient\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"redirectUris\":[\"https://openmetadata.odap.local:8443/*\",\"https://openmetadata.odap.local/*\",\"http://openmetadata.odap.local:8443/*\",\"http://openmetadata.odap.local/*\"],\"attributes\":{\"access.token.lifespan\":\"86400\",\"client.session.max.lifespan\":\"86400\",\"client.session.idle.timeout\":\"28800\",\"use.refresh.tokens\":\"true\",\"post.logout.redirect.uris\":\"+\"}}' -o /dev/null
 fi
 
 # 3. Unmanaged attribute policy enablen — Keycloak 24+ heeft Declarative
 #    User Profile met unmanaged-attributes standaard UIT. Zonder deze
 #    setting wordt de \\\"policy\\\" custom attribute silently genegeerd
 #    (PUT geeft 204 maar er wordt niets opgeslagen).
-PROFILE_CFG=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/users/profile\" 2>/dev/null)
+PROFILE_CFG=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/users/profile\" 2>/dev/null)
 if ! echo \"\$PROFILE_CFG\" | grep -q '\"unmanagedAttributePolicy\":\"ADMIN_EDIT\"'; then
   echo \"\$PROFILE_CFG\" | sed -e 's/}\$/,\"unmanagedAttributePolicy\":\"ADMIN_EDIT\"}/' > /tmp/up.json
-  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/uwv/users/profile\" --data @/tmp/up.json -o /dev/null
+  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/users/profile\" --data @/tmp/up.json -o /dev/null
 fi
 
 # 4. policy attribute voor MinIO consoleAdmin op demo-admins. NB: PUT
 #    moet email + enabled MEEsturen — partial body wist andere velden.
 for u in wia.beoordelaar platform.admin; do
-  KCUID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/users?username=\$u\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
+  KCUID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/users?username=\$u\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
   [ -z \"\$KCUID\" ] && continue
-  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/uwv/users/\$KCUID\" \\
-    -d \"{\\\"username\\\":\\\"\$u\\\",\\\"email\\\":\\\"\$u@uwv-platform.local\\\",\\\"emailVerified\\\":true,\\\"enabled\\\":true,\\\"attributes\\\":{\\\"policy\\\":[\\\"consoleAdmin\\\"]}}\" -o /dev/null
+  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/users/\$KCUID\" \\
+    -d \"{\\\"username\\\":\\\"\$u\\\",\\\"email\\\":\\\"\$u@odap.local\\\",\\\"emailVerified\\\":true,\\\"enabled\\\":true,\\\"attributes\\\":{\\\"policy\\\":[\\\"consoleAdmin\\\"]}}\" -o /dev/null
 done
 
 # 5. TOTP-requirement clearen voor demo-admins zodat eerste login simpel is
 for u in platform.admin wajong.arbeidsdeskundige data.engineer; do
-  KCUID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/users?username=\$u\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
+  KCUID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/users?username=\$u\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
   [ -z \"\$KCUID\" ] && continue
-  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/uwv/users/\$KCUID\" -d \"{\\\"username\\\":\\\"\$u\\\",\\\"email\\\":\\\"\$u@uwv-platform.local\\\",\\\"emailVerified\\\":true,\\\"enabled\\\":true,\\\"requiredActions\\\":[]}\" -o /dev/null
-  curl -sS -X DELETE -H \"\$A\" \"\$KC/admin/realms/uwv/attack-detection/brute-force/users/\$KCUID\" -o /dev/null
+  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/users/\$KCUID\" -d \"{\\\"username\\\":\\\"\$u\\\",\\\"email\\\":\\\"\$u@odap.local\\\",\\\"emailVerified\\\":true,\\\"enabled\\\":true,\\\"requiredActions\\\":[]}\" -o /dev/null
+  curl -sS -X DELETE -H \"\$A\" \"\$KC/admin/realms/odap/attack-detection/brute-force/users/\$KCUID\" -o /dev/null
 done
 " >/dev/null 2>&1
     log "  Keycloak realm-patches toegepast"
 
     # ---- Add .cloud redirect URIs to OIDC clients ----
-    # The base realm-uwv.json registers only *.uwv-platform.local/* as valid
+    # The base realm.json registers only *.odap.local/* as valid
     # redirect URIs. On AKS, ingress-nginx rewrites Location: .local Keycloak
     # -> .cloud Keycloak (via proxy-redirect-from/-to in the cloud-ingresses
     # manifest), so the browser ends up at .cloud — but Keycloak then rejects
     # the .cloud redirect_uri parameter unless it's in the allowed list. Add
     # the .cloud variants here, idempotent (skip if already present).
     log "AKS-post: add .cloud redirect URIs to OIDC clients"
-    kubectl -n uwv-auth exec "$KCPOD" -c keycloak -- bash -c "
-T=\$(curl -fsS -d 'client_id=admin-cli' -d 'username=kcadmin' -d 'password=uwv-dev-only-CHANGE-ME-2026' -d 'grant_type=password' http://localhost:8080/realms/master/protocol/openid-connect/token | sed 's/.*access_token\":\"\\([^\"]*\\)\".*/\\1/')
+    kubectl -n odap-auth exec "$KCPOD" -c keycloak -- bash -c "
+T=\$(curl -fsS -d 'client_id=admin-cli' -d 'username=kcadmin' -d 'password=odap-dev-only-CHANGE-ME' -d 'grant_type=password' http://localhost:8080/realms/master/protocol/openid-connect/token | sed 's/.*access_token\":\"\\([^\"]*\\)\".*/\\1/')
 A=\"Authorization: Bearer \$T\"
 KC=http://localhost:8080
 
 patch_uris() {
   local c=\$1; shift
-  local CID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/clients?clientId=\$c\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
+  local CID=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/clients?clientId=\$c\" 2>/dev/null | grep -oE '\"id\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4)
   [ -z \"\$CID\" ] && return
-  local CUR=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/uwv/clients/\$CID\" | grep -oE '\"redirectUris\":\\[[^]]*\\]' | head -1 | sed -E 's/.*\\[(.*)\\]/\\1/')
+  local CUR=\$(curl -fsS -H \"\$A\" \"\$KC/admin/realms/odap/clients/\$CID\" | grep -oE '\"redirectUris\":\\[[^]]*\\]' | head -1 | sed -E 's/.*\\[(.*)\\]/\\1/')
   declare -A SEEN
   local OUT=()
   IFS=, read -ra ITEMS <<< \"\$CUR\"
   for u in \"\${ITEMS[@]}\"; do u=\$(echo \"\$u\" | tr -d '\"'); SEEN[\$u]=1; OUT+=(\"\\\"\$u\\\"\"); done
   for u in \"\$@\"; do [ -z \"\${SEEN[\$u]:-}\" ] && OUT+=(\"\\\"\$u\\\"\") && SEEN[\$u]=1; done
   local NEW=\"[\$(IFS=,; echo \"\${OUT[*]}\")]\"
-  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/uwv/clients/\$CID\" -d \"{\\\"redirectUris\\\":\$NEW}\" -o /dev/null
+  curl -sS -X PUT -H \"\$A\" -H 'Content-Type: application/json' \"\$KC/admin/realms/odap/clients/\$CID\" -d \"{\\\"redirectUris\\\":\$NEW}\" -o /dev/null
 }
 
-patch_uris superset 'https://superset.uwv-platform.cloud/*' 'https://superset.uwv-platform.cloud:8443/*'
-patch_uris airflow 'https://airflow.uwv-platform.cloud/*' 'https://airflow.uwv-platform.cloud:8443/*'
-patch_uris openmetadata 'https://openmetadata.uwv-platform.cloud/*' 'https://openmetadata.uwv-platform.cloud:8443/*'
-patch_uris minio 'https://minio-console.uwv-platform.cloud:8443/oauth_callback' 'https://minio-console.uwv-platform.cloud:8443/*'
-patch_uris portal 'https://platform.uwv-platform.cloud:8443/oauth2/callback' 'https://platform.uwv-platform.cloud/oauth2/callback'
-patch_uris jupyter 'https://jupyter.uwv-platform.cloud/hub/oauth_callback' 'https://jupyter.uwv-platform.cloud:8443/hub/oauth_callback'
+patch_uris superset 'https://superset.odap-platform.cloud/*' 'https://superset.odap-platform.cloud:8443/*'
+patch_uris airflow 'https://airflow.odap-platform.cloud/*' 'https://airflow.odap-platform.cloud:8443/*'
+patch_uris openmetadata 'https://openmetadata.odap-platform.cloud/*' 'https://openmetadata.odap-platform.cloud:8443/*'
+patch_uris minio 'https://minio-console.odap-platform.cloud:8443/oauth_callback' 'https://minio-console.odap-platform.cloud:8443/*'
+patch_uris portal 'https://platform.odap-platform.cloud:8443/oauth2/callback' 'https://platform.odap-platform.cloud/oauth2/callback'
+patch_uris jupyter 'https://jupyter.odap-platform.cloud/hub/oauth_callback' 'https://jupyter.odap-platform.cloud:8443/hub/oauth_callback'
 
-# Also register the eu-sovereigndataplatform.com redirects (current public
+# Also register the example.com redirects (current public
 # DNS — the .cloud variants above are kept for backward compat).
 # NB: nifi en trino zijn niet langer publiek bereikbaar (geen Ingress
 # meer); flows worden as-code beheerd en Trino-queries gaan via
 # Superset/Jupyter/dbt/Airflow. Geen redirect URIs nodig.
-patch_uris superset 'https://superset.eu-sovereigndataplatform.com/*'
-patch_uris airflow 'https://airflow.eu-sovereigndataplatform.com/*' 'https://airflow.eu-sovereigndataplatform.com/oauth-authorized/keycloak'
-patch_uris openmetadata 'https://openmetadata.eu-sovereigndataplatform.com/*' 'https://openmetadata.eu-sovereigndataplatform.com/callback'
-patch_uris minio 'https://minio.eu-sovereigndataplatform.com/oauth_callback' 'https://minio.eu-sovereigndataplatform.com/*'
-patch_uris portal 'https://platform.eu-sovereigndataplatform.com/oauth2/callback' 'https://eu-sovereigndataplatform.com/oauth2/callback'
-patch_uris jupyter 'https://jupyter.eu-sovereigndataplatform.com/hub/oauth_callback'
+patch_uris superset 'https://superset.example.com/*'
+patch_uris airflow 'https://airflow.example.com/*' 'https://airflow.example.com/oauth-authorized/keycloak'
+patch_uris openmetadata 'https://openmetadata.example.com/*' 'https://openmetadata.example.com/callback'
+patch_uris minio 'https://minio.example.com/oauth_callback' 'https://minio.example.com/*'
+patch_uris portal 'https://platform.example.com/oauth2/callback' 'https://example.com/oauth2/callback'
+patch_uris jupyter 'https://jupyter.example.com/hub/oauth_callback'
 " >/dev/null 2>&1 || warn "  redirect-URI patch failed (browse Keycloak admin to fix manually)"
-    log "  .cloud + .eu-sovereigndataplatform.com redirect URIs added (idempotent)"
+    log "  .cloud + .example.com redirect URIs added (idempotent)"
   fi
 fi
 
 # ---- MinIO restart zodat OIDC-discovery slaagt ----
 # MinIO doet OIDC discovery alleen bij startup. Als de pod al bestond vóór
 # de DNS-fix klaar was, faalt OIDC en is er geen Keycloak-knop in Console.
-if kubectl -n uwv-platform get deployment minio >/dev/null 2>&1; then
+if kubectl -n odap-platform get deployment minio >/dev/null 2>&1; then
   log "AKS-post: MinIO herstart (OIDC discovery na DNS-fix)"
-  kubectl -n uwv-platform rollout restart deployment minio >/dev/null
-  kubectl -n uwv-platform rollout status deployment minio --timeout=120s >/dev/null \
+  kubectl -n odap-platform rollout restart deployment minio >/dev/null
+  kubectl -n odap-platform rollout status deployment minio --timeout=120s >/dev/null \
     || warn "MinIO rollout traag"
 fi
 

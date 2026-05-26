@@ -8,7 +8,7 @@
 #   Mirrors the AKS workaround.
 # - authentication URLs point at the public LE-served Keycloak.
 # - extraInitContainers / extraVolumes / extraVolumeMounts / extraEnvs:
-#   base values.yaml imports a uwv-ca-bundle ConfigMap for the self-signed
+#   base values.yaml imports a platform-ca-bundle ConfigMap for the self-signed
 #   dev CA. SKE uses LE-issued real certs, so empty them out (the ConfigMap
 #   doesn't exist on cloud deployments — would cause missing-volume failure).
 
@@ -22,22 +22,22 @@ openmetadata:
       host: 0.0.0.0
 
     authentication:
-      authority: https://keycloak.freshstackable.com/realms/uwv
-      callbackUrl: https://openmetadata.freshstackable.com/callback
+      authority: https://keycloak.example.com/realms/odap
+      callbackUrl: https://openmetadata.example.com/callback
       publicKeys:
-        - http://openmetadata.uwv-meta.svc.cluster.local:8585/api/v1/system/config/jwks
-        - https://keycloak.freshstackable.com/realms/uwv/protocol/openid-connect/certs
+        - http://openmetadata.odap-meta.svc.cluster.local:8585/api/v1/system/config/jwks
+        - https://keycloak.example.com/realms/odap/protocol/openid-connect/certs
 
       oidcConfiguration:
-        discoveryUri: https://keycloak.freshstackable.com/realms/uwv/.well-known/openid-configuration
-        callbackUrl: https://openmetadata.freshstackable.com/callback
-        serverUrl: https://openmetadata.freshstackable.com
+        discoveryUri: https://keycloak.example.com/realms/odap/.well-known/openid-configuration
+        callbackUrl: https://openmetadata.example.com/callback
+        serverUrl: https://openmetadata.example.com
 
     authorizer:
-      principalDomain: freshstackable.com
+      principalDomain: example.com
 
-# Chart-managed ingress.hosts stays on .uwv-platform.local — public SKE
-# ingress at openmetadata.freshstackable.com lands in Phase 4 at
+# Chart-managed ingress.hosts stays on .odap.local — public SKE
+# ingress at openmetadata.example.com lands in Phase 4 at
 # infrastructure/stackit/public-ingresses.yaml.
 
 # No self-signed CA on SKE — Let's Encrypt + default JDK trust store cover it.

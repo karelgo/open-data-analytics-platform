@@ -168,7 +168,7 @@ const rolesPayload = roles.map((r) => ({
   }
 
   function user(): string {
-    return sessionStorage.getItem('uwv-portal-user') ?? 'UWV-medewerker';
+    return sessionStorage.getItem('odap-portal-user') ?? 'UWV-medewerker';
   }
 
   function isComplete(roleId: string): boolean {

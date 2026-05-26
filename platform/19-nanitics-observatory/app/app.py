@@ -64,7 +64,7 @@ from nanitics.observatory import create_observatory_router
 
 from watcher import WATCHER_DEFAULT_TASK, WATCHER_SYSTEM_PROMPT, WATCHER_TOOLS
 
-LOG = logging.getLogger("nanitics-observatory-uwv")
+LOG = logging.getLogger("nanitics-observatory")
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 
 UI_DIR = Path("/srv/observatory-ui")
@@ -88,9 +88,9 @@ async def greet(name: str) -> str:
 @tool("describe_platform", "Describe the UWV reference data platform layout.")
 async def describe_platform() -> str:
     return (
-        "UWV reference data platform on k3d. Namespaces: uwv-platform "
-        "(portal, ingress), uwv-data (Trino/Spark/Hive), uwv-meta "
-        "(metastore, catalogs), uwv-monitoring, uwv-auth (Keycloak). "
+        "UWV reference data platform on k3d. Namespaces: odap-platform "
+        "(portal, ingress), odap-data (Trino/Spark/Hive), odap-meta "
+        "(metastore, catalogs), odap-monitoring, odap-auth (Keycloak). "
         "Storage: MinIO S3. Auth: Keycloak via oauth2-proxy."
     )
 
@@ -138,18 +138,18 @@ class LATSNodeEvaluator:
             return EvaluationResult(
                 verdict=EvaluationVerdict.ACCEPT,
                 score=1.0,
-                evaluator_name="lats-uwv",
+                evaluator_name="lats",
             )
         if "dead end" in lower or "stuck" in lower or "cannot proceed" in lower:
             return EvaluationResult(
                 verdict=EvaluationVerdict.REJECT,
                 score=0.0,
-                evaluator_name="lats-uwv",
+                evaluator_name="lats",
             )
         return EvaluationResult(
             verdict=EvaluationVerdict.REVISE,
             score=0.6,
-            evaluator_name="lats-uwv",
+            evaluator_name="lats",
         )
 
 
@@ -252,7 +252,7 @@ SYSTEM_PROMPT = (
 
 async def _run_react(emitter: Any, task: str) -> str:
     agent = ReActAgent(
-        name="uwv-react",
+        name="react",
         llm_client=_make_llm_client(),
         emitter=emitter,
         tools=ALL_TOOLS,
@@ -263,7 +263,7 @@ async def _run_react(emitter: Any, task: str) -> str:
 
 async def _run_rewoo(emitter: Any, task: str) -> str:
     agent = ReWOOAgent(
-        name="uwv-rewoo",
+        name="rewoo",
         llm_client=_make_llm_client(),
         emitter=emitter,
         tools=[search, summarize, analyze, describe_platform],
@@ -279,14 +279,14 @@ async def _run_rewoo(emitter: Any, task: str) -> str:
 
 async def _run_reflexion(emitter: Any, task: str) -> str:
     inner = ReActAgent(
-        name="uwv-reflexion-inner",
+        name="reflexion-inner",
         llm_client=_make_llm_client(),
         emitter=emitter,  # rebound by Reflexion at attempt start
         tools=ALL_TOOLS,
         system_prompt=SYSTEM_PROMPT,
     )
     agent = ReflexionAgent(
-        name="uwv-reflexion",
+        name="reflexion",
         llm_client=_make_llm_client(),
         emitter=emitter,
         system_prompt=SYSTEM_PROMPT + " Use reflection between attempts.",
@@ -300,7 +300,7 @@ async def _run_reflexion(emitter: Any, task: str) -> str:
 
 async def _run_lats(emitter: Any, task: str) -> str:
     agent = LATSAgent(
-        name="uwv-lats",
+        name="lats",
         llm_client=_make_llm_client(),
         emitter=emitter,
         tools=[search, summarize, analyze, describe_platform],
@@ -319,7 +319,7 @@ async def _run_lats(emitter: Any, task: str) -> str:
 
 async def _run_watcher(emitter: Any, task: str) -> str:
     agent = ReActAgent(
-        name="uwv-platform-watcher",
+        name="odap-platform-watcher",
         llm_client=_make_llm_client(),
         emitter=emitter,
         tools=[describe_platform, *WATCHER_TOOLS],
@@ -383,7 +383,7 @@ AGENTS: dict[str, dict[str, Any]] = {
 @app.get("/", include_in_schema=False)
 async def root() -> RedirectResponse:
     """Bare hostname → chat UI. Avoids the 'nginx 404' confusion when
-    someone opens https://nanitics.uwv-platform.local:8443/ without
+    someone opens https://nanitics.odap.local:8443/ without
     knowing the right path."""
     return RedirectResponse(url="/chat", status_code=307)
 
@@ -428,7 +428,7 @@ async def _execute(agent_slug: str, body: RunRequest) -> dict[str, str]:
     run_id, result = await executor.execute(
         _work,
         metadata={
-            "source": "uwv-platform",
+            "source": "odap-platform",
             "provider": LLM_PROVIDER,
             "agent_type": agent_slug,
         },
@@ -474,7 +474,7 @@ async def _execute_in_background(agent_slug: str, body: RunRequest) -> str:
     run_id = str(uuid.uuid4())
     trace_id = str(uuid.uuid4())
     metadata = {
-        "source": "uwv-platform",
+        "source": "odap-platform",
         "provider": LLM_PROVIDER,
         "agent_type": agent_slug,
         "surface": "chat-stream",

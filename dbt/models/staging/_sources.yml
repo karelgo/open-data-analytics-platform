@@ -12,7 +12,7 @@ sources:
     database: bronze
     schema: uwv
     description: |
-      Raw JSONL envelopes uit s3a://uwv-raw/<domain>/<entity>/. Per stream
+      Raw JSONL envelopes uit s3a://odap-raw/<domain>/<entity>/. Per stream
       één Delta-tabel.
       Schema: `payload (string), stream, source_file, source_ts, ingestion_ts, event_date`.
     loader: spark-streaming
@@ -105,19 +105,19 @@ sources:
   # Silver source voor Databricks (Unity Catalog).
   #
   # Tabellen worden geschreven door uc11_silver.ipynb in de Databricks
-  # workspace → uwv_databricks.silver.<name>. Schema is dezelfde als de
+  # workspace → databricks.silver.<name>. Schema is dezelfde als de
   # `silver` source voor Fabric, alleen ander adres.
   #
   # int_klantreis_events.sql schakelt naar deze source als target.type ==
   # 'databricks' (zie macro klantreis_entity).
   # ─────────────────────────────────────────────────────────────────
   - name: silver_uc
-    database: "{{ env_var('DATABRICKS_CATALOG', 'uwv_databricks') }}"
+    database: "{{ env_var('DATABRICKS_CATALOG', 'databricks') }}"
     schema: silver
     description: |
       Pre-parsed silver Delta-tabellen in Databricks Unity Catalog,
       geschreven door uc11_silver.ipynb. Identifier matcht de tabel-naam
-      onder uwv_databricks.silver.*.
+      onder databricks.silver.*.
 
     tables:
       - name: persona

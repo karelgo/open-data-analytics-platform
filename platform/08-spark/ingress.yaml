@@ -5,10 +5,10 @@
 # seconden tot minuten dus geeft de ingress meestal 503.
 #
 # Nu: route naar de SparkHistoryServer (zie history-server.yaml). Die leest
-# event-logs uit s3a://uwv-checkpoints/spark-events/ en serveert UI op 18080.
+# event-logs uit s3a://odap-checkpoints/spark-events/ en serveert UI op 18080.
 # Permanent beschikbaar, toont alle historische én actieve runs.
 #
-# Wat krijg je op https://spark.uwv-platform.local:8443/ ?
+# Wat krijg je op https://spark.odap.local:8443/ ?
 #   - Lijst van completed applications (silver-wia-*, gold-wia-*, seed-bronze-wia)
 #   - Per app: Jobs/Stages/Tasks/SQL/Environment tabs zoals een live UI
 #   - Geen SSO — Spark UI heeft geen native auth. Acceptabel voor dev/k3d.
@@ -17,7 +17,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: spark
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   type: ClusterIP
   selector:
@@ -36,20 +36,20 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: spark
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     # Iframe-allow voor portal embed-shell (cross-origin).
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["spark.uwv-platform.local"]
+    - hosts: ["spark.odap.local"]
       secretName: spark-tls
   rules:
-    - host: spark.uwv-platform.local
+    - host: spark.odap.local
       http:
         paths:
           - path: /

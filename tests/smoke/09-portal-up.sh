@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Smoke test 09 — UWV Platform Portal (Astro + oauth2-proxy).
+# Smoke test 09 — ODAP Portal (Astro + oauth2-proxy).
 #
 # Mode-aware. On k3d the portal is the chart-style `portal` Deployment
-# (locally-built uwv-platform/portal:dev image). On AKS that image isn't
+# (locally-built odap/portal:dev image). On AKS that image isn't
 # pullable, so platform-overlays/aks/15-portal/ replaces the Deployment +
 # Service + Ingress with `platform-landing` (Astro tarball ConfigMap +
 # public-registry nginx + sidecar oauth2-proxy).
@@ -22,9 +22,9 @@ skip() { printf '  [SKIP] %s\n' "$*"; }
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 
 DEPLOYMENT_MODE="${DEPLOYMENT_MODE:-${MODE:-k3d}}"
-PLATFORM_DOMAIN="${PLATFORM_DOMAIN:-uwv-platform.local}"
+PLATFORM_DOMAIN="${PLATFORM_DOMAIN:-odap.local}"
 
-NS=uwv-platform
+NS=odap-platform
 case "$DEPLOYMENT_MODE" in
   aks)
     # The AKS portal is platform-landing (consolidated from
@@ -112,15 +112,15 @@ fi
 
 # 6. Keycloak realm bevat client 'portal'
 log "Keycloak realm 'uwv' kent client 'portal'"
-KC_RESP=$(kubectl -n uwv-auth run kc-portal-check-$RANDOM \
+KC_RESP=$(kubectl -n odap-auth run kc-portal-check-$RANDOM \
             --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
             curl -fsSL --max-time 10 \
-              "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/.well-known/openid-configuration" \
+              "http://keycloak.odap-auth.svc.cluster.local/realms/odap/.well-known/openid-configuration" \
             2>/dev/null || true)
 if echo "$KC_RESP" | grep -q '"issuer"'; then
   pass "Keycloak realm 'uwv' beantwoordt OIDC-discovery"
   # NB: zonder admin-API kunnen we client-list niet enumereren; dat is OK,
-  # de realm-import bevat 'portal' (zie infrastructure/helm/keycloak/realm-uwv.json).
+  # de realm-import bevat 'portal' (zie infrastructure/helm/keycloak/realm.json).
   skip "client-enumeration vereist Keycloak admin-API; vertrouw op realm-import"
 else
   fail "Keycloak realm 'uwv' beantwoordt geen OIDC-discovery"

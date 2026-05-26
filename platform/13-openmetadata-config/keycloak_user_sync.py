@@ -16,9 +16,9 @@ Dit script:
 Wordt door een CronJob aangeroepen (dagelijks). Sla onbekende velden over.
 
 Env-vars:
-  OM_URL              http://openmetadata.uwv-meta.svc.cluster.local:8585
+  OM_URL              http://openmetadata.odap-meta.svc.cluster.local:8585
   OM_JWT_TOKEN        admin/bot JWT met user-create-recht
-  KEYCLOAK_URL        http://keycloak.uwv-auth.svc.cluster.local
+  KEYCLOAK_URL        http://keycloak.odap-auth.svc.cluster.local
   KEYCLOAK_REALM      uwv (default)
   KEYCLOAK_CLIENT_ID  admin-cli (default — public client)
   KEYCLOAK_ADMIN_USER kcadmin (Bitnami chart default)
@@ -33,12 +33,12 @@ import sys
 import requests
 
 OM_URL = os.environ.get(
-    "OM_URL", "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+    "OM_URL", "http://openmetadata.odap-meta.svc.cluster.local:8585"
 ).rstrip("/")
 OM_TOKEN = os.environ["OM_JWT_TOKEN"]
 
 KC_URL = os.environ.get(
-    "KEYCLOAK_URL", "http://keycloak.uwv-auth.svc.cluster.local"
+    "KEYCLOAK_URL", "http://keycloak.odap-auth.svc.cluster.local"
 ).rstrip("/")
 KC_REALM = os.environ.get("KEYCLOAK_REALM", "uwv")
 KC_CLIENT = os.environ.get("KEYCLOAK_CLIENT_ID", "admin-cli")
@@ -60,7 +60,7 @@ def log(msg: str) -> None:
 
 def get_kc_token() -> str:
     """Krijgt admin-token via password-flow op master-realm. Keycloak's
-    admin-API draait altijd op master, niet op het uwv-realm."""
+    admin-API draait altijd op master, niet op het odap-realm."""
     r = requests.post(
         f"{KC_URL}/realms/master/protocol/openid-connect/token",
         data={
@@ -104,7 +104,7 @@ def upsert_om_user(user: dict) -> None:
     username = user.get("username")
     if not username:
         return
-    email = user.get("email") or f"{username}@uwv-platform.local"
+    email = user.get("email") or f"{username}@odap.local"
     display = (
         " ".join(filter(None, [user.get("firstName"), user.get("lastName")]))
         or username

@@ -1,6 +1,6 @@
 ---
 title: Home
-description: UWV referentie-implementatie van een compliant data- en analyticsplatform.
+description: ODAP reference implementation van een compliant data- en analyticsplatform.
 hide:
   - navigation
 ---
@@ -8,16 +8,16 @@ hide:
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
      Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
-# UWV Reference Data Platform
+# Open Data & Analytics Platform
 
 Een **fictieve, illustratieve** referentie-implementatie van een modern data-
 en analyticsplatform voor UWV, gebouwd op open source en gericht op compliance
 met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
 
-!!! warning "Geen echte UWV-data"
+!!! warning "Geen echte ODAP data"
     Geen echte BSN's, geen echte productiecode. Alle datasets zijn synthetisch
-    en gemarkeerd met `# SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE`.
-    Deze repo is geen UWV-product en geen aanbestedingsstuk.
+    en gemarkeerd met `# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`.
+    Deze repo is geen ODAP product en geen aanbestedingsstuk.
 
 ## Wat vind je hier?
 
@@ -92,9 +92,9 @@ git clone https://github.com/fresh-minds/FreshStackableDataPlatform.git
 cd FreshStackableDataPlatform
 
 # DNS-injectie voor lokale toegang
-echo "127.0.0.1 keycloak.uwv-platform.local \
-  superset.uwv-platform.local airflow.uwv-platform.local \
-  minio.uwv-platform.local openmetadata.uwv-platform.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1 keycloak.odap.local \
+  superset.odap.local airflow.odap.local \
+  minio.odap.local openmetadata.odap.local" | sudo tee -a /etc/hosts
 
 # Cluster + platform deployen (~15-30 min op de eerste run)
 make cluster        # k3d cluster create

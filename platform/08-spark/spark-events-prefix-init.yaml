@@ -1,4 +1,4 @@
-# One-shot Job: maak s3a://uwv-checkpoints/spark-events/.keep aan zodat
+# One-shot Job: maak s3a://odap-checkpoints/spark-events/.keep aan zodat
 # SparkHistoryServer kan starten (anders FsHistoryProvider crasht met
 # "Log directory specified does not exist").
 #
@@ -11,9 +11,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: spark-events-prefix-init
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    uwv.nl/component: spark-history
+    odap.io/component: spark-history
 spec:
   ttlSecondsAfterFinished: 600
   backoffLimit: 3
@@ -43,5 +43,5 @@ spec:
               # Maak het prefix aan via een placeholder. mc cp van /dev/null
               # werkt niet — kleine echo-pipe in tmpfile.
               echo "spark-events directory marker (created by spark-events-prefix-init Job)" > /tmp/.keep
-              mc cp --insecure /tmp/.keep local/uwv-checkpoints/spark-events/.keep
+              mc cp --insecure /tmp/.keep local/odap-checkpoints/spark-events/.keep
               echo "OK: spark-events/.keep aanwezig"

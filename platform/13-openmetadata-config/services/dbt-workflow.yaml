@@ -1,5 +1,5 @@
 # dbt-workflow — leest manifest.json + catalog.json + run_results.json
-# uit s3://uwv-meta/dbt/<run_id>/ en koppelt:
+# uit s3://odap-meta/dbt/<run_id>/ en koppelt:
 #   - dbt-models aan Trino-tables (lineage)
 #   - dbt-tests aan OpenMetadata data-quality
 #   - dbt-meta (legal_basis, doelbinding, ...) aan OpenMetadata-tags via auto-classification
@@ -9,19 +9,19 @@
 ---
 source:
   type: dbt
-  serviceName: uwv-trino   # dbt-models worden gekoppeld aan deze Trino-service
+  serviceName: trino   # dbt-models worden gekoppeld aan deze Trino-service
   sourceConfig:
     config:
       type: DBT
       dbtConfigSource:
         dbtConfigType: s3
         dbtSecurityConfig:
-          awsAccessKeyId: uwvadmin
+          awsAccessKeyId: platformadmin
           awsSecretAccessKey: ${MINIO_SECRET_KEY}
           awsRegion: eu-nl-1
-          endPointURL: https://minio.uwv-platform.svc.cluster.local:9000
+          endPointURL: https://minio.odap-platform.svc.cluster.local:9000
         dbtPrefixConfig:
-          dbtBucketName: uwv-meta
+          dbtBucketName: odap-meta
           dbtObjectPrefix: dbt/latest/
 sink:
   type: metadata-rest
@@ -29,7 +29,7 @@ sink:
 workflowConfig:
   loggerLevel: INFO
   openMetadataServerConfig:
-    hostPort: http://openmetadata.uwv-meta.svc.cluster.local:8585/api
+    hostPort: http://openmetadata.odap-meta.svc.cluster.local:8585/api
     authProvider: openmetadata
     securityConfig:
       jwtToken: ${OM_JWT_TOKEN}

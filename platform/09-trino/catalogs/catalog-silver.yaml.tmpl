@@ -3,13 +3,13 @@ apiVersion: trino.stackable.tech/v1alpha1
 kind: TrinoCatalog
 metadata:
   name: silver
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    trino: uwv-trino
-    uwv.nl/zone: silver
-    uwv.nl/format: __TABLE_FORMAT__
+    trino: trino
+    odap.io/zone: silver
+    odap.io/format: __TABLE_FORMAT__
   annotations:
-    uwv.nl/description: "Silver layer — geconformeerd, gepseudonimiseerd waar mogelijk. Domain-engineers + analisten."
+    odap.io/description: "Silver layer — geconformeerd, gepseudonimiseerd waar mogelijk. Domain-engineers + analisten."
 spec:
   connector:
 __TABLE_FORMAT_CONNECTOR_BLOCK__

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: portal
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   replicas: 1
   strategy:
@@ -30,7 +30,7 @@ spec:
         # 1) De Astro static-build, geserveerd door nginx-unprivileged op :8080.
         #    Niet via Service blootgesteld — alleen via oauth2-proxy.
         - name: portal-web
-          image: uwv-platform/portal:dev
+          image: odap/portal:dev
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -75,13 +75,13 @@ spec:
         # zijn via /proc zichtbaar voor processen met dezelfde UID — dus
         # geen quick-win.
         - name: airflow-bridge
-          image: uwv-platform/portal-airflow-bridge:dev
+          image: odap/portal-airflow-bridge:dev
           imagePullPolicy: IfNotPresent
           env:
             - name: AIRFLOW_BASE_URL
-              value: "http://uwv-airflow-webserver.uwv-platform.svc.cluster.local:8080"
+              value: "http://airflow-webserver.odap-platform.svc.cluster.local:8080"
             - name: AIRFLOW_PUBLIC_URL
-              value: "https://platform.uwv-platform.local:8443/airflow"
+              value: "https://platform.odap.local:8443/airflow"
             - name: AIRFLOW_USERNAME
               valueFrom:
                 secretKeyRef: { name: airflow-api-bot, key: username }

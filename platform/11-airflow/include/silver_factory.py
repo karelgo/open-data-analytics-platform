@@ -46,21 +46,21 @@ DEFAULT_ARGS = {
 }
 
 # Locaties — gemount door airflowcluster.yaml podOverrides.
-DBT_PROJECT_PATH = Path(os.environ.get("UWV_DBT_PROJECT_PATH", "/opt/uwv/dbt"))
+DBT_PROJECT_PATH = Path(os.environ.get("DBT_PROJECT_PATH", "/opt/odap/dbt"))
 DBT_MANIFEST_PATH = Path(
-    os.environ.get("UWV_DBT_MANIFEST_PATH", "/opt/uwv/dbt/manifest.json")
+    os.environ.get("DBT_MANIFEST_PATH", "/opt/odap/dbt/manifest.json")
 )
-DBT_EXECUTABLE_PATH = os.environ.get("UWV_DBT_EXECUTABLE_PATH", "/usr/local/bin/dbt")
-DBT_IMAGE = os.environ.get("UWV_DBT_IMAGE", "uwv/dbt-trino:1.9.0-uwv")
+DBT_EXECUTABLE_PATH = os.environ.get("DBT_EXECUTABLE_PATH", "/usr/local/bin/dbt")
+DBT_IMAGE = os.environ.get("DBT_IMAGE", "odap/dbt-trino:1.9.0")
 
 
 def _profile_config() -> ProfileConfig:
-    """Cosmos profile-mapping naar Airflow Connection `trino_uwv`."""
+    """Cosmos profile-mapping naar Airflow Connection `trino_default`."""
     return ProfileConfig(
-        profile_name="uwv_trino",
+        profile_name="trino_default",
         target_name="dev",
         profile_mapping=TrinoCertificateProfileMapping(
-            conn_id="trino_uwv",
+            conn_id="trino_default",
             profile_args={
                 "schema": "{{ ref.schema }}",
                 "threads": 4,
@@ -108,7 +108,7 @@ def build_silver_dag(source: SourceSpec) -> DAG:
         ),
         operator_args={
             "image": DBT_IMAGE,
-            "namespace": "uwv-platform",
+            "namespace": "odap-platform",
             "is_delete_operator_pod": True,
             "get_logs": True,
             "container_resources": {

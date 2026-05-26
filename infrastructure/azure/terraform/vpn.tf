@@ -15,8 +15,8 @@ resource "tls_self_signed_cert" "vpn_root" {
   private_key_pem = tls_private_key.vpn_root[0].private_key_pem
 
   subject {
-    common_name  = "UWV Platform VPN Root CA"
-    organization = "UWV Reference Platform"
+    common_name  = "Platform VPN Root CA"
+    organization = "Open Data & Analytics Platform"
   }
 
   is_ca_certificate     = true
@@ -46,8 +46,8 @@ resource "tls_cert_request" "vpn_client" {
   private_key_pem = tls_private_key.vpn_client[0].private_key_pem
 
   subject {
-    common_name  = "uwv-platform-vpn-client"
-    organization = "UWV Reference Platform"
+    common_name  = "odap-platform-vpn-client"
+    organization = "Open Data & Analytics Platform"
   }
 }
 
@@ -153,7 +153,7 @@ resource "azurerm_virtual_network_gateway" "vpn" {
     vpn_client_protocols = ["IkeV2", "OpenVPN"]
 
     root_certificate {
-      name             = "uwv-platform-vpn-root"
+      name             = "odap-platform-vpn-root"
       public_cert_data = local.vpn_root_cert_b64
     }
   }

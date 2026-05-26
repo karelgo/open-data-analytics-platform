@@ -1,4 +1,4 @@
-# MASTER AGENT PROMPT v2 — UWV Data & Analytics Platform
+# MASTER AGENT PROMPT v2 — ODAP Data & Analytics Platform
 
 > **Hoe te gebruiken:** plaats deze prompt samen met de vier achtergrond-documenten
 > (zie §0) in één folder. Open Claude Code in die folder en geef deze prompt
@@ -14,9 +14,9 @@ directory staan als deze prompt. Ze zijn cumulatief: elk bouwt op het vorige.
 | # | Bestand | Wat het bevat | Waarom je het nodig hebt |
 |---|---|---|---|
 | 1 | `requirements-compliant-data-analyseplatform.md` | Generieke requirementsbaseline (~75 genummerde requirements) op basis van NORA, AVG, BIO/BIO2, NIS2 voor een modern data- en analyticsplatform | Het wettelijke en architectonische fundament. Elke maatregel die je bouwt moet hier op te herleiden zijn (R-NORA-xx, R-AVG-xx, R-BIO-xx, R-NIS2-xx). |
-| 2 | `referentiearchitectuur-uwv-data-analytics.md` | UWV-specifieke referentiearchitectuur, 10 uitgewerkte fictieve use cases (UC-01 t/m UC-10), CGM-mapping, AVG-grondslagen per UC | De inhoudelijke scope. Wanneer je een use case bouwt, ga **terug naar dit document** voor de details (welke bronnen, welke entiteiten, welke compliance-eisen, welke risico's). |
-| 3 | `uwv-platform-mapping-research.md` | Hoe Stackable, dbt-trino en OpenMetadata samen het platform vormen; component-tot-component-mapping | De technische blauwdruk. Hier staat exact welk component welke rol vervult. Geen overlap, geen gaten. |
-| 4 | `uwv-platform-adr-0002-iceberg-vs-delta.md` | Architectural Decision Record over tabelformaat (Iceberg vs Delta Lake) | Toelichting op de default-keuze (Iceberg) en wanneer/hoe je naar Delta switcht. |
+| 2 | `referentiearchitectuur-odap-data-analytics.md` | UWV-specifieke referentiearchitectuur, 10 uitgewerkte fictieve use cases (UC-01 t/m UC-10), CGM-mapping, AVG-grondslagen per UC | De inhoudelijke scope. Wanneer je een use case bouwt, ga **terug naar dit document** voor de details (welke bronnen, welke entiteiten, welke compliance-eisen, welke risico's). |
+| 3 | `odap-platform-mapping-research.md` | Hoe Stackable, dbt-trino en OpenMetadata samen het platform vormen; component-tot-component-mapping | De technische blauwdruk. Hier staat exact welk component welke rol vervult. Geen overlap, geen gaten. |
+| 4 | `odap-platform-adr-0002-iceberg-vs-delta.md` | Architectural Decision Record over tabelformaat (Iceberg vs Delta Lake) | Toelichting op de default-keuze (Iceberg) en wanneer/hoe je naar Delta switcht. |
 
 **Verplichte eerste actie voor jou als agent:**
 
@@ -42,16 +42,16 @@ Je bent een **senior platform engineer** met expertise in:
 - OpenMetadata 1.12+ (Helm)
 - Nederlandse overheidskaders (NORA, AVG, BIO/BIO2, NIS2, AI Act, Wet SUWI)
 
-Je bouwt een **referentie-implementatie** van het UWV-platform zoals beschreven
-in `referentiearchitectuur-uwv-data-analytics.md`. Het platform draait op
+Je bouwt een **referentie-implementatie** van het ODAP platform zoals beschreven
+in `referentiearchitectuur-odap-data-analytics.md`. Het platform draait op
 Kubernetes, gebruikt **uitsluitend open source**, en is volledig declaratief
 (alles als code).
 
 **Belangrijke randvoorwaarden:**
 
-1. **Geen echte UWV-data.** Uitsluitend **synthetische** data, gegenereerd door
+1. **Geen echte ODAP data.** Uitsluitend **synthetische** data, gegenereerd door
    scripts in dit project. Geen echte BSN's, namen, medische gegevens. Markeer
-   alle datasets met header "SYNTHETIC DATA — UWV REFERENCE PLATFORM".
+   alle datasets met header "SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM".
 2. **Geen hardcoded secrets.** Alles via Kubernetes Secrets, Stackable
    SecretClass, of een SealedSecret/SOPS-flow.
 3. **Idempotent en herstartbaar.** Elk script meerdere keren te draaien zonder
@@ -209,7 +209,7 @@ niet naar onderliggend formaat).
 ## §4 Repository-layout
 
 ```
-uwv-data-platform/
+odap-data-platform/
 ├── README.md
 ├── platform-config.yaml               ← centrale config (TABLE_FORMAT etc.)
 ├── docs/
@@ -267,7 +267,7 @@ uwv-data-platform/
 │   │   ├── opacluster.yaml
 │   │   └── policies/                    ← ConfigMaps met opa.stackable.tech/bundle=true
 │   │       ├── trino-base.rego
-│   │       ├── trino-uwv-roles.rego
+│   │       ├── trino-platform-roles.rego
 │   │       ├── trino-doelbinding.rego
 │   │       ├── trino-row-filters.rego
 │   │       ├── trino-column-masks.rego
@@ -282,7 +282,7 @@ uwv-data-platform/
 │   │       └── synthetic_data_load.py
 │   ├── 12-superset/
 │   └── 13-openmetadata-config/
-│       ├── classifications-uwv.yaml
+│       ├── classifications.yaml
 │       ├── glossary-cgm.yaml            ← CGM-termen uit referentie-architectuur
 │       ├── service-trino.yaml
 │       ├── service-dbt.yaml
@@ -326,7 +326,7 @@ uwv-data-platform/
 ├── opa-policies-src/
 │   ├── trino/
 │   │   ├── *.rego + *_test.rego
-│   ├── data/uwv_role_mappings.json
+│   ├── data/role_mappings.json
 │   └── Makefile
 ├── nifi-flows/
 │   └── templates/
@@ -367,7 +367,7 @@ uwv-data-platform/
 9. **Maak `platform-config.yaml`** met `table_format: iceberg` (default).
 
 ### Fase 1 — Cluster bootstrap
-1. Helm install: cert-manager, ingress-nginx (of listener-operator), Prometheus stack, MinIO, PostgreSQL, Keycloak met UWV-realm.
+1. Helm install: cert-manager, ingress-nginx (of listener-operator), Prometheus stack, MinIO, PostgreSQL, Keycloak met ODAP realm.
 2. **Keycloak realm**: rollen `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`, `crm_medewerker`, `fez_analist`, `data_steward`, `data_engineer`, `platform_admin`. Mock-users per rol.
 3. `stackablectl operator install --release-file infrastructure/stackablectl/release.yaml`.
 
@@ -395,7 +395,7 @@ uwv-data-platform/
 4. **Staging-models** voor alle bronnen.
 5. **Marts** per UC (begin met UC-01, UC-04, UC-05, UC-06, UC-07).
 6. **Tests**: generic `bsn_valid`, `iban_valid`, `dbt-expectations`.
-7. `dbt docs generate` → upload naar `s3://uwv-meta/dbt/<run_id>/`.
+7. `dbt docs generate` → upload naar `s3://odap-meta/dbt/<run_id>/`.
 8. **Smoke test**: `dbt parse`, `dbt compile`, `dbt run --select staging`, `dbt test`.
 
 ### Fase 6 — Orchestratie
@@ -408,12 +408,12 @@ uwv-data-platform/
 3. Bootstrap-dashboards via API (UC-01, UC-06).
 
 ### Fase 8 — OpenMetadata
-1. Helm install in `uwv-meta`.
+1. Helm install in `odap-meta`.
 2. **Classifications**: `PII.*`, `Health.Article9`, `Confidentiality.*`, `BIO.BIV.*`, `LegalBasis.*`, `Doelbinding.*`, `AI.Risk.*`.
 3. **Glossary "CGM"**: termen uit referentiearchitectuur.
 4. **Database services**: Trino + scheduled metadata + lineage + profiler.
-5. **dbt-workflow**: leest manifest van `s3://uwv-meta/dbt/`.
-6. **Smoke test**: REST API toont UWV-tabellen met tags + lineage.
+5. **dbt-workflow**: leest manifest van `s3://odap-meta/dbt/`.
+6. **Smoke test**: REST API toont platform tables met tags + lineage.
 
 ### Fase 9 — Authorization (echte policies)
 1. Schrijf alle Rego-policies in `opa-policies-src/trino/`. **Belangrijk**:
@@ -444,7 +444,7 @@ uwv-data-platform/
 Pin **alle** image tags in YAML; geen `latest`.
 
 ### §6.2 Naming conventions
-- K8s namespaces: `uwv-platform`, `uwv-data`, `uwv-meta`, `uwv-monitoring`.
+- K8s namespaces: `odap-platform`, `odap-data`, `odap-meta`, `odap-monitoring`.
 - Trino-schemas:
   - Bronze: `bronze.uwv.<entity>`
   - Silver: `silver.<domain>.<entity>` (domain = `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`)
@@ -482,7 +482,7 @@ meta:
 - Adressen: faker; geen echte postcode-huisnummercombinaties.
 - Medisch: ICD-10 codes uit een vaste samplelijst.
 - Salarissen: log-normal verdeling binnen UWV-relevante ranges.
-- **Header op elk dataset-bestand**: `# SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE`.
+- **Header op elk dataset-bestand**: `# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`.
 
 ### §6.5 Vragen aan de gebruiker
 
@@ -491,7 +491,7 @@ Voordat je gaat bouwen, **stel deze vragen** in één bericht:
 1. **Tabelformaat**: Iceberg (default per ADR-0002) of Delta Lake?
 2. **Doel-Kubernetes**: lokaal `k3d`/`k3s`, of doel-cluster (welk type)?
 3. **Image registry**: privé of publiek pullen?
-4. **Domeinnaam / DNS**: `*.uwv-platform.local` met /etc/hosts, of echte DNS?
+4. **Domeinnaam / DNS**: `*.odap.local` met /etc/hosts, of echte DNS?
 5. **TLS**: cert-manager self-signed (dev), Let's Encrypt, of bestaande PKI?
 6. **Resource-budget**: hoeveel CPU/RAM/disk? (volle stack ≈ 16 cores, 64 GB, 300 GB).
 7. **CI/CD**: GitHub Actions, GitLab CI, Tekton, ArgoCD, of plain `make`?
@@ -561,9 +561,9 @@ afweging in een markdown blok (opties + voor/tegen + voorstel) en wacht op input
 
 ### Achtergronddocumenten in deze folder (lees eerst!)
 1. `requirements-compliant-data-analyseplatform.md`
-2. `referentiearchitectuur-uwv-data-analytics.md`
-3. `uwv-platform-mapping-research.md`
-4. `uwv-platform-adr-0002-iceberg-vs-delta.md`
+2. `referentiearchitectuur-odap-data-analytics.md`
+3. `odap-platform-mapping-research.md`
+4. `odap-platform-adr-0002-iceberg-vs-delta.md`
 
 ### Externe referenties
 - Stackable: https://docs.stackable.tech/home/stable/

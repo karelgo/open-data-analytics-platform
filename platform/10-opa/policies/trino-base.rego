@@ -1,12 +1,12 @@
 package trino
 
 # =====================================================================
-#  UWV PLATFORM — TRINO OPA BASE POLICY (fase 9)
+#  ODAP PLATFORM — TRINO OPA BASE POLICY (fase 9)
 # =====================================================================
 #
 #  Vervangt de allow-all base-policy uit fase 3.
 #  Default-deny + bouwt allow op via:
-#    - role-mapping     (trino-uwv-roles.rego)
+#    - role-mapping     (trino-platform-roles.rego)
 #    - doelbinding      (trino-doelbinding.rego, R-AVG-06)
 #    - row filters      (trino-row-filters.rego, R-BIO-11)
 #    - column masks     (trino-column-masks.rego, R-AVG-07 + R-BIO-11)
@@ -37,7 +37,7 @@ authenticated if {
 	input.context.identity.user != ""
 }
 
-# UWV-rollen uit Keycloak: groups-claim of (fallback) leeg.
+# ODAP roles uit Keycloak: groups-claim of (fallback) leeg.
 user_roles := groups if {
 	groups := input.context.identity.groups
 	count(groups) > 0

@@ -1,4 +1,4 @@
-# Ingress voor UWV Lab onder platform.uwv-platform.local/jupyter.
+# Ingress voor ODAP Lab under platform.odap.local/jupyter.
 # Same-origin met de portal embed-shell (/embed/jupyter).
 #
 # WebSocket support is vereist voor de kernel-message channel tussen
@@ -13,9 +13,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: jupyter
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
     nginx.ingress.kubernetes.io/proxy-buffer-size: "32k"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
@@ -23,10 +23,10 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["platform.uwv-platform.local"]
+    - hosts: ["platform.odap.local"]
       secretName: jupyter-platform-tls
   rules:
-    - host: platform.uwv-platform.local
+    - host: platform.odap.local
       http:
         paths:
           - path: /jupyter

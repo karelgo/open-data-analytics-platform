@@ -6,11 +6,11 @@ Datasets + YAML-source-registry. Eén YAML toevoegen = nieuwe bron in productie.
 
 | Resource | Doel |
 |---|---|
-| `AirflowCluster uwv-airflow` | Webserver + scheduler + KubernetesExecutor, Postgres-backend, OIDC via Keycloak. |
+| `AirflowCluster airflow` | Webserver + scheduler + KubernetesExecutor, Postgres-backend, OIDC via Keycloak. |
 | `ConfigMap airflow-dags` | Mount op `/stackable/airflow/dags` — DAG-aanroeperfiles (factory-calls). |
-| `ConfigMap airflow-include` | Mount op `/opt/uwv/airflow/include` (PYTHONPATH) — factories + helpers. |
-| `ConfigMap airflow-sources` | Mount op `/opt/uwv/airflow/sources` — YAML-registry. |
-| `ConfigMap dbt-manifest` | Mount op `/opt/uwv/dbt/manifest.json` — Cosmos-input, gerenderd door `dbt-manifest-render` Job. |
+| `ConfigMap airflow-include` | Mount op `/opt/odap/airflow/include` (PYTHONPATH) — factories + helpers. |
+| `ConfigMap airflow-sources` | Mount op `/opt/odap/airflow/sources` — YAML-registry. |
+| `ConfigMap dbt-manifest` | Mount op `/opt/odap/dbt/manifest.json` — Cosmos-input, gerenderd door `dbt-manifest-render` Job. |
 | `Job dbt-manifest-render` | Eenmalige `dbt parse` + ConfigMap-write. Re-run bij dbt-model-wijziging. |
 
 ## Mapstructuur
@@ -80,10 +80,10 @@ Astronomer-Cosmos wordt door een initContainer `cosmos-init` (image `python:3.12
 ## Apply
 
 ```bash
-# Eenmalig: render dbt manifest.json (vereist Airflow Variable uwv_repo_url
-# of een ConfigMap uwv-repo-url met key=url)
+# Eenmalig: render dbt manifest.json (vereist Airflow Variable repo_url
+# of een ConfigMap odap-repo-url met key=url)
 kubectl apply -f platform/11-airflow/jobs/dbt-manifest-job.yaml
-kubectl -n uwv-platform wait --for=condition=complete --timeout=5m job/dbt-manifest-render
+kubectl -n odap-platform wait --for=condition=complete --timeout=5m job/dbt-manifest-render
 
 # Daarna: het hele platform-deel
 kubectl apply -k platform/11-airflow/
@@ -91,11 +91,11 @@ kubectl apply -k platform/11-airflow/
 
 ## Trino-connection in Airflow
 
-Pre-deploy: maak via Airflow UI Admin → Connections de connectie `trino_uwv`:
+Pre-deploy: maak via Airflow UI Admin → Connections de connectie `trino_default`:
 
 ```
 Conn Type:   Trino
-Host:        uwv-trino-coordinator.uwv-platform.svc.cluster.local
+Host:        trino-coordinator.odap-platform.svc.cluster.local
 Port:        8443
 Login:       smoketest
 Password:    <waarde uit Secret trino-static-users.smoketest>
@@ -110,7 +110,7 @@ Cosmos `TrinoCertificateProfileMapping` leest deze uit (zie `silver_factory._pro
 ```bash
 # Host-validatie zonder cluster
 cd platform/11-airflow
-UWV_SOURCES_DIR=$PWD/sources PYTHONPATH=$PWD/include \
+SOURCES_DIR=$PWD/sources PYTHONPATH=$PWD/include \
   python3 -m pytest tests/
 
 # Wat de test dekt:

@@ -9,11 +9,11 @@
 // gebruiker landt op de MinIO Console UI, ingelogd.
 //
 // Waarom in-cluster proxy ipv directe call op
-// https://minio-console.uwv-platform.local:8443/api/v1/login?
+// https://minio-console.odap.local:8443/api/v1/login?
 // Die endpoint returnt over de EXTERNE ingress `redirectRules: null`
 // (MinIO Console-quirk; SSO-knop alleen via de in-cluster Service).
 // portal/nginx.conf locatie `/api/minio-sso/login` proxyt naar
-// minio-console.uwv-platform.svc.cluster.local:9001/api/v1/login.
+// minio-console.odap-platform.svc.cluster.local:9001/api/v1/login.
 //
 // BEWUST geen layout — een nested portal-topbar binnen de embed-shell
 // iframe zou verwarrend zijn. We renderen alleen een tiny spinner
@@ -58,8 +58,8 @@
     <div id="loading"><span class="spinner" aria-hidden="true"></span><span>MinIO openen via Keycloak…</span></div>
     <div id="fallback" class="fallback">
       SSO niet beschikbaar. Open
-      <a href="https://minio-console.uwv-platform.local:8443" rel="noreferrer">MinIO Console</a>
-      direct (root-account: <code>uwvadmin</code>).
+      <a href="https://minio-console.odap.local:8443" rel="noreferrer">MinIO Console</a>
+      direct (root-account: <code>platformadmin</code>).
     </div>
     <script>
       (async function () {

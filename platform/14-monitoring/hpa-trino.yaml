@@ -9,13 +9,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: uwv-trino-worker-hpa
-  namespace: uwv-platform
+  name: trino-worker-hpa
+  namespace: odap-platform
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
-    name: uwv-trino-worker-default
+    name: trino-worker-default
   minReplicas: 1
   maxReplicas: 3
   metrics:

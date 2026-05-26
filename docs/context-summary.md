@@ -26,7 +26,7 @@ mee.
 
 ---
 
-## 2. `referentiearchitectuur-uwv-data-analytics.md` — UWV-specifieke scope
+## 2. `referentiearchitectuur-odap-data-analytics.md` — UWV-specifieke scope
 
 **Inhoud.**
 
@@ -53,7 +53,7 @@ met striktere OPA-policies.
 
 ---
 
-## 3. `uwv-platform-mapping-research.md` — technische blauwdruk
+## 3. `odap-platform-mapping-research.md` — technische blauwdruk
 
 **Inhoud.** Component-tot-component-mapping zonder overlap, geen gaten:
 
@@ -76,7 +76,7 @@ van deze mapping naar onze k3d-context.
 
 ---
 
-## 4. `uwv-platform-adr-0002-iceberg-vs-delta.md` — tabelformaat-keuze
+## 4. `odap-platform-adr-0002-iceberg-vs-delta.md` — tabelformaat-keuze
 
 **Inhoud.** Expliciete afweging tussen Apache Iceberg en Delta Lake op tien
 criteria. **Iceberg** wint op 6 punten (Trino-rijpheid, Stackable-demo-maturity,

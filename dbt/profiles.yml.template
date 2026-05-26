@@ -1,4 +1,4 @@
-# dbt profiles voor het UWV-platform.
+# dbt profiles voor het ODAP platform.
 #
 # Plaats deze file in ~/.dbt/profiles.yml of zet env DBT_PROFILES_DIR=./dbt
 # (en hernoem naar profiles.yml). Voor in-cluster Airflow-runs (fase 6) wordt
@@ -16,7 +16,7 @@
 #   pip install dbt-databricks   # voor databricks_dev
 #   pip install dbt-fabricspark  # voor fabric_dev
 ---
-uwv_trino:
+trino_default:
   target: dev
   outputs:
     dev:
@@ -27,10 +27,10 @@ uwv_trino:
       # X-Trino-User header, wat Trino accepteert.
       method: none
       user: "{{ env_var('TRINO_USER', 'smoketest') }}"
-      host: "{{ env_var('TRINO_HOST', 'trino.uwv-platform.local') }}"
+      host: "{{ env_var('TRINO_HOST', 'trino.odap.local') }}"
       port: "{{ env_var('TRINO_PORT', '8443') | int }}"
       http_scheme: https
-      cert: "{{ env_var('TRINO_TLS_CERT_PATH', '/etc/ssl/uwv-platform-ca.crt') }}"
+      cert: "{{ env_var('TRINO_TLS_CERT_PATH', '/etc/ssl/odap-platform-ca.crt') }}"
       database: silver               # default Trino-catalog (zie dbt_project.yml voor per-laag)
       schema: dbt_default            # default schema (overridden per model)
       threads: 4
@@ -41,7 +41,7 @@ uwv_trino:
       method: oidc                   # OIDC via Keycloak (productie)
       user: "{{ env_var('TRINO_USER') }}"
       jwt_token: "{{ env_var('TRINO_JWT') }}"
-      host: trino.uwv-platform.local
+      host: trino.odap.local
       port: 8443
       http_scheme: https
       database: silver
@@ -50,7 +50,7 @@ uwv_trino:
 
     # ─────────────────────────────────────────────────────────────────
     # Databricks Unity Catalog (uc11 multi-platform demo).
-    # Connect via SQL warehouse; catalog `uwv_databricks` met schemas
+    # Connect via SQL warehouse; catalog `databricks` met schemas
     # silver_* en gold_*. Tabellen zijn UC-managed (Databricks-default
     # ADLS Gen2 storage onder de motorkap, geen externe locatie nodig).
     # ─────────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ uwv_trino:
       host: "{{ env_var('DATABRICKS_HOST') }}"           # bv. dbc-xxxx.cloud.databricks.com
       http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}" # SQL-warehouse HTTP path
       token: "{{ env_var('DATABRICKS_TOKEN') }}"         # PAT of OAuth via secret-scope
-      catalog: "{{ env_var('DATABRICKS_CATALOG', 'uwv_databricks') }}"
+      catalog: "{{ env_var('DATABRICKS_CATALOG', 'databricks') }}"
       schema: "{{ env_var('DATABRICKS_SCHEMA', 'dbt_default') }}"
       threads: 4
       connect_retries: 3
@@ -93,7 +93,7 @@ uwv_trino:
       endpoint: "{{ env_var('FABRIC_ENDPOINT', 'https://api.fabric.microsoft.com/v1') }}"
       schema: "{{ env_var('FABRIC_SCHEMA', 'uc11_lakehouse') }}"
       spark_config:
-        name: "dbt-uwv-uc11"
+        name: "dbt-uc11"
       threads: 4
       connect_retries: 5
       connect_timeout: 60

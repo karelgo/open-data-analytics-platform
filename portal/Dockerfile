@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 #
-# UWV Platform Portal — multi-stage:
+# ODAP Portal — multi-stage:
 #   1. node:lts-alpine bouwt de Astro static site.
 #   2. nginxinc/nginx-unprivileged serveert de output (non-root op :8080).
 #
@@ -9,7 +9,7 @@
 # Build VANUIT REPO-ROOT zodat opa-policies-src/data mee-gekopieerd kan
 # worden voor de prebuild-stap (single source of truth voor rol-mappings):
 #
-#   docker build -f portal/Dockerfile -t uwv-platform/portal:dev .
+#   docker build -f portal/Dockerfile -t odap/portal:dev .
 
 FROM node:20-alpine AS build
 WORKDIR /app

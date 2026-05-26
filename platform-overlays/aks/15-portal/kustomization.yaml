@@ -1,6 +1,6 @@
 # AKS overlay for platform/15-portal.
 #
-# On AKS the chart-style `portal` Deployment (k3d-only `uwv-platform/portal:dev`
+# On AKS the chart-style `portal` Deployment (k3d-only `odap/portal:dev`
 # image) is replaced by `platform-landing` — same Astro static site but
 # served via a tarball ConfigMap + public nginx image, so no registry-push
 # step is needed. The platform-public Ingress (LE-issued cert, public apex

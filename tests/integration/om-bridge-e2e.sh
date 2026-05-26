@@ -13,7 +13,7 @@
 #      Keycloak heeft.
 #
 # Vereist: kubectl-exec/port-forward in een gezonde k3d/AKS-cluster
-# (Keycloak in uwv-auth, OM in uwv-meta, bridge in uwv-platform). Run via:
+# (Keycloak in odap-auth, OM in odap-meta, bridge in odap-platform). Run via:
 #
 #   bash tests/integration/om-bridge-e2e.sh
 #
@@ -21,9 +21,9 @@
 
 set -euo pipefail
 
-OM_NS="${OM_NS:-uwv-meta}"
-KC_NS="${KC_NS:-uwv-auth}"
-BRIDGE_NS="${BRIDGE_NS:-uwv-platform}"
+OM_NS="${OM_NS:-odap-meta}"
+KC_NS="${KC_NS:-odap-auth}"
+BRIDGE_NS="${BRIDGE_NS:-odap-platform}"
 REQUESTER="${E2E_REQUESTER:-researcher}"
 ASSIGNEE="${E2E_ASSIGNEE:-data.steward}"
 ASSET_FQN="${E2E_ASSET_FQN:-trino.gold.uc05_client_360.mart_uc05_client_360}"
@@ -73,7 +73,7 @@ KC_BASE="http://127.0.0.1:${KC_PF_PORT}"
 OM_TOKEN=$(kubectl -n "$OM_NS" get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' | base64 -d)
 [ -n "$OM_TOKEN" ] || fail "geen OM jwtToken in openmetadata-admin secret"
 
-KC_TOKEN=$(curl -fsS -d "client_id=admin-cli" -d "username=kcadmin" -d "password=uwv-dev-only-CHANGE-ME-2026" -d "grant_type=password" \
+KC_TOKEN=$(curl -fsS -d "client_id=admin-cli" -d "username=kcadmin" -d "password=odap-dev-only-CHANGE-ME" -d "grant_type=password" \
   "${KC_BASE}/realms/master/protocol/openid-connect/token" | sed 's/.*access_token":"\([^"]*\)".*/\1/')
 [ -n "$KC_TOKEN" ] || fail "Keycloak admin-token niet verkregen"
 
@@ -89,16 +89,16 @@ pass "asset id=${ASSET_ID}"
 # --- 3. Snapshot huidige rollen van requester --------------------------
 log "Huidige Keycloak-roles voor ${REQUESTER}"
 USER_ID=$(curl -fsS -H "Authorization: Bearer ${KC_TOKEN}" \
-  "${KC_BASE}/admin/realms/uwv/users?username=${REQUESTER}&exact=true" | grep -oE '"id":"[^"]+"' | head -1 | cut -d'"' -f4)
+  "${KC_BASE}/admin/realms/odap/users?username=${REQUESTER}&exact=true" | grep -oE '"id":"[^"]+"' | head -1 | cut -d'"' -f4)
 [ -n "$USER_ID" ] || fail "user ${REQUESTER} niet gevonden in Keycloak"
 BEFORE=$(curl -fsS -H "Authorization: Bearer ${KC_TOKEN}" \
-  "${KC_BASE}/admin/realms/uwv/users/${USER_ID}/role-mappings/realm" | grep -oE '"name":"[^"]+"' | tr -d '"' | tr '\n' ' ')
+  "${KC_BASE}/admin/realms/odap/users/${USER_ID}/role-mappings/realm" | grep -oE '"name":"[^"]+"' | tr -d '"' | tr '\n' ' ')
 if echo "$BEFORE" | grep -q "name:${EXPECTED_ROLE}"; then
   log "  rol bestaat al — verwijder eerst voor schone test"
-  ROLE_OBJ=$(curl -fsS -H "Authorization: Bearer ${KC_TOKEN}" "${KC_BASE}/admin/realms/uwv/roles/${EXPECTED_ROLE}")
+  ROLE_OBJ=$(curl -fsS -H "Authorization: Bearer ${KC_TOKEN}" "${KC_BASE}/admin/realms/odap/roles/${EXPECTED_ROLE}")
   ROLE_ID=$(echo "$ROLE_OBJ" | grep -oE '"id":"[^"]+"' | head -1 | cut -d'"' -f4)
   curl -sS -o /dev/null -X DELETE -H "Authorization: Bearer ${KC_TOKEN}" -H 'Content-Type: application/json' \
-    "${KC_BASE}/admin/realms/uwv/users/${USER_ID}/role-mappings/realm" \
+    "${KC_BASE}/admin/realms/odap/users/${USER_ID}/role-mappings/realm" \
     -d "[{\"id\":\"$ROLE_ID\",\"name\":\"$EXPECTED_ROLE\"}]"
 fi
 pass "snapshot genomen"
@@ -143,7 +143,7 @@ pass "Task resolved"
 log "Polling: ${EXPECTED_ROLE} verschijnt in Keycloak-roles van ${REQUESTER}"
 for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
   AFTER=$(curl -fsS -H "Authorization: Bearer ${KC_TOKEN}" \
-    "${KC_BASE}/admin/realms/uwv/users/${USER_ID}/role-mappings/realm" | grep -oE '"name":"[^"]+"' | tr -d '"' | tr '\n' ' ')
+    "${KC_BASE}/admin/realms/odap/users/${USER_ID}/role-mappings/realm" | grep -oE '"name":"[^"]+"' | tr -d '"' | tr '\n' ' ')
   if echo "$AFTER" | grep -q "name:${EXPECTED_ROLE}"; then
     pass "grant aangekomen na ${i} polls (~$((i*2))s) — rol ${EXPECTED_ROLE} aanwezig"
     echo

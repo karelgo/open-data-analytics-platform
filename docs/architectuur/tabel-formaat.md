@@ -49,7 +49,7 @@ flowchart LR
     Bron[Bron-mock] --> NiFi[NiFi<br/>PublishKafka]
     NiFi --> Kafka[Kafka topic<br/>uwv.&lt;domain&gt;.&lt;event&gt;]
     Kafka --> Spark[Spark Structured Streaming<br/>SparkApplication, K8s]
-    Spark --> Delta[Delta-tabel in MinIO<br/>s3a://uwv-bronze/...]
+    Spark --> Delta[Delta-tabel in MinIO<br/>s3a://odap-bronze/...]
     Delta --> Hive[Hive Metastore registreert tabel]
 ```
 

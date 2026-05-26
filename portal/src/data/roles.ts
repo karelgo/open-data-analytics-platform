@@ -56,8 +56,8 @@ export interface RoleCapability {
   _role_purpose?: string;
 }
 
-const rawRoles = (roleMappings as { uwv_role_mappings: { roles: Record<string, RoleCapability> } })
-  .uwv_role_mappings.roles;
+const rawRoles = (roleMappings as { role_mappings: { roles: Record<string, RoleCapability> } })
+  .role_mappings.roles;
 
 export function capabilityFor(role: RoleId): RoleCapability | undefined {
   return rawRoles[role];

@@ -11,7 +11,7 @@ kunnen bestaan. Trino-pad: silver.wia_spark.aanvraag.
 Aanroep: via Airflow DAG transform_wia_spark (SparkApplication-template
 platform/11-airflow/jobs/spark-silver-wia.yaml).
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ from lakehouse_io import (  # noqa: E402
     get_spark_with_lakehouse_config,
 )
 
-SILVER_BASE = os.getenv("SILVER_BASE", "s3a://uwv-silver")
+SILVER_BASE = os.getenv("SILVER_BASE", "s3a://odap-silver")
 SILVER_SCHEMA = "wia_spark"
 SILVER_TABLE = f"{SILVER_SCHEMA}.aanvraag"
 SILVER_PATH = f"{SILVER_BASE}/{SILVER_SCHEMA}/aanvraag"
@@ -69,7 +69,7 @@ PAYLOAD_SCHEMA = StructType(
 
 
 def ensure_silver_schema(spark) -> None:
-    """HMS-database wia_spark @ s3a://uwv-silver/wia_spark/ (idempotent)."""
+    """HMS-database wia_spark @ s3a://odap-silver/wia_spark/ (idempotent)."""
     spark.sql(
         f"CREATE SCHEMA IF NOT EXISTS {SILVER_SCHEMA} "
         f"LOCATION '{SILVER_BASE}/{SILVER_SCHEMA}/'"
@@ -79,7 +79,7 @@ def ensure_silver_schema(spark) -> None:
 def main() -> int:
     from pyspark.sql import Window  # noqa: PLC0415
 
-    spark = get_spark_with_lakehouse_config("uwv-batch-silver-wia")
+    spark = get_spark_with_lakehouse_config("batch-silver-wia")
     spark.sparkContext.setLogLevel("WARN")
     print(
         f"==> Silver batch start: source={SOURCE_TABLE} target={SILVER_TABLE} "

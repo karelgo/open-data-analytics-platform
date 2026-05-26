@@ -1,5 +1,5 @@
 # SparkHistoryServer — leest event-logs van alle voltooide SparkApplications
-# uit s3a://uwv-checkpoints/spark-events/ en serveert de UI op poort 18080.
+# uit s3a://odap-checkpoints/spark-events/ en serveert de UI op poort 18080.
 #
 # Waarom dit bestaat: zonder history-server is de Spark-UI alleen bereikbaar
 # zolang een driver-pod draait. Batch-jobs (silver/gold) leven seconden tot
@@ -14,9 +14,9 @@ apiVersion: spark.stackable.tech/v1alpha1
 kind: SparkHistoryServer
 metadata:
   name: history
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    uwv.nl/component: spark-history
+    odap.io/component: spark-history
 spec:
   image:
     productVersion: "3.5.8"
@@ -25,7 +25,7 @@ spec:
       prefix: spark-events/
       bucket:
         inline:
-          bucketName: uwv-checkpoints
+          bucketName: odap-checkpoints
           connection:
             reference: s3-minio
   nodes:

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: multica-daemon
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   replicas: 1
   strategy:
@@ -29,16 +29,16 @@ spec:
           type: RuntimeDefault
       containers:
         - name: daemon
-          image: uwv-platform/multica-daemon:dev
+          image: odap/multica-daemon:dev
           imagePullPolicy: IfNotPresent
           env:
             # Pointers — the daemon talks to the backend Service on the
             # cluster network. The app_url is what Multica embeds in
             # task URLs etc.; humans use the ingress hostname.
             - name: MULTICA_SERVER_URL
-              value: "http://multica-backend.uwv-platform:80"
+              value: "http://multica-backend.odap-platform:80"
             - name: MULTICA_APP_URL
-              value: "https://multica.uwv-platform.local:8443"
+              value: "https://multica.odap.local:8443"
             # Tell the daemon which Foundry deployment to drive codex at.
             # The codex CLI ALSO reads its own model from ~/.codex/config.toml;
             # this var is Multica's override and wins.

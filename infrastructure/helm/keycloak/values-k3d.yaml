@@ -5,7 +5,7 @@
 
 extraEnvVars:
   - name: KC_HOSTNAME
-    value: "https://keycloak.uwv-platform.local:8443"
+    value: "https://keycloak.odap.local:8443"
   - name: KC_HOSTNAME_STRICT
     value: "false"
   - name: KC_HOSTNAME_STRICT_BACKCHANNEL
@@ -14,4 +14,4 @@ extraEnvVars:
     value: "xforwarded"
 
 # Chart-managed ingress.hostname is now in the base values.yaml
-# (keycloak.uwv-platform.local — same on every mode for in-cluster routing).
+# (keycloak.odap.local — same on every mode for in-cluster routing).

@@ -17,13 +17,13 @@
 
 ---
 # ===================================================================
-# uwv-platform — Stackable data-plane (Kafka, Hive, Trino, NiFi, Spark)
+# odap-platform — Stackable data-plane (Kafka, Hive, Trino, NiFi, Spark)
 # ===================================================================
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: default-deny-all
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   podSelector: {}
   policyTypes:
@@ -35,7 +35,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-dns-egress
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   podSelector: {}
   policyTypes: [Egress]
@@ -58,7 +58,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-intra-namespace
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   podSelector: {}
   policyTypes: [Ingress, Egress]
@@ -74,41 +74,41 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-from-monitoring
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
-  # Prometheus + Vector live in uwv-monitoring and scrape every Stackable pod.
+  # Prometheus + Vector live in odap-monitoring and scrape every Stackable pod.
   podSelector: {}
   policyTypes: [Ingress]
   ingress:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-monitoring
+              kubernetes.io/metadata.name: odap-monitoring
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-egress-to-data-and-meta
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
-  # Hive Metastore + Airflow + Superset all talk to Postgres in uwv-data.
-  # Trino + Airflow talk to OpenMetadata + OpenSearch in uwv-meta.
+  # Hive Metastore + Airflow + Superset all talk to Postgres in odap-data.
+  # Trino + Airflow talk to OpenMetadata + OpenSearch in odap-meta.
   podSelector: {}
   policyTypes: [Egress]
   egress:
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-data
+              kubernetes.io/metadata.name: odap-data
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-meta
+              kubernetes.io/metadata.name: odap-meta
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-auth
+              kubernetes.io/metadata.name: odap-auth
       ports:
         - protocol: TCP
           port: 8080
@@ -120,7 +120,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-egress-to-internet-https
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   # NiFi/Spark may pull external reference data over HTTPS. Restrict to 443.
   # Tighten further with FQDN-egress (Cilium) once available.
@@ -141,13 +141,13 @@ spec:
 
 ---
 # ===================================================================
-# uwv-data — Postgres (shared metastore for Hive/Airflow/Superset/OM/KC)
+# odap-data — Postgres (shared metastore for Hive/Airflow/Superset/OM/KC)
 # ===================================================================
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: default-deny-all
-  namespace: uwv-data
+  namespace: odap-data
 spec:
   podSelector: {}
   policyTypes: [Ingress, Egress]
@@ -157,7 +157,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-dns-egress
-  namespace: uwv-data
+  namespace: odap-data
 spec:
   podSelector: {}
   policyTypes: [Egress]
@@ -178,7 +178,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-postgres-from-clients
-  namespace: uwv-data
+  namespace: odap-data
 spec:
   podSelector:
     matchLabels:
@@ -188,13 +188,13 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-platform
+              kubernetes.io/metadata.name: odap-platform
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-meta
+              kubernetes.io/metadata.name: odap-meta
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-auth
+              kubernetes.io/metadata.name: odap-auth
       ports:
         - {protocol: TCP, port: 5432}
 
@@ -203,7 +203,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-from-monitoring
-  namespace: uwv-data
+  namespace: odap-data
 spec:
   podSelector: {}
   policyTypes: [Ingress]
@@ -211,17 +211,17 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-monitoring
+              kubernetes.io/metadata.name: odap-monitoring
 
 ---
 # ===================================================================
-# uwv-meta — OpenMetadata + OpenSearch
+# odap-meta — OpenMetadata + OpenSearch
 # ===================================================================
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: default-deny-all
-  namespace: uwv-meta
+  namespace: odap-meta
 spec:
   podSelector: {}
   policyTypes: [Ingress, Egress]
@@ -231,7 +231,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-dns-egress
-  namespace: uwv-meta
+  namespace: odap-meta
 spec:
   podSelector: {}
   policyTypes: [Egress]
@@ -252,7 +252,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-intra-namespace
-  namespace: uwv-meta
+  namespace: odap-meta
 spec:
   podSelector: {}
   policyTypes: [Ingress, Egress]
@@ -266,7 +266,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-ingress-from-platform-and-monitoring
-  namespace: uwv-meta
+  namespace: odap-meta
 spec:
   podSelector: {}
   policyTypes: [Ingress]
@@ -274,17 +274,17 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-platform
+              kubernetes.io/metadata.name: odap-platform
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-monitoring
+              kubernetes.io/metadata.name: odap-monitoring
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-egress-to-data-and-auth
-  namespace: uwv-meta
+  namespace: odap-meta
 spec:
   podSelector: {}
   policyTypes: [Egress]
@@ -292,23 +292,23 @@ spec:
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-data
+              kubernetes.io/metadata.name: odap-data
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-auth
+              kubernetes.io/metadata.name: odap-auth
       ports:
         - {protocol: TCP, port: 8443}
 
 ---
 # ===================================================================
-# uwv-auth — Keycloak
+# odap-auth — Keycloak
 # ===================================================================
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: default-deny-all
-  namespace: uwv-auth
+  namespace: odap-auth
 spec:
   podSelector: {}
   policyTypes: [Ingress, Egress]
@@ -318,7 +318,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-dns-egress
-  namespace: uwv-auth
+  namespace: odap-auth
 spec:
   podSelector: {}
   policyTypes: [Egress]
@@ -339,7 +339,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-keycloak-from-everywhere-in-cluster
-  namespace: uwv-auth
+  namespace: odap-auth
 spec:
   # OIDC discovery + token endpoints are called by every service that uses
   # Keycloak. Allow all in-cluster namespaces (still blocks raw internet).
@@ -359,15 +359,15 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-egress-to-data
-  namespace: uwv-auth
+  namespace: odap-auth
 spec:
-  # Keycloak uses Postgres in uwv-data.
+  # Keycloak uses Postgres in odap-data.
   podSelector: {}
   policyTypes: [Egress]
   egress:
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uwv-data
+              kubernetes.io/metadata.name: odap-data
       ports:
         - {protocol: TCP, port: 5432}

@@ -54,9 +54,9 @@ silver/gold (CGM-conform, business-ready). Eisen:
 
 | Risico | Mitigatie |
 |---|---|
-| dbt-trino kent minder materializations dan dbt-snowflake/redshift | Voor UWV-workloads (table, view, incremental, materialized_view) is dekking voldoende |
+| dbt-trino kent minder materializations dan dbt-snowflake/redshift | Voor platform workloads (table, view, incremental, materialized_view) is dekking voldoende |
 | Materialized Views in Trino voor Delta zijn beperkt (ADR-0002) | Default `materialized='table'`; MV alleen waar zinvol en op Iceberg-modus |
-| `target/` directory met manifests kan groot worden | Niet committen; `dbt-artifacts.zip` upload naar `s3://uwv-meta/dbt/` per run |
+| `target/` directory met manifests kan groot worden | Niet committen; `dbt-artifacts.zip` upload naar `s3://odap-meta/dbt/` per run |
 | `profiles.yml` bevat credentials | Niet committen; renderen vanuit Kubernetes Secret in Airflow-pod |
 
 ---

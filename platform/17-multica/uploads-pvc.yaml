@@ -3,12 +3,12 @@
 # Multica's backend writes to ./data/uploads when S3_BUCKET is unset (which
 # is our v1 default). Without a PVC, every pod restart loses attachments.
 #
-# v2: switch to MinIO-backed S3 (S3_BUCKET=uwv-multica) and drop this PVC.
+# v2: switch to MinIO-backed S3 (S3_BUCKET=multica) and drop this PVC.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: multica-uploads
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   accessModes:
     - ReadWriteOnce

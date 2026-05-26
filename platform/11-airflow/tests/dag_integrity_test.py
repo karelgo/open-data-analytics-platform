@@ -31,7 +31,7 @@ SOURCES_DIR = AIRFLOW_DIR / "sources"
 
 # Voeg include/ aan sys.path zodat factory-imports werken (matcht productie).
 sys.path.insert(0, str(INCLUDE_DIR))
-os.environ.setdefault("UWV_SOURCES_DIR", str(SOURCES_DIR))
+os.environ.setdefault("SOURCES_DIR", str(SOURCES_DIR))
 
 
 def _try_import(name: str) -> bool:

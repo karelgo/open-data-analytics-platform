@@ -27,8 +27,8 @@ input voor begrotingen. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards: schadelast, prognoses | https://superset.uwv-platform.local |
-| **OpenMetadata** | Definities, eigenaarschap | https://openmetadata.uwv-platform.local |
+| **Apache Superset** | Dashboards: schadelast, prognoses | https://superset.odap.local |
+| **OpenMetadata** | Definities, eigenaarschap | https://openmetadata.odap.local |
 
 ---
 

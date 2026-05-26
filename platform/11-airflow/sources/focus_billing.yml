@@ -17,7 +17,7 @@ domain: finops
 ingest:
   kind: csv
   staging:
-    bucket: uwv-staging
+    bucket: odap-staging
     prefix: incoming/focus
     processed_prefix: processed/focus
   csv:

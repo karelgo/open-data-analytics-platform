@@ -1,7 +1,7 @@
 # Runbook
 
 Operationele handleiding voor het draaien, monitoren, herstellen en uitbreiden
-van het UWV Reference Data Platform. Dekt cluster-lifecycle, component-
+van het Open Data & Analytics Platform. Dekt cluster-lifecycle, component-
 healthchecks, 6 incident-scenario's, backup & restore (Postgres + MinIO +
 Keycloak), upgrade-procedures (operators, Helm-charts, dbt-packages,
 Kubernetes), synthetische data-reseed, OPA-policy-deploy, observability +
@@ -39,13 +39,13 @@ gebruik je de `<mode>-up`-targets die Terraform draaien.
 
 | Mode | Hoe |
 |---|---|
-| `k3d` | `k3d cluster stop uwv-platform` / `… start`; `scripts/cluster.sh` regelt de kubelet-TLS-swap automatisch op stopped→start. |
+| `k3d` | `k3d cluster stop odap-platform` / `… start`; `scripts/cluster.sh` regelt de kubelet-TLS-swap automatisch op stopped→start. |
 | `aks` | Stop-deallocate van VMSS via Azure CLI; goedkoper is een nightly `terraform destroy` + ochtend `make aks-up`. |
 | `stackit` | `make stackit-hibernate` zet workers naar 0 (control plane slaapt; PVCs + Floating IP blijven); `make stackit-wake` brengt 'm in ~3-5 min terug. `make stackit-status` toont `HIBERNATED`/`HEALTHY`/`RECONCILING`. |
 
 ### 2.3 Cluster volledig opruimen
 ```bash
-make clean          # k3d cluster delete uwv-platform
+make clean          # k3d cluster delete odap-platform
 ```
 
 ---
@@ -61,8 +61,8 @@ make clean          # k3d cluster delete uwv-platform
 | OPA | `kubectl get opacluster -A` |
 | Airflow | `kubectl get airflowcluster -A` |
 | Superset | `kubectl get supersetcluster -A` |
-| OpenMetadata | `kubectl get pods -n uwv-meta` |
-| Keycloak | `kubectl get pods -n uwv-auth` |
+| OpenMetadata | `kubectl get pods -n odap-meta` |
+| Keycloak | `kubectl get pods -n odap-auth` |
 
 TODO (fase 2+): vul per component de specifieke "is-het-gezond?" probes in.
 
@@ -71,41 +71,41 @@ TODO (fase 2+): vul per component de specifieke "is-het-gezond?" probes in.
 ## 4. Veelvoorkomende incidenten
 
 ### 4.1 Trino weigert query met "Access Denied"
-- Eerst: log inspecteren — `kubectl logs -n uwv-platform <trino-coordinator-pod> -c trino`.
+- Eerst: log inspecteren — `kubectl logs -n odap-platform <trino-coordinator-pod> -c trino`.
 - OPA-decision-log bekijken in OpenSearch.
 - Verifieer rol-toekenning in Keycloak voor de gebruiker.
 - TODO (fase 9): voorbeeldqueries per rol.
 
 ### 4.2 dbt-run faalt met "table not found"
-- Check Hive Metastore: `kubectl exec -it -n uwv-platform <hive-pod> -- ...` (TODO: precieze syntax).
+- Check Hive Metastore: `kubectl exec -it -n odap-platform <hive-pod> -- ...` (TODO: precieze syntax).
 - Verifieer dat eerdere fase-runs (bronze/silver) geslaagd zijn.
 
 ### 4.3 Streaming-job blijft hangen
-- Spark UI port-forwarden: `kubectl port-forward -n uwv-platform svc/spark-streaming-ui 4040:4040`.
-- Checkpoint-bucket inspecteren: `mc alias set local http://minio.uwv-platform.local:80 ...`; `mc ls local/uwv-checkpoints/`.
+- Spark UI port-forwarden: `kubectl port-forward -n odap-platform svc/spark-streaming-ui 4040:4040`.
+- Checkpoint-bucket inspecteren: `mc alias set local http://minio.odap.local:80 ...`; `mc ls local/odap-checkpoints/`.
 
 ### 4.4 Hive Metastore Postgres-corruption of readiness-fail
 
-> Triggered by alert `HiveMetastoreDown` ([prometheusrule-uwv.yaml](../platform/14-monitoring/prometheusrule-uwv.yaml)).
+> Triggered by alert `HiveMetastoreDown` ([prometheusrule.yaml](../platform/14-monitoring/prometheusrule.yaml)).
 
 Symptomen: Trino-queries falen met "Could not get metastore client",
 Spark-jobs gooien `MetaException`, dbt parseert wel maar `run` blijft hangen.
 
 ```bash
 # 1. Is HMS-pod ready?
-kubectl -n uwv-platform get pods -l app.kubernetes.io/name=hive
+kubectl -n odap-platform get pods -l app.kubernetes.io/name=hive
 
 # 2. Heeft HMS verbinding naar Postgres?
-kubectl -n uwv-platform exec sts/uwv-hive-metastore-default -- \
-  bash -c 'pg_isready -h postgres-postgresql.uwv-data.svc -U hive'
+kubectl -n odap-platform exec sts/hive-metastore-default -- \
+  bash -c 'pg_isready -h postgres-postgresql.odap-data.svc -U hive'
 
 # 3. Hive schema-bootstrap-status (één-malig na restore):
-kubectl -n uwv-platform exec sts/uwv-hive-metastore-default -- \
+kubectl -n odap-platform exec sts/hive-metastore-default -- \
   bash -c 'schematool -dbType postgres -info'
 ```
 
 **Recovery**:
-- Connection-pool-uitputting → herstart HMS-pod: `kubectl -n uwv-platform rollout restart sts/uwv-hive-metastore-default`.
+- Connection-pool-uitputting → herstart HMS-pod: `kubectl -n odap-platform rollout restart sts/hive-metastore-default`.
 - Postgres-corruption → restore vanuit backup (zie §5.1) en daarna
   `schematool -dbType postgres -upgradeSchema` indien nodig.
 
@@ -115,14 +115,14 @@ kubectl -n uwv-platform exec sts/uwv-hive-metastore-default -- \
 
 ```bash
 # 1. Scheduler-pod loggen
-kubectl -n uwv-platform logs sts/uwv-airflow-scheduler-default --tail=200
+kubectl -n odap-platform logs sts/airflow-scheduler-default --tail=200
 
 # 2. Heartbeat-tijdstamp in metadata-DB
-kubectl -n uwv-platform exec sts/uwv-airflow-scheduler-default -- \
+kubectl -n odap-platform exec sts/airflow-scheduler-default -- \
   airflow db check
 
 # 3. Heartbeat-table inspecteren
-kubectl -n uwv-data exec sts/postgres-postgresql -- psql -U postgres -d airflow \
+kubectl -n odap-data exec sts/postgres-postgresql -- psql -U postgres -d airflow \
   -c "SELECT hostname, latest_heartbeat FROM job WHERE state='running' ORDER BY id DESC LIMIT 5;"
 ```
 
@@ -145,7 +145,7 @@ kubectl get certificate -A -o json \
 kubectl -n <ns> describe certificaterequest <cert-name>-<rev>
 
 # 3. Issuer status
-kubectl get clusterissuer uwv-platform-issuer -o yaml \
+kubectl get clusterissuer platform-issuer -o yaml \
   | yq '.status.conditions'
 ```
 
@@ -161,52 +161,52 @@ kubectl get clusterissuer uwv-platform-issuer -o yaml \
 
 ### 5.1 Postgres (alle 6 databases)
 
-De shared Postgres-pod in `uwv-data` host `platform`, `hivemetastore`,
+De shared Postgres-pod in `odap-data` host `platform`, `hivemetastore`,
 `airflow`, `superset`, `openmetadata`, `keycloak`. Een dagelijkse CronJob
 draait om 03:17 UTC ([`postgres-backup-cronjob.yaml`](../platform/14-monitoring/postgres-backup-cronjob.yaml)):
 
 - `pg_dumpall --clean --if-exists --no-role-passwords | gzip` → één bestand
-- upload naar `s3://uwv-meta/backups/postgres/YYYY-MM-DD/dump-HHMMSS.sql.gz`
+- upload naar `s3://odap-meta/backups/postgres/YYYY-MM-DD/dump-HHMMSS.sql.gz`
 - retentie 30 dagen (oudere dumps worden weggegooid bij de volgende run)
 
 Backup-status check:
 
 ```bash
-kubectl -n uwv-data get cronjob postgres-backup
-kubectl -n uwv-data get jobs --selector=job-name=postgres-backup-... \
+kubectl -n odap-data get cronjob postgres-backup
+kubectl -n odap-data get jobs --selector=job-name=postgres-backup-... \
   --sort-by=.metadata.creationTimestamp | tail -5
 ```
 
 Ad-hoc backup forceren:
 
 ```bash
-kubectl -n uwv-data create job --from=cronjob/postgres-backup \
+kubectl -n odap-data create job --from=cronjob/postgres-backup \
   postgres-backup-manual-$(date +%s)
-kubectl -n uwv-data logs -f job/postgres-backup-manual-...
+kubectl -n odap-data logs -f job/postgres-backup-manual-...
 ```
 
 **Restore** (drop + reload alle 6 databases):
 
 ```bash
 # 1. Download de meest recente dump
-kubectl -n uwv-data exec -it postgres-postgresql-0 -- bash
-mc alias set local http://minio.uwv-platform.svc:9000 $S3_KEY $S3_SECRET
-mc cp local/uwv-meta/backups/postgres/2026-05-21/dump-031701.sql.gz /tmp/
+kubectl -n odap-data exec -it postgres-postgresql-0 -- bash
+mc alias set local http://minio.odap-platform.svc:9000 $S3_KEY $S3_SECRET
+mc cp local/odap-meta/backups/postgres/2026-05-21/dump-031701.sql.gz /tmp/
 
 # 2. Stop alle clients (anders blokkeren ze de DROP DATABASE)
-kubectl -n uwv-platform scale --replicas=0 \
-  statefulset.apps/uwv-airflow-scheduler-default \
-  statefulset.apps/uwv-airflow-webserver-default \
-  statefulset.apps/uwv-superset-node-default \
-  hivecluster.hive.stackable.tech/uwv-hive   # via operator-CR scale
-kubectl -n uwv-meta scale deploy openmetadata --replicas=0
-kubectl -n uwv-auth scale statefulset keycloak --replicas=0
+kubectl -n odap-platform scale --replicas=0 \
+  statefulset.apps/airflow-scheduler-default \
+  statefulset.apps/airflow-webserver-default \
+  statefulset.apps/superset-node-default \
+  hivecluster.hive.stackable.tech/hive   # via operator-CR scale
+kubectl -n odap-meta scale deploy openmetadata --replicas=0
+kubectl -n odap-auth scale statefulset keycloak --replicas=0
 
 # 3. Restore
 gunzip -c /tmp/dump-031701.sql.gz | psql -U postgres
 
 # 4. Bring everything back
-kubectl -n uwv-platform scale --replicas=1 statefulset.apps/uwv-airflow-scheduler-default ...
+kubectl -n odap-platform scale --replicas=1 statefulset.apps/airflow-scheduler-default ...
 ```
 
 > **RTO**: ~10 min voor één database, ~25 min volledige restore.
@@ -219,17 +219,17 @@ Naast de Postgres-backup kun je een Keycloak-realm-export trekken (handig
 om alleen een specifieke realm te restoren zonder full Postgres-restore):
 
 ```bash
-kubectl -n uwv-auth exec -it sts/keycloak -- /opt/keycloak/bin/kc.sh \
-  export --realm uwv --file /tmp/uwv-realm.json --users realm_file
-kubectl -n uwv-auth cp keycloak-0:/tmp/uwv-realm.json ./uwv-realm-$(date -u +%Y%m%d).json
+kubectl -n odap-auth exec -it sts/keycloak -- /opt/keycloak/bin/kc.sh \
+  export --realm uwv --file /tmp/odap-realm.json --users realm_file
+kubectl -n odap-auth cp keycloak-0:/tmp/odap-realm.json ./odap-realm-$(date -u +%Y%m%d).json
 ```
 
 Restore: drop de bestaande realm in UI, dan import met de UI-file-uploader of:
 
 ```bash
-kubectl -n uwv-auth cp ./uwv-realm-20260520.json keycloak-0:/tmp/
-kubectl -n uwv-auth exec sts/keycloak -- /opt/keycloak/bin/kc.sh \
-  import --file /tmp/uwv-realm-20260520.json
+kubectl -n odap-auth cp ./odap-realm-20260520.json keycloak-0:/tmp/
+kubectl -n odap-auth exec sts/keycloak -- /opt/keycloak/bin/kc.sh \
+  import --file /tmp/odap-realm-20260520.json
 ```
 
 ### 5.3 MinIO (lakehouse objects)
@@ -240,7 +240,7 @@ strategieën:
 
 - **`mc mirror`** naar een externe S3-bucket (cron of CronJob, dagelijks):
   ```bash
-  mc mirror --remove --watch local/uwv-bronze backup/uwv-bronze
+  mc mirror --remove --watch local/odap-bronze backup/odap-bronze
   ```
 - **Velero + restic** voor volledige cluster-volume backup (zie §5.4).
 - **Productie**: switch MinIO naar distributed mode (`replicas: 4`,
@@ -257,7 +257,7 @@ Voor disaster-recovery van K8s-resources zelf (CRDs, ConfigMaps, Secrets):
   installeer [Velero](https://velero.io/) en draai
   ```bash
   velero schedule create daily-backup --schedule="0 4 * * *" \
-    --include-namespaces uwv-platform,uwv-data,uwv-meta,uwv-auth,uwv-monitoring \
+    --include-namespaces odap-platform,odap-data,odap-meta,odap-auth,odap-monitoring \
     --ttl 720h
   ```
   → 30 dagen retentie.
@@ -355,7 +355,7 @@ make seed
 
 Dit:
 1. Genereert 10k synthetische cliënten + bijbehorende entiteiten in `data-generation/output/`.
-2. Pusht ze als JSONL naar `s3://uwv-raw/<domain>/<entity>/dt=YYYY-MM-DD/`.
+2. Pusht ze als JSONL naar `s3://odap-raw/<domain>/<entity>/dt=YYYY-MM-DD/`.
 3. Triggert dbt-run (in een Airflow-DAG) die silver + gold rebuilt.
 
 ### 7.1 Ingestion-debug-checklist
@@ -364,18 +364,18 @@ Wanneer een `make seed` niet doorkomt tot in de marts:
 
 ```bash
 # 1. Staan de raw JSONL files in MinIO?
-kubectl -n uwv-platform exec deploy/mc-pod -- mc ls local/uwv-raw/
+kubectl -n odap-platform exec deploy/mc-pod -- mc ls local/odap-raw/
 
 # 2. Heeft Airflow de seed-DAG getriggerd?
-kubectl -n uwv-platform exec sts/uwv-airflow-webserver-default -- \
+kubectl -n odap-platform exec sts/airflow-webserver-default -- \
   airflow dags list-runs -d synthetic_data_load --state success --limit 1
 
 # 3. Zijn de bronze tabellen in Hive zichtbaar?
-kubectl -n uwv-platform exec sts/uwv-trino-coordinator-default -- \
+kubectl -n odap-platform exec sts/trino-coordinator-default -- \
   trino --execute "SHOW TABLES IN bronze.uwv;"
 
 # 4. Heeft dbt de marts gebouwd?
-kubectl -n uwv-platform exec sts/uwv-trino-coordinator-default -- \
+kubectl -n odap-platform exec sts/trino-coordinator-default -- \
   trino --execute "SELECT count(*) FROM gold.uc01_wia_funnel.fct_funnel;"
 ```
 
@@ -385,14 +385,14 @@ Soms wil je terug naar nul (bv. na schema-changes in een staging-model):
 
 ```bash
 # Wipe bronze/silver/gold buckets (BEHOUD raw + checkpoints!)
-kubectl -n uwv-platform exec deploy/mc-pod -- bash -c '
-  mc rm --recursive --force local/uwv-bronze/
-  mc rm --recursive --force local/uwv-silver/
-  mc rm --recursive --force local/uwv-gold/
+kubectl -n odap-platform exec deploy/mc-pod -- bash -c '
+  mc rm --recursive --force local/odap-bronze/
+  mc rm --recursive --force local/odap-silver/
+  mc rm --recursive --force local/odap-gold/
 '
 
 # Drop alle Hive-tabellen
-kubectl -n uwv-platform exec sts/uwv-trino-coordinator-default -- \
+kubectl -n odap-platform exec sts/trino-coordinator-default -- \
   trino --execute "DROP SCHEMA bronze.uwv CASCADE; ..."
 
 # Reseed
@@ -408,11 +408,11 @@ header — momenteel uitgeschakeld in `kustomization.yaml`):
 
 ```bash
 # Driver + executor pods inspecteren
-kubectl -n uwv-platform get pods -l spark-app-name=streaming-bronze
-kubectl -n uwv-platform logs <driver-pod> --tail=200
+kubectl -n odap-platform get pods -l spark-app-name=streaming-bronze
+kubectl -n odap-platform logs <driver-pod> --tail=200
 
 # Force restart: delete CR + opnieuw applyen
-kubectl -n uwv-platform delete sparkapplication streaming-bronze
+kubectl -n odap-platform delete sparkapplication streaming-bronze
 kubectl apply -k platform/08-spark/
 ```
 
@@ -441,35 +441,35 @@ TODO (fase 9): troubleshooting "policy lijkt niet actief".
 
 ## 9. Observability dashboards
 
-- Grafana: `https://grafana.uwv-platform.local:8443`
-- OpenSearch Dashboards: `https://opensearch.uwv-platform.local:8443`
-- OpenMetadata: `https://openmetadata.uwv-platform.local:8443`
-- Prometheus: `https://prometheus.uwv-platform.local:8443`
-- Alertmanager: in-cluster only — `kubectl -n uwv-monitoring port-forward svc/prometheus-kube-prometheus-alertmanager 9093:9093`
-- MailHog (k3d-only, dev-SMTP-sink): `https://mailhog.uwv-platform.local:8443/`
+- Grafana: `https://grafana.odap.local:8443`
+- OpenSearch Dashboards: `https://opensearch.odap.local:8443`
+- OpenMetadata: `https://openmetadata.odap.local:8443`
+- Prometheus: `https://prometheus.odap.local:8443`
+- Alertmanager: in-cluster only — `kubectl -n odap-monitoring port-forward svc/prometheus-kube-prometheus-alertmanager 9093:9093`
+- MailHog (k3d-only, dev-SMTP-sink): `https://mailhog.odap.local:8443/`
 
 TODO (fase 1/8): default-credentials uit secrets ophalen, voorbeeld-queries.
 
 ### 9.1 Alert-pipeline overzicht
 
 ```
-metrics  → Prometheus → AlertmanagerConfig → email (SMTP) → MailHog (k3d) / UWV-relay (aks)
-logs     → Vector log_to_metric → Prometheus → ↑                          └→ Slack #uwv-data-platform
+metrics  → Prometheus → AlertmanagerConfig → email (SMTP) → MailHog (k3d) / platform relay (aks)
+logs     → Vector log_to_metric → Prometheus → ↑                          └→ Slack #odap-data-platform
 ```
 
 Definities:
-- Metric-rules: [`platform/14-monitoring/prometheusrule-uwv.yaml`](../platform/14-monitoring/prometheusrule-uwv.yaml)
+- Metric-rules: [`platform/14-monitoring/prometheusrule.yaml`](../platform/14-monitoring/prometheusrule.yaml)
 - Log-rules:    [`platform/14-monitoring/vector-log-alerts.yaml`](../platform/14-monitoring/vector-log-alerts.yaml)
 - Receivers:    [`platform/14-monitoring/alertmanager-config.yaml`](../platform/14-monitoring/alertmanager-config.yaml) (k3d) / `platform-overlays/aks/14-monitoring/` (aks)
 - Vector-config: [`infrastructure/helm/vector/values.yaml`](../infrastructure/helm/vector/values.yaml) (transforms `detect_alert_events` + `log_to_metric`)
 
 ### 9.2 Alert komt niet aan (debug-checklist)
 
-1. **Is Alertmanager actief?** `kubectl -n uwv-monitoring get pods -l app.kubernetes.io/name=alertmanager` — verwacht `Running`.
-2. **Is de AlertmanagerConfig geladen?** `kubectl -n uwv-monitoring get alertmanagerconfig uwv-platform-receivers -o yaml` — geen `status.error`.
-3. **Vuren de regels?** `kubectl -n uwv-monitoring port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090` → http://localhost:9090/alerts.
-4. **Komt Alertmanager bij de SMTP-host?** Alertmanager-pod-logs: `kubectl -n uwv-monitoring logs -l app.kubernetes.io/name=alertmanager --tail=100 | grep -i smtp`.
-5. **MailHog in k3d** — UI op `https://mailhog.uwv-platform.local:8443/`. Geen mails? Check `kubectl -n uwv-monitoring logs deploy/mailhog`.
+1. **Is Alertmanager actief?** `kubectl -n odap-monitoring get pods -l app.kubernetes.io/name=alertmanager` — verwacht `Running`.
+2. **Is de AlertmanagerConfig geladen?** `kubectl -n odap-monitoring get alertmanagerconfig odap-platform-receivers -o yaml` — geen `status.error`.
+3. **Vuren de regels?** `kubectl -n odap-monitoring port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090` → http://localhost:9090/alerts.
+4. **Komt Alertmanager bij de SMTP-host?** Alertmanager-pod-logs: `kubectl -n odap-monitoring logs -l app.kubernetes.io/name=alertmanager --tail=100 | grep -i smtp`.
+5. **MailHog in k3d** — UI op `https://mailhog.odap.local:8443/`. Geen mails? Check `kubectl -n odap-monitoring logs deploy/mailhog`.
 
 ### 9.3 End-to-end alert-test
 
@@ -486,14 +486,14 @@ make alert-test-resolve
 
 Verwacht resultaat:
 - k3d : verschijnt binnen ~30s in MailHog UI
-- aks : verschijnt binnen ~30s in `platform-alerts@uwv.nl`
+- aks : verschijnt binnen ~30s in `platform-alerts@example.com`
 
 ### 9.4 Log-based alert: OpaDecisionDenySpike
 
 - Vector detecteert `"result":false` in OPA-logs (zie `detect_alert_events` in helm-values).
-- Tellt counter `vector_uwv_alert_event_total{event="opa_deny"}`.
-- PrometheusRule `uwv-log-events` vuurt op `rate(...) > 0.2/s` over 5m.
-- Onderzoek: query OpenSearch op `uwv-logs-audit-*` met `result: false` filter, of zoek in Trino coordinator-logs welke gebruiker / catalog gewerd.
+- Tellt counter `vector_alert_event_total{event="opa_deny"}`.
+- PrometheusRule `log-events` vuurt op `rate(...) > 0.2/s` over 5m.
+- Onderzoek: query OpenSearch op `logs-audit-*` met `result: false` filter, of zoek in Trino coordinator-logs welke gebruiker / catalog gewerd.
 
 ### 9.5 Log-based alert: JvmOutOfMemory
 
@@ -525,15 +525,15 @@ landt.
 |---|---|---|
 | R-AVG-06 (doelbinding) | OPA-policy + tests draaien | `make opa-test` → 35 assertions GREEN |
 | R-AVG-07 (pseudonimisering) | Macro toepast op alle persoon-attributen | `grep -rn 'pseudonymize()' dbt/models/` |
-| R-AVG-15 (breach-detection) | Audit-logs ≥ 7 jaar in OpenSearch | `kubectl -n uwv-meta get opensearchilmpolicy uwv-audit-7y` |
-| R-BIO-05 (strong auth) | Keycloak password policy | `realm-uwv.json::passwordPolicy` |
+| R-AVG-15 (breach-detection) | Audit-logs ≥ 7 jaar in OpenSearch | `kubectl -n odap-meta get opensearchilmpolicy audit-7y` |
+| R-BIO-05 (strong auth) | Keycloak password policy | `realm.json::passwordPolicy` |
 | R-BIO-08 (secrets manager) | Geen plaintext secrets in repo | `git ls-files \| xargs grep -l 'CHANGE-ME' \|\| true` (verwacht: niets na ExternalSecrets-migratie) |
 | R-BIO-09 (least privilege) | Pod-security: runAsNonRoot, readOnlyRootFS | `kubectl get pods -A -o json \| jq '.items[].spec.securityContext'` |
 | R-BIO-11 (col-level security) | OPA column-masks tests | `make opa-test` → trino-column-masks_test.rego GREEN |
-| R-BIO-13 (network segmentation) | NetworkPolicies actief op alle UWV-namespaces | `kubectl get networkpolicy -A \| wc -l` (verwacht ≥ 19 in cloud-mode) |
+| R-BIO-13 (network segmentation) | NetworkPolicies actief op alle platform namespaces | `kubectl get networkpolicy -A \| wc -l` (verwacht ≥ 19 in cloud-mode) |
 | R-BIO-15 (vuln-mgmt) | Trivy SARIF upload + SBOM artifacts | GitHub Actions: `security-scan.yml` + `sbom.yml` runs |
 | R-BIO-20 (audit-retention) | OpenSearch ILM 7-jaar | `opensearch-ilm-job.yaml` |
-| R-BIO-23 (3-2-1 backup) | Postgres backup CronJob + off-cluster mirror | `kubectl -n uwv-data get cronjob postgres-backup` |
+| R-BIO-23 (3-2-1 backup) | Postgres backup CronJob + off-cluster mirror | `kubectl -n odap-data get cronjob postgres-backup` |
 | R-NIS2-03 (supply chain) | SBOM per release | GitHub Actions: artifact `sbom-*.cdx.json` per build |
 | R-NIS2-04 (incident detect) | Alert-pipeline + runbook §9 | `make alert-test` |
 | AI Act art. 11 (DPIA) | Per UC met `risk_tier: hoog` | `docs/use-cases/uc02-wajong-ai.md` etc. — DPIA-link in frontmatter |

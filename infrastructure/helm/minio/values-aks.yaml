@@ -13,15 +13,15 @@ persistence:
   storageClass: "managed-csi"
   size: 100Gi
 
-# Chart-managed ingress hostnames stay on .uwv-platform.local (in-cluster
-# routing). Public AKS access at *.eu-sovereigndataplatform.com is served
+# Chart-managed ingress hostnames stay on .odap.local (in-cluster
+# routing). Public AKS access at *.example.com is served
 # by infrastructure/azure/public-ingresses.yaml (`minio-public` + `minio-api-public`).
 
 # OIDC URLs visible to the browser must match the public hostname.
 # CORS-origin lijst moet de publieke portal-host bevatten zodat de browser
-# vanuit https://platform.eu-sovereigndataplatform.com mag PUTten naar
-# https://minio-api.eu-sovereigndataplatform.com.
+# vanuit https://platform.example.com mag PUTten naar
+# https://minio-api.example.com.
 environment:
-  MINIO_IDENTITY_OPENID_CONFIG_URL: "https://keycloak.eu-sovereigndataplatform.com/realms/uwv/.well-known/openid-configuration"
-  MINIO_IDENTITY_OPENID_REDIRECT_URI: "https://minio.eu-sovereigndataplatform.com/oauth_callback"
-  MINIO_API_CORS_ALLOW_ORIGIN: "https://platform.eu-sovereigndataplatform.com"
+  MINIO_IDENTITY_OPENID_CONFIG_URL: "https://keycloak.example.com/realms/odap/.well-known/openid-configuration"
+  MINIO_IDENTITY_OPENID_REDIRECT_URI: "https://minio.example.com/oauth_callback"
+  MINIO_API_CORS_ALLOW_ORIGIN: "https://platform.example.com"

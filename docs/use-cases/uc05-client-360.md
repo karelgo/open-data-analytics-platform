@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1e |
 | Bewaartermijn | 7 jaar voor besluit-relaterende velden; 2 jaar voor klantcontactlogs |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-05](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-05](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 
@@ -65,7 +65,7 @@ silver.uitkeringen + silver.contacten + silver.werkmap_berichten + silver.trajec
 | `bankrekening` | masked | masked | full (handhaving) | masked |
 | `klacht_status` | full | full | full | full |
 
-Implementatie: `opa-policies-src/trino/trino-uwv-roles.rego` +
+Implementatie: `opa-policies-src/trino/trino-platform-roles.rego` +
 `trino-column-masks.rego` + `trino-row-filters.rego`.
 
 ## dbt-model `meta`
@@ -91,8 +91,8 @@ Elke API-call (Trino read door CRM-applicatie) wordt gelogd met:
 
 - gebruiker (Keycloak-claim `sub`)
 - rol (Keycloak-claim `roles`)
-- doelcode (HTTP header `X-UWV-Purpose`)
-- aanleiding (HTTP header `X-UWV-Reason`, bv. `ticket-12345`)
+- doelcode (HTTP header `X-Purpose`)
+- aanleiding (HTTP header `X-Reason`, bv. `ticket-12345`)
 - gequeried `bsn`
 - timestamp
 

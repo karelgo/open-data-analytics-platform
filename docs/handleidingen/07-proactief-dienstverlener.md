@@ -29,8 +29,8 @@ case en initieert proactief contact. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Werklijst-dashboard | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Definities, model-info | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Werklijst-dashboard | https://superset.odap.local:8443 |
+| **OpenMetadata** | Definities, model-info | https://openmetadata.odap.local:8443 |
 
 ---
 

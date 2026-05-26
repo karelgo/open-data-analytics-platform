@@ -1,4 +1,4 @@
-# Referentiearchitectuur — UWV Modern Data & Analytics Platform
+# Referentiearchitectuur — Open Data & Analytics Platform
 
 **Versie:** 1.0 (fictief, ter illustratie)
 **Scope:** een doelarchitectuur voor het UWV-brede data- en analyticsplatform, aansluitend op de **Waardegedreven Data & Analytics Strategie (WDAS)**, het **Canoniek Gegevensmodel (CGM)**, **Dmap** en de SUWI-ketenarchitectuur (**KARWEI**), compliant met **NORA, AVG, BIO/BIO2, NIS2 en de AI Act**.
@@ -278,7 +278,7 @@ Iedere domein-zone publiceert "data products" met:
 
 ### 6.6 Consumptie
 
-- **BI**: Power BI als primair tool (in lijn met huidige UWV-stack), met certified datasets.
+- **BI**: Power BI als primair tool (in lijn met huidige platform stack), met certified datasets.
 - **Self-service analytics**: gecontroleerde sandboxes met geaggregeerde of gesynthetiseerde data.
 - **Embedded analytics**: in Werkmap, behandelaarschermen, beoordelaarstools.
 - **Gegevensdiensten naar derden**: via Suwinet/BKWI én via een nieuw API-platform (Mijn Gegevensdiensten 2.0).
@@ -320,7 +320,7 @@ Iedere domein-zone publiceert "data products" met:
 - **Netwerksegmentatie**: VPC's per zone, private endpoints, geen publieke endpoints voor opslag.
 - **Hardening**: CIS Benchmarks, Infrastructure as Code (Terraform), policy-as-code (OPA/Sentinel).
 - **Vulnerability management**: continue scans (Trivy, Snyk), SLA's per criticality (kritiek ≤ 7 dagen).
-- **SIEM/SOC**: integratie met UWV-SOC; use-cases voor data-exfiltratie, anomalous queries op polisadministratie, privileged misuse.
+- **SIEM/SOC**: integratie met Platform SOC; use-cases voor data-exfiltratie, anomalous queries op polisadministratie, privileged misuse.
 - **Incident response**: 24-uurs early warning + 72-uurs incident report aan NCSC/CSIRT (NIS2).
 - **Backup**: 3-2-1, immutable copies tegen ransomware, jaarlijks geteste DR.
 - **Supply chain security**: SBOM voor kritieke componenten, leveranciers-TPM's (zoals UWV nu al doet voor datacenter en netwerk).
@@ -560,7 +560,7 @@ Iedere domein-zone publiceert "data products" met:
 **Architectuur**:
 - Onderzoeksomgeving (sandbox) met gepseudonimiseerde panels.
 - Rekenomgeving voor data scientists, met gestandaardiseerde pipelines (causalml, doWhy).
-- Resultaten gepubliceerd in `uwv.nl/kennis` (vergelijkbaar met "Wat werkt bij Wajongers" 2011).
+- Resultaten gepubliceerd in `odap.io/kennis` (vergelijkbaar met "Wat werkt bij Wajongers" 2011).
 
 **Compliance**:
 - AVG: verenigbaar gebruik (art. 5 lid 1 onder b) voor wetenschappelijk/statistisch doel.

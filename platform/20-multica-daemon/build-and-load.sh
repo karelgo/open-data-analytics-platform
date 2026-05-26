@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Build the multica-daemon image and import it into the local k3d
-# cluster (uwv-platform).
+# cluster (odap-platform).
 #
 # Idempotent and safe to re-run.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IMAGE_TAG="${IMAGE_TAG:-uwv-platform/multica-daemon:dev}"
-CLUSTER_NAME="${CLUSTER_NAME:-uwv-platform}"
+IMAGE_TAG="${IMAGE_TAG:-odap/multica-daemon:dev}"
+CLUSTER_NAME="${CLUSTER_NAME:-odap-platform}"
 
 echo "==> image tag:       ${IMAGE_TAG}"
 echo "==> k3d cluster:     ${CLUSTER_NAME}"
@@ -30,4 +30,4 @@ echo "Image '${IMAGE_TAG}' is now available inside the '${CLUSTER_NAME}' cluster
 echo "Apply manifests with:"
 echo "  kubectl apply -k ${SCRIPT_DIR}"
 echo "Or trigger a rollout if already deployed:"
-echo "  kubectl -n uwv-platform rollout restart deploy/multica-daemon"
+echo "  kubectl -n odap-platform rollout restart deploy/multica-daemon"

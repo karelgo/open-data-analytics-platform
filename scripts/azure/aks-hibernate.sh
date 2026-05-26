@@ -30,7 +30,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 [[ -f "$ROOT/scripts/azure/env.sh" ]] && source "$ROOT/scripts/azure/env.sh"
 
 RG="${AKS_RESOURCE_GROUP:-dev-stackable-rg}"
-CLUSTER="${AKS_CLUSTER_NAME:-uwv-platform-aks}"
+CLUSTER="${AKS_CLUSTER_NAME:-odap-platform-aks}"
 REGION="${AKS_REGION:-westeurope}"
 NODE_RG="MC_${RG}_${CLUSTER}_${REGION}"
 SNAP_SUFFIX="hibernate"

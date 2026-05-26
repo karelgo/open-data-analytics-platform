@@ -31,15 +31,15 @@ platform. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Keycloak Admin** | Rolbeheer, gebruikers, MFA-policies | https://keycloak.uwv-platform.local:8443/admin |
+| **Keycloak Admin** | Rolbeheer, gebruikers, MFA-policies | https://keycloak.odap.local:8443/admin |
 | **kubectl + k9s** | Alle clusters, alle pods | terminal |
-| **Apache Airflow** | Maintenance-DAGs | https://airflow.uwv-platform.local:8443 |
+| **Apache Airflow** | Maintenance-DAGs | https://airflow.odap.local:8443 |
 | **OpenSearch / OPA-logs** | Audit-log review | via Vector ingestion |
-| **OpenMetadata** | Service-config, governance | https://openmetadata.uwv-platform.local:8443 |
-| **Prometheus + Grafana** | Metrics, alerts | https://grafana.uwv-platform.local:8443 |
-| **MinIO Console** | Bucket-beheer | https://minio.uwv-platform.local:8443 |
+| **OpenMetadata** | Service-config, governance | https://openmetadata.odap.local:8443 |
+| **Prometheus + Grafana** | Metrics, alerts | https://grafana.odap.local:8443 |
+| **MinIO Console** | Bucket-beheer | https://minio.odap.local:8443 |
 
-- Trino break-glass queries: `kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443` en dan via DBeaver op `localhost:8443`.
+- Trino break-glass queries: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443` en dan via DBeaver op `localhost:8443`.
 
 > **MFA verplicht en hardware-gebonden.** Voor productie: WebAuthn-passkey of
 > hardware-token (YubiKey). Geen TOTP-app op een mobiel.
@@ -83,11 +83,11 @@ De data-steward valideert de volgende ochtend dat deze comments er zijn.
 make doctor
 
 # Per Stackable-laag
-kubectl get pods -n uwv-platform
-kubectl get pods -n uwv-data
-kubectl get pods -n uwv-meta
-kubectl get pods -n uwv-monitoring
-kubectl get pods -n uwv-auth
+kubectl get pods -n odap-platform
+kubectl get pods -n odap-data
+kubectl get pods -n odap-meta
+kubectl get pods -n odap-monitoring
+kubectl get pods -n odap-auth
 
 # Custom resources
 kubectl get trinocluster,kafkacluster,hivecluster,opacluster,airflowcluster,supersetcluster,nificluster -A
@@ -95,10 +95,10 @@ kubectl get trinocluster,kafkacluster,hivecluster,opacluster,airflowcluster,supe
 
 ### 4.2 Workflow B — Nieuwe gebruiker toevoegen
 
-> In productie: gebeurt via SSO-federatie (DigiD/eHerkenning of UWV-AD).
+> In productie: gebeurt via SSO-federatie (DigiD/eHerkenning of Entra ID).
 > In deze referentie via Keycloak Admin.
 
-1. Open https://keycloak.uwv-platform.local:8443/admin → realm `uwv` → **Users → Add user**.
+1. Open https://keycloak.odap.local:8443/admin → realm `uwv` → **Users → Add user**.
 2. Vul username, email, voornaam, achternaam.
 3. Tab **Credentials** → temporary password.
 4. Tab **Role mappings** → wijs de juiste rol toe (één rol per persoon!).
@@ -127,7 +127,7 @@ scripts/build-opa-bundle.sh       # rendert ConfigMap
 kubectl apply -f platform/10-opa/
 
 # 4. Verifieer
-kubectl logs -n uwv-platform <opa-pod>
+kubectl logs -n odap-platform <opa-pod>
 # en draai smoke test:
 tests/smoke/08-opa-decisions.sh
 ```
@@ -141,21 +141,21 @@ Volgens [`docs/runbook.md` § 5](../runbook.md):
 
 ```bash
 # MinIO mirror
-mc mirror local/uwv-bronze backup-bucket/uwv-bronze/$(date -I)/
-mc mirror local/uwv-silver backup-bucket/uwv-silver/$(date -I)/
-mc mirror local/uwv-gold backup-bucket/uwv-gold/$(date -I)/
-mc mirror local/uwv-sensitive backup-bucket/uwv-sensitive/$(date -I)/
+mc mirror local/odap-bronze backup-bucket/odap-bronze/$(date -I)/
+mc mirror local/odap-silver backup-bucket/odap-silver/$(date -I)/
+mc mirror local/odap-gold backup-bucket/odap-gold/$(date -I)/
+mc mirror local/sensitive backup-bucket/sensitive/$(date -I)/
 
 # Postgres dumps (Hive Metastore, Airflow, Superset, OpenMetadata)
 for db in hive airflow superset openmetadata; do
-  kubectl exec -n uwv-platform postgres-$db-0 -- \
+  kubectl exec -n odap-platform postgres-$db-0 -- \
     pg_dump -U $db $db > backups/$db-$(date -I).sql
 done
 
 # Keycloak realm export
-kubectl exec -n uwv-auth keycloak-0 -- \
-  /opt/keycloak/bin/kc.sh export --file /tmp/uwv-realm.json --realm uwv
-kubectl cp uwv-auth/keycloak-0:/tmp/uwv-realm.json backups/uwv-realm-$(date -I).json
+kubectl exec -n odap-auth keycloak-0 -- \
+  /opt/keycloak/bin/kc.sh export --file /tmp/odap-realm.json --realm uwv
+kubectl cp odap-auth/keycloak-0:/tmp/odap-realm.json backups/odap-realm-$(date -I).json
 ```
 
 ### 4.6 Workflow F — Incident-response (cluster down)
@@ -163,7 +163,7 @@ kubectl cp uwv-auth/keycloak-0:/tmp/uwv-realm.json backups/uwv-realm-$(date -I).
 Volgens [`docs/runbook.md` § 4](../runbook.md):
 
 1. **Triage**: `make doctor`, lees recente alerts in Grafana.
-2. **Communicatie**: meld incident in Slack `#uwv-incidents`; zet status-page.
+2. **Communicatie**: meld incident in Slack `#incidents`; zet status-page.
 3. **Stabilize**: rolling restart van het falende component (`kubectl rollout restart`).
 4. **Diagnose**: pod-logs, OPA-decision-log, OpenSearch.
 5. **Resolve**: pas patch toe; als infra-niveau, escaleer naar SRE.
@@ -179,14 +179,14 @@ make opa-test > evidence/opa-test-$(date -I).log
 
 # OpenMetadata classifications
 curl -H "Authorization: Bearer $TOKEN" \
-  https://openmetadata.uwv-platform.local:8443/api/v1/tags?fields=classifications \
+  https://openmetadata.odap.local:8443/api/v1/tags?fields=classifications \
   > evidence/om-classifications-$(date -I).json
 
 # dbt test history
 dbt run --select metadata.dbt_test_results > evidence/dbt-tests-$(date -I).log
 
 # OPA decision-log statistieken
-opensearch-curl /uwv-logs-*/_search?q=opa.decision&size=0&_source=false \
+opensearch-curl /logs-*/_search?q=opa.decision&size=0&_source=false \
   > evidence/opa-decisions-stats-$(date -I).json
 ```
 
@@ -200,7 +200,7 @@ Bij ernstig incident:
 2. **Binnen 72u**: officieel incident-rapport met scope, oorzaak, impact, mitigatie.
 3. **Binnen 1 maand**: definitief evaluatierapport.
 
-Templates en escalatie-paden: out-of-platform via UWV CISO.
+Templates en escalatie-paden: out-of-platform via Platform CISO.
 
 ---
 
@@ -222,7 +222,7 @@ In volgorde van prioriteit:
 | Probleem | Contact |
 |---|---|
 | Productie-incident | Volg runbook + UWV SRE-team |
-| Beleidsvraag | UWV CISO + Data Office |
+| Beleidsvraag | Platform CISO + Data Office |
 | Wettelijke vraag | Privacy Officer (FG) |
 | Burnout / overbelasting | Manager + collega-admin (rol moet redundant zijn!) |
 
@@ -235,7 +235,7 @@ In volgorde van prioriteit:
 - Direct `kubectl edit` op productie-CRDs — altijd via GitOps.
 - Een wachtwoord in plaintext doorsturen, ook niet "tijdelijk".
 - MFA disable-en voor "even debuggen".
-- Nieuwe rollen creëren zonder vermelding in `uwv_role_mappings.json` + ADR.
+- Nieuwe rollen creëren zonder vermelding in `role_mappings.json` + ADR.
 
 ---
 

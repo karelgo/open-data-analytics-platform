@@ -1,6 +1,6 @@
-# Keycloak — OIDC IdP voor het UWV-platform.
+# Keycloak — OIDC IdP voor het ODAP platform.
 #
-# Mock UWV-realm wordt geïmporteerd via realm-uwv.json (ConfigMap).
+# Mock ODAP realm wordt geïmporteerd via realm.json (ConfigMap).
 # Productie: separate instance, MFA verplicht, externe IdP-federatie (DigiD/eHerkenning).
 #
 # Chart: bitnami/keycloak
@@ -17,16 +17,16 @@ image:
 # Auth (DEV ONLY)
 auth:
   adminUser: kcadmin
-  adminPassword: "uwv-dev-only-CHANGE-ME-2026"
+  adminPassword: "odap-dev-only-CHANGE-ME"
 
 # Externe Postgres (gedeeld) — niet de embedded H2 of bundled PG.
 postgresql:
   enabled: false
 externalDatabase:
-  host: postgres-postgresql.uwv-data.svc.cluster.local
+  host: postgres-postgresql.odap-data.svc.cluster.local
   port: 5432
-  user: uwvplatform
-  password: "uwv-dev-only-CHANGE-ME-2026"
+  user: odap
+  password: "odap-dev-only-CHANGE-ME"
   database: keycloak
 
 # Productie-mode (vereist EXTERNAL DB)
@@ -57,25 +57,25 @@ resources:
 extraStartupArgs: "--import-realm"
 
 extraVolumes:
-  - name: uwv-realm
+  - name: odap-realm
     configMap:
-      name: keycloak-uwv-realm
+      name: keycloak-realm
 
 extraVolumeMounts:
-  - name: uwv-realm
+  - name: odap-realm
     mountPath: /opt/bitnami/keycloak/data/import
     readOnly: true
 
 # Hostname / proxy voor ingress-nginx vóór Keycloak.
 # KC_HOSTNAME (browser-visible URL) is mode-specifiek (zie values-{k3d,aks}.yaml).
-# Chart-managed ingress.hostname STAYS as keycloak.uwv-platform.local on
+# Chart-managed ingress.hostname STAYS as keycloak.odap.local on
 # every mode — it's the in-cluster routing target (via /etc/hosts on k3d,
 # or CoreDNS hosts-override on AKS). The PUBLIC AKS ingress with the LE cert
 # lives in infrastructure/azure/public-ingresses.yaml as `keycloak-public`.
 proxy: edge
 extraEnvVars:
   - name: KC_HOSTNAME
-    value: "https://keycloak.uwv-platform.local:8443"
+    value: "https://keycloak.odap.local:8443"
   - name: KC_HOSTNAME_STRICT
     value: "false"
   - name: KC_HOSTNAME_STRICT_BACKCHANNEL
@@ -111,7 +111,7 @@ ingress:
   enabled: true
   ingressClassName: nginx
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     # Iframe-allow voor de portal embed-shell. Keycloak stuurt standaard
     # `X-Frame-Options: SAMEORIGIN` PLUS een eigen CSP met
@@ -128,8 +128,8 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;
       proxy_hide_header Content-Security-Policy;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
-  hostname: keycloak.uwv-platform.local
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
+  hostname: keycloak.odap.local
   tls: true
   selfSigned: false  # cert-manager doet de cert
 

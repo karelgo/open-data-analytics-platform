@@ -1,9 +1,9 @@
 [project]
-name = "uwv-data-generation"
+name = "odap-data-generation"
 version = "0.1.0"
-description = "Synthetische data-generators voor het UWV referentie-platform. Geen echte data."
+description = "Synthetische data-generators voor het ODAP reference platform. Geen echte data."
 requires-python = ">=3.11"
-authors = [{name = "UWV Reference Platform contributors"}]
+authors = [{name = "Open Data & Analytics Platform contributors"}]
 license = {text = "Apache-2.0"}
 
 dependencies = [

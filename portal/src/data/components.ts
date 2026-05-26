@@ -58,7 +58,7 @@ export type ComponentStage =
 // "open in nieuw tabblad"-gedrag (en de TLD-rewrite in Layout.astro) blijft
 // werken met de oorspronkelijke externe URL.
 //
-// - 'subpath':   de service draait onder platform.uwv-platform.local/<path>/
+// - 'subpath':   de service draait onder platform.odap.local/<path>/
 //                (same-origin, geen cross-origin cookie-issues).
 // - 'subdomain': service draait op een eigen <svc>.<tld> en wordt cross-origin
 //                geiframed. Vereist dat de service X-Frame-Options/CSP toestaat
@@ -102,7 +102,7 @@ export const components: PlatformComponent[] = [
     short: 'OIDC-identity provider — single sign-on en MFA voor alle componenten.',
     purpose: 'Eén keer inloggen, overal toegang volgens je rol. MFA en audit-log centraal.',
     icon: '/icons/brand/keycloak.svg',
-    url: 'https://keycloak.uwv-platform.local:8443',
+    url: 'https://keycloak.odap.local:8443',
     // Keycloak admin-console is bewust niet iframe-baar — login-redirects
     // breken in iframe-context, en sommige browsers blokkeren third-party
     // OIDC-cookies sowieso. Open altijd in een nieuw tabblad.
@@ -190,7 +190,7 @@ export const components: PlatformComponent[] = [
     // (via een eigen Service+Ingress, zie platform/08-spark/ingress.yaml).
     // Op de Executors-tab vind je stderr/stdout per pod = "spark cluster logs".
     // 503 als de driver niet draait.
-    url: 'https://spark.uwv-platform.local:8443',
+    url: 'https://spark.odap.local:8443',
     embed: { mode: 'subdomain' },
     prometheusJob: 'spark',
     rolesUsing: ['platform_admin', 'data_engineer'],
@@ -207,7 +207,7 @@ export const components: PlatformComponent[] = [
     // zelfde patroon als Spark). Eindgebruikers blijven Trino vooral via
     // Superset, Jupyter, dbt en Airflow gebruiken; de UI is handig voor
     // query-history, EXPLAIN-plans en het killen van runaway queries.
-    url: 'https://trino.uwv-platform.local:8443',
+    url: 'https://trino.odap.local:8443',
     embed: { mode: 'subdomain' },
     prometheusJob: 'trino',
     rolesUsing: [
@@ -244,7 +244,7 @@ export const components: PlatformComponent[] = [
     short: 'Dashboards en SQL Lab — primaire UI voor de meeste eindgebruikers.',
     purpose: 'Dashboards en ad-hoc analyse voor business-rollen — zonder SQL hoeven kennen.',
     icon: '/icons/brand/superset.svg',
-    url: 'https://superset.uwv-platform.local:8443',
+    url: 'https://superset.odap.local:8443',
     // Subdomain-routing — Superset hard-codet /superset als blueprint-
     // prefix voor z'n eigen klasse (Superset.welcome → /superset/welcome/),
     // dus nginx-rewrite + SCRIPT_NAME=/superset zou /superset/superset/...
@@ -273,7 +273,7 @@ export const components: PlatformComponent[] = [
     short: 'Catalog, glossary, lineage, data-quality.',
     purpose: 'Wat hebben we, wie is eigenaar, hoe is het opgebouwd, en is het op orde?',
     icon: '/icons/brand/openmetadata.svg',
-    url: 'https://openmetadata.uwv-platform.local:8443',
+    url: 'https://openmetadata.odap.local:8443',
     // OpenMetadata 1.x heeft geen configureerbare context-path (alle /api/v1,
     // /callback, /entities zijn hard-coded). Blijft daarom cross-origin op
     // eigen subdomein; ingress strip't X-Frame-Options.
@@ -311,13 +311,13 @@ export const components: PlatformComponent[] = [
   },
   {
     id: 'jupyter',
-    name: 'UWV Lab (Jupyter)',
+    name: 'ODAP Lab (Jupyter)',
     layer: 'compute',
     stage: 'consumption',
     short: 'Notebook-werkomgeving — Python/SQL op bronze/silver/gold/sensitive, met Git-integratie.',
     purpose: 'Interactief data verkennen en analyseren — Trino, Delta, MinIO, OpenMetadata vanuit één Python-kernel; werk versioneren met Git.',
     icon: '/icons/brand/jupyter.svg',
-    url: 'https://jupyter.uwv-platform.local:8443',
+    url: 'https://jupyter.odap.local:8443',
     // JupyterHub draait onder c.JupyterHub.base_url = '/jupyter/'.
     // Notebook-kernels gebruiken websockets; nginx-ingress proxy_pass laat
     // die door zolang de Upgrade-header niet wordt geblokkeerd.
@@ -339,7 +339,7 @@ export const components: PlatformComponent[] = [
     short: 'DAG-orchestratie voor batch-jobs en dbt-runs.',
     purpose: 'Plant en bewaakt alle scheduled jobs — wat draait wanneer, in welke volgorde.',
     icon: '/icons/brand/airflow.svg',
-    url: 'https://airflow.uwv-platform.local:8443',
+    url: 'https://airflow.odap.local:8443',
     // Airflow 3 — AIRFLOW__API__BASE_URL en AIRFLOW__FAB__BASE_URL beide
     // gezet op platform-host + /airflow. FAB proxy-fix met X_PREFIX zorgt
     // dat redirect_uri's correct worden opgebouwd onder subpath.
@@ -355,7 +355,7 @@ export const components: PlatformComponent[] = [
     short: 'Metrics + alerts; voedt de status-badges in deze portal.',
     purpose: 'Metrics verzamelen en alerteren als iets stuk dreigt te gaan.',
     icon: '/icons/brand/prometheus.svg',
-    url: 'https://prometheus.uwv-platform.local:8443',
+    url: 'https://prometheus.odap.local:8443',
     // --web.external-url=/prometheus + --web.route-prefix=/prometheus in
     // de Prometheus CR; geen auth dus geen cookie-overwegingen.
     embed: { mode: 'subpath', path: '/prometheus' },
@@ -373,7 +373,7 @@ export const components: PlatformComponent[] = [
     // Login via Keycloak SSO (auth.generic_oauth in helm/prometheus-stack/values.yaml).
     // Klik op "Sign in with Keycloak" op de Grafana-loginpagina; admin-account
     // blijft beschikbaar als break-glass.
-    url: 'https://grafana.uwv-platform.local:8443',
+    url: 'https://grafana.odap.local:8443',
     // server.root_url + serve_from_sub_path=true in grafana.ini; werkt
     // schoon onder subpath.
     embed: { mode: 'subpath', path: '/grafana' },
@@ -390,7 +390,7 @@ export const components: PlatformComponent[] = [
     icon: '/icons/brand/opensearch.svg',
     // Externe URL wijst naar OpenSearch Dashboards (port 5601). De REST-API
     // (port 9200) is alleen intern bereikbaar via cluster-DNS.
-    url: 'https://opensearch.uwv-platform.local:8443',
+    url: 'https://opensearch.odap.local:8443',
     // OpenSearch Dashboards heeft een eigen oauth-flow; we houden 'm
     // cross-origin tot we tijd hebben voor server.basePath-config.
     embed: { mode: 'subdomain' },
@@ -408,7 +408,7 @@ export const components: PlatformComponent[] = [
     short: 'Coördinatie van coding agents (Claude Code, Codex, Copilot CLI, …) — taken, voortgang, skills.',
     purpose: 'Taken toewijzen aan coding agents; voortgang volgen. Agents draaien op je laptop.',
     icon: '/icons/brand/multica.svg',
-    url: 'https://multica.uwv-platform.local:8443',
+    url: 'https://multica.odap.local:8443',
     // Cross-origin op eigen subdomein achter oauth2-proxy; behoeft alleen
     // dat ingress X-Frame-Options niet zet.
     embed: { mode: 'subdomain' },
@@ -469,7 +469,7 @@ export const components: PlatformComponent[] = [
     // Geen eigen brand-svg; valt terug op het generieke agents-stage-icoon
     // tot er een Nanitics-logo aan public/icons/brand/ is toegevoegd.
     icon: '/icons/stage/agents.svg',
-    url: 'https://nanitics.uwv-platform.local:8443/api/observatory/',
+    url: 'https://nanitics.odap.local:8443/api/observatory/',
     embed: { mode: 'subdomain' },
     rolesUsing: ['platform_admin', 'data_engineer'],
   },
@@ -518,7 +518,7 @@ export function tileHref(c: PlatformComponent): string | null {
 
 /**
  * Resolveert de iframe-src URL voor een component, optioneel met deep-link
- * pad. Bouwt op build-time de uwv-platform.local-URL; Layout.astro's
+ * pad. Bouwt op build-time de odap.local-URL; Layout.astro's
  * runtime TLD-rewrite swap't naar de juiste cloud-host. De DEEP-LINK is een
  * pad-inclusief-query (bv. "/dashboard/list/?filters=…") relatief aan de
  * service-root.
@@ -535,7 +535,7 @@ export function resolveEmbedSrc(
   const cleanDeep = (deepLink ?? '').trim();
   // Voor 'subpath' bouwen we platform-host + path + deep-link.
   // De runtime rewrite in Layout.astro raakt 'm niet aan want geen
-  // *.uwv-platform.local hostname.
+  // *.odap.local hostname.
   // Path die op een bestand wijst (bv. `/dbt-docs.html`) krijgt geen
   // trailing slash — anders bouwen we `/dbt-docs.html/` en dat 404't.
   // Heuristic: een laatste segment met een '.' is een bestand.

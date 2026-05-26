@@ -4,39 +4,39 @@
 # `prometheus_log_events` (zie infrastructure/helm/vector/values.yaml) en
 # de PodMonitor in podmonitor-vector.yaml.
 #
-# De counter heet `vector_uwv_alert_event_total` (Vector prefixes met de
+# De counter heet `vector_alert_event_total` (Vector prefixes met de
 # default_namespace `vector`). Labels: event, kubernetes_namespace,
 # container.
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: uwv-log-events
-  namespace: uwv-monitoring
+  name: log-events
+  namespace: odap-monitoring
   labels:
     prometheus: kube-prometheus
     role: alert-rules
-    uwv.nl/policy-tier: production
+    odap.io/policy-tier: production
 spec:
   groups:
-    - name: uwv-log-events
+    - name: log-events
       interval: 1m
       rules:
         - alert: OpaDecisionDenySpike
           expr: |
-            sum(rate(vector_uwv_alert_event_total{event="opa_deny"}[5m])) > 0.2
+            sum(rate(vector_alert_event_total{event="opa_deny"}[5m])) > 0.2
           for: 5m
           labels:
             severity: warning
             component: opa
           annotations:
             summary: "OPA-deny rate hoog (> 12/min over 5m)"
-            description: "OPA weigert > 12 beslissingen/minuut. Controleer of een nieuwe rol-mapping of policy-update onbedoeld toegang afsluit. Decision-IDs in OpenSearch: index uwv-logs-audit-*"
+            description: "OPA weigert > 12 beslissingen/minuut. Controleer of een nieuwe rol-mapping of policy-update onbedoeld toegang afsluit. Decision-IDs in OpenSearch: index logs-audit-*"
             runbook_url: "/docs/runbook.md#94-log-based-alert-opadecisiondenyspike"
 
         - alert: TrinoAccessDeniedSpike
           expr: |
-            sum(rate(vector_uwv_alert_event_total{event="trino_access_denied"}[5m])) > 0.1
+            sum(rate(vector_alert_event_total{event="trino_access_denied"}[5m])) > 0.1
           for: 5m
           labels:
             severity: warning
@@ -49,7 +49,7 @@ spec:
         - alert: JvmOutOfMemory
           expr: |
             sum by (kubernetes_namespace, container) (
-              increase(vector_uwv_alert_event_total{event="jvm_oom"}[10m])
+              increase(vector_alert_event_total{event="jvm_oom"}[10m])
             ) > 0
           for: 0m
           labels:
@@ -62,7 +62,7 @@ spec:
 
         - alert: KeycloakLoginErrorSpike
           expr: |
-            sum(rate(vector_uwv_alert_event_total{event="keycloak_login_error"}[5m])) > 0.5
+            sum(rate(vector_alert_event_total{event="keycloak_login_error"}[5m])) > 0.5
           for: 5m
           labels:
             severity: warning
@@ -74,11 +74,11 @@ spec:
 
         - alert: CsvUploadFailureSpike
           expr: |
-            sum(rate(vector_uwv_alert_event_total{event="csv_upload_failed"}[15m])) > 0.05
+            sum(rate(vector_alert_event_total{event="csv_upload_failed"}[15m])) > 0.05
           for: 10m
           labels:
             severity: warning
             component: csv-uploader
           annotations:
             summary: "csv-uploader faalt meermaals — schema-drift of MinIO-quota?"
-            description: "Inspecteer csv-uploader-pod-logs in uwv-platform; check MinIO bucket-quota."
+            description: "Inspecteer csv-uploader-pod-logs in odap-platform; check MinIO bucket-quota."

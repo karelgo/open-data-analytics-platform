@@ -1,4 +1,4 @@
-"""Pre-configured Trino client for the UWV Lab notebook image.
+"""Pre-configured Trino client for the ODAP Lab notebook image.
 
 Uses the trino-python-client. The X-Trino-User header is set to the Keycloak
 ``preferred_username`` (injected by the JupyterHub spawner as ``TRINO_USER``);
@@ -14,9 +14,9 @@ from __future__ import annotations
 import os
 from typing import Any
 
-# Lazy imports so `import uwv_lab` doesn't pull pandas/trino on every kernel.
+# Lazy imports so `import odap_lab` doesn't pull pandas/trino on every kernel.
 _DEFAULTS = {
-    "host": "uwv-trino-coordinator.uwv-platform.svc.cluster.local",
+    "host": "trino-coordinator.odap-platform.svc.cluster.local",
     "port": 8443,
     "scheme": "https",
     "user": "lab-user",
@@ -63,9 +63,9 @@ def connect(**overrides: Any):
         schema=c["schema"],
         http_scheme=c["scheme"],
         auth=auth,
-        # In-cluster TLS is signed by the UWV CA bundle if mounted, otherwise
+        # In-cluster TLS is signed by the Platform CA bundle if mounted, otherwise
         # accept self-signed (dev cluster only).
-        verify=os.environ.get("UWV_CA_BUNDLE") or False,
+        verify=os.environ.get("CA_BUNDLE") or False,
     )
 
 

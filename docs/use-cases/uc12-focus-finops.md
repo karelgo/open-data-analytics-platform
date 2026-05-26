@@ -25,7 +25,7 @@ Finance medewerker
    │  Upload focus-yyyymm.csv via mc CLI of MinIO Console
    │  (portal /csv-upload is sinds 2026-05 generiek — zie handleidingen/csv-upload.md Pad B)
    ▼
-MinIO  s3://uwv-staging/incoming/focus/<ts>-<file>.csv
+MinIO  s3://odap-staging/incoming/focus/<ts>-<file>.csv
    │  (handmatige trigger: Airflow UI of REST API)
    ▼
 ingest_csv_focus DAG (auto-generated door csv_ingest_factory)
@@ -85,7 +85,7 @@ Modellen in [dbt/models/marts/uc12_focus_finops/](../../dbt/models/marts/uc12_fo
 
 ## 4. Het dashboard
 
-Slug: **`uc12-focus-finops`** — `https://superset.uwv-platform.local:8443/superset/dashboard/uc12-focus-finops/`.
+Slug: **`uc12-focus-finops`** — `https://superset.odap.local:8443/superset/dashboard/uc12-focus-finops/`.
 
 Layout (5 rijen):
 
@@ -118,23 +118,23 @@ de DAG handmatig:
 
 ```bash
 # 1. Upload het bestand
-mc alias set minio-uwv https://minio.uwv-platform.local:8443 uwvadmin \
-  'uwv-dev-only-CHANGE-ME-2026' --insecure
+mc alias set minio https://minio.odap.local:8443 platformadmin \
+  'odap-dev-only-CHANGE-ME' --insecure
 TS=$(date -u +%Y%m%dT%H%M%S)
 mc cp ./focus-2026-05.csv \
-  minio-uwv/uwv-staging/incoming/focus/${TS}.csv --insecure
+  minio/odap-staging/incoming/focus/${TS}.csv --insecure
 
 # 2. Trigger de ingest-DAG via Airflow REST
-curl -fsS -u "airflow:uwv-dev-only-CHANGE-ME-2026" \
+curl -fsS -u "airflow:odap-dev-only-CHANGE-ME" \
   -X POST -H 'Content-Type: application/json' \
   -d "{\"conf\":{\"object_key\":\"incoming/focus/${TS}.csv\"}}" \
-  https://airflow.uwv-platform.local:8443/api/v1/dags/ingest_csv_focus/dagRuns
+  https://airflow.odap.local:8443/api/v1/dags/ingest_csv_focus/dagRuns
 ```
 
 Of via de Airflow UI: open `ingest_csv_focus`, klik **Trigger DAG w/ config**
 en geef `{"object_key": "incoming/focus/<ts>.csv"}`.
 
-1. Bekijk progress in Airflow: https://airflow.uwv-platform.local:8443/dags/ingest_csv_focus.
+1. Bekijk progress in Airflow: https://airflow.odap.local:8443/dags/ingest_csv_focus.
 2. Bij succes ververst het Superset-dashboard zodra `gold_uc12_focus_finops` klaar is (5-15 min na upload, afhankelijk van rij-aantal).
 
 ### Test-CSV genereren
@@ -171,7 +171,7 @@ Aanpassingen via flags: `--months 6 --seed 99 --end-year 2026 --end-month 4`.
 
 **dbt — config**
 - [dbt/dbt_project.yml](../../dbt/dbt_project.yml) — `finops` staging-schema + `uc12_focus_finops` mart-schema
-- [dbt/macros/ensure_uwv_schemas.sql](../../dbt/macros/ensure_uwv_schemas.sql) — bootstrap silver.finops + gold.uc12_focus_finops met S3-locatie
+- [dbt/macros/ensure_schemas.sql](../../dbt/macros/ensure_schemas.sql) — bootstrap silver.finops + gold.uc12_focus_finops met S3-locatie
 
 **Superset**
 - [platform/12-superset/dashboards-init-job.yaml](../../platform/12-superset/dashboards-init-job.yaml) — `uc12-focus-finops`-blok met 5 charts × 5 datasources

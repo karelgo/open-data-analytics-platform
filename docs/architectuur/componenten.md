@@ -25,7 +25,7 @@ _SSO regelt wie wat mag — elk onderdeel checkt het token._
 
 OIDC-identity provider — single sign-on en MFA voor alle componenten.
 
-- **URL:** [Live UI ↗](https://keycloak.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://keycloak.odap.local:8443)
 - **Gebruikt door:** **alle rollen**
 
 ## Ingestie
@@ -97,7 +97,7 @@ _Opschonen, joinen, modelleren — met policy-checks per query._
 
 Streaming + batch jobs die Delta-tabellen op MinIO schrijven.
 
-- **URL:** [Live UI ↗](https://spark.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://spark.odap.local:8443)
 - **Gebruikt door:** `platform_admin`, `data_engineer`
 
 ### Trino { #trino }
@@ -137,19 +137,19 @@ _Eindgebruikers consumeren via dashboards en SQL._
 
 Dashboards en SQL Lab — primaire UI voor de meeste eindgebruikers.
 
-- **URL:** [Live UI ↗](https://superset.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://superset.odap.local:8443)
 - **Gebruikt door:** `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`, `crm_medewerker`, `fez_analist`, `smz_planner`, `proactief_dienstverlener`, `researcher`, `data_steward`, `platform_admin`
 
-### UWV Lab (Jupyter) { #jupyter }
+### ODAP Lab (Jupyter) { #jupyter }
 
-!!! abstract "Wat doet UWV Lab (Jupyter)?"
+!!! abstract "Wat doet ODAP Lab (Jupyter)?"
     Interactief data verkennen en analyseren — Trino, Delta, MinIO, OpenMetadata vanuit één Python-kernel; werk versioneren met Git.
 
 **Laag:** `compute` · **Stage:** `consumption` · **Prometheus job:** _niet gemonitord_
 
 Notebook-werkomgeving — Python/SQL op bronze/silver/gold/sensitive, met Git-integratie.
 
-- **URL:** [Live UI ↗](https://jupyter.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://jupyter.odap.local:8443)
 - **Gebruikt door:** `researcher`, `data_engineer`, `data_steward`, `wajong_arbeidsdeskundige`, `fez_analist`, `platform_admin`
 
 ### Power BI { #powerbi }
@@ -177,7 +177,7 @@ _Catalog, lineage en data-kwaliteit — wat hebben we eigenlijk?_
 
 Catalog, glossary, lineage, data-quality.
 
-- **URL:** [Live UI ↗](https://openmetadata.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://openmetadata.odap.local:8443)
 - **Gebruikt door:** `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`, `crm_medewerker`, `fez_analist`, `smz_planner`, `researcher`, `data_steward`, `data_engineer`, `platform_admin`
 
 ### dbt docs { #dbt-docs }
@@ -205,7 +205,7 @@ _Wat draait wanneer, in welke volgorde, met welke afhankelijkheid._
 
 DAG-orchestratie voor batch-jobs en dbt-runs.
 
-- **URL:** [Live UI ↗](https://airflow.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://airflow.odap.local:8443)
 - **Gebruikt door:** `platform_admin`, `data_engineer`
 
 ## Observability
@@ -221,7 +221,7 @@ _Metrics, logs en alerts om de gezondheid van het platform te zien._
 
 Metrics + alerts; voedt de status-badges in deze portal.
 
-- **URL:** [Live UI ↗](https://prometheus.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://prometheus.odap.local:8443)
 - **Gebruikt door:** `platform_admin`
 
 ### Grafana { #grafana }
@@ -233,7 +233,7 @@ Metrics + alerts; voedt de status-badges in deze portal.
 
 Dashboards over Prometheus-metrics — cluster-health en service-latency.
 
-- **URL:** [Live UI ↗](https://grafana.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://grafana.odap.local:8443)
 - **Gebruikt door:** `platform_admin`, `data_engineer`
 
 ### OpenSearch { #opensearch }
@@ -245,7 +245,7 @@ Dashboards over Prometheus-metrics — cluster-health en service-latency.
 
 Logs (Vector) + search-backend voor OpenMetadata.
 
-- **URL:** [Live UI ↗](https://opensearch.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://opensearch.odap.local:8443)
 - **Gebruikt door:** `platform_admin`, `data_steward`
 
 ## Agents & AI-tooling
@@ -261,7 +261,7 @@ _Coördinatie van coding agents (Multica) en gerelateerde dev-loop tooling._
 
 Coördinatie van coding agents (Claude Code, Codex, Copilot CLI, …) — taken, voortgang, skills.
 
-- **URL:** [Live UI ↗](https://multica.uwv-platform.local:8443)
+- **URL:** [Live UI ↗](https://multica.odap.local:8443)
 - **Gebruikt door:** `platform_admin`, `data_engineer`
 
 ### Nanitics Observatory { #nanitics }
@@ -273,7 +273,7 @@ Coördinatie van coding agents (Claude Code, Codex, Copilot CLI, …) — taken,
 
 In-cluster agent-runtime + trace-viewer. Watcher monitort het platform en filed issues naar Multica.
 
-- **URL:** [Live UI ↗](https://nanitics.uwv-platform.local:8443/api/observatory/)
+- **URL:** [Live UI ↗](https://nanitics.odap.local:8443/api/observatory/)
 - **Gebruikt door:** `platform_admin`, `data_engineer`
 
 

@@ -3,8 +3,8 @@
 #
 # Stuurt een synthetische alert direct naar Alertmanager via amtool of
 # kubectl-exec-curl. Daarna kun je 'm verifiëren:
-#   - in k3d : open https://mailhog.uwv-platform.local:8443/  (MailHog UI)
-#   - in aks : check de inbox van platform-alerts@uwv.nl
+#   - in k3d : open https://mailhog.odap.local:8443/  (MailHog UI)
+#   - in aks : check de inbox van platform-alerts@example.com
 #
 # Gebruik:
 #   bash scripts/alert-test.sh              # default: 1 warning
@@ -14,7 +14,7 @@
 #
 # Vereisten:
 #   - kubectl context wijst naar de cluster waar Alertmanager draait
-#   - Alertmanager runt in namespace uwv-monitoring
+#   - Alertmanager runt in namespace odap-monitoring
 #
 # Exit-codes: 0 = success, !=0 = failure.
 
@@ -27,7 +27,7 @@ parse_mode_args "$@"
 # parse_mode_args slokt --mode op. Positionele args staan in REMAINING_ARGS.
 
 ACTION="${REMAINING_ARGS[0]:-warning}"
-NS="uwv-monitoring"
+NS="odap-monitoring"
 AM_SVC="prometheus-kube-prometheus-alertmanager"
 AM_PORT="9093"
 
@@ -61,7 +61,7 @@ fi
 PAYLOAD=$(cat <<JSON
 [{
   "labels": {
-    "alertname": "UwvSyntheticTestAlert",
+    "alertname": "SyntheticTestAlert",
     "severity": "${SEV}",
     "component": "alert-test",
     "namespace": "${NS}",
@@ -74,7 +74,7 @@ PAYLOAD=$(cat <<JSON
   },
   "startsAt": "${STARTS_AT}",
   "endsAt": "${ENDS_AT}",
-  "generatorURL": "https://alertmanager.uwv-platform.local/alert-test"
+  "generatorURL": "https://alertmanager.odap.local/alert-test"
 }]
 JSON
 )
@@ -121,13 +121,13 @@ ok "Alert verstuurd (HTTP ${RESP})."
 case "$DEPLOYMENT_MODE" in
   k3d)
     echo
-    echo "Verifieer: open MailHog UI → https://mailhog.uwv-platform.local:8443/"
+    echo "Verifieer: open MailHog UI → https://mailhog.odap.local:8443/"
     echo "           (of port-forward: kubectl -n ${NS} port-forward svc/mailhog 8025:8025)"
-    echo "Verwacht: nieuwe mail met subject '[FIRING:1] UwvSyntheticTestAlert (${SEV})'"
+    echo "Verwacht: nieuwe mail met subject '[FIRING:1] SyntheticTestAlert (${SEV})'"
     ;;
   aks)
     echo
-    echo "Verifieer: check de inbox van platform-alerts@uwv.nl"
+    echo "Verifieer: check de inbox van platform-alerts@example.com"
     echo "          (smarthost via platform-overlays/aks/14-monitoring/alertmanager-smtp-prod.yaml)"
     ;;
 esac

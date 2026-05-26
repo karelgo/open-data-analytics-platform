@@ -16,10 +16,10 @@ patches:
         value: letsencrypt-prod
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: jupyter.eu-sovereigndataplatform.com
+        value: jupyter.example.com
       - op: replace
         path: /spec/rules/0/host
-        value: jupyter.eu-sovereigndataplatform.com
+        value: jupyter.example.com
   - target:
       kind: Deployment
       name: jupyterhub
@@ -29,10 +29,10 @@ patches:
       # OPENMETADATA_PUBLIC_URL, CONFIGPROXY_AUTH_TOKEN, ...
       - op: replace
         path: /spec/template/spec/containers/0/env/2/value
-        value: "https://jupyter.eu-sovereigndataplatform.com/hub/oauth_callback"
+        value: "https://jupyter.example.com/hub/oauth_callback"
       - op: replace
         path: /spec/template/spec/containers/0/env/3/value
-        value: "https://keycloak.eu-sovereigndataplatform.com"
+        value: "https://keycloak.example.com"
       - op: replace
         path: /spec/template/spec/containers/0/env/4/value
-        value: "https://openmetadata.eu-sovereigndataplatform.com"
+        value: "https://openmetadata.example.com"

@@ -2,11 +2,11 @@
 
 Roept hetzelfde mechanisme aan als `make seed`: ConfigMaps voor de
 generator-code, dan een Job die `load_to_s3.py` draait. Schrijft JSONL
-naar `s3a://uwv-raw/`; Spark file-source streaming pikt het op.
+naar `s3a://odap-raw/`; Spark file-source streaming pikt het op.
 
 Gebruikt KubernetesJobOperator (Airflow 2.10+) met inline-spec.
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -64,10 +64,10 @@ def build_seed_job(client_count: int = 10000, seed: int = 2026) -> V1JobSpec:
         env=[
             V1EnvVar(name="COUNT", value=str(client_count)),
             V1EnvVar(name="SEED", value=str(seed)),
-            V1EnvVar(name="S3_BUCKET", value="uwv-raw"),
+            V1EnvVar(name="S3_BUCKET", value="odap-raw"),
             V1EnvVar(
                 name="S3_ENDPOINT",
-                value="https://minio.uwv-platform.svc.cluster.local:9000",
+                value="https://minio.odap-platform.svc.cluster.local:9000",
             ),
             V1EnvVar(name="S3_REGION", value="us-east-1"),
             _secret_env("S3_ACCESS_KEY", "minio-s3-credentials", "accessKey"),
@@ -101,7 +101,7 @@ def build_seed_job(client_count: int = 10000, seed: int = 2026) -> V1JobSpec:
         ttl_seconds_after_finished=3600,
         backoff_limit=1,
         template=V1PodTemplateSpec(
-            metadata=V1ObjectMeta(labels={"uwv.nl/component": "data-generation"}),
+            metadata=V1ObjectMeta(labels={"odap.io/component": "data-generation"}),
             spec=pod_spec,
         ),
     )
@@ -119,12 +119,12 @@ with DAG(
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
 
-    client_count = int(Variable.get("uwv_seed_client_count", default_var="10000"))
-    seed_value = int(Variable.get("uwv_seed_value", default_var="2026"))
+    client_count = int(Variable.get("seed_client_count", default_var="10000"))
+    seed_value = int(Variable.get("seed_value", default_var="2026"))
 
     seed_task = KubernetesJobOperator(
         task_id="seed_data_to_s3",
-        namespace="uwv-platform",
+        namespace="odap-platform",
         job_template=V1ObjectMeta(name="seed-data-generation"),
         full_pod_spec=None,
         job_spec=build_seed_job(client_count=client_count, seed=seed_value),

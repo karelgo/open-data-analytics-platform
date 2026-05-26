@@ -4,10 +4,10 @@
 - Iceberg: native procedures `expire_snapshots` + `rewrite_data_files`
   + `remove_orphan_files`
 
-Selecteert format vanuit Airflow Variable `uwv_table_format` (default 'delta').
+Selecteert format vanuit Airflow Variable `table_format` (default 'delta').
 Per bronze/silver/gold-tabel één task; faalt graceful als tabel niet bestaat.
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -72,7 +72,7 @@ with DAG(
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
 
-    fmt = Variable.get("uwv_table_format", default_var="delta")
+    fmt = Variable.get("table_format", default_var="delta")
 
     for catalog, schema, table in MAINTAIN_TABLES:
         op = TrinoOperator(

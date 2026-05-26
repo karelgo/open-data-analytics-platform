@@ -1,6 +1,6 @@
 # docs/ — Index
 
-Alle documentatie van het UWV Reference Data Platform op één plek. De
+Alle documentatie van het Open Data & Analytics Platform op één plek. De
 [top-level `README.md`](../README.md) is het instappunt; van daar verwijst
 deze map dieper.
 

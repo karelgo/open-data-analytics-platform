@@ -28,10 +28,10 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **OpenMetadata** | Hoofdwerkplek: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.uwv-platform.local:8443 |
-| **Apache Superset** | Dashboards reviewen, ownership-overzichten | https://superset.uwv-platform.local:8443 |
-| **Apache Airflow** | DQ-DAGs draaien | https://airflow.uwv-platform.local:8443 |
-| **OpenSearch (Kibana-achtig)** | OPA-decision-logs reviewen | https://opensearch.uwv-platform.local:8443/logs |
+| **OpenMetadata** | Hoofdwerkplek: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.odap.local:8443 |
+| **Apache Superset** | Dashboards reviewen, ownership-overzichten | https://superset.odap.local:8443 |
+| **Apache Airflow** | DQ-DAGs draaien | https://airflow.odap.local:8443 |
+| **OpenSearch (Kibana-achtig)** | OPA-decision-logs reviewen | https://opensearch.odap.local:8443/logs |
 | **dbt CLI / docs** | dbt-tests + lineage-docs | lokaal of via VS Code remote |
 
 ---

@@ -1,5 +1,5 @@
-# Postgres backup — daily pg_dumpall of the shared Postgres pod in uwv-data,
-# uploaded to MinIO under s3://uwv-meta/backups/postgres/YYYY-MM-DD/.
+# Postgres backup — daily pg_dumpall of the shared Postgres pod in odap-data,
+# uploaded to MinIO under s3://odap-meta/backups/postgres/YYYY-MM-DD/.
 #
 # Scope: the single shared Postgres pod hosts 6 databases:
 #   platform, hivemetastore, airflow, superset, openmetadata, keycloak
@@ -10,8 +10,8 @@
 # compliance, but for operational restore-recoverability 30 days is enough.)
 #
 # Manual restore:
-#   kubectl -n uwv-data exec -it postgres-postgresql-0 -- bash
-#   # download from MinIO: mc cp myminio/uwv-meta/backups/postgres/2026-05-21/dump.sql.gz /tmp/
+#   kubectl -n odap-data exec -it postgres-postgresql-0 -- bash
+#   # download from MinIO: mc cp myminio/odap-meta/backups/postgres/2026-05-21/dump.sql.gz /tmp/
 #   gunzip -c /tmp/dump.sql.gz | psql -U postgres
 #
 # Why MinIO and not a separate cloud bucket?
@@ -23,15 +23,15 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: postgres-backup
-  namespace: uwv-data
+  namespace: odap-data
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: postgres-backup
-  namespace: uwv-data
+  namespace: odap-data
   labels:
-    app.kubernetes.io/part-of: uwv-platform
+    app.kubernetes.io/part-of: odap-platform
     app.kubernetes.io/component: backup
 spec:
   # 03:17 UTC daily — outside business hours and after most overnight DAG
@@ -62,7 +62,7 @@ spec:
               imagePullPolicy: IfNotPresent
               env:
                 - name: PGHOST
-                  value: postgres-postgresql.uwv-data.svc.cluster.local
+                  value: postgres-postgresql.odap-data.svc.cluster.local
                 - name: PGPORT
                   value: "5432"
                 - name: PGUSER

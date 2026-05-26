@@ -1,5 +1,5 @@
 # In-cluster Multica daemon, bundled with the OpenAI Codex CLI wired to
-# the UWV Azure AI Foundry endpoint.
+# the Azure AI Foundry endpoint.
 #
 # History: opencode was briefly installed alongside codex as a fallback
 # runtime, but Foundry's gpt-5.4-nano deployment rejects opencode's
@@ -16,7 +16,7 @@
 #
 # Or:
 #
-#   docker build -t uwv-platform/multica-daemon:dev .
+#   docker build -t odap/multica-daemon:dev .
 
 # Stage 1 — grab the multica CLI binary from the upstream backend image.
 # We don't reuse that image as the runtime base because we need Node.js

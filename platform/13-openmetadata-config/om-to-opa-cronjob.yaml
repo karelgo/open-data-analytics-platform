@@ -2,30 +2,30 @@
 #
 # OM 1.5 heeft geen native Reverse Metadata (community-feature pas vanaf
 # 1.7+). Deze CronJob implementeert het pad zelf: leest Doelbinding.* tags
-# van Trino-tabellen in OM en updatet `uwv_role_mappings.resource_purposes`
+# van Trino-tabellen in OM en updatet `role_mappings.resource_purposes`
 # in de opa-trino-bundle ConfigMap. Stackable's OPA-operator herlaadt
 # automatisch via de bundle-label.
 #
 # Sluit het lint: dbt-meta → enricher → OM → OPA → Trino-row/col-policy.
 #
-# Cross-namespace RBAC: CronJob draait in uwv-meta, patcht configmap in
-# uwv-platform. ServiceAccount `om-to-opa-sync` heeft een Role in beide NS:
-#   - uwv-platform: configmaps/get,patch (om de bundle te updaten)
+# Cross-namespace RBAC: CronJob draait in odap-meta, patcht configmap in
+# odap-platform. ServiceAccount `om-to-opa-sync` heeft een Role in beide NS:
+#   - odap-platform: configmaps/get,patch (om de bundle te updaten)
 #   - kube-API-discovery wordt door ServiceAccount-token gedekt.
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: om-to-opa-sync
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: om-to-opa-sync
+    odap.io/component: om-to-opa-sync
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: om-to-opa-sync-cm
-  namespace: uwv-platform
+  namespace: odap-platform
 rules:
   - apiGroups: [""]
     resources: ["configmaps"]
@@ -36,11 +36,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: om-to-opa-sync-cm
-  namespace: uwv-platform
+  namespace: odap-platform
 subjects:
   - kind: ServiceAccount
     name: om-to-opa-sync
-    namespace: uwv-meta
+    namespace: odap-meta
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -50,9 +50,9 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: openmetadata-to-opa-sync
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: om-to-opa-sync
+    odap.io/component: om-to-opa-sync
 spec:
   # Elke 15 min — Doelbinding-tags zijn relatief stabiel (komen uit dbt-meta)
   # maar deze cadence vangt nieuwe marts snel op zonder OPA-flapping.
@@ -67,7 +67,7 @@ spec:
       template:
         metadata:
           labels:
-            uwv.nl/component: om-to-opa-sync
+            odap.io/component: om-to-opa-sync
         spec:
           serviceAccountName: om-to-opa-sync
           restartPolicy: OnFailure
@@ -79,16 +79,16 @@ spec:
                 - "python /config/om_to_opa_sync.py"
               env:
                 - name: OM_URL
-                  value: "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+                  value: "http://openmetadata.odap-meta.svc.cluster.local:8585"
                 - name: OM_JWT_TOKEN
                   valueFrom:
                     secretKeyRef:
                       name: openmetadata-admin
                       key: jwtToken
                 - name: OM_TRINO_SERVICE
-                  value: "uwv-trino"
+                  value: "trino"
                 - name: OPA_CONFIGMAP_NS
-                  value: "uwv-platform"
+                  value: "odap-platform"
                 - name: OPA_CONFIGMAP_NAME
                   value: "opa-trino-bundle"
               volumeMounts:
@@ -105,4 +105,4 @@ spec:
           volumes:
             - name: config
               configMap:
-                name: openmetadata-uwv-config
+                name: openmetadata-platform-config

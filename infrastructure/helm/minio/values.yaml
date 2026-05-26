@@ -14,8 +14,8 @@ persistence:
 
 # Auth (DEV ONLY — vervangen in productie via Secret)
 # Voor reproduceerbaarheid in dev hardcoded; bootstrap waarschuwt expliciet.
-rootUser: "uwvadmin"
-rootPassword: "uwv-dev-only-CHANGE-ME-2026"
+rootUser: "platformadmin"
+rootPassword: "odap-dev-only-CHANGE-ME"
 
 # Resources
 resources:
@@ -28,28 +28,28 @@ resources:
 
 # Buckets aanmaken via een post-install Job (werkt op standalone mode)
 buckets:
-  - name: uwv-raw
+  - name: odap-raw
     policy: none
     purge: false
-  - name: uwv-bronze
+  - name: odap-bronze
     policy: none
     purge: false
-  - name: uwv-silver
+  - name: odap-silver
     policy: none
     purge: false
-  - name: uwv-gold
+  - name: odap-gold
     policy: none
     purge: false
-  - name: uwv-sensitive
+  - name: sensitive
     policy: none
     purge: false
-  - name: uwv-staging
+  - name: odap-staging
     policy: none
     purge: false
-  - name: uwv-checkpoints
+  - name: odap-checkpoints
     policy: none
     purge: false
-  - name: uwv-meta
+  - name: odap-meta
     policy: none
     purge: false
 
@@ -72,20 +72,20 @@ ingress:
   enabled: true
   ingressClassName: nginx
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
   hosts:
-    - minio.uwv-platform.local
+    - minio.odap.local
   tls:
-    - hosts: [minio.uwv-platform.local]
+    - hosts: [minio.odap.local]
       secretName: minio-tls
 
 consoleIngress:
   enabled: true
   ingressClassName: nginx
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
     # MinIO Console iframe-allow voor portal embed-shell (cross-origin).
@@ -94,11 +94,11 @@ consoleIngress:
     # en zetten frame-ancestors zodat portal-shell 'm kan iframen.
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
   hosts:
-    - minio-console.uwv-platform.local
+    - minio-console.odap.local
   tls:
-    - hosts: [minio-console.uwv-platform.local]
+    - hosts: [minio-console.odap.local]
       secretName: minio-console-tls
 
 # In-cluster TLS aan: Trino 469+ vereist TLS voor S3 connections.
@@ -114,32 +114,32 @@ tls:
   privateKey: private.key
 
 # OIDC SSO via Keycloak voor de MinIO Console.
-# Browser-flow: console redirect naar https://keycloak.uwv-platform.local:8443
+# Browser-flow: console redirect naar https://keycloak.odap.local:8443
 # (via KC_HOSTNAME). Backend MinIO doet OIDC discovery via dezelfde URL —
-# vereist dat de pod keycloak.uwv-platform.local in-cluster kan resolveren
+# vereist dat de pod keycloak.odap.local in-cluster kan resolveren
 # (zie platform/02-authentication/keycloak-external-svc.yaml + CoreDNS).
 # Cert-manager CA is nodig voor TLS-verify; mount via extraVolumes.
 #
-# CORS — de portal-CSV-upload doet vanuit https://platform.uwv-platform.local:8443
-# een AssumeRoleWithWebIdentity + PUT naar https://minio.uwv-platform.local:8443.
+# CORS — de portal-CSV-upload doet vanuit https://platform.odap.local:8443
+# een AssumeRoleWithWebIdentity + PUT naar https://minio.odap.local:8443.
 # Cross-origin browser-PUT vereist dat MinIO de portal-origin in de CORS-header
 # whitelist heeft.
 environment:
-  MINIO_IDENTITY_OPENID_CONFIG_URL: "https://keycloak.uwv-platform.local:8443/realms/uwv/.well-known/openid-configuration"
+  MINIO_IDENTITY_OPENID_CONFIG_URL: "https://keycloak.odap.local:8443/realms/odap/.well-known/openid-configuration"
   MINIO_IDENTITY_OPENID_CLIENT_ID: "minio"
-  MINIO_IDENTITY_OPENID_CLIENT_SECRET: "uwv-dev-only-CHANGE-ME-minio-secret"
+  MINIO_IDENTITY_OPENID_CLIENT_SECRET: "odap-dev-only-CHANGE-ME-minio-secret"
   MINIO_IDENTITY_OPENID_DISPLAY_NAME: "Keycloak (UWV)"
   MINIO_IDENTITY_OPENID_CLAIM_NAME: "policy"
-  MINIO_IDENTITY_OPENID_REDIRECT_URI: "https://minio-console.uwv-platform.local:8443/oauth_callback"
+  MINIO_IDENTITY_OPENID_REDIRECT_URI: "https://minio-console.odap.local:8443/oauth_callback"
   MINIO_IDENTITY_OPENID_SCOPES: "openid,profile,email,roles"
-  MINIO_API_CORS_ALLOW_ORIGIN: "https://platform.uwv-platform.local:8443,https://platform.uwv-platform.local"
-  SSL_CERT_FILE: "/etc/uwv-ca/ca.crt"
-  CURL_CA_BUNDLE: "/etc/uwv-ca/ca.crt"
+  MINIO_API_CORS_ALLOW_ORIGIN: "https://platform.odap.local:8443,https://platform.odap.local"
+  SSL_CERT_FILE: "/etc/platform-ca/ca.crt"
+  CURL_CA_BUNDLE: "/etc/platform-ca/ca.crt"
 
 # Named policies — chart maakt deze aan via post-install mc-job
 # (`mc admin policy create`). De 'csv-uploader' policy wordt door MinIO
 # toegekend aan gebruikers met user-attribute policy=csv-uploader in Keycloak
-# (zie infrastructure/helm/keycloak/realm-uwv.json) na een
+# (zie infrastructure/helm/keycloak/realm.json) na een
 # AssumeRoleWithWebIdentity STS-call vanuit de portal.
 policies:
   - name: csv-uploader
@@ -150,7 +150,7 @@ policies:
       # prefix overeenkomt met X-Auth-Request-Email vóór trigger.
       - effect: Allow
         resources:
-          - "arn:aws:s3:::uwv-staging/uploads/*"
+          - "arn:aws:s3:::odap-staging/uploads/*"
         actions:
           - "s3:PutObject"
           - "s3:AbortMultipartUpload"
@@ -160,7 +160,7 @@ policies:
       # bestaande klanttevredenheid/focus_billing flows.
       - effect: Allow
         resources:
-          - "arn:aws:s3:::uwv-staging/incoming/*"
+          - "arn:aws:s3:::odap-staging/incoming/*"
         actions:
           - "s3:PutObject"
           - "s3:AbortMultipartUpload"
@@ -172,10 +172,10 @@ policies:
       # naar processed/, bronze/, silver/ en gold/ openen.
       - effect: Allow
         resources:
-          - "arn:aws:s3:::uwv-staging"
-          - "arn:aws:s3:::uwv-bronze"
-          - "arn:aws:s3:::uwv-silver"
-          - "arn:aws:s3:::uwv-gold"
+          - "arn:aws:s3:::odap-staging"
+          - "arn:aws:s3:::odap-bronze"
+          - "arn:aws:s3:::odap-silver"
+          - "arn:aws:s3:::odap-gold"
         actions:
           - "s3:GetBucketLocation"
       # 3. LIST — folder-listing per laag. Geen s3:prefix-conditie meer
@@ -183,10 +183,10 @@ policies:
       # bronze/<table>/, gold/<uc>/ moet kunnen bladeren.
       - effect: Allow
         resources:
-          - "arn:aws:s3:::uwv-staging"
-          - "arn:aws:s3:::uwv-bronze"
-          - "arn:aws:s3:::uwv-silver"
-          - "arn:aws:s3:::uwv-gold"
+          - "arn:aws:s3:::odap-staging"
+          - "arn:aws:s3:::odap-bronze"
+          - "arn:aws:s3:::odap-silver"
+          - "arn:aws:s3:::odap-gold"
         actions:
           - "s3:ListBucket"
       # 4. READ — alleen-lezen op processed-archief, eigen uploads + alle
@@ -195,21 +195,21 @@ policies:
       # een eigen policy maken zodat een UC-12-uploader geen UC-11-PII kan zien.
       - effect: Allow
         resources:
-          - "arn:aws:s3:::uwv-staging/processed/*"
-          - "arn:aws:s3:::uwv-staging/uploads/*"
-          - "arn:aws:s3:::uwv-bronze/*"
-          - "arn:aws:s3:::uwv-silver/*"
-          - "arn:aws:s3:::uwv-gold/*"
+          - "arn:aws:s3:::odap-staging/processed/*"
+          - "arn:aws:s3:::odap-staging/uploads/*"
+          - "arn:aws:s3:::odap-bronze/*"
+          - "arn:aws:s3:::odap-silver/*"
+          - "arn:aws:s3:::odap-gold/*"
         actions:
           - "s3:GetObject"
 
 extraVolumes:
-  - name: uwv-ca
+  - name: platform-ca
     configMap:
-      name: uwv-ca-bundle
+      name: platform-ca-bundle
 extraVolumeMounts:
-  - name: uwv-ca
-    mountPath: /etc/uwv-ca
+  - name: platform-ca
+    mountPath: /etc/platform-ca
     readOnly: true
 
 # Disable Bitnami-style metrics (chart heeft eigen metrics endpoint)

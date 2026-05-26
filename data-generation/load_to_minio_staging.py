@@ -16,7 +16,7 @@ import click
 
 @click.command()
 @click.option("--count", default=10000)
-@click.option("--bucket", default="uwv-staging")
+@click.option("--bucket", default="odap-staging")
 @click.option("--prefix", default="incoming/persona")
 def main(count: int, bucket: str, prefix: str) -> None:
     """Stub — implementeer in fase 5 als batch-ingest path nodig is."""

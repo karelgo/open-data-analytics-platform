@@ -15,11 +15,11 @@ en logs een stuk eenvoudiger. Alle componenten houden zich hieraan.
 
 | Namespace | Inhoud |
 |---|---|
-| `uwv-platform` | Stackable workloads (Trino, Spark, Kafka, NiFi, OPA, …) |
-| `uwv-data` | Synthetic data jobs, dbt-runners |
-| `uwv-meta` | OpenMetadata stack |
-| `uwv-monitoring` | Prometheus, Grafana, Vector |
-| `uwv-auth` | Keycloak |
+| `odap-platform` | Stackable workloads (Trino, Spark, Kafka, NiFi, OPA, …) |
+| `odap-data` | Synthetic data jobs, dbt-runners |
+| `odap-meta` | OpenMetadata stack |
+| `odap-monitoring` | Prometheus, Grafana, Vector |
+| `odap-auth` | Keycloak |
 
 ## Trino-schemas
 
@@ -59,10 +59,10 @@ Voorbeelden:
 ## DNS
 
 ```
-<service>.uwv-platform.local
+<service>.odap.local
 ```
 
-Voor lokale k3d-clusters. In AKS-deploys (`eu-sovereigndataplatform.com`)
+Voor lokale k3d-clusters. In AKS-deploys (`example.com`)
 rewrite de portal client-side; zie
 [`portal/src/layouts/Layout.astro`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/portal/src/layouts/Layout.astro).
 
@@ -71,7 +71,7 @@ rewrite de portal client-side; zie
 | Service-naam | Inhoud |
 |---|---|
 | `trino-prod` | Trino-instance met alle catalogs (bronze/silver/gold/sensitive/sandbox) |
-| `dbt-uwv` | dbt-project (lineage + tests) |
+| `dbt` | dbt-project (lineage + tests) |
 | `superset-prod` | Superset BI (dashboards) |
-| `airflow-uwv` | Airflow (pipeline-runs) |
-| `kafka-uwv` | Kafka (event-topics + schemas) |
+| `airflow` | Airflow (pipeline-runs) |
+| `kafka` | Kafka (event-topics + schemas) |

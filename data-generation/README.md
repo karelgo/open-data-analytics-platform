@@ -5,7 +5,7 @@ Python-package met synthetische data-generators voor het UWV-referentie-platform
 > **STRIKT SYNTHETISCH.** Geen echte BSN's, geen echte adresgegevens, geen
 > echte cliënt-data. Test-BSN-bereik (`9XXXXXXXX`) per BRP-conventie.
 > Elke geserialiseerde dataset bevat het header-comment
-> `SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE`.
+> `SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`.
 
 ## Generators
 
@@ -27,8 +27,8 @@ deterministische seeding.
 
 | Script | Doel |
 |---|---|
-| `load_to_s3.py` | Schrijft generator-output als JSONL naar `s3://uwv-raw/<domain>/<entity>/dt=YYYY-MM-DD/*.jsonl`. Spark Structured Streaming (file source) pikt dit op. |
-| `load_to_minio_staging.py` | Schrijft batch-output naar `s3://uwv-staging/` als CSV (placeholder). |
+| `load_to_s3.py` | Schrijft generator-output als JSONL naar `s3://odap-raw/<domain>/<entity>/dt=YYYY-MM-DD/*.jsonl`. Spark Structured Streaming (file source) pikt dit op. |
+| `load_to_minio_staging.py` | Schrijft batch-output naar `s3://odap-staging/` als CSV (placeholder). |
 
 ## Lokaal draaien
 
@@ -49,4 +49,4 @@ uv run ruff check generators/    # lint
 
 `scripts/seed.sh` past `data-generation/k8s/seed-job.yaml` toe op het cluster.
 De Job mount de generator-code via twee ConfigMaps en draait `load_to_s3.py`
-tegen de in-cluster MinIO (`s3://uwv-raw/`).
+tegen de in-cluster MinIO (`s3://odap-raw/`).

@@ -13,7 +13,7 @@ models:
       doelbinding: ["primair_proces"]
       bio_classificatie: vertrouwelijk
       bewaartermijn_jaren: 7
-      eigenaar: data_office_uwv
+      eigenaar: data_office
       pii_kolommen: [bsn, voornaam, achternaam, geboortedatum, straat, huisnummer, postcode]
       risk_tier: laag
 

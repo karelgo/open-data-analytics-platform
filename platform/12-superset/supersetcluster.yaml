@@ -1,6 +1,6 @@
 # SupersetCluster — BI / dashboarding.
 #
-# Auth: OIDC via keycloak-uwv. UWV-rollen → Superset-rollen via syncRolesAt: Login.
+# Auth: OIDC via keycloak. ODAP roles → Superset-rollen via syncRolesAt: Login.
 # Database backend: gedeelde Postgres `superset` DB.
 # Trino-registratie + datasets gebeuren via een post-deploy init-Job
 # (zie init-job.yaml).
@@ -8,8 +8,8 @@
 apiVersion: superset.stackable.tech/v1alpha1
 kind: SupersetCluster
 metadata:
-  name: uwv-superset
-  namespace: uwv-platform
+  name: superset
+  namespace: odap-platform
 spec:
   image:
     productVersion: "4.1.4"
@@ -17,7 +17,7 @@ spec:
     # 26.3: listenerClass + loadExamplesOnInit uit clusterConfig.
     credentialsSecret: superset-postgres-credentials
     authentication:
-      - authenticationClass: keycloak-uwv
+      - authenticationClass: keycloak
         oidc:
           clientCredentialsSecret: superset-oidc-client
         userRegistration: true
@@ -43,10 +43,10 @@ spec:
     configOverrides:
       superset_config.py:
         ENABLE_PROXY_FIX: "True"
-        WEBSERVER_BASE_URL: '"https://superset.uwv-platform.local:8443"'
+        WEBSERVER_BASE_URL: '"https://superset.odap.local:8443"'
         # SameSite=None + Secure: zonder dit blokkeert de browser de
         # Flask session cookie bij cross-origin iframe-context (portal
-        # embed-shell op platform.uwv-platform.local). Werkt alleen
+        # embed-shell op platform.odap.local). Werkt alleen
         # over HTTPS — wat we al hebben via cert-manager.
         SESSION_COOKIE_SAMESITE: '"None"'
         SESSION_COOKIE_SECURE: "True"
@@ -55,7 +55,7 @@ spec:
         # Tweede taak: extract Keycloak realm-roles uit het JWT en geef
         # ze als `role_keys` zodat AUTH_ROLES_MAPPING (zie hieronder)
         # ze naar Superset-rollen kan mappen. Module komt uit
-        # superset-extra-config ConfigMap, gemount op /stackable/uwv-extras
+        # superset-extra-config ConfigMap, gemount op /stackable/extras
         # (zie podOverrides). We kunnen /stackable/app/pythonpath niet
         # gebruiken: een subPath-mount daar zou Stackable's startup-cp
         # van log_config.py blokkeren. In plaats van een tweede statement
@@ -63,7 +63,7 @@ spec:
         # gebruiken we een 1-expressie-truc: list.insert() returnt None,
         # en `None or X` evalueert tot X — sys.path-mutatie als
         # side-effect, daarna import.
-        CUSTOM_SECURITY_MANAGER: "(__import__('sys').path.insert(0, '/stackable/uwv-extras') or __import__('uwv_security').UWVSecurityManager)"
+        CUSTOM_SECURITY_MANAGER: "(__import__('sys').path.insert(0, '/stackable/extras') or __import__('security').PlatformSecurityManager)"
         # OIDC role-mapping: Keycloak realm-rol → Superset rol. UWV-
         # SecurityManager stopt de realm-rollen in `role_keys` in
         # user_info, en FAB matcht ze tegen deze mapping bij elke login
@@ -71,12 +71,12 @@ spec:
         # Stackable-operator vanuit syncRolesAt: Login).
         AUTH_ROLES_MAPPING: '{"platform_admin": ["Admin"]}'
     envOverrides:
-      # Pad naar uwv-platform-CA bundle (zie podOverrides volume mount).
+      # Pad naar odap-platform-CA bundle (zie podOverrides volume mount).
       # Python's requests-lib (gebruikt door Authlib voor OAuth token-
       # exchange) leest deze om de cert-manager self-signed CA te
-      # vertrouwen voor https://keycloak.uwv-platform.local:8443.
-      REQUESTS_CA_BUNDLE: "/etc/uwv-ca/ca.crt"
-      SSL_CERT_FILE: "/etc/uwv-ca/ca.crt"
+      # vertrouwen voor https://keycloak.odap.local:8443.
+      REQUESTS_CA_BUNDLE: "/etc/platform-ca/ca.crt"
+      SSL_CERT_FILE: "/etc/platform-ca/ca.crt"
     roleGroups:
       default:
         replicas: 1
@@ -85,16 +85,16 @@ spec:
             containers:
               - name: superset
                 volumeMounts:
-                  - name: uwv-ca
-                    mountPath: /etc/uwv-ca
+                  - name: platform-ca
+                    mountPath: /etc/platform-ca
                     readOnly: true
-                  - name: uwv-extra
-                    mountPath: /stackable/uwv-extras
+                  - name: extra
+                    mountPath: /stackable/extras
                     readOnly: true
             volumes:
-              - name: uwv-ca
+              - name: platform-ca
                 configMap:
-                  name: uwv-ca-bundle
-              - name: uwv-extra
+                  name: platform-ca-bundle
+              - name: extra
                 configMap:
                   name: superset-extra-config

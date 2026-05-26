@@ -11,8 +11,8 @@
 ## Context
 
 Het platform draait in drie modes (k3d / aks / stackit) en heeft vier
-UWV-namespaces (`uwv-platform`, `uwv-data`, `uwv-meta`, `uwv-auth`) plus
-`uwv-monitoring`. Tot vóór deze ADR was de network-laag **default-allow**:
+platform namespaces (`odap-platform`, `odap-data`, `odap-meta`, `odap-auth`) plus
+`odap-monitoring`. Tot vóór deze ADR was de network-laag **default-allow**:
 elke pod in elke namespace kon willekeurig praten met elke andere pod
 en uit naar internet.
 
@@ -22,7 +22,7 @@ zero-trust beginsel). Audit 2026-05 markeerde het als HIGH.
 In de developer-cluster (k3d) maakt default-allow het juist mogelijk om
 `make seed`, port-forwards en cross-namespace shortcut-tests snel te
 laten werken. De Stackable-operators verwachten ook netwerktoegang naar
-het bootstrap-Postgres in `uwv-data` zonder expliciete annotaties.
+het bootstrap-Postgres in `odap-data` zonder expliciete annotaties.
 
 ## Beslissing
 
@@ -34,7 +34,7 @@ We hanteren een **mode-gesplitste NetworkPolicy-strategie**:
 | `aks` | aan | default-deny + namespace-segmentation | `platform-overlays/aks/00-namespaces/networkpolicies.yaml` |
 | `stackit` | aan | default-deny + namespace-segmentation | `platform-overlays/stackit/00-namespaces/networkpolicies.yaml` |
 
-Per UWV-namespace (`uwv-platform`, `uwv-data`, `uwv-meta`, `uwv-auth`):
+Per platform namespace (`odap-platform`, `odap-data`, `odap-meta`, `odap-auth`):
 
 1. `default-deny-all` — `policyTypes: [Ingress, Egress]` met lege podSelector.
 2. `allow-dns-egress` — UDP+TCP/53 naar `kube-system/k8s-app=kube-dns`.
@@ -44,8 +44,8 @@ Per UWV-namespace (`uwv-platform`, `uwv-data`, `uwv-meta`, `uwv-auth`):
 4. Namespace-specifieke ingress/egress-rules met `namespaceSelector` op
    `kubernetes.io/metadata.name`.
 
-`uwv-monitoring` blijft zonder NetworkPolicies — Prometheus/Vector
-scrapen elke andere namespace; `uwv-platform`/`uwv-data`/`uwv-meta`/`uwv-auth`
+`odap-monitoring` blijft zonder NetworkPolicies — Prometheus/Vector
+scrapen elke andere namespace; `odap-platform`/`odap-data`/`odap-meta`/`odap-auth`
 laten Prometheus binnen via `allow-from-monitoring`.
 
 ## Alternatieven overwogen

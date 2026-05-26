@@ -29,7 +29,7 @@ airflow-jobs ConfigMap te substitueren met sed, applied via kubectl, en
 polled tot status.phase ∈ {Succeeded, Failed}.
 
 BENODIGD: Airflow's ServiceAccount moet SparkApplications mogen
-create/get/delete in uwv-platform — zie platform/11-airflow/rbac-spark.yaml.
+create/get/delete in odap-platform — zie platform/11-airflow/rbac-spark.yaml.
 
 Schedule:
   None (alleen handmatige trigger of via TriggerDagRunOperator). Reden:
@@ -37,7 +37,7 @@ Schedule:
   SparkApplication), niet door een streaming-DAG. Voor productie: vervang
   door schedule=[bronze_wia_dataset].
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -60,9 +60,9 @@ from kubernetes.client.models import (
 KUBECTL_IMAGE = "bitnami/kubectl:1.30"
 
 JOBS_CM = "airflow-jobs"
-JOBS_MOUNT = "/opt/uwv/airflow/jobs"
+JOBS_MOUNT = "/opt/odap/airflow/jobs"
 
-NAMESPACE = "uwv-platform"
+NAMESPACE = "odap-platform"
 
 # Datasets — downstream DAGs kunnen hierop schedulen.
 SILVER_DATASET = Dataset("uwv://silver/wia_spark/aanvraag")
@@ -168,7 +168,7 @@ with DAG(
     dag_id="transform_wia_spark",
     description=(
         "Spark-pad voor WIA bronze→silver→gold (parallel aan dbt). "
-        "Tasks roepen SparkApplications aan in uwv-platform namespace. "
+        "Tasks roepen SparkApplications aan in odap-platform namespace. "
         "Vereist seed-bronze-wia te zijn gedraaid (zie platform/08-spark/README.md)."
     ),
     default_args=DEFAULT_ARGS,

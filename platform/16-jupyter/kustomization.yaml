@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: uwv-platform
+namespace: odap-platform
 
 resources:
   - namespace-rbac.yaml
@@ -39,4 +39,4 @@ configMapGenerator:
 # set per-manifest (Hub vs singleuser) and used by Service selectors and
 # NetworkPolicy podSelectors.
 commonLabels:
-  app.kubernetes.io/part-of: uwv-platform
+  app.kubernetes.io/part-of: odap-platform

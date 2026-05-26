@@ -3,16 +3,16 @@
 ---
 source:
   type: superset
-  serviceName: uwv-superset
+  serviceName: superset
   serviceConnection:
     config:
       type: Superset
-      hostPort: http://uwv-superset-node.uwv-platform.svc.cluster.local:8088
+      hostPort: http://superset-node.odap-platform.svc.cluster.local:8088
       connection:
         provider: db
         # Superset application-admin (zie platform/01-secrets/dev-secrets.yaml
         # secret superset-postgres-credentials → adminUser.username/password).
-        # NIET de Postgres-user 'uwvplatform' — die is voor de SQLAlchemy-DB.
+        # NIET de Postgres-user 'odap' — die is voor de SQLAlchemy-DB.
         username: admin
         password: ${SUPERSET_ADMIN_PW}
   sourceConfig:
@@ -26,14 +26,14 @@ source:
       # direct onder `config` (anders: "Extra parameter 'dbServiceNames'").
       lineageInformation:
         dbServiceNames:
-          - uwv-trino
+          - trino
 sink:
   type: metadata-rest
   config: {}
 workflowConfig:
   loggerLevel: INFO
   openMetadataServerConfig:
-    hostPort: http://openmetadata.uwv-meta.svc.cluster.local:8585/api
+    hostPort: http://openmetadata.odap-meta.svc.cluster.local:8585/api
     authProvider: openmetadata
     securityConfig:
       jwtToken: ${OM_JWT_TOKEN}

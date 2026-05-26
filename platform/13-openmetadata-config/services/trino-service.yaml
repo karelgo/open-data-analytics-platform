@@ -1,17 +1,17 @@
 # OpenMetadata Trino service-connection + ingestion-workflow.
 #
 # Wordt door de init-Job toegepast via `metadata ingest -c trino-service.yaml`.
-# Schema-filter dekt alle UWV-catalogs (bronze/silver/gold/sensitive).
+# Schema-filter dekt alle platform catalogs (bronze/silver/gold/sensitive).
 #
 # JWT-token komt uit Secret openmetadata-admin (env-substitutie in Job).
 ---
 source:
   type: trino
-  serviceName: uwv-trino
+  serviceName: trino
   serviceConnection:
     config:
       type: Trino
-      hostPort: uwv-trino-coordinator.uwv-platform.svc.cluster.local:8443
+      hostPort: trino-coordinator.odap-platform.svc.cluster.local:8443
       username: smoketest
       # Stackable's Trino draait met `authentication: []` — geen password-
       # authenticator. Auth komt via X-Trino-User header (impersonation),
@@ -67,7 +67,7 @@ sink:
 workflowConfig:
   loggerLevel: INFO
   openMetadataServerConfig:
-    hostPort: http://openmetadata.uwv-meta.svc.cluster.local:8585/api
+    hostPort: http://openmetadata.odap-meta.svc.cluster.local:8585/api
     authProvider: openmetadata
     securityConfig:
       jwtToken: ${OM_JWT_TOKEN}

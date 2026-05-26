@@ -141,7 +141,7 @@ def build_job_settings() -> dict:
                 "job_cluster_key": "uc11-cluster",
                 "notebook_task": {
                     "notebook_path": f"{base_path}/uc11_seed_bronze",
-                    "base_parameters": {"catalog": "uwv_databricks"},
+                    "base_parameters": {"catalog": "databricks"},
                 },
                 "timeout_seconds": 1800,
             },
@@ -151,7 +151,7 @@ def build_job_settings() -> dict:
                 "depends_on": [{"task_key": "seed_bronze"}],
                 "notebook_task": {
                     "notebook_path": f"{base_path}/uc11_silver",
-                    "base_parameters": {"catalog": "uwv_databricks"},
+                    "base_parameters": {"catalog": "databricks"},
                 },
                 "timeout_seconds": 1800,
             },

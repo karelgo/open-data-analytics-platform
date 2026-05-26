@@ -4,7 +4,7 @@
 # bitnamilegacy/* keeps the chart working. Same fix applies on any cloud.
 #
 # Public DNS hostname on standard 443. iss in issued tokens will be
-# https://keycloak.freshstackable.com/realms/uwv regardless of whether the
+# https://keycloak.example.com/realms/odap regardless of whether the
 # call came from the browser (public hostname) or in-cluster apps using the
 # Service name — apps need to expect the public iss either way.
 
@@ -17,11 +17,11 @@ postgresql:
 
 auth:
   realm: master
-  frontendUrl: "https://keycloak.freshstackable.com"
+  frontendUrl: "https://keycloak.example.com"
 
 extraEnvVars:
   - name: KC_HOSTNAME
-    value: "https://keycloak.freshstackable.com"
+    value: "https://keycloak.example.com"
   - name: KC_HOSTNAME_STRICT
     value: "false"
   - name: KC_HOSTNAME_STRICT_BACKCHANNEL
@@ -29,7 +29,7 @@ extraEnvVars:
   - name: KC_PROXY_HEADERS
     value: "xforwarded"
 
-# The chart-managed ingress on keycloak.uwv-platform.local stays in place
+# The chart-managed ingress on keycloak.odap.local stays in place
 # for in-cluster CoreDNS routing of OIDC backchannel discovery. The public
-# keycloak.freshstackable.com ingress (with LE cert) lives in Phase 4 at
+# keycloak.example.com ingress (with LE cert) lives in Phase 4 at
 # infrastructure/stackit/public-ingresses.yaml.

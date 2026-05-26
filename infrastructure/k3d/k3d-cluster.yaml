@@ -1,4 +1,4 @@
-# UWV Reference Platform — k3d cluster config
+# Open Data & Analytics Platform — k3d cluster config
 #
 # Scaled-down profiel, geschikt voor ontwikkel-laptop. Niet voor productie.
 # Dit cluster moet op Docker Desktop draaien met minimaal 8 GB RAM en 4 CPU's
@@ -18,7 +18,7 @@ apiVersion: k3d.io/v1alpha5
 kind: Simple
 
 metadata:
-  name: uwv-platform
+  name: odap-platform
 
 servers: 1
 agents: 2
@@ -36,7 +36,7 @@ ports:
 
 # Volumes: gedeelde host-cache voor image-pulls (sneller na eerste run).
 volumes:
-  - volume: uwv-platform-data:/var/lib/rancher/k3s/storage
+  - volume: odap-platform-data:/var/lib/rancher/k3s/storage
     nodeFilters:
       - all
 

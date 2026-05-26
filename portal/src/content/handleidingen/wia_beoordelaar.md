@@ -31,7 +31,7 @@ tot de Sensitive Vault (`sensitive.*`) — die is voor de Wajong-arbeidsdeskundi
 
 ### 2.1 Account
 
-Je accountnaam is `wia.beoordelaar` (in productie: je eigen UWV-account, gefedereerd via SSO).
+Je accountnaam is `wia.beoordelaar` (in productie: je eigen platform account, gefedereerd via SSO).
 Het wachtwoord wijzig je bij eerste inlog. **MFA is verplicht** —
 configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Password etc.).
 
@@ -39,14 +39,14 @@ configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Passwo
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards bekijken: WIA-funnel, doorlooptijden | https://superset.uwv-platform.local |
-| **OpenMetadata** | Opzoeken welke kolom wat betekent, wie eigenaar is | https://openmetadata.uwv-platform.local |
+| **Apache Superset** | Dashboards bekijken: WIA-funnel, doorlooptijden | https://superset.odap.local |
+| **OpenMetadata** | Opzoeken welke kolom wat betekent, wie eigenaar is | https://openmetadata.odap.local |
 
 > Je gebruikt **niet**: NiFi (ingestion), Airflow (orchestratie). Die zijn voor het platform-team.
 
 ### 2.3 Eerste keer inloggen — stappen
 
-1. Open https://superset.uwv-platform.local
+1. Open https://superset.odap.local
 2. Klik **Inloggen via Keycloak (UWV)**
 3. Vul gebruikersnaam + wachtwoord; bij eerste login wijzig je het wachtwoord
 4. Scan de QR-code met je TOTP-app en bevestig de eerste 6-cijferige code
@@ -176,7 +176,7 @@ ORDER BY gem_doorlooptijd DESC;
 
 **Scenario.** Wat is precies "datum_aanvraag" versus "datum_eerste_dag"? Welke is leidend?
 
-1. Open https://openmetadata.uwv-platform.local
+1. Open https://openmetadata.odap.local
 2. Zoek op `mart_uc01_wia_funnel_daily` of op kolomnaam
 3. Bij elke kolom zie je: **definitie**, **eigenaar** (data-steward), **bron-tabel**,
    **bewaartermijn**, **classificatie**
@@ -224,7 +224,7 @@ je niet zou mogen zien?
 
 1. **Stop met kijken** — niet doorklikken, niet downloaden
 2. Maak **één** screenshot van je scherm voor bewijsvoering (geen BSN's expliciet)
-3. **Bel** de platform-admin (`platform.admin@uwv-platform.local`, niet via mail)
+3. **Bel** de platform-admin (`platform.admin@odap.local`, niet via mail)
 4. Schrijf binnen 24 uur een korte notitie van wat, wanneer, waar
 
 ### 6.3 Wie helpt waarbij?

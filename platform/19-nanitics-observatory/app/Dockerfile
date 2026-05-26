@@ -12,7 +12,7 @@
 # Or:
 #
 #   cp -R <nanitics-repo>/observatory/dist-embed app/observatory-ui
-#   docker build -t uwv-platform/nanitics-observatory:dev app/
+#   docker build -t odap/nanitics-observatory:dev app/
 
 FROM python:3.11-slim
 

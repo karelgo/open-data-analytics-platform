@@ -9,8 +9,8 @@ description: Welke rollen het platform onderscheidt en wie wat ziet.
 # Rollen op het platform
 
 Het platform onderscheidt **11 menselijke rollen** + **1 systeemrol**,
-gemodelleerd in [`infrastructure/helm/keycloak/realm-uwv.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm-uwv.json)
-en [`opa-policies-src/data/uwv_role_mappings.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/opa-policies-src/data/uwv_role_mappings.json).
+gemodelleerd in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
+en [`opa-policies-src/data/role_mappings.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/opa-policies-src/data/role_mappings.json).
 
 ## Business-rollen (eindgebruikers)
 

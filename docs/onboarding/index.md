@@ -13,10 +13,10 @@ het startpunt voor iedereen die voor het eerst met het platform aan de
 slag gaat. Kies hieronder het pad dat bij je rol past — elk pad eindigt
 in een handleiding die in detail beschrijft wat je dagelijks doet.
 
-!!! warning "Geen echte UWV-data"
+!!! warning "Geen echte ODAP data"
     Dit platform is een **fictieve, illustratieve referentie-implementatie**.
     Alle datasets zijn synthetisch (alleen 9-prefix BSN's, `meta.synthetic: true`).
-    Geen echte productie-UWV-data, geen echte productiecode.
+    Geen echte productie-ODAP data, geen echte productiecode.
 
 ---
 
@@ -97,8 +97,8 @@ en schemas je standaard mag zien — geen handmatige permissies nodig.
 
 ### Stap 2 · Log in op de portal
 
-1. Open **<https://platform.uwv-platform.local:8443>** (k3d) of
-   `https://platform.eu-sovereigndataplatform.com` (aks).
+1. Open **<https://platform.odap.local:8443>** (k3d) of
+   `https://platform.example.com` (aks).
 2. Klik **Inloggen via Keycloak (UWV)**.
 3. Vul gebruikersnaam + wachtwoord; wijzig wachtwoord bij eerste inlog.
 4. Scan de QR-code met je TOTP-app en bevestig.
@@ -161,13 +161,13 @@ Lees in deze volgorde:
 
 | Component | Doel | URL (k3d) |
 |---|---|---|
-| **Airflow** | Orchestratie van dbt-runs en pipelines | `https://airflow.uwv-platform.local:8443` |
+| **Airflow** | Orchestratie van dbt-runs en pipelines | `https://airflow.odap.local:8443` |
 | **dbt-docs** | Model-lineage en docs | via portal `Mijn werkplek` |
-| **OpenMetadata** | Catalog, lineage, ownership, data-quality, sensitive-review | `https://openmetadata.uwv-platform.local:8443` |
-| **MinIO** | Object-storage (S3-compatible) | `https://minio.uwv-platform.local:8443` |
+| **OpenMetadata** | Catalog, lineage, ownership, data-quality, sensitive-review | `https://openmetadata.odap.local:8443` |
+| **MinIO** | Object-storage (S3-compatible) | `https://minio.odap.local:8443` |
 
 - NiFi-flows worden as-code beheerd in `nifi-flows/templates/` (REST-import via `kubectl port-forward`); geen UI.
-- Trino is in-cluster; queries gaan via Superset, Jupyter, dbt of Airflow. Ad-hoc debug: `kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443`.
+- Trino is in-cluster; queries gaan via Superset, Jupyter, dbt of Airflow. Ad-hoc debug: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443`.
 
 ### Stap 4 · Lees jouw rol-handleiding
 
@@ -177,7 +177,7 @@ Lees in deze volgorde:
 ### Stap 5 · Eerste hands-on
 
 Een researcher-style sandbox + Delta-regressie-notebook zit klaar in
-JupyterHub (`https://jupyter.uwv-platform.local:8443`). Verken een synthetische
+JupyterHub (`https://jupyter.odap.local:8443`). Verken een synthetische
 dataset, draai een dbt-model, kijk hoe lineage in OpenMetadata bijwerkt.
 
 ---

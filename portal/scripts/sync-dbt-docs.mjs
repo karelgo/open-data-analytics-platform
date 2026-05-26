@@ -62,7 +62,7 @@ if (existsSync(src)) {
   <h1>dbt-documentatie nog niet gegenereerd</h1>
   <p>
     Deze pagina toont normaal de <strong>statisch geëxporteerde dbt docs</strong>
-    (modellen, tests, sources, lineage) van het UWV-platform. De build-bundel
+    (modellen, tests, sources, lineage) van het ODAP platform. De build-bundel
     <code>dbt/target/static_index.html</code> ontbreekt op het moment dat de
     portal-image gebouwd is.
   </p>
@@ -77,7 +77,7 @@ if (existsSync(src)) {
   <p class="muted">
     In productie wordt deze stap door CI of een Airflow-job uitgevoerd zodra de
     silver/gold-runs slagen. Lineage staat ook in
-    <a href="https://openmetadata.uwv-platform.local:8443">OpenMetadata</a>
+    <a href="https://openmetadata.odap.local:8443">OpenMetadata</a>
     via de <code>governance_om_ingest</code> DAG.
   </p>
 </body>

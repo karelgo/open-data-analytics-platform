@@ -8,7 +8,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: superset-dashboards-init-script
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   build_dashboards.py: |
     """Bouw WIA Funnel-dashboard programmatisch in Superset."""
@@ -21,8 +21,8 @@ data:
 
     import requests
 
-    SUPERSET_URL = os.environ.get("SUPERSET_URL", "http://uwv-superset-node:8088")
-    ADMIN_USER = os.environ.get("ADMIN_USER", "uwvplatform")
+    SUPERSET_URL = os.environ.get("SUPERSET_URL", "http://superset-node:8088")
+    ADMIN_USER = os.environ.get("ADMIN_USER", "odap")
     ADMIN_PW   = os.environ["ADMIN_PASSWORD"]
     DATASET_NAME = os.environ.get("WIA_DATASET", "mart_uc01_wia_funnel_daily")
 
@@ -918,16 +918,16 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: superset-dashboards-init
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    uwv.nl/component: superset-dashboards-init
+    odap.io/component: superset-dashboards-init
 spec:
   ttlSecondsAfterFinished: 3600
   backoffLimit: 2
   template:
     metadata:
       labels:
-        uwv.nl/component: superset-dashboards-init
+        odap.io/component: superset-dashboards-init
     spec:
       restartPolicy: OnFailure
       containers:
@@ -940,7 +940,7 @@ spec:
               python /scripts/build_dashboards.py
           env:
             - name: SUPERSET_URL
-              value: "http://uwv-superset-node:8088"
+              value: "http://superset-node:8088"
             - name: ADMIN_USER
               valueFrom:
                 secretKeyRef:

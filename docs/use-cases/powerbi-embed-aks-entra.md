@@ -1,6 +1,6 @@
 # Power BI in-portal embed — AKS + Entra ID SSO
 
-End-state: een gebruiker logt op `https://platform.eu-sovereigndataplatform.com/`
+End-state: een gebruiker logt op `https://platform.example.com/`
 in via **Microsoft Entra ID** (via de Keycloak-broker, [ADR-0008](../adr/0008-entra-broker-via-keycloak.md)),
 klikt links op **Dashboarding → Power BI**, en ziet het UC-12 FinOps-rapport
 **ingebed in de portal-shell** zonder iframe-blok of "Open in nieuw tabblad"-omweg.
@@ -37,7 +37,7 @@ audit-spoor met de echte gebruikersnaam, en de rest van het portal-shell
                                │ cookie van oauth2-proxy
                                ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│ AKS / uwv-platform namespace                                         │
+│ AKS / odap-platform namespace                                         │
 │                                                                      │
 │  oauth2-proxy ── X-Auth-Request-Email ─▶  portal-backend (FastAPI)   │
 │       │                                       │                       │
@@ -73,11 +73,11 @@ Twee belangrijke punten:
 
 | | Status | Notitie |
 |---|---|---|
-| AKS cluster up + bootstrap | ✓ in `scripts/azure/aks-up.sh` + `make aks-all` | Public DNS `*.eu-sovereigndataplatform.com` + Let's Encrypt |
+| AKS cluster up + bootstrap | ✓ in `scripts/azure/aks-up.sh` + `make aks-all` | Public DNS `*.example.com` + Let's Encrypt |
 | Keycloak realm `uwv` met Entra IdP | ✓ in deze branch (ADR-0008 cherry-picked) | Realm-import bevat IdP `entra` met `REPLACE_ME` placeholders |
 | Service Principal met Workspace-Contributor op de Fabric workspace | ✓ — UC-11/UC-12 reuse | Zelfde SP uit `secrets/local/uc11-multiplatform.env` |
 | Power BI API delegated permissions op de SP | ❌ **Te doen** (Entra portal) | Zie [§ Setup-stappen](#setup-stappen) |
-| K8s Secret `powerbi-embed-creds` in `uwv-platform` namespace | ❌ **Te doen** (één `kubectl` commando) | Template in `platform/15-portal/powerbi-embed-creds-template.yaml` |
+| K8s Secret `powerbi-embed-creds` in `odap-platform` namespace | ❌ **Te doen** (één `kubectl` commando) | Template in `platform/15-portal/powerbi-embed-creds-template.yaml` |
 | Power BI report om te embedden | ✓ — UC-12 dashboard `3f508254-…` | Default report-id in `PowerBIEmbed.tsx` |
 
 ---
@@ -106,7 +106,7 @@ SP zit.
 
 ### 2. Keycloak Entra IdP
 
-Vul de placeholders in `infrastructure/helm/keycloak/realm-uwv.json`
+Vul de placeholders in `infrastructure/helm/keycloak/realm.json`
 (of in de runtime-Secret `keycloak-entra-broker` — zie
 [platform/02-authentication/README.md](../../platform/02-authentication/README.md)):
 
@@ -122,7 +122,7 @@ voor een running cluster: patch via de Admin REST API of doe een
 
 Stel daarna de **Redirect URI** in de Entra app-registration in op:
 ```
-https://keycloak.eu-sovereigndataplatform.com/realms/uwv/broker/entra/endpoint
+https://keycloak.example.com/realms/odap/broker/entra/endpoint
 ```
 
 ### 3. K8s Secret voor de SP-creds
@@ -131,14 +131,14 @@ Vanuit repo-root, met je SP-creds in de shell:
 
 ```bash
 set -a; source secrets/local/uc11-multiplatform.env; set +a
-kubectl -n uwv-platform create secret generic powerbi-embed-creds \
+kubectl -n odap-platform create secret generic powerbi-embed-creds \
   --from-literal=FABRIC_TENANT_ID="$FABRIC_TENANT_ID" \
   --from-literal=FABRIC_CLIENT_ID="$FABRIC_CLIENT_ID" \
   --from-literal=FABRIC_CLIENT_SECRET="$FABRIC_CLIENT_SECRET" \
   --from-literal=FABRIC_WORKSPACE_ID="$FABRIC_WORKSPACE_ID"
 
-kubectl -n uwv-platform rollout restart deploy/udp-portal-backend
-kubectl -n uwv-platform rollout status  deploy/udp-portal-backend --timeout=120s
+kubectl -n odap-platform rollout restart deploy/udp-portal-backend
+kubectl -n odap-platform rollout status  deploy/udp-portal-backend --timeout=120s
 ```
 
 ### 4. Deploy de portal-update
@@ -147,7 +147,7 @@ kubectl -n uwv-platform rollout status  deploy/udp-portal-backend --timeout=120s
 make deploy MODE=aks
 ```
 
-Bouwt het portal-image (`uwv-platform/portal:dev`) inclusief de
+Bouwt het portal-image (`odap/portal:dev`) inclusief de
 nieuwe `powerbi-client-react` deps en de aangepaste nginx-CSP,
 ship't 'm via de ConfigMap-tarball (zie `scripts/azure/portal-publish.sh`),
 en rollt de Deployment uit. De portal-backend wordt automatisch herstart
@@ -157,14 +157,14 @@ omdat z'n Deployment-spec is gewijzigd (4 nieuwe env-refs).
 
 ```bash
 # Backend reachable?
-kubectl -n uwv-platform exec deploy/udp-portal-backend -- \
+kubectl -n odap-platform exec deploy/udp-portal-backend -- \
   curl -s http://localhost:8089/api/portal/_ping
 
 # Backend kan SP-token ophalen?
 # (vereist dat je via oauth2-proxy bent ingelogd; lokale dev: skip)
 
 # Open in browser:
-open https://platform.eu-sovereigndataplatform.com/embed/powerbi/
+open https://platform.example.com/embed/powerbi/
 ```
 
 Verwacht gedrag:
@@ -189,7 +189,7 @@ Verwacht gedrag:
 | [`platform/15-portal/portal-backend.yaml`](../../platform/15-portal/portal-backend.yaml) | 4 secretKeyRef-envs voor de SP-creds |
 | [`platform/15-portal/powerbi-embed-creds-template.yaml`](../../platform/15-portal/powerbi-embed-creds-template.yaml) | Template voor de `kubectl create secret`-stap |
 | [`docs/adr/0008-entra-broker-via-keycloak.md`](../adr/0008-entra-broker-via-keycloak.md) | Architectuur-beslissing IdP-brokering |
-| [`infrastructure/helm/keycloak/realm-uwv.json`](../../infrastructure/helm/keycloak/realm-uwv.json) | Entra als IdP in het `uwv` realm |
+| [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json) | Entra als IdP in het `uwv` realm |
 | [`tests/smoke/10-entra-broker.sh`](../../tests/smoke/10-entra-broker.sh) | Structuur-check van de realm-import |
 
 ---

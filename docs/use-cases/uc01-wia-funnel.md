@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1e (wettelijke taak); aggregaten zonder herleiding |
 | Bewaartermijn (gold) | 7 jaar (besluitvormingsdata) |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-01](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-01](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 

@@ -37,12 +37,12 @@ cp "$ROOT/spark-jobs/batch_gold_wia.py"               "$ROOT/platform/08-spark/s
 # re-run never clobbers real values. Skipping these would crash 17-multica
 # on first apply (Postgres + backend deployments reference the secrets).
 log "Multica: ensure dev-placeholder secrets exist (idempotent)"
-kubectl create namespace uwv-platform --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-if ! kubectl -n uwv-platform get secret multica-postgres >/dev/null 2>&1; then
+kubectl create namespace odap-platform --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+if ! kubectl -n odap-platform get secret multica-postgres >/dev/null 2>&1; then
   PG_PW=$(openssl rand -hex 24)
-  kubectl -n uwv-platform create secret generic multica-postgres \
+  kubectl -n odap-platform create secret generic multica-postgres \
     --from-literal=POSTGRES_PASSWORD="$PG_PW"
-  kubectl -n uwv-platform create secret generic multica-backend \
+  kubectl -n odap-platform create secret generic multica-backend \
     --from-literal=JWT_SECRET="$(openssl rand -hex 32)" \
     --from-literal=DATABASE_URL="postgres://multica:${PG_PW}@multica-postgres:5432/multica?sslmode=disable"
   ok "multica-postgres + multica-backend secrets seeded (dev values)"
@@ -59,7 +59,7 @@ fi
 # once the Secrets land.
 check_optional_secret() {
   local name="$1" component="$2" hint="$3"
-  if ! kubectl -n uwv-platform get secret "$name" >/dev/null 2>&1; then
+  if ! kubectl -n odap-platform get secret "$name" >/dev/null 2>&1; then
     warn "${component}: Secret '${name}' not found — pod will crash-loop until provisioned. ${hint}"
   fi
 }
@@ -74,7 +74,7 @@ LAYERS=(
   "platform/01-secrets"
   "platform/02-authentication"
   "platform/03-storage"
-  # 04-zookeeper, 06-kafka, 07-nifi disabled — UC11 leest uit s3a://uwv-raw/
+  # 04-zookeeper, 06-kafka, 07-nifi disabled — UC11 leest uit s3a://odap-raw/
   "platform/05-hive-metastore"
   "platform/08-spark"
   "platform/09-trino"
@@ -107,7 +107,7 @@ for layer in "${LAYERS[@]}"; do
   fi
 
   # platform/11-airflow contains the dbt-manifest-render Job, whose
-  # git-sync initContainer reads GITSYNC_REPO from ConfigMap uwv-repo-url
+  # git-sync initContainer reads GITSYNC_REPO from ConfigMap odap-repo-url
   # (optional key). Without it, git-sync exits "required flag: --repo"
   # and the Job fails — noisy and confusing, even though the same
   # manifest gets seeded later via the Docker-based renderer below.
@@ -116,10 +116,10 @@ for layer in "${LAYERS[@]}"; do
   if [[ "$layer" == "platform/11-airflow" ]]; then
     repo_url="$(git -C "$ROOT" remote get-url origin 2>/dev/null || true)"
     if [[ -n "$repo_url" ]]; then
-      kubectl -n uwv-platform create configmap uwv-repo-url \
+      kubectl -n odap-platform create configmap odap-repo-url \
         --from-literal=url="$repo_url" \
         --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-      log "  uwv-repo-url ConfigMap geseed met ${repo_url} (voor dbt-manifest-render Job)"
+      log "  odap-repo-url ConfigMap geseed met ${repo_url} (voor dbt-manifest-render Job)"
     fi
   fi
 
@@ -135,52 +135,52 @@ for layer in "${LAYERS[@]}"; do
   fi
 done
 
-# openmetadata-uwv-config wordt door kustomize in `uwv-meta` aangemaakt
+# openmetadata-platform-config wordt door kustomize in `odap-meta` aangemaakt
 # (zie platform/13-openmetadata-config/kustomization.yaml: configMapGenerator
-# heeft `namespace: uwv-meta`). De governance_om_ingest DAG en de KPO-tasks
-# in 13-openmetadata-config/*-cronjob.yaml draaien echter in `uwv-platform`
+# heeft `namespace: odap-meta`). De governance_om_ingest DAG en de KPO-tasks
+# in 13-openmetadata-config/*-cronjob.yaml draaien echter in `odap-platform`
 # en mounten de CM uit hun eigen namespace. Zonder deze copy-stap blijft
-# de `uwv-platform`-kopie stale na elke YAML-update onder services/ —
+# de `odap-platform`-kopie stale na elke YAML-update onder services/ —
 # bootstrap.sh doet 'm één keer bij eerste install, maar incremental
 # deploys moeten 'm hier opnieuw doen.
 mirror_om_config_cm() {
-  if kubectl -n uwv-meta get configmap openmetadata-uwv-config >/dev/null 2>&1; then
-    kubectl -n uwv-meta get configmap openmetadata-uwv-config -o yaml \
-      | sed -e 's/namespace: uwv-meta/namespace: uwv-platform/' \
+  if kubectl -n odap-meta get configmap openmetadata-platform-config >/dev/null 2>&1; then
+    kubectl -n odap-meta get configmap openmetadata-platform-config -o yaml \
+      | sed -e 's/namespace: odap-meta/namespace: odap/' \
             -e '/resourceVersion:/d' -e '/uid:/d' -e '/creationTimestamp:/d' \
       | kubectl apply -f - >/dev/null \
-      && log "  openmetadata-uwv-config gespiegeld naar uwv-platform" \
-      || printf '\033[1;33m!!\033[0m mirror van openmetadata-uwv-config naar uwv-platform faalde\n'
+      && log "  openmetadata-platform-config gespiegeld naar odap-platform" \
+      || printf '\033[1;33m!!\033[0m mirror van openmetadata-platform-config naar odap-platform faalde\n'
   fi
 }
 mirror_om_config_cm
 
-# CoreDNS-override voor in-cluster resolutie van *.uwv-platform.local.
+# CoreDNS-override voor in-cluster resolutie van *.odap.local.
 # Achtergrond: k3d kopieert de host-/etc/hosts naar de cluster-resolver
 # zodat alle hostnames die de gebruiker daar heeft staan (127.0.0.1
-# minio-console.uwv-platform.local etc.) ook in de pods naar 127.0.0.1
+# minio-console.odap.local etc.) ook in de pods naar 127.0.0.1
 # wijzen. Voor MinIO/OpenMetadata/Superset/Airflow/Trino/NiFi die
-# server-side OIDC-discovery doen tegen https://keycloak.uwv-platform.local:8443
+# server-side OIDC-discovery doen tegen https://keycloak.odap.local:8443
 # is dat fataal — ze proberen verbinding te maken met hun eigen loopback.
-# Fix: laat CoreDNS *.uwv-platform.local naar de keycloak-external Service
+# Fix: laat CoreDNS *.odap.local naar de keycloak-external Service
 # in ingress-nginx wijzen (die mappt 8443 → 443 op ingress-nginx-controller).
-# uwv-ca-bundle uitbreiden met de Stackable secret-operator self-signed CA.
+# platform-ca-bundle uitbreiden met de Stackable secret-operator self-signed CA.
 # Bootstrap probeert dit ook (via een trigger-pod), maar als de operator dan
 # nog niet klaar is om certs uit te delen, blijft de bundle alleen het
-# uwv-platform-issuer CA en faalt later TLS-verify naar Trino/Hive
+# platform-issuer CA en faalt later TLS-verify naar Trino/Hive
 # (Superset → Trino, OM Java truststore, etc). Hier zijn alle pods al
 # een tijdje TLS aan het opvragen, dus secret-provisioner-tls-ca bestaat.
-log "uwv-ca-bundle (her)opbouwen: Mozilla public roots + UWV-CA + Stackable secret-operator CA"
+log "platform-ca-bundle (her)opbouwen: Mozilla public roots + Platform CA + Stackable secret-operator CA"
 # Public roots zijn nodig zodat Airflow/Superset/Trino (Python REQUESTS_CA_BUNDLE
-# en SSL_CERT_FILE wijzen naar /etc/uwv-ca/ca.crt) Let's Encrypt certs van
-# keycloak.eu-sovereigndataplatform.com kunnen verifiëren bij OIDC-token-
+# en SSL_CERT_FILE wijzen naar /etc/platform-ca/ca.crt) Let's Encrypt certs van
+# keycloak.example.com kunnen verifiëren bij OIDC-token-
 # exchange. Zonder die roots → "unable to get local issuer certificate".
-# UWV-CA is voor cert-manager-issued Keycloak op .local + interne TLS.
+# Platform CA is voor cert-manager-issued Keycloak op .local + interne TLS.
 # Stackable-CA is voor in-cluster Trino/Hive/Kafka TLS (Superset → Trino).
 if kubectl -n stackable-operators get secret secret-provisioner-tls-ca >/dev/null 2>&1; then
   TMP=$(mktemp -d)
   curl -fsSL --connect-timeout 10 https://curl.se/ca/cacert.pem -o "$TMP/public.crt"
-  kubectl -n cert-manager get secret uwv-platform-ca -o jsonpath='{.data.ca\.crt}' 2>/dev/null \
+  kubectl -n cert-manager get secret odap-platform-ca -o jsonpath='{.data.ca\.crt}' 2>/dev/null \
     | base64 -d > "$TMP/uwv.crt"
   kubectl -n stackable-operators get secret secret-provisioner-tls-ca \
     -o jsonpath='{.data.0\.ca\.crt}' | base64 -d > "$TMP/stackable.crt"
@@ -188,20 +188,20 @@ if kubectl -n stackable-operators get secret secret-provisioner-tls-ca >/dev/nul
     cat "$TMP/public.crt" "$TMP/uwv.crt" "$TMP/stackable.crt" > "$TMP/combined.crt"
     # delete+create (apply hits 256KB last-applied-configuration annotation
     # limit — the combined bundle is ~220 KB).
-    kubectl -n uwv-platform delete configmap uwv-ca-bundle --ignore-not-found >/dev/null
-    kubectl -n uwv-platform create configmap uwv-ca-bundle \
+    kubectl -n odap-platform delete configmap platform-ca-bundle --ignore-not-found >/dev/null
+    kubectl -n odap-platform create configmap platform-ca-bundle \
       --from-file=ca.crt="$TMP/combined.crt" >/dev/null
-    kubectl -n uwv-meta delete configmap uwv-ca-bundle --ignore-not-found >/dev/null
-    kubectl -n uwv-meta create configmap uwv-ca-bundle \
+    kubectl -n odap-meta delete configmap platform-ca-bundle --ignore-not-found >/dev/null
+    kubectl -n odap-meta create configmap platform-ca-bundle \
       --from-file=ca.crt="$TMP/combined.crt" >/dev/null
     n=$(grep -c "BEGIN CERT" "$TMP/combined.crt")
-    printf '\033[1;32mOK\033[0m uwv-ca-bundle bevat nu %s certs (Mozilla + UWV + Stackable)\n' "$n"
+    printf '\033[1;32mOK\033[0m platform-ca-bundle bevat nu %s certs (Mozilla + UWV + Stackable)\n' "$n"
     # Roll workloads die de bundle mounten, zodat hun proces de nieuwe file
     # ziet (de mounted file via ConfigMap-volume update zelf automatisch,
     # maar Python's `ssl` cached zijn context bij eerste open).
-    kubectl -n uwv-platform delete pod -l app.kubernetes.io/name=superset --ignore-not-found >/dev/null 2>&1 || true
-    kubectl -n uwv-platform delete pod -l app.kubernetes.io/name=airflow --ignore-not-found >/dev/null 2>&1 || true
-    kubectl -n uwv-meta delete pod -l app.kubernetes.io/name=openmetadata --ignore-not-found >/dev/null 2>&1 || true
+    kubectl -n odap-platform delete pod -l app.kubernetes.io/name=superset --ignore-not-found >/dev/null 2>&1 || true
+    kubectl -n odap-platform delete pod -l app.kubernetes.io/name=airflow --ignore-not-found >/dev/null 2>&1 || true
+    kubectl -n odap-meta delete pod -l app.kubernetes.io/name=openmetadata --ignore-not-found >/dev/null 2>&1 || true
   fi
   rm -rf "$TMP"
 else
@@ -251,12 +251,12 @@ else
 fi
 
 # MinIO laadt OIDC-config alleen bij startup. Als de pod bootte vóór dat
-# keycloak.uwv-platform.local resolveerbaar was (CoreDNS-override boven),
+# keycloak.odap.local resolveerbaar was (CoreDNS-override boven),
 # faalt de eerste OpenID-discovery met "connection refused" en MinIO valt
 # terug op `loginStrategy: form` — geen Keycloak-knop op de console of
 # /go/minio/ portal-redirect. Restart pakt OIDC opnieuw op.
 log "MinIO restarten zodat OIDC-discovery via Keycloak slaagt"
-kubectl -n uwv-platform delete pod -l app=minio --ignore-not-found >/dev/null 2>&1 || true
+kubectl -n odap-platform delete pod -l app=minio --ignore-not-found >/dev/null 2>&1 || true
 
 # Live Keycloak runtime patches die niet uit de realm-import komen.
 # Realm-import strategy=IGNORE_EXISTING raakt bestaande users niet aan; en
@@ -264,45 +264,45 @@ kubectl -n uwv-platform delete pod -l app=minio --ignore-not-found >/dev/null 2>
 # `MINIO_IDENTITY_OPENID_CLAIM_NAME=policy` claim-mapper) zitten niet
 # standaard in de import. Dezelfde stap zit in scripts/full-deploy.sh §8.
 log "Keycloak: TOTP wissen + policy=consoleAdmin op demo-admins"
-if kubectl -n uwv-auth get pod keycloak-0 >/dev/null 2>&1; then
-  kubectl -n uwv-auth exec keycloak-0 -c keycloak -- bash -c '
-T=$(curl -fsS -d "client_id=admin-cli" -d "username=kcadmin" -d "password=uwv-dev-only-CHANGE-ME-2026" -d "grant_type=password" http://localhost:8080/realms/master/protocol/openid-connect/token 2>/dev/null | sed "s/.*access_token\":\"\([^\"]*\)\".*/\1/")
+if kubectl -n odap-auth get pod keycloak-0 >/dev/null 2>&1; then
+  kubectl -n odap-auth exec keycloak-0 -c keycloak -- bash -c '
+T=$(curl -fsS -d "client_id=admin-cli" -d "username=kcadmin" -d "password=odap-dev-only-CHANGE-ME" -d "grant_type=password" http://localhost:8080/realms/master/protocol/openid-connect/token 2>/dev/null | sed "s/.*access_token\":\"\([^\"]*\)\".*/\1/")
 [ -z "$T" ] && { echo "Keycloak admin login faalde"; exit 0; }
 A="Authorization: Bearer $T"
 KC=http://localhost:8080
 for u in platform.admin wia.beoordelaar wajong.arbeidsdeskundige data.engineer; do
-  KCUID=$(curl -fsS -H "$A" "$KC/admin/realms/uwv/users?username=$u" 2>/dev/null | grep -oE "\"id\":\"[^\"]*\"" | head -1 | cut -d"\"" -f4)
+  KCUID=$(curl -fsS -H "$A" "$KC/admin/realms/odap/users?username=$u" 2>/dev/null | grep -oE "\"id\":\"[^\"]*\"" | head -1 | cut -d"\"" -f4)
   [ -z "$KCUID" ] && continue
-  curl -sS -X PUT -H "$A" -H "Content-Type: application/json" "$KC/admin/realms/uwv/users/$KCUID" \
-    -d "{\"username\":\"$u\",\"email\":\"$u@uwv-platform.local\",\"emailVerified\":true,\"enabled\":true,\"requiredActions\":[],\"attributes\":{\"policy\":[\"consoleAdmin\"]}}" -o /dev/null
-  curl -sS -X DELETE -H "$A" "$KC/admin/realms/uwv/attack-detection/brute-force/users/$KCUID" -o /dev/null
+  curl -sS -X PUT -H "$A" -H "Content-Type: application/json" "$KC/admin/realms/odap/users/$KCUID" \
+    -d "{\"username\":\"$u\",\"email\":\"$u@odap.local\",\"emailVerified\":true,\"enabled\":true,\"requiredActions\":[],\"attributes\":{\"policy\":[\"consoleAdmin\"]}}" -o /dev/null
+  curl -sS -X DELETE -H "$A" "$KC/admin/realms/odap/attack-detection/brute-force/users/$KCUID" -o /dev/null
 done
 
 # Idempotent: ensure the `jupyter` OIDC client (JupyterHub) exists. The
-# client is in realm-uwv.json, but Keycloak imports with strategy
+# client is in realm.json, but Keycloak imports with strategy
 # IGNORE_EXISTING, so when the realm already exists from a previous deploy
 # the new client is *not* added — leading to "Client not found" at login.
-EXISTS=$(curl -fsS -H "$A" "$KC/admin/realms/uwv/clients?clientId=jupyter" 2>/dev/null)
+EXISTS=$(curl -fsS -H "$A" "$KC/admin/realms/odap/clients?clientId=jupyter" 2>/dev/null)
 if echo "$EXISTS" | grep -q "\"clientId\":\"jupyter\""; then
   echo "jupyter client already present"
 else
   curl -sS -X POST -H "$A" -H "Content-Type: application/json" \
-    "$KC/admin/realms/uwv/clients" \
-    -d "{\"clientId\":\"jupyter\",\"name\":\"UWV Lab (Jupyter)\",\"enabled\":true,\"protocol\":\"openid-connect\",\"publicClient\":false,\"secret\":\"uwv-dev-only-CHANGE-ME-jupyter-secret\",\"standardFlowEnabled\":true,\"directAccessGrantsEnabled\":false,\"serviceAccountsEnabled\":false,\"redirectUris\":[\"https://jupyter.'"${PLATFORM_DOMAIN}"':'"${PLATFORM_PORT}"'/hub/oauth_callback\",\"https://jupyter.'"${PLATFORM_DOMAIN}"'/hub/oauth_callback\"],\"webOrigins\":[\"https://jupyter.'"${PLATFORM_DOMAIN}"':'"${PLATFORM_PORT}"'\",\"https://jupyter.'"${PLATFORM_DOMAIN}"'\"],\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"fullScopeAllowed\":true}" \
+    "$KC/admin/realms/odap/clients" \
+    -d "{\"clientId\":\"jupyter\",\"name\":\"ODAP Lab (Jupyter)\",\"enabled\":true,\"protocol\":\"openid-connect\",\"publicClient\":false,\"secret\":\"odap-dev-only-CHANGE-ME-jupyter-secret\",\"standardFlowEnabled\":true,\"directAccessGrantsEnabled\":false,\"serviceAccountsEnabled\":false,\"redirectUris\":[\"https://jupyter.'"${PLATFORM_DOMAIN}"':'"${PLATFORM_PORT}"'/hub/oauth_callback\",\"https://jupyter.'"${PLATFORM_DOMAIN}"'/hub/oauth_callback\"],\"webOrigins\":[\"https://jupyter.'"${PLATFORM_DOMAIN}"':'"${PLATFORM_PORT}"'\",\"https://jupyter.'"${PLATFORM_DOMAIN}"'\"],\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"fullScopeAllowed\":true}" \
     -o /dev/null -w "jupyter client created (status %{http_code})\n"
 fi
 echo "Keycloak runtime patches OK"
 ' 2>&1 | tail -3
 fi
 
-# Superset: na eerste OIDC-login krijgen UWV-users de `Public`-rol.
+# Superset: na eerste OIDC-login krijgen platform users de `Public`-rol.
 # AUTH_ROLES_SYNC_AT_LOGIN promoot via realm_access.roles als die in de
 # access_token zit; in deze realm zit die niet altijd, dus we promoten
 # alle Public-only users handmatig naar Admin (demo-cluster only).
 log "Superset: Admin-rol op demo-users zonder rollen"
 # Use a Ready-check rather than just `get pod` — see DAG-unpause block below.
-if kubectl -n uwv-platform wait --for=condition=Ready pod/uwv-superset-node-default-0 --timeout=1s >/dev/null 2>&1; then
-  kubectl -n uwv-platform exec uwv-superset-node-default-0 -c superset -- python3 -c '
+if kubectl -n odap-platform wait --for=condition=Ready pod/superset-node-default-0 --timeout=1s >/dev/null 2>&1; then
+  kubectl -n odap-platform exec superset-node-default-0 -c superset -- python3 -c '
 from superset.app import create_app
 app = create_app()
 with app.app_context():
@@ -326,12 +326,12 @@ fi
 # overschrijdt de ConfigMap data-limiet (1MB). De Airflow-scheduler heeft
 # echter al een `manifest-decompress` initContainer die `manifest.json.gz`
 # en `dbt-project.tar.gz` uit binaryData uitpakt — we leveren die hier
-# direct vanaf de host via de uwv/dbt-trino:1.9.0-uwv image (~135KB gzipd).
+# direct vanaf de host via de odap/dbt-trino:1.9.0 image (~135KB gzipd).
 # Superset-init Job re-runt zodat hij na de CA-bundle update + Superset
 # pod-roll de Trino-databases registreert. Backoff van een eerdere Failed
 # Job blokkeert anders een retry.
 log "superset-init Job opnieuw triggeren (na CA-bundle update + pod-roll)"
-kubectl -n uwv-platform delete job superset-init --ignore-not-found >/dev/null 2>&1 || true
+kubectl -n odap-platform delete job superset-init --ignore-not-found >/dev/null 2>&1 || true
 kubectl apply -k "$ROOT/platform/12-superset" >/dev/null 2>&1 || true
 
 # OpenMetadata: seed admin JWT + re-trigger openmetadata-init Job.
@@ -339,11 +339,11 @@ kubectl apply -k "$ROOT/platform/12-superset" >/dev/null 2>&1 || true
 # → JWT-secret blijft leeg → openmetadata-init API-calls krijgen 401
 # en classifications/glossary worden niet geladen. Hier is OM Ready.
 log "OpenMetadata: decrypt ingestion-bot JWT + re-trigger init-Job"
-if kubectl -n uwv-meta rollout status deploy/openmetadata --timeout=5m >/dev/null 2>&1; then
-  FERNET=$(kubectl -n uwv-meta get secret openmetadata-fernetkey-secret -o jsonpath='{.data}' 2>/dev/null \
+if kubectl -n odap-meta rollout status deploy/openmetadata --timeout=5m >/dev/null 2>&1; then
+  FERNET=$(kubectl -n odap-meta get secret openmetadata-fernetkey-secret -o jsonpath='{.data}' 2>/dev/null \
     | python3 -c 'import json,sys,base64;d=json.load(sys.stdin);print(next(iter(base64.b64decode(v).decode() for v in d.values())))' 2>/dev/null || true)
-  ENCRYPTED=$(kubectl -n uwv-data exec postgres-postgresql-0 -c postgresql -- \
-    env PGPASSWORD="$(kubectl -n uwv-data get secret postgres-postgresql -o jsonpath='{.data.password}' | base64 -d)" \
+  ENCRYPTED=$(kubectl -n odap-data exec postgres-postgresql-0 -c postgresql -- \
+    env PGPASSWORD="$(kubectl -n odap-data get secret postgres-postgresql -o jsonpath='{.data.password}' | base64 -d)" \
     psql -U postgres -d openmetadata -t -A -c \
     "SELECT json->'authenticationMechanism'->'config'->>'JWTToken' FROM user_entity WHERE name='ingestion-bot' LIMIT 1;" \
     2>/dev/null | sed 's/^fernet://' || true)
@@ -357,14 +357,14 @@ print(mf.decrypt(b'${ENCRYPTED}').decode())
   fi
   if [[ -n "$JWT" ]]; then
     JWT_B64=$(printf '%s' "$JWT" | base64 | tr -d '\n')
-    kubectl -n uwv-meta patch secret openmetadata-admin --type='json' \
+    kubectl -n odap-meta patch secret openmetadata-admin --type='json' \
       -p="[{\"op\":\"replace\",\"path\":\"/data/jwtToken\",\"value\":\"${JWT_B64}\"}]" >/dev/null 2>&1 || true
-    kubectl -n uwv-platform create secret generic openmetadata-admin \
+    kubectl -n odap-platform create secret generic openmetadata-admin \
       --from-literal=jwtToken="$JWT" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-    kubectl -n uwv-meta delete job openmetadata-init --ignore-not-found >/dev/null 2>&1 || true
+    kubectl -n odap-meta delete job openmetadata-init --ignore-not-found >/dev/null 2>&1 || true
     kubectl apply -k "$ROOT/platform/13-openmetadata-config" >/dev/null 2>&1 || true
-    # De re-apply hierboven update de CM in uwv-meta; mirror opnieuw naar
-    # uwv-platform zodat de DAG/CronJobs de verse YAML zien (zie helper).
+    # De re-apply hierboven update de CM in odap-meta; mirror opnieuw naar
+    # odap-platform zodat de DAG/CronJobs de verse YAML zien (zie helper).
     mirror_om_config_cm
     printf '\033[1;32mOK\033[0m OpenMetadata admin-JWT geseed + init-Job opnieuw getriggerd\n'
   else
@@ -374,13 +374,13 @@ else
   printf '\033[1;33m!!\033[0m OpenMetadata deployment niet Ready binnen 5m — JWT-seed overgeslagen\n'
 fi
 
-log "dbt-manifest ConfigMap renderen via uwv/dbt-trino:1.9.0-uwv"
-if docker image inspect uwv/dbt-trino:1.9.0-uwv >/dev/null 2>&1; then
+log "dbt-manifest ConfigMap renderen via odap/dbt-trino:1.9.0"
+if docker image inspect odap/dbt-trino:1.9.0 >/dev/null 2>&1; then
   TMP=$(mktemp -d)
-  docker run --rm -v "$TMP:/out" --entrypoint sh uwv/dbt-trino:1.9.0-uwv -c '
-    cd /opt/uwv/dbt
+  docker run --rm -v "$TMP:/out" --entrypoint sh odap/dbt-trino:1.9.0 -c '
+    cd /opt/odap/dbt
     cp profiles.yml.template profiles.yml 2>/dev/null || true
-    DBT_PROFILES_DIR=/opt/uwv/dbt \
+    DBT_PROFILES_DIR=/opt/odap/dbt \
     TRINO_HOST=placeholder TRINO_PORT=8443 \
     TRINO_USER=placeholder TRINO_PASSWORD=placeholder \
     TABLE_FORMAT=delta \
@@ -396,12 +396,12 @@ if docker image inspect uwv/dbt-trino:1.9.0-uwv >/dev/null 2>&1; then
   ' 2>&1 | tail -3 || true
   if [[ -s "$TMP/manifest.json" ]]; then
     gzip -f -c "$TMP/manifest.json" > "$TMP/manifest.json.gz"
-    kubectl -n uwv-platform create configmap dbt-manifest \
+    kubectl -n odap-platform create configmap dbt-manifest \
       --from-file=manifest.json.gz="$TMP/manifest.json.gz" \
       --from-file=dbt-project.tar.gz="$TMP/dbt-project.tar.gz" \
       --dry-run=client -o yaml | kubectl apply -f - >/dev/null
     # Forceer Airflow scheduler-rollout zodat manifest-decompress init opnieuw runt.
-    kubectl -n uwv-platform delete pod -l app.kubernetes.io/component=scheduler --ignore-not-found >/dev/null 2>&1 || true
+    kubectl -n odap-platform delete pod -l app.kubernetes.io/component=scheduler --ignore-not-found >/dev/null 2>&1 || true
     printf '\033[1;32mOK\033[0m dbt-manifest ConfigMap geseed (manifest.json.gz=%s, dbt-project.tar.gz=%s)\n' \
       "$(du -h "$TMP/manifest.json.gz" | cut -f1)" "$(du -h "$TMP/dbt-project.tar.gz" | cut -f1)"
   else
@@ -409,18 +409,18 @@ if docker image inspect uwv/dbt-trino:1.9.0-uwv >/dev/null 2>&1; then
   fi
   rm -rf "$TMP"
 else
-  printf '\033[1;33m!!\033[0m uwv/dbt-trino:1.9.0-uwv image niet gevonden — `make dbt-image` eerst draaien\n'
+  printf '\033[1;33m!!\033[0m odap/dbt-trino:1.9.0 image niet gevonden — `make dbt-image` eerst draaien\n'
 fi
 
-# Unpause de UWV DAGs zodat ze automatisch op hun cron-schedule starten zodra
+# Unpause de Platform DAGs so they automatically start on their cron schedule once
 # de scheduler ze ziet. Airflow's default is is_paused_upon_creation=true,
 # en op een verse cluster betekent dat ze stilstaan tot je via de UI klikt.
-log "Unpause UWV DAGs (governance/ingest/transform/maintenance)"
+log "Unpause Platform DAGs (governance/ingest/transform/maintenance)"
 # Pod-readiness gate: `kubectl get pod` succeeds even when the pod is
 # pending/no-host (the resource exists). With `set -o pipefail` an
 # `exec` failure here aborts the whole script. Use a `Ready` check.
-if kubectl -n uwv-platform wait --for=condition=Ready pod/uwv-airflow-scheduler-default-0 --timeout=1s >/dev/null 2>&1; then
-  kubectl -n uwv-platform exec uwv-airflow-scheduler-default-0 -c airflow -- bash -c '
+if kubectl -n odap-platform wait --for=condition=Ready pod/airflow-scheduler-default-0 --timeout=1s >/dev/null 2>&1; then
+  kubectl -n odap-platform exec airflow-scheduler-default-0 -c airflow -- bash -c '
 for dag in bronze_watch \
            silver_persoon silver_polisadm silver_ww silver_wia \
            silver_wajong silver_zw silver_crm silver_fez silver_klantcontact \
@@ -433,7 +433,7 @@ done
 echo "DAGs unpaused (skipped any that don'\''t exist yet — parse delay is normal)"
   ' 2>&1 | tail -2 || true
 else
-  printf '\033[1;33m!!\033[0m uwv-airflow-scheduler-default-0 nog niet ready — DAGs blijven paused tot je manueel `airflow dags unpause` draait\n'
+  printf '\033[1;33m!!\033[0m airflow-scheduler-default-0 nog niet ready — DAGs blijven paused tot je manueel `airflow dags unpause` draait\n'
 fi
 
 # om-access-bridge (ADR-0008): self-service data-access webhook bridge.
@@ -446,7 +446,7 @@ fi
 log "om-access-bridge (ADR-0008): wait for OM admin token, then deploy"
 om_ready=false
 for i in 1 2 3 4 5 6; do
-  if kubectl -n uwv-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' 2>/dev/null | grep -q .; then
+  if kubectl -n odap-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' 2>/dev/null | grep -q .; then
     om_ready=true
     break
   fi

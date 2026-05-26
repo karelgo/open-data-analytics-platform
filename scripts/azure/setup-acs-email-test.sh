@@ -20,7 +20,7 @@
 #        <acs-resource-name>.<entra-app-id>.<tenant-id>
 #      — per MS Learn /azure/communication-services/concepts/email/
 #      email-smtp-authentication-microsoft-entra).
-#   5. Patch het k8s-Secret 'alertmanager-receivers' (uwv-monitoring NS)
+#   5. Patch het k8s-Secret 'alertmanager-receivers' (odap-monitoring NS)
 #      met smtp_password_acs = <client-secret>
 #   6. Patch platform-overlays/azure-personal/14-monitoring/
 #      alertmanager-add-acs.yaml met de authUsername.
@@ -38,10 +38,10 @@ set -euo pipefail
 SUBSCRIPTION_ID="4910a5a6-aec6-405d-9294-c7f2845512a4"
 TENANT_ID="fedcef2f-0c85-40dd-8f55-e23143dcb367"
 RG="dev-stackable-rg"
-ACS_NAME="uwv-acs"
-EMAIL_SERVICE_NAME="uwv-emailcs"
+ACS_NAME="acs"
+EMAIL_SERVICE_NAME="emailcs"
 EMAIL_DOMAIN_NAME="AzureManagedDomain"
-APP_DISPLAY_NAME="uwv-platform-alertmanager-smtp"
+APP_DISPLAY_NAME="odap-platform-alertmanager-smtp"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OVERLAY_PATCH="${ROOT}/platform-overlays/azure-personal/14-monitoring/alertmanager-add-acs.yaml"
@@ -208,13 +208,13 @@ ok "Overlay-bestand bijgewerkt"
 
 # --- patch k8s Secret ------------------------------------------------
 log "Patch k8s Secret alertmanager-receivers"
-if ! kubectl -n uwv-monitoring get secret alertmanager-receivers >/dev/null 2>&1; then
-  warn "Secret alertmanager-receivers bestaat nog niet in uwv-monitoring."
+if ! kubectl -n odap-monitoring get secret alertmanager-receivers >/dev/null 2>&1; then
+  warn "Secret alertmanager-receivers bestaat nog niet in odap-monitoring."
   warn "Doe eerst 'make deploy MODE=k3d' (of apply platform/14-monitoring) en run opnieuw."
   exit 1
 fi
 B64="$(printf %s "$CLIENT_SECRET" | base64)"
-kubectl -n uwv-monitoring patch secret alertmanager-receivers \
+kubectl -n odap-monitoring patch secret alertmanager-receivers \
   --type='json' \
   -p='[{"op":"add","path":"/data/smtp_password_acs","value":"'"$B64"'"}]' >/dev/null
 ok "Secret-key smtp_password_acs gezet"
@@ -228,11 +228,11 @@ Apply de overlay en stuur een test-alert:
   make alert-test
 
 Verwacht binnen ~30s:
-  - MailHog UI:           https://mailhog.uwv-platform.local:8443/
+  - MailHog UI:           https://mailhog.odap.local:8443/
   - Echte inbox:          karel.goense@freshminds.nl
-    (subject: '[ACS-test FIRING] UwvSyntheticTestAlert (warning)')
+    (subject: '[ACS-test FIRING] SyntheticTestAlert (warning)')
 
 Bij SMTP-fouten:
-  kubectl -n uwv-monitoring logs -l app.kubernetes.io/name=alertmanager \\
+  kubectl -n odap-monitoring logs -l app.kubernetes.io/name=alertmanager \\
     --tail=200 | grep -iE 'smtp|tls|auth'
 EOF

@@ -12,7 +12,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
   - Tabelformaat **Delta Lake** (afwijking van ADR-0002 default Iceberg) → ADR-0006.
   - Doel-cluster: lokaal **k3d**.
   - Image registry: publiek pullen.
-  - DNS: `*.uwv-platform.local` via /etc/hosts.
+  - DNS: `*.odap.local` via /etc/hosts.
   - TLS: cert-manager self-signed.
   - Resource-budget: scaled-down profiel.
   - CI/CD: GitHub Actions (placeholder voor later).
@@ -42,7 +42,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 
 ### Gedaan
 - **Helm values per chart** (`infrastructure/helm/`):
-  - `cert-manager/values.yaml` + `cluster-issuer.yaml` (self-signed CA `uwv-platform-issuer` voor `*.uwv-platform.local`).
+  - `cert-manager/values.yaml` + `cluster-issuer.yaml` (self-signed CA `platform-issuer` voor `*.odap.local`).
   - `ingress-nginx/values.yaml` (k3d LB → :8080/:8443).
   - `minio/values.yaml` (single-node, 7 buckets aangemaakt via chart-job, ingress voor API + Console).
   - `postgresql/values.yaml` (single-instance, init-script maakt `hivemetastore`/`airflow`/`superset`/`openmetadata`/`keycloak` databases aan).
@@ -50,7 +50,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
   - `prometheus-stack/values.yaml` (Prometheus + Grafana, Alertmanager uit, scaled-down).
   - `vector/values.yaml` (Agent-mode, OpenSearch sink — fase 8).
   - `openmetadata/values.yaml` (gedeelde Postgres + OpenSearch, OIDC via Keycloak — fase 8).
-- **Keycloak UWV-realm** (`infrastructure/helm/keycloak/realm-uwv.json`): 11 realm-rollen (de 8 mock-rollen + `researcher`, `smz_planner`, `proactief_dienstverlener`), één mock-user per rol, 5 OIDC-clients (trino, superset, airflow, nifi, openmetadata) met dev-only secrets en redirect-URIs op `*.uwv-platform.local:8443`.
+- **Keycloak ODAP realm** (`infrastructure/helm/keycloak/realm.json`): 11 realm-rollen (de 8 mock-rollen + `researcher`, `smz_planner`, `proactief_dienstverlener`), één mock-user per rol, 5 OIDC-clients (trino, superset, airflow, nifi, openmetadata) met dev-only secrets en redirect-URIs op `*.odap.local:8443`.
 - **Stackable release pin** (`infrastructure/stackablectl/release.yaml` — SDP 26.3 alle 12 operators) + `stack.yaml` (verwijst naar `platform/00..13`).
 - **Scripts** (`scripts/`): `cluster.sh`, `bootstrap.sh` (idempotente helm upgrade --install volgorde: cert-manager → ClusterIssuer → ingress-nginx → Postgres → MinIO → Keycloak → Prometheus → Stackable operators), `clean.sh`, `doctor.sh` (tooling + /etc/hosts check), `port-forward.sh`, `run-smoke-tests.sh`, `deploy-platform.sh` (stub voor fase 2+), `seed.sh` (stub voor fase 4+). Allemaal `chmod +x`.
 - **Smoke test** `tests/smoke/01-stackable-up.sh`: cluster, namespaces, helm-releases, ClusterIssuer Ready, MinIO buckets, Stackable operator pods, Keycloak OIDC discovery.
@@ -61,9 +61,9 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 
 ### Beslissingen
 - **Scaled-down Postgres single-instance** met meerdere databases (HMS, Airflow, Superset, OM, Keycloak). Productie: aparte instances per consumer.
-- **Self-signed CA** (`uwv-platform-issuer`) als ClusterIssuer voor alle `*.uwv-platform.local` certificates. CA-cert blijft in `cert-manager` namespace; in browsers moet de CA expliciet vertrouwd worden voor lokaal gebruik.
+- **Self-signed CA** (`platform-issuer`) als ClusterIssuer voor alle `*.odap.local` certificates. CA-cert blijft in `cert-manager` namespace; in browsers moet de CA expliciet vertrouwd worden voor lokaal gebruik.
 - **Bitnami charts** voor PostgreSQL en Keycloak ondanks recente licentie-vragen — voor referentie volstaat de Apache 2.0 chart; voor productie cnpg-operator of Keycloak-operator overwegen.
-- **Dev-only credentials** zijn hardcoded in `values.yaml` met expliciete `uwv-dev-only-CHANGE-ME-*` prefix. Bootstrap.sh logt een warning. ADR voor secret-handling in productie wordt later geschreven.
+- **Dev-only credentials** zijn hardcoded in `values.yaml` met expliciete `odap-dev-only-CHANGE-ME-*` prefix. Bootstrap.sh logt een warning. ADR voor secret-handling in productie wordt later geschreven.
 - **MinIO bucket-creation** via chart's eigen post-install hook (`buckets:`-array in values). Voorkomt extra mc-job manifest.
 - **ingress-nginx** is THE ingress-controller; Stackable's listener-operator (fase 2) blijft voor Stackable-services voor in-cluster service-discovery, ingress-nginx voor externe routes.
 
@@ -77,13 +77,13 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - 14 YAML-bestanden uit fase 0/1: groen.
 
 ### Gedaan
-- `platform/00-namespaces/` — 5 namespaces (`uwv-platform`/`-data`/`-meta`/`-monitoring`/`-auth`) met UWV-labels (`uwv.nl/zone`, `uwv.nl/bio-classificatie`, `uwv.nl/doelbinding`) + Pod Security baseline.
+- `platform/00-namespaces/` — 5 namespaces (`odap-platform`/`-data`/`-meta`/`-monitoring`/`-auth`) met platform labels (`odap.io/zone`, `odap.io/bio-classificatie`, `odap.io/doelbinding`) + Pod Security baseline.
 - `platform/01-secrets/` — 2 Stackable SecretClasses (`s3-credentials-minio`, `oidc-client-credentials`) + 8 K8s Secrets (MinIO, Hive→Postgres, 4× OIDC client per service, Airflow- en Superset-Postgres). Dev-only; banner in dev-secrets.yaml.
-- `platform/02-authentication/` — `AuthenticationClass keycloak-uwv` (OIDC, issuer `keycloak.uwv-platform.local:8443/realms/uwv`, scopes `openid profile email roles`, principalClaim `preferred_username`) + `SecretClass tls-internal` voor CA-bundle.
+- `platform/02-authentication/` — `AuthenticationClass keycloak` (OIDC, issuer `keycloak.odap.local:8443/realms/odap`, scopes `openid profile email roles`, principalClaim `preferred_username`) + `SecretClass tls-internal` voor CA-bundle.
 - `platform/03-storage/` — `S3Connection s3-minio` (path-style, in-cluster).
-- `platform/04-zookeeper/` — `ZookeeperCluster uwv-zookeeper` (3.9.3, 1 server) + `ZookeeperZnode uwv-zookeeper-znode-kafka`.
-- `platform/05-hive-metastore/` — `HiveCluster uwv-hive` (4.0.1, Postgres-backed `hivemetastore`-DB, S3 ref `s3-minio`).
-- `platform/06-kafka/` — `KafkaCluster uwv-kafka` (3.7.1, 1 broker, RF=1, `auto.create.topics=true` voor demo).
+- `platform/04-zookeeper/` — `ZookeeperCluster zookeeper` (3.9.3, 1 server) + `ZookeeperZnode zookeeper-znode-kafka`.
+- `platform/05-hive-metastore/` — `HiveCluster hive` (4.0.1, Postgres-backed `hivemetastore`-DB, S3 ref `s3-minio`).
+- `platform/06-kafka/` — `KafkaCluster kafka` (3.7.1, 1 broker, RF=1, `auto.create.topics=true` voor demo).
 - Per directory `kustomization.yaml` + `README.md`.
 - `tests/smoke/01-stackable-up.sh` uitgebreid: foundation-checks (CRD-aanwezigheid voor alle SDP-26.3 product-CRDs + Ready-status van ZK/Hive/Kafka, gracefully skipt als nog niet applied) + custom-resource bestaanscheck (SecretClasses, AuthenticationClass, S3Connection, ZookeeperCluster, Znode).
 
@@ -96,7 +96,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 ### Beslissingen
 - **Foundation kustomizations** zijn per-directory; `scripts/deploy-platform.sh` past elke directory in volgorde toe (00 → 13). Dit ondersteunt een incrementele rollout en duidelijke afhankelijkheidsvolgorde.
 - **`auto.create.topics.enable=true`** in dev — productie zou expliciete KafkaTopic-CRDs gebruiken voor change management. Documenteren in fase 6 README.
-- **OIDC issuer-URL** is **extern** (`keycloak.uwv-platform.local:8443`), niet intern (`keycloak.uwv-auth.svc.cluster.local`), omdat tokens een issuer-claim bevatten die de browser-redirect-URL moet matchen. Stackable's AuthenticationClass kan zowel; we kiezen extern.
+- **OIDC issuer-URL** is **extern** (`keycloak.odap.local:8443`), niet intern (`keycloak.odap-auth.svc.cluster.local`), omdat tokens een issuer-claim bevatten die de browser-redirect-URL moet matchen. Stackable's AuthenticationClass kan zowel; we kiezen extern.
 - **SecretClass `tls-internal`** voor de CA-bundle is voorbereid maar pas relevant in fase 3 (Trino → Keycloak OIDC TLS-verificatie). Bootstrap kan in fase 3 een trust-manager Bundle of handmatige Secret-kopie toevoegen.
 - **`enableVectorAgent: false`** op alle Stackable-clusters in fase 2: Vector wordt pas in fase 8 ingezet; tot die tijd geen extra container per pod.
 
@@ -105,17 +105,17 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 ## 2026-05-01 — Sessie 4: Fase 3 (Trino + OPA + catalogs)
 
 ### Gedaan
-- `platform/09-trino/catalogs/*.yaml.tmpl` — vier templates (`bronze`, `silver`, `gold`, `sensitive`) met placeholders `__TABLE_FORMAT__` + `__TABLE_FORMAT_CONNECTOR_BLOCK__`. Catalogs hebben labels (`uwv.nl/zone`, `uwv.nl/format`) en annotaties; `sensitive` heeft `uwv.nl/avg-art9: "true"`.
+- `platform/09-trino/catalogs/*.yaml.tmpl` — vier templates (`bronze`, `silver`, `gold`, `sensitive`) met placeholders `__TABLE_FORMAT__` + `__TABLE_FORMAT_CONNECTOR_BLOCK__`. Catalogs hebben labels (`odap.io/zone`, `odap.io/format`) en annotaties; `sensitive` heeft `odap.io/avg-art9: "true"`.
 - `scripts/render-trino-catalogs.py` — Python renderer (PyYAML; leest `platform-config.yaml`, kan via `TABLE_FORMAT` env worden overschreven). Renders → `platform/09-trino/catalogs/rendered/*.yaml` + auto-gegenereerde `kustomization.yaml`. Sanity-parse per output.
 - `.gitignore` uitgebreid met `platform/09-trino/catalogs/rendered/`.
 - `scripts/deploy-platform.sh` roept render aan vóór de layer-loop. `Makefile`-target `render-catalogs` toegevoegd; `deploy-platform` heeft het als pre-req.
 - `platform/09-trino/`:
-  - `trino-static-auth.yaml` — `AuthenticationClass trino-static-uwv` + Secret `trino-static-users` (alleen smoketest user, dev-only).
-  - `trinocluster.yaml` — Trino 470, 1 coordinator + 1 worker, **twee** AuthenticationClasses (`trino-static-uwv` + `keycloak-uwv`), `authorization.opa.configMapName: uwv-opa` met package `trino`.
+  - `trino-static-auth.yaml` — `AuthenticationClass trino-static` + Secret `trino-static-users` (alleen smoketest user, dev-only).
+  - `trinocluster.yaml` — Trino 470, 1 coordinator + 1 worker, **twee** AuthenticationClasses (`trino-static` + `keycloak`), `authorization.opa.configMapName: opa` met package `trino`.
   - `kustomization.yaml` — referenceert static-auth + trinocluster + `catalogs/rendered/` (door render-script gegenereerd).
 - `platform/10-opa/`:
   - `opacluster.yaml` — OPA 1.0.1, 1 server.
-  - `policies/trino-base.rego` — `package trino`, `import rego.v1`, default-deny + allow-rule voor authenticated users, `default rowFilters/columnMask` leeg, `batch` rule. Banner: `TICKET UWV-PLATFORM-OPA-001` + `TIGHTEN: fase 9`.
+  - `policies/trino-base.rego` — `package trino`, `import rego.v1`, default-deny + allow-rule voor authenticated users, `default rowFilters/columnMask` leeg, `batch` rule. Banner: `TICKET ODAP-PLATFORM-OPA-001` + `TIGHTEN: fase 9`.
   - `policies/trino-base_test.rego` — 6 tests (anonymous deny, authenticated allow, geen filters/masks, batch passthrough, batch empty bij anonymous).
   - `kustomization.yaml` — `configMapGenerator` bouwt `opa-trino-bundle` ConfigMap met label `opa.stackable.tech/bundle: "true"` + `disableNameSuffixHash: true`.
 - `tests/smoke/02-trino-query.sh` — Trino+Worker rollout, OPA Ready, ConfigMap+label, OPA decision-endpoint via `/v1/data/trino/allow` (allow-true voor smoketest-user, allow-false voor anonymous), `SHOW CATALOGS` retourneert `bronze/silver/gold/sensitive`, `SELECT 1`.
@@ -127,7 +127,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `opa test` lokaal niet uitgevoerd (opa niet op host); rego-tests draaien straks in CI.
 
 ### Beslissingen
-- **Twee AuthenticationClasses** op TrinoCluster: `trino-static-uwv` (smoketest-user) + `keycloak-uwv` (echte users). Productie zou alleen OIDC hebben; statisch is voor smoke + break-glass.
+- **Twee AuthenticationClasses** op TrinoCluster: `trino-static` (smoketest-user) + `keycloak` (echte users). Productie zou alleen OIDC hebben; statisch is voor smoke + break-glass.
 - **`catalogs/rendered/` gitignored** — single source of truth zijn de `.yaml.tmpl` en `platform-config.yaml`. `make render-catalogs` is idempotent.
 - **OPA bundle via kustomize `configMapGenerator`** in plaats van een handmatig geschreven ConfigMap — voorkomt rego-content-duplicatie en behoudt `opa fmt`/`opa test` op de echte `.rego` files.
 - **`disableNameSuffixHash: true`** op generator — TrinoCluster verwijst naar de ConfigMap-naam `opa-trino-bundle` zonder hash.
@@ -150,7 +150,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `data-generation/k8s/seed-job.yaml` — Kubernetes Job die python:3.11-slim image gebruikt, deps pip-installeert, ConfigMaps mount op /app, en `load_to_kafka.py` runt tegen in-cluster Kafka-bootstrap. Idempotent via TTL + scripts/seed.sh delete-before-apply.
 - `spark-jobs/lib/lakehouse_io.py` — format-agnostische helper (`get_spark_with_lakehouse_config`, `write_table`, `write_stream_to_table`, `ensure_bronze_schema`). Leest `TABLE_FORMAT` env, configureert Delta- of Iceberg-extensions + S3A + HMS.
 - `spark-jobs/streaming_kafka_to_lakehouse.py` — Subscribet `uwv\..*\..*` Kafka topics; `foreachBatch` dispatcher schrijft per topic naar `bronze.uwv.<domain>_<entity>`. Schema: `payload (string), topic, kafka_partition, kafka_offset, kafka_ts, ingestion_ts, event_date`.
-- `platform/07-nifi/` — `NiFiCluster uwv-nifi` (NiFi 2.0.0, OIDC via keycloak-uwv) + `ZookeeperZnode uwv-zookeeper-znode-nifi`. Documenteert in README dat fase-4-flows via Python-loader gevuld worden; NiFi-flow-import is fase 5+.
+- `platform/07-nifi/` — `NiFiCluster nifi` (NiFi 2.0.0, OIDC via keycloak) + `ZookeeperZnode zookeeper-znode-nifi`. Documenteert in README dat fase-4-flows via Python-loader gevuld worden; NiFi-flow-import is fase 5+.
 - `platform/08-spark/apps/streaming-bronze.yaml` — `SparkApplication streaming-bronze` (Spark 3.5.5, deps.packages: spark-sql-kafka-0-10, delta-spark, hadoop-aws). PodOverrides mounten ConfigMap `spark-streaming-jobs` op `/stackable/spark/jobs`. Driver+executor environment: `TABLE_FORMAT=delta`, `S3_ACCESS/SECRET_KEY` uit `minio-s3-credentials` Secret.
 - `platform/08-spark/kustomization.yaml` — `configMapGenerator` bouwt `spark-streaming-jobs` ConfigMap uit `platform/08-spark/scripts/` (gitignored sync target).
 - `nifi-flows/templates/{delta,iceberg}/README.md` — flow-design documentatie + NiFi 2.x import-API instructies.
@@ -173,7 +173,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - **Spark-jobs sync via deploy-platform.sh** — kustomize `configMapGenerator` accepteert geen `../../<dir>` paths zonder `loadRestrictor: None`; cleaner is om naar een gitignored sub-directory te syncen.
 - **`foreachBatch` dispatcher per topic** in plaats van één-stream-per-topic — efficienter (één Spark query) én flexibeler (nieuwe topics auto-pickup via `subscribePattern`).
 - **In-cluster seed via Job** in plaats van host-side port-forward — Kafka-broker advertising-listeners maken host-side Kafka-clients onbetrouwbaar. Job zit op het cluster-netwerk en gebruikt de standaard service-DNS.
-- **Header `SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE`** in elk generator-bestand + envelope `meta.synthetic: true`.
+- **Header `SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`** in elk generator-bestand + envelope `meta.synthetic: true`.
 
 ---
 
@@ -253,10 +253,10 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 ## 2026-05-01 — Sessie 7: Fase 6 (Airflow + DAGs)
 
 ### Gedaan
-- `platform/11-airflow/airflowcluster.yaml` — Stackable AirflowCluster (Airflow 2.10.4), gedeelde Postgres-backend (`airflow` DB), KubernetesExecutor (Celery off), OIDC via `keycloak-uwv` AuthenticationClass, listener-class `cluster-internal`. Webservers + schedulers met podOverrides die ConfigMap `airflow-dags` mounten op `/stackable/airflow/dags`.
+- `platform/11-airflow/airflowcluster.yaml` — Stackable AirflowCluster (Airflow 2.10.4), gedeelde Postgres-backend (`airflow` DB), KubernetesExecutor (Celery off), OIDC via `keycloak` AuthenticationClass, listener-class `cluster-internal`. Webservers + schedulers met podOverrides die ConfigMap `airflow-dags` mounten op `/stackable/airflow/dags`.
 - `platform/11-airflow/kustomization.yaml` — `configMapGenerator` bouwt `airflow-dags` uit `dags/*.py` met `disableNameSuffixHash`.
-- `platform/11-airflow/dags/dbt_run_per_domain.py` — DAG met **8 KubernetesPodOperator-tasks parallel** (één per domein: persoon/polisadm/ww/wia/wajong/zw/crm/fez). Init-container `registry.k8s.io/git-sync/git-sync:v4.2.4` clont repo (URL via Airflow Variable `uwv_repo_url`), main-container `ghcr.io/dbt-labs/dbt-trino:1.9.0` draait `dbt deps && dbt run --select tag:<domein> && dbt test --select tag:<domein>` met TRINO_PASSWORD uit Secret `trino-static-users`. Falt back op skip-task als de variabele leeg is (lokale-dev-zonder-git).
-- `platform/11-airflow/dags/lakehouse_maintenance.py` — DAG met `TrinoOperator` per bronze-tabel (8 stuks). Format-aware SQL: Delta `OPTIMIZE` + `VACUUM RETENTION '7d'`, Iceberg `expire_snapshots` + `remove_orphan_files` + `optimize`. Format via Variable `uwv_table_format`.
+- `platform/11-airflow/dags/dbt_run_per_domain.py` — DAG met **8 KubernetesPodOperator-tasks parallel** (één per domein: persoon/polisadm/ww/wia/wajong/zw/crm/fez). Init-container `registry.k8s.io/git-sync/git-sync:v4.2.4` clont repo (URL via Airflow Variable `repo_url`), main-container `ghcr.io/dbt-labs/dbt-trino:1.9.0` draait `dbt deps && dbt run --select tag:<domein> && dbt test --select tag:<domein>` met TRINO_PASSWORD uit Secret `trino-static-users`. Falt back op skip-task als de variabele leeg is (lokale-dev-zonder-git).
+- `platform/11-airflow/dags/lakehouse_maintenance.py` — DAG met `TrinoOperator` per bronze-tabel (8 stuks). Format-aware SQL: Delta `OPTIMIZE` + `VACUUM RETENTION '7d'`, Iceberg `expire_snapshots` + `remove_orphan_files` + `optimize`. Format via Variable `table_format`.
 - `platform/11-airflow/dags/synthetic_data_load.py` — DAG met `KubernetesJobOperator` die de Job-spec uit `data-generation/k8s/seed-job.yaml` programmatisch reconstrueert (zelfde ConfigMap-mounts). Manueel triggerbaar; geen schedule.
 - `platform/11-airflow/dags/__init__.py` — banner.
 - `platform/11-airflow/README.md` — drie paden voor DAG-distributie (ConfigMap-mount voor dev / dagsGitSync voor productie / PVC voor air-gapped) + Airflow Connection-recipe voor `trino_default`.
@@ -271,7 +271,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 ### Beslissingen
 - **KubernetesExecutor** in plaats van Celery — cleaner voor scaled-down k3d (geen aparte celery-worker/redis), elke task spawnt zijn eigen pod. Productie kan Celery overwegen voor task-throughput.
 - **DAGs via ConfigMap-mount** als default voor dev — kustomize `configMapGenerator` is reproducible. Productie commentaar in README beschrijft `dagsGitSync` als juist productiepad.
-- **git-sync init-container voor dbt-tasks** — repo-clone in pod is robuust (geen kustomize ConfigMap met dbt-project-tarball), werkt met elke git-host. Toegevoegde Airflow Variable `uwv_repo_url` houdt het generiek.
+- **git-sync init-container voor dbt-tasks** — repo-clone in pod is robuust (geen kustomize ConfigMap met dbt-project-tarball), werkt met elke git-host. Toegevoegde Airflow Variable `repo_url` houdt het generiek.
 - **Trino-credentials via Secret-ref** in env_vars (niet Airflow Connection) — KubernetesPodOperator pikt secrets direct, geen extra Connection-config in Airflow nodig (alleen de TrinoOperator gebruikt connection trino_default voor maintenance-DAG).
 - **synthetic_data_load gebruikt KubernetesJobOperator** met inline-Job-spec — voorkomt afhankelijkheid van een aparte yaml-file in de pod-mount; alle Job-config staat in de DAG zelf.
 - **Geen `om_*`-DAGs in fase 6** — die landen in fase 8 zodra OpenMetadata draait.
@@ -285,16 +285,16 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 
 ### Gedaan
 - `platform/01-secrets/dev-secrets.yaml` — `superset-postgres-credentials` secret aangevuld met `connections.sqlalchemyDatabaseUri` (psycopg2-URI naar de gedeelde Postgres `superset` DB) — Stackable's SupersetCluster vereist deze key direct.
-- `platform/12-superset/supersetcluster.yaml` — Stackable SupersetCluster (Superset 4.1.1, 1 node, scaled-down). OIDC via `keycloak-uwv` AuthenticationClass met `userRegistration: true` + `syncRolesAt: Login` zodat UWV-realm-users automatisch een Superset-account krijgen (default rol: `Public`). `loadExamplesOnInit: false`.
+- `platform/12-superset/supersetcluster.yaml` — Stackable SupersetCluster (Superset 4.1.1, 1 node, scaled-down). OIDC via `keycloak` AuthenticationClass met `userRegistration: true` + `syncRolesAt: Login` zodat ODAP realm-users automatisch een Superset-account krijgen (default rol: `Public`). `loadExamplesOnInit: false`.
 - `platform/12-superset/init-job.yaml` — bevat een **ConfigMap** (`superset-init-script`) met een 100-regel Python-bootstrap-script én een **Job** (`superset-init`) die python:3.11-slim gebruikt + `requests` pip-installeert. Het script:
   1. Wacht tot `/health` 200 OK retourneert.
   2. Logt in via `/api/v1/security/login` (Bearer-token + CSRF-token).
-  3. Registreert een Trino-database met SQLAlchemy URI `trino://smoketest:<pw>@uwv-trino-coordinator:8443/bronze?protocol=https&verify=false` (idempotent — checkt eerst bestaande).
+  3. Registreert een Trino-database met SQLAlchemy URI `trino://smoketest:<pw>@trino-coordinator:8443/bronze?protocol=https&verify=false` (idempotent — checkt eerst bestaande).
   4. Maakt 6 datasets aan voor UC-01/04/05/06 (×2)/07 (idempotent).
 - `platform/12-superset/dashboards/README.md` — workflow voor interactief-bouwen + export naar zip + commit, plus TODO voor declaratief programmatisch maken via Superset's chart-API.
 - `platform/12-superset/kustomization.yaml` — referenties supersetcluster + init-job.
 - `platform/12-superset/README.md` — OIDC-rolmapping uitgelegd, voorbehoud over single-database-connection (default-catalog `bronze`; `gold.*` via fully-qualified naam of aparte connection in fase 7+), validatie + productie-overwegingen.
-- `tests/smoke/06-superset-up.sh` — pod rollout, init-Job Complete, login → DB-list bevat `uwv-trino`, dataset-count ≥ 3.
+- `tests/smoke/06-superset-up.sh` — pod rollout, init-Job Complete, login → DB-list bevat `trino`, dataset-count ≥ 3.
 
 ### Verificatie (host, geen cluster)
 - 3 YAML-bestanden parsen.
@@ -320,22 +320,22 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 
 **Helm + namespaces**
 - `infrastructure/helm/opensearch/values.yaml` — single-node OpenSearch (master+ingest+data), security plugin uit (dev), `discovery.type=single-node`, 10Gi PVC. Gedeeld voor Vector logs én OM-search per gebruikerskeuze.
-- `scripts/bootstrap.sh` — drie nieuwe Helm-installs aan eind: OpenSearch (`opensearch-uwv` in `uwv-meta`), OpenMetadata (`openmetadata` in `uwv-meta`), Vector (`vector` in `uwv-monitoring`, Agent-mode). Repo's `opensearch`, `open-metadata`, `vector` toegevoegd. Versies pinned (OS 2.27.1, OM 1.5.0, Vector 0.36.1). Eind-message verwijst naar `metadata generate-token` voor JWT-bootstrap.
-- `platform/01-secrets/dev-secrets.yaml` — `openmetadata-admin` Secret (in `uwv-meta`) toegevoegd: adminEmail, adminPassword, jwtToken-placeholder.
+- `scripts/bootstrap.sh` — drie nieuwe Helm-installs aan eind: OpenSearch (`opensearch` in `odap-meta`), OpenMetadata (`openmetadata` in `odap-meta`), Vector (`vector` in `odap-monitoring`, Agent-mode). Repo's `opensearch`, `open-metadata`, `vector` toegevoegd. Versies pinned (OS 2.27.1, OM 1.5.0, Vector 0.36.1). Eind-message verwijst naar `metadata generate-token` voor JWT-bootstrap.
+- `platform/01-secrets/dev-secrets.yaml` — `openmetadata-admin` Secret (in `odap-meta`) toegevoegd: adminEmail, adminPassword, jwtToken-placeholder.
 
 **OM-config**
-- `platform/13-openmetadata-config/classifications-uwv.yaml` — **7 classifications met ~50 tags totaal**: PII (BSN/Naam/Adres/Geboortedatum/IBAN/Telefoon/Email/LH_Nummer/Sensitive), Health (Article9/Diagnose/VerzekeringsArts/Arbeidsdeskundige), Confidentiality (Public/Internal/Confidential/Secret — mutuallyExclusive), BIO (BIV-Hoog/Midden/Laag), LegalBasis (Art6_1c/1e + Art9_2h + Art5_1b), Doelbinding (12 tags incl. Uitkering/Reintegratie/Handhaving/Statistisch_Onderzoek), AI (Risk-Laag/Midden/Hoog/Verboden + HumanInTheLoop + Algoritmeregister-Geregistreerd).
+- `platform/13-openmetadata-config/classifications.yaml` — **7 classifications met ~50 tags totaal**: PII (BSN/Naam/Adres/Geboortedatum/IBAN/Telefoon/Email/LH_Nummer/Sensitive), Health (Article9/Diagnose/VerzekeringsArts/Arbeidsdeskundige), Confidentiality (Public/Internal/Confidential/Secret — mutuallyExclusive), BIO (BIV-Hoog/Midden/Laag), LegalBasis (Art6_1c/1e + Art9_2h + Art5_1b), Doelbinding (12 tags incl. Uitkering/Reintegratie/Handhaving/Statistisch_Onderzoek), AI (Risk-Laag/Midden/Hoog/Verboden + HumanInTheLoop + Algoritmeregister-Geregistreerd).
 - `platform/13-openmetadata-config/glossary-cgm.yaml` — **CGM-glossary met 22 termen**: Client, Persona, Aanvraag, Beoordeling, Beoordelaar, Capaciteit, Diagnose, Traject, Werkhervatting, Uitkomst, IKV, Werknemer, Werkgever, Dienstverband, Ontslag, Uitkering, Inkomen, Huishouden, Aggregaat, Contact, Kanaal, Doelgroepregister.
 - `platform/13-openmetadata-config/services/` — **6 service-configs** in OM workflow-YAML format (env-substitutie via `${VAR}`):
-  - `trino-service.yaml` (DatabaseMetadata, schema-filters voor alle UWV-catalogs)
+  - `trino-service.yaml` (DatabaseMetadata, schema-filters voor alle platform catalogs)
   - `trino-lineage.yaml` (DatabaseLineage, query-history 7 dagen)
   - `trino-profiler.yaml` (Profiler op silver, 30% sample voor scaled-down)
-  - `dbt-workflow.yaml` (S3-bron `s3://uwv-meta/dbt/latest/`)
+  - `dbt-workflow.yaml` (S3-bron `s3://odap-meta/dbt/latest/`)
   - `superset-service.yaml`
   - `airflow-service.yaml`
   - `kafka-service.yaml`
 - `platform/13-openmetadata-config/init-job.yaml` — ConfigMap `openmetadata-init-config` met Python-script dat (1) wacht op `/api/v1/system/version`, (2) classifications + tags POSTet (idempotent: 200/201/409/422 → ok), (3) glossary + terms POSTet. Job gebruikt python:3.11-slim + `requests + pyyaml`. Mount `/config` met de YAMLs.
-- `platform/13-openmetadata-config/kustomization.yaml` — `configMapGenerator` bouwt `openmetadata-uwv-config` ConfigMap uit alle YAMLs (classifications + glossary + 6 services). Init-Job mount die op `/config`.
+- `platform/13-openmetadata-config/kustomization.yaml` — `configMapGenerator` bouwt `openmetadata-platform-config` ConfigMap uit alle YAMLs (classifications + glossary + 6 services). Init-Job mount die op `/config`.
 - `platform/13-openmetadata-config/README.md` — uitgelegd hoe Job werkt + waar JWT vandaan komt + welke ingestion-runs door Airflow-DAGs worden getriggerd.
 
 **Airflow DAGs**
@@ -349,18 +349,18 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 ### Verificatie (host, geen cluster)
 - 12 YAML-bestanden parsen.
 - Init-script + 2 Airflow DAGs Python-syntax groen.
-- `kubectl kustomize platform/13-openmetadata-config` → 3 resources (1 Job + 2 ConfigMaps: init-script + uwv-config bundle).
+- `kubectl kustomize platform/13-openmetadata-config` → 3 resources (1 Job + 2 ConfigMaps: init-script + platform-config bundle).
 - `kubectl kustomize platform/11-airflow` → 2 resources met **6 DAG-files** in ConfigMap.
 - bash-syntax bootstrap.sh + smoke 07 groen.
 
 ### Beslissingen
-- **OpenSearch single-node** — past bij user-keuze (vraag 10): één gedeeld cluster voor logs én OM-search. Index-prefixen `uwv-logs-*` en `open_metadata*` scheiden de twee consumers. Productie: ≥3 master-eligible + dedicated data-tier.
+- **OpenSearch single-node** — past bij user-keuze (vraag 10): één gedeeld cluster voor logs én OM-search. Index-prefixen `logs-*` en `open_metadata*` scheiden de twee consumers. Productie: ≥3 master-eligible + dedicated data-tier.
 - **Init-Job via REST API** in plaats van OM CLI — REST is forgivability-friendlier (idempotent via 409/422-detectie); CLI is meer geschikt voor full-blown ingestion-runs (die de DAGs doen).
 - **Workflow-YAMLs ondersteunen `${VAR}` env-substitutie** — geen statische passwords/tokens in committed YAMLs. Airflow-DAGs doen `envsubst` voor de actual run.
 - **Trino-profiler op `silver`-schemas** — bronze is raw JSON, profiler levert geen waardevolle stats; gold is meestal aggregaten met geringe variatie. Silver is sweet-spot.
 - **Reverse-metadata** (OM tags → Trino kolommen → OPA) blijft fase 9 — nu alleen tags landen in OM, OPA-policies in fase 9 lezen ze (potentieel via Stackable's komende auto-bundle).
 - **JWT-token-bootstrap is een handmatige post-step** — `metadata generate-token` op de OM-pod, daarna in Secret patchen. Productie: External Secrets + Vault rotatie.
-- **Vector deploy in `uwv-monitoring`** met endpoint naar OpenSearch in `uwv-meta` — cross-namespace service-DNS werkt prima; geen NetworkPolicy issues in dev.
+- **Vector deploy in `odap-monitoring`** met endpoint naar OpenSearch in `odap-meta` — cross-namespace service-DNS werkt prima; geen NetworkPolicy issues in dev.
 
 ### Open / volgende sessie
 - Fase 9 — echte OPA-policies (zie sessie 10 hieronder).
@@ -372,11 +372,11 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 ### Gedaan
 
 **Source-of-truth**
-- `opa-policies-src/data/uwv_role_mappings.json` — top-level wrapper `{"uwv_role_mappings": {...}}` zodat zowel `opa test` (raw load → `data.uwv_role_mappings.*`) als productie-bundle dezelfde structuur hebben. Bevat: 12 rollen × `catalogs`/`schemas`/`purposes`/capability-flags (`can_see_pii`/`can_see_medical`/`can_see_bankrekening`/`regio_filter`/`break_glass`); 16 `resource_purposes`-mappings (van dbt `meta.doelbinding`); 10 `sensitive_columns` met PII/medical/bankrekening-flags.
+- `opa-policies-src/data/role_mappings.json` — top-level wrapper `{"role_mappings": {...}}` zodat zowel `opa test` (raw load → `data.role_mappings.*`) als productie-bundle dezelfde structuur hebben. Bevat: 12 rollen × `catalogs`/`schemas`/`purposes`/capability-flags (`can_see_pii`/`can_see_medical`/`can_see_bankrekening`/`regio_filter`/`break_glass`); 16 `resource_purposes`-mappings (van dbt `meta.doelbinding`); 10 `sensitive_columns` met PII/medical/bankrekening-flags.
 
 **Vijf Rego-policies** in `opa-policies-src/trino/`
 - `trino-base.rego` — `default allow := false`, `default rowFilters := []`, `default columnMask := {}`. Helpers: `authenticated`, `user_roles` (met smoketest-fallback), `user_purpose` (uit extraCredentials.purpose), operation-classifiers (`is_read_op`/`is_meta_op`/`is_write_op`). Top-level allow-rules combineren role-check + doelbinding-check.
-- `trino-uwv-roles.rego` — `role_allows_resource` met **twee paden**: (1) `schemas == null` → catalog-only, (2) `schemas != null` → catalog + schema-membership. Helpers `role_has_capability` + `any_role_has_capability` voor capability-driven masks.
+- `trino-platform-roles.rego` — `role_allows_resource` met **twee paden**: (1) `schemas == null` → catalog-only, (2) `schemas != null` → catalog + schema-membership. Helpers `role_has_capability` + `any_role_has_capability` voor capability-driven masks.
 - `trino-doelbinding.rego` — `purpose_allows_resource` (R-AVG-06). Wildcard-resolver matcht `<catalog>.<schema>.<table>` of `<catalog>.<schema>.*`. `user_allowed_purposes` is union over rollen. `*` wildcard voor platform_admin.
 - `trino-row-filters.rego` — WIA regio-filter `regio_code = '<UPPER>'` met regex-injection-validatie (`^[a-z]{3}$`); UC-04 opt-out filter; sandbox `bsn_pseudo IS NOT NULL`.
 - `trino-column-masks.rego` — BSN-mask `concat('XXXXX', substr(bsn, 6, 4))` voor crm_medewerker; BSN-hard-mask voor rollen zonder `can_see_pii`; IBAN/bankrekening masked voor rollen zonder `can_see_bankrekening`; diagnose/icd10 → NULL voor rollen zonder `can_see_medical`; geboortedatum bucket-per-jaar voor data_steward.
@@ -386,13 +386,13 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `trino-doelbinding_test.rego` — DoD-check `test_uc05_denied_without_purpose` + 4 anderen.
 - `trino-column-masks_test.rego` — DoD-check `test_bsn_masked_for_crm_medewerker` + 5 anderen (IBAN, diagnose, etc.).
 - `trino-row-filters_test.rego` — regio-filter, geen filter voor data_steward, opt-out, regex-injection-defense.
-- `trino-uwv-roles_test.rego` — 5 role-resource-tests.
+- `trino-platform-roles_test.rego` — 5 role-resource-tests.
 
 **Build-pipeline**
 - `scripts/build-opa-bundle.sh` — `opa fmt --diff` + `opa test` + sync `*.rego` (excl. `_test.rego`) + render `data.json` (strip `_`-prefixed keys).
 - `Makefile` — nieuwe targets `opa-test` + `opa-bundle`.
 - `opa-policies-src/Makefile` — convenience-target `make -C opa-policies-src test`.
-- `platform/10-opa/kustomization.yaml` — `configMapGenerator` met **6 files** (5 rego + data.json), label `uwv.nl/policy-tier: production` (vervangt fase-3 allow-all base).
+- `platform/10-opa/kustomization.yaml` — `configMapGenerator` met **6 files** (5 rego + data.json), label `odap.io/policy-tier: production` (vervangt fase-3 allow-all base).
 
 **Smoke + compliance**
 - `tests/smoke/08-opa-decisions.sh` — 6 OPA-decision-checks: anonymous deny, crm_medewerker+klantcontact allow, **data_steward zonder purpose op uc05 → deny (DoD R-AVG-06)**, **crm_medewerker+bsn → masking-expr (DoD R-AVG-07)**, wia_beoordelaar+regio_AMS → row-filter, crm_medewerker+diagnose → NULL.
@@ -405,7 +405,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - bash-syntax build-opa-bundle.sh + smoke 08: groen.
 
 ### Beslissingen
-- **Data-source onder `uwv_role_mappings`-key wrappen** in source JSON — zo werken `opa test` (raw-JSON-load → `data.uwv_role_mappings.*`) en productie-bundle dezelfde structuur, geen dubbele wrapper.
+- **Data-source onder `role_mappings`-key wrappen** in source JSON — zo werken `opa test` (raw-JSON-load → `data.role_mappings.*`) en productie-bundle dezelfde structuur, geen dubbele wrapper.
 - **Twee `role_allows_resource`-paden** (`schemas == null` voor catalog-wide, `schemas != null AND schema in schemas`) — voorkomt dat de catalog-only-pad als bypass werkt.
 - **Capability-flags op rol-niveau** in JSON in plaats van rol-specifieke mask-rules in Rego — schaalt beter; nieuwe rol = entry in JSON, geen rego-wijziging.
 - **Regex-validatie van `regio`-input** voorkomt SQL-injection via `extraCredentials`-header. Regio moet `^[a-z]{3}$` matchen.
@@ -432,11 +432,11 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 **Compliance-mapping** (`docs/compliance-mapping.md` sweep)
 - Alle ~75 requirements bijgewerkt met concrete file-paths + ADR-links waar relevant. Voorbeelden:
   - R-NORA-04 → `platform-config.yaml::table_format` + ADR-0002
-  - R-NORA-08 → `infrastructure/helm/keycloak/realm-uwv.json` + `AuthenticationClass keycloak-uwv`
+  - R-NORA-08 → `infrastructure/helm/keycloak/realm.json` + `AuthenticationClass keycloak`
   - R-AVG-15 → `infrastructure/helm/vector/values.yaml` + runbook §4
   - R-BIO-23 → runbook §5 (MinIO mirror + pg_dumpall + Keycloak realm-export)
   - R-NIS2-03 → cosign verify + Stackable SBOM in `ci/github-actions/security-scan.yml`
-  - R-FUN-10 → `classifications-uwv.yaml::AI.Risk-{Laag/Midden/Hoog/Verboden}`
+  - R-FUN-10 → `classifications.yaml::AI.Risk-{Laag/Midden/Hoog/Verboden}`
   - R-COMP-04 → DPIA-placeholders in UC-02/UC-04/UC-09
 - "TBD"-flags blijven alleen op out-of-scope items (productie-secret-rotatie, MFA-WebAuthn, NetworkPolicies).
 
@@ -499,7 +499,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - **Geen `make compliance-evidence` script** — zou een aparte fase 11 verdienen; runbook §10 documenteert handmatige stappen.
 
 ### Project klaar
-**Het UWV Reference Data Platform is in 10 sessies (≈ 1 dag werk gespreid) compleet opgeleverd.** Volledig host-validateerbaar; cluster-uitvoering vereist Docker Desktop met 8 GB RAM + 4 CPU. Productie-deployment vereist verzwaringen die per component in de README zijn gedocumenteerd.
+**Het Open Data & Analytics Platform is in 10 sessies (≈ 1 dag werk gespreid) compleet opgeleverd.** Volledig host-validateerbaar; cluster-uitvoering vereist Docker Desktop met 8 GB RAM + 4 CPU. Productie-deployment vereist verzwaringen die per component in de README zijn gedocumenteerd.
 
 ---
 
@@ -512,9 +512,9 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 ### Quick-wins toegepast (15/15)
 
 **Monitoring suite** (`platform/14-monitoring/` — nieuw):
-- #1 `prometheusrule-uwv.yaml` — alerts op Trino p99-latency, OPA deny-rate, Spark streaming-lag, Postgres-disk, namespace-quota, KubePodNotReady.
+- #1 `prometheusrule.yaml` — alerts op Trino p99-latency, OPA deny-rate, Spark streaming-lag, Postgres-disk, namespace-quota, KubePodNotReady.
 - #5 `alertmanager-config.yaml` — Slack-receiver (warning) + PagerDuty (critical) + inhibit-rules; webhooks via Secret `alertmanager-receivers`.
-- #3 `pdb-uwv.yaml` — PodDisruptionBudgets voor 8 workloads (Trino-coord/worker, Kafka, ZK, Hive, OPA, Postgres, OpenSearch).
+- #3 `pdb.yaml` — PodDisruptionBudgets voor 8 workloads (Trino-coord/worker, Kafka, ZK, Hive, OPA, Postgres, OpenSearch).
 - #3 `hpa-trino.yaml` — HorizontalPodAutoscaler op Trino-workers (1-3 replicas, 70% CPU / 80% mem-target).
 - #15 `opensearch-ilm-job.yaml` — twee ILM-policies: app-logs 30d delete, audit-logs 7 jaar (R-BIO-20). Idempotente Job die ze toepast via OS REST API.
 
@@ -525,13 +525,13 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - #2 `platform/06-kafka/kafkatopics-job.yaml` — ConfigMap met 14 topics (incl. DLQ + audit), Bitnami Kafka-image-Job die ze idempotent creëert. KafkaCluster-config: `auto.create.topics.enable=false`.
 
 **Identity hardening**:
-- #6 Realm-uwv.json uitgebreid met `passwordPolicy: length(12) and digits(1) and upperCase(1) and specialChars(1) and notUsername and passwordHistory(5)`, sessie-timeouts (1u idle, 8u max), TOTP-policy + `requiredActions: ["CONFIGURE_TOTP"]` op `platform.admin`, `data.engineer`, `wajong.arbeidsdeskundige`.
+- #6 Realm odap.json uitgebreid met `passwordPolicy: length(12) and digits(1) and upperCase(1) and specialChars(1) and notUsername and passwordHistory(5)`, sessie-timeouts (1u idle, 8u max), TOTP-policy + `requiredActions: ["CONFIGURE_TOTP"]` op `platform.admin`, `data.engineer`, `wajong.arbeidsdeskundige`.
 
 **Pseudonymize-macro daadwerkelijk gebruikt**:
 - #7 `dbt/models/intermediate/int_persona_pseudonymized.sql` — pseudo-identifier helper. `dbt/models/marts/uc09_reint_effect/mart_uc09_effect_panel.sql` — sandbox-panel met **alleen** `bsn_pseudo`, geen ruwe BSN. Vult ook gap #1.1 (UC-09 mart leeg).
 
 **Audit-log-routering**:
-- #12 `platform/10-opa/opacluster.yaml` configOverride `decision_logs.console: true`. Vector `route_audit_logs` transform splitst OPA-decisions + Trino-queryId-logs naar `uwv-logs-audit-*` index met 7-jaar-retentie.
+- #12 `platform/10-opa/opacluster.yaml` configOverride `decision_logs.console: true`. Vector `route_audit_logs` transform splitst OPA-decisions + Trino-queryId-logs naar `logs-audit-*` index met 7-jaar-retentie.
 
 **Bewaartermijn-enforcement (R-AVG-08)**:
 - #9 `platform/11-airflow/dags/bewaartermijn_enforcer.py` — daily DAG met TrinoOperator per tabel; bewaartermijnen uit dbt schema.yml `meta.bewaartermijn_jaren`. Dry-run-modus voor publiek-publiceerbare data.

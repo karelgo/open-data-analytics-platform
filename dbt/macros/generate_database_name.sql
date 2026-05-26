@@ -3,7 +3,7 @@
    - trino: gebruik letterlijk `+database:` waarde uit het project
      (bv. `silver`, `gold` — Trino-catalogs).
    - databricks: Unity Catalog heeft één catalog per workspace-binding
-     (bv. `uwv_databricks`). Negeer `+database:` uit dbt_project.yml
+     (bv. `databricks`). Negeer `+database:` uit dbt_project.yml
      (dat is een Trino-catalog-naam) en gebruik altijd `target.database`
      zodat alle layers in dezelfde UC catalog landen.
    - fabricspark: het Lakehouse heeft één database (= lakehouse-naam).

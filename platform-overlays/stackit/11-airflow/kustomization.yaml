@@ -1,11 +1,11 @@
 # StackIT SKE overlay for platform/11-airflow.
-# Platform-level ingress on airflow.uwv-platform.local stays put for
+# Platform-level ingress on airflow.odap.local stays put for
 # in-cluster routing; public AKS ingress is `airflow-public` in
 # infrastructure/stackit/public-ingresses.yaml.
 #
 # This overlay only flips AirflowCluster's BASE_URL so Flask's OAuth
 # redirect_uri (and X-Forwarded-Host proxy_fix) builds URLs that match
-# what the browser sees on https://airflow.freshstackable.com.
+# what the browser sees on https://airflow.example.com.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
@@ -15,4 +15,4 @@ patches:
     target:
       group: airflow.stackable.tech
       kind: AirflowCluster
-      name: uwv-airflow
+      name: airflow

@@ -35,8 +35,8 @@ wachtwoord wijzigen.
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Cliënt-360-dashboard, contact-trends | https://superset.uwv-platform.local |
-| **OpenMetadata** | Begrippen opzoeken | https://openmetadata.uwv-platform.local |
+| **Apache Superset** | Cliënt-360-dashboard, contact-trends | https://superset.odap.local |
+| **OpenMetadata** | Begrippen opzoeken | https://openmetadata.odap.local |
 
 Voor productie: meestal werk je vanuit een **Werkmap-frontend** die UC-05
 via Trino REST API consumeert. Het platform is dan onzichtbaar; deze
@@ -130,7 +130,7 @@ In Superset → dashboard "CRM Trends" → filteren op je team → exporteer als
 
 Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
-1. Wat **jij** ziet in het 360°-beeld (= een **deel** van het volledige UWV-beeld)
+1. Wat **jij** ziet in het 360°-beeld (= een **deel** van het volledige platform image)
 2. Verwijs voor volledige inzage naar het AVG-inzageformulier (out-of-platform proces)
 3. Geef nooit een uitprint van het scherm — laat zien op het scherm en lees voor
 

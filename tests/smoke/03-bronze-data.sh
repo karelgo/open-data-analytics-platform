@@ -8,9 +8,9 @@
 #   3. SparkApplication heeft minimaal één micro-batch verwerkt.
 set -euo pipefail
 
-NS="${NS:-uwv-platform}"
+NS="${NS:-odap-platform}"
 SMOKE_USER="${SMOKE_USER:-smoketest}"
-SMOKE_PASSWORD="${SMOKE_PASSWORD:-uwv-dev-only-CHANGE-ME-Smoke2026}"
+SMOKE_PASSWORD="${SMOKE_PASSWORD:-odap-dev-only-CHANGE-ME-Smoke2026}"
 EXPECTED_COUNT="${EXPECTED_COUNT:-10000}"
 
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
@@ -44,7 +44,7 @@ esac
 log "Hive Metastore: bronze.uwv schema"
 TRINO_HELPER="$(dirname "$0")/_trino_query.py"
 trino_exec() {
-  kubectl -n "$NS" exec -i statefulset/uwv-trino-coordinator-default -c trino -- \
+  kubectl -n "$NS" exec -i statefulset/trino-coordinator-default -c trino -- \
     env TRINO_USER="$SMOKE_USER" TRINO_SERVER="https://localhost:8443" \
     python3 - "$1" <"$TRINO_HELPER"
 }

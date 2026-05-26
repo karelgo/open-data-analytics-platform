@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1e |
 | Bewaartermijn | 7 jaar |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-03](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-03](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 
@@ -78,7 +78,7 @@ meta:
   pii_kolommen: [bsn]
   risk_tier: hoog
   human_in_the_loop: true
-  algoritmeregister_id: UWV-WW-VERWIJTBAARHEID-001  # placeholder
+  algoritmeregister_id: ODAP-CLAIMS-ATTRIBUTION-001  # placeholder
 ```
 
 ## OPA-policies
@@ -90,7 +90,7 @@ meta:
 
 ## OpenMetadata
 
-- Tags: `Domain.WW`, `AI.Risk.Hoog`, `Doelbinding.handhaving`, `Algoritmeregister.UWV-WW-VERWIJTBAARHEID-001`.
+- Tags: `Domain.WW`, `AI.Risk.Hoog`, `Doelbinding.handhaving`, `Algoritmeregister.ODAP-CLAIMS-ATTRIBUTION-001`.
 - Custom property `champion_challenger`: link naar A/B-experiment-id.
 - Lineage: bronze → silver → mart → (latere: model-feature → score → behandeling → besluit).
 

@@ -4,24 +4,24 @@
 Draait in een KubernetesPodOperator (zie csv_ingest_factory.py).
 
 Stappen:
-  1. Lees source-YAML uit /opt/uwv/airflow/sources/<name>.yml
+  1. Lees source-YAML uit /opt/odap/airflow/sources/<name>.yml
   2. Download CSV uit s3://<staging_bucket>/<object_key>
   3. Valideer schema + cast types via pyarrow
   4. Voeg metadata-kolommen toe (ingestion_ts, source_file, event_date)
-  5. Schrijf Delta naar s3://uwv-bronze/uwv/<table>/ (append, partitioned by event_date)
+  5. Schrijf Delta naar s3://odap-bronze/uwv/<table>/ (append, partitioned by event_date)
   6. Registreer Delta-tabel in Hive Metastore via Trino `system.register_table`
      (idempotent — eerste run maakt entry, volgende runs no-op)
   7. Verplaats CSV naar processed/ prefix
 
 Vereiste env-vars (gezet door csv_ingest_factory):
-  UWV_SOURCE_NAME       — naam van de bron (matcht <name>.yml)
-  UWV_OBJECT_KEY        — s3-key binnen staging-bucket (uit dag_run.conf)
-  S3_ENDPOINT           — bv. http://minio.uwv-platform.svc.cluster.local:9000
+  SOURCE_NAME       — naam van de bron (matcht <name>.yml)
+  OBJECT_KEY        — s3-key binnen staging-bucket (uit dag_run.conf)
+  S3_ENDPOINT           — bv. http://minio.odap-platform.svc.cluster.local:9000
   S3_ACCESS_KEY / S3_SECRET_KEY
   TRINO_HOST / TRINO_PORT / TRINO_USER / TRINO_PASSWORD
-  UWV_SOURCES_DIR       — default /opt/uwv/airflow/sources
+  SOURCES_DIR       — default /opt/odap/airflow/sources
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 from __future__ import annotations
 
@@ -44,22 +44,22 @@ from trino.dbapi import connect as trino_connect
 # ---------------------------------------------------------------------------
 # Config — uit env, geen defaults voor secrets.
 # ---------------------------------------------------------------------------
-SOURCE_NAME = os.environ["UWV_SOURCE_NAME"]
-OBJECT_KEY = os.environ["UWV_OBJECT_KEY"]
-SOURCES_DIR = Path(os.environ.get("UWV_SOURCES_DIR", "/opt/uwv/airflow/sources"))
+SOURCE_NAME = os.environ["SOURCE_NAME"]
+OBJECT_KEY = os.environ["OBJECT_KEY"]
+SOURCES_DIR = Path(os.environ.get("SOURCES_DIR", "/opt/odap/airflow/sources"))
 
 S3_ENDPOINT = os.environ["S3_ENDPOINT"]
 S3_ACCESS_KEY = os.environ["S3_ACCESS_KEY"]
 S3_SECRET_KEY = os.environ["S3_SECRET_KEY"]
 S3_REGION = os.environ.get("S3_REGION", "eu-nl-1")
-BRONZE_BUCKET = os.environ.get("UWV_BRONZE_BUCKET", "uwv-bronze")
+BRONZE_BUCKET = os.environ.get("BRONZE_BUCKET", "odap-bronze")
 
 TRINO_HOST = os.environ["TRINO_HOST"]
 TRINO_PORT = int(os.environ.get("TRINO_PORT", "8443"))
 TRINO_USER = os.environ["TRINO_USER"]
 TRINO_PASSWORD = os.environ.get("TRINO_PASSWORD") or None
 TRINO_HTTP_SCHEME = os.environ.get("TRINO_HTTP_SCHEME", "https")
-TRINO_VERIFY = os.environ.get("TRINO_VERIFY", "/etc/uwv-ca/ca.crt")
+TRINO_VERIFY = os.environ.get("TRINO_VERIFY", "/etc/platform-ca/ca.crt")
 
 
 # ---------------------------------------------------------------------------
@@ -233,7 +233,7 @@ def add_metadata_columns(table: pa.Table, source_file: str,
 
 
 def write_to_bronze(table: pa.Table, bronze_table: str, partition_col: str) -> tuple[str, str]:
-    """Append naar Delta. Pad: s3://uwv-bronze/uwv/<table>/.
+    """Append naar Delta. Pad: s3://odap-bronze/uwv/<table>/.
 
     Returns (write_location_s3, register_location_s3a). De S3-bucket is
     fysiek hetzelfde — alleen de URL-scheme verschilt tussen deltalake-rs
@@ -269,7 +269,7 @@ def ensure_trino_table(spec: dict, location: str) -> None:
     fqn = f"{bronze['catalog']}.{bronze['schema']}.{bronze['table']}"
     log(f"register tabel in Trino: {fqn}")
 
-    # Geen BasicAuth — de UWV-cluster heeft `authentication: []`, dus Trino
+    # Geen BasicAuth — de platform cluster heeft `authentication: []`, dus Trino
     # weigert password-auth ("Password not allowed for insecure authentication"
     # i.c.m. http-server.process-forwarded=true). Alleen X-Trino-User header
     # werkt; OPA doet authz. Zie ook dbt/profiles.yml.template (method=none).

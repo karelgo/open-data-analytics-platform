@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-time host setup for the cluster Multica:
-#   1. Add multica.uwv-platform.local to /etc/hosts (so DNS resolves)
+#   1. Add multica.odap.local to /etc/hosts (so DNS resolves)
 #   2. Trust the cluster CA in macOS Keychain (so TLS validation passes)
 #
 # Run from repo root with sudo; idempotent (skips entries that already exist).
@@ -16,9 +16,9 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-HOSTS_LINE="127.0.0.1 multica.uwv-platform.local"
-if grep -qE "^[^#]*multica\.uwv-platform\.local" /etc/hosts; then
-  echo "/etc/hosts already has multica.uwv-platform.local — skipping."
+HOSTS_LINE="127.0.0.1 multica.odap.local"
+if grep -qE "^[^#]*multica\.odap-platform\.local" /etc/hosts; then
+  echo "/etc/hosts already has multica.odap.local — skipping."
 else
   echo "$HOSTS_LINE" >> /etc/hosts
   echo "Added to /etc/hosts: $HOSTS_LINE"
@@ -30,8 +30,8 @@ KUBE_USER="${SUDO_USER:-$USER}"
 KUBE_HOME=$(eval echo "~$KUBE_USER")
 export KUBECONFIG="${KUBECONFIG:-$KUBE_HOME/.kube/config}"
 
-CA_FILE=/tmp/uwv-platform-ca.crt
-sudo -u "$KUBE_USER" kubectl -n uwv-platform get secret multica-tls \
+CA_FILE=/tmp/odap-platform-ca.crt
+sudo -u "$KUBE_USER" kubectl -n odap-platform get secret multica-tls \
   -o jsonpath='{.data.ca\.crt}' 2>/dev/null \
   | base64 -d > "$CA_FILE"
 if [ ! -s "$CA_FILE" ]; then
@@ -53,4 +53,4 @@ else
 fi
 
 rm -f "$CA_FILE"
-echo "Done. multica.uwv-platform.local is now reachable with valid TLS."
+echo "Done. multica.odap.local is now reachable with valid TLS."

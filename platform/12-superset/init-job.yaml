@@ -11,10 +11,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: superset-init-script
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   init_superset.py: |
-    """Bootstrap Superset met UWV-defaults.
+    """Bootstrap Superset met platform defaults.
 
     Volgorde:
       1. Wacht tot Superset webserver health-endpoint OK.
@@ -32,11 +32,11 @@ data:
 
     SUPERSET_URL = os.environ.get(
         "SUPERSET_URL",
-        "http://uwv-superset-node:8088",
+        "http://superset-node:8088",
     )
     ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
     ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
-    TRINO_HOST = os.environ.get("TRINO_HOST", "uwv-trino-coordinator.uwv-platform.svc.cluster.local")
+    TRINO_HOST = os.environ.get("TRINO_HOST", "trino-coordinator.odap-platform.svc.cluster.local")
     # Hardcoded — Kubernetes injecteert auto-env TRINO_PORT=tcp://IP:PORT bij
     # dezelfde-naam service (collision met onze env-var); ignore en hardcode.
     TRINO_PORT = "8443"
@@ -100,8 +100,8 @@ data:
         # SQLAlchemy URI — Trino zonder password (smoketest via X-Trino-User).
         # Trino's password-authenticator weigert basic-auth bij niet-direct-TLS,
         # `method=none` werkt wel (dezelfde aanpak als dbt-trino profiles.yml).
-        # Cert-validation: REQUESTS_CA_BUNDLE wijst naar /etc/uwv-ca/ca.crt
-        # die zowel de uwv-platform-issuer als de Stackable secret-operator-CA
+        # Cert-validation: REQUESTS_CA_BUNDLE wijst naar /etc/platform-ca/ca.crt
+        # die zowel de platform-issuer als de Stackable secret-operator-CA
         # bevat (zie scripts/bootstrap.sh sectie 8). Geen verify=False nodig.
         uri = f"trino://{TRINO_USER}@{TRINO_HOST}:8443/{catalog}"
         body = {
@@ -173,7 +173,7 @@ data:
         # 2. Catalog uit URI parsen: trino://user@host:port/<catalog>
         # We hebben deze info nodig om Trino direct aan te spreken.
         # Voor de ingebouwde Stackable-setup: dataset.database.database_name
-        # is bijv. "uwv-trino-gold" → catalog = "gold".
+        # is bijv. "trino-gold" → catalog = "gold".
         db_name = db_info.get("database_name", "")
         catalog = db_name.split("-")[-1] if "-" in db_name else "gold"
 
@@ -271,9 +271,9 @@ data:
         # Per Trino-catalog 1 Superset-database. Voor BI dashboards is gold
         # de hoofdcatalog (mart-tabellen), maar SQL Lab heeft baat bij
         # bronze + silver erbij voor exploratie/lineage-checks.
-        bronze_id = ensure_trino_database(s, "uwv-trino-bronze", "bronze")
-        silver_id = ensure_trino_database(s, "uwv-trino-silver", "silver")
-        gold_id = ensure_trino_database(s, "uwv-trino-gold", "gold")
+        bronze_id = ensure_trino_database(s, "trino-bronze", "bronze")
+        silver_id = ensure_trino_database(s, "trino-silver", "silver")
+        gold_id = ensure_trino_database(s, "trino-gold", "gold")
 
         # Datasets — gold.uc0x_*.mart_uc0x_* (UC-mart-tabellen voor BI).
         # Naam komt uit dbt-modellen in dbt/models/marts/uc0x_*.
@@ -574,17 +574,17 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: superset-init
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    uwv.nl/component: superset-init
-    uwv.nl/dev-only: "true"
+    odap.io/component: superset-init
+    odap.io/dev-only: "true"
 spec:
   ttlSecondsAfterFinished: 3600
   backoffLimit: 2
   template:
     metadata:
       labels:
-        uwv.nl/component: superset-init
+        odap.io/component: superset-init
     spec:
       restartPolicy: OnFailure
       containers:
@@ -597,7 +597,7 @@ spec:
               python /scripts/init_superset.py
           env:
             - name: SUPERSET_URL
-              value: "http://uwv-superset-node:8088"
+              value: "http://superset-node:8088"
             - name: ADMIN_USER
               valueFrom:
                 secretKeyRef:
@@ -609,7 +609,7 @@ spec:
                   name: superset-postgres-credentials
                   key: adminUser.password
             - name: TRINO_HOST
-              value: "uwv-trino-coordinator.uwv-platform.svc.cluster.local"
+              value: "trino-coordinator.odap-platform.svc.cluster.local"
             - name: TRINO_USER
               value: "smoketest"
             - name: TRINO_PASSWORD

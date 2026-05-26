@@ -3,7 +3,7 @@
 # Cosmos `LoadMode.DBT_MANIFEST` heeft een vóór-gerenderd `manifest.json`
 # nodig om DAGs te parsen zonder Trino-connectie. Deze Job runt `dbt parse`
 # en zet de output in ConfigMap `dbt-manifest`. De Airflow scheduler mount
-# die ConfigMap onder /opt/uwv/dbt/manifest.json.
+# die ConfigMap onder /opt/odap/dbt/manifest.json.
 #
 # Trigger:
 #   - Eenmalig na bootstrap (handmatig: `kubectl apply -f`)
@@ -12,19 +12,19 @@
 #
 # Productie: in CI als post-merge-hook op main.
 #
-# SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: dbt-manifest-renderer
-  namespace: uwv-platform
+  namespace: odap-platform
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: dbt-manifest-cm-writer
-  namespace: uwv-platform
+  namespace: odap-platform
 rules:
   - apiGroups: [""]
     resources: ["configmaps"]
@@ -37,11 +37,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: dbt-manifest-cm-writer
-  namespace: uwv-platform
+  namespace: odap-platform
 subjects:
   - kind: ServiceAccount
     name: dbt-manifest-renderer
-    namespace: uwv-platform
+    namespace: odap-platform
 roleRef:
   kind: Role
   name: dbt-manifest-cm-writer
@@ -51,16 +51,16 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: dbt-manifest-render
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    uwv.nl/component: airflow-cosmos
+    odap.io/component: airflow-cosmos
 spec:
   ttlSecondsAfterFinished: 3600
   backoffLimit: 1
   template:
     metadata:
       labels:
-        uwv.nl/component: airflow-cosmos
+        odap.io/component: airflow-cosmos
     spec:
       restartPolicy: Never
       serviceAccountName: dbt-manifest-renderer
@@ -71,7 +71,7 @@ spec:
             - name: GITSYNC_REPO
               valueFrom:
                 configMapKeyRef:
-                  name: uwv-repo-url
+                  name: odap-repo-url
                   key: url
                   optional: true
             - name: GITSYNC_REF
@@ -134,7 +134,7 @@ spec:
             # Trino-conn-vars zijn nodig voor profile-render maar niet voor parse.
             # Geef placeholders zodat dbt parse niet faalt op missing var.
             - name: TRINO_HOST
-              value: uwv-trino-coordinator.uwv-platform.svc.cluster.local
+              value: trino-coordinator.odap-platform.svc.cluster.local
             - name: TRINO_PORT
               value: "8443"
             - name: TRINO_USER
@@ -168,7 +168,7 @@ spec:
               # container `manifest-decompress` packt het ter plekke uit.
               gzip -c /artifacts/manifest.json > /tmp/manifest.json.gz
               ls -lh /tmp/manifest.json.gz /artifacts/dbt-project.tar.gz
-              kubectl -n uwv-platform create configmap dbt-manifest \
+              kubectl -n odap-platform create configmap dbt-manifest \
                 --from-file=dbt-project.tar.gz=/artifacts/dbt-project.tar.gz \
                 --from-file=manifest.json.gz=/tmp/manifest.json.gz \
                 --dry-run=client -o yaml | kubectl apply -f -
@@ -179,7 +179,7 @@ spec:
               readOnly: true
         - name: minio-uploader
           # Pusht manifest.json + (optioneel) catalog.json/run_results.json
-          # naar s3://uwv-meta/dbt/latest/. OpenMetadata's dbt-workflow
+          # naar s3://odap-meta/dbt/latest/. OpenMetadata's dbt-workflow
           # (zie platform/13-openmetadata-config/services/dbt-workflow.yaml)
           # leest deze bestanden en bouwt model→table lineage.
           image: python:3.11-slim
@@ -233,7 +233,7 @@ spec:
               secure = os.environ["MINIO_ENDPOINT"].startswith("https://")
               mc = Minio(endpoint, os.environ["MINIO_ACCESS"], os.environ["MINIO_SECRET"],
                        secure=secure, cert_check=False)
-              mc.fput_object("uwv-meta", "dbt/latest/manifest.json", "/tmp/manifest.json")
+              mc.fput_object("odap-meta", "dbt/latest/manifest.json", "/tmp/manifest.json")
               print("uploaded dbt/latest/manifest.json (patched)")
               # catalog.json + run_results.json hebben dezelfde V12 strict-issue
               # (extra timestamps). Skippen vanaf OM 1.5 — dbt-lineage werkt ook
@@ -241,7 +241,7 @@ spec:
               EOF
           env:
             - name: MINIO_ENDPOINT
-              value: "https://minio.uwv-platform.svc.cluster.local:9000"
+              value: "https://minio.odap-platform.svc.cluster.local:9000"
             - name: MINIO_ACCESS
               valueFrom:
                 secretKeyRef:

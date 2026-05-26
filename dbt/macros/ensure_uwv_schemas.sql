@@ -1,7 +1,7 @@
-{# Target-aware schema-bootstrap voor het UWV-platform.
+{# Target-aware schema-bootstrap voor het ODAP platform.
 
    Gebruik (in dbt_project.yml):
-     on-run-start: "{{ ensure_uwv_schemas() }}"
+     on-run-start: "{{ ensure_schemas() }}"
 
    Per target:
    - trino    → CREATE SCHEMA ... WITH (location = 's3a://uwv-<laag>/<naam>/')
@@ -16,7 +16,7 @@
    - default → no-op + waarschuwing, zodat onbekende targets niet stilletjes
                schema-creatie missen.
 #}
-{% macro ensure_uwv_schemas() %}
+{% macro ensure_schemas() %}
     {%- set silver_schemas = [
         'persoon', 'polisadm', 'ww', 'wia', 'wajong', 'zw', 'crm',
         'fez', 'klantcontact', 'finops', 'intermediate', 'sandbox_uc09', 'seed'
@@ -33,23 +33,23 @@
             {%- for s in silver_schemas -%}
                 {%- do run_query(
                     "CREATE SCHEMA IF NOT EXISTS silver." ~ s ~
-                    " WITH (location = 's3a://uwv-silver/" ~ s ~ "/')"
+                    " WITH (location = 's3a://odap-silver/" ~ s ~ "/')"
                 ) -%}
             {%- endfor -%}
             {%- for g in gold_schemas -%}
                 {%- do run_query(
                     "CREATE SCHEMA IF NOT EXISTS gold." ~ g ~
-                    " WITH (location = 's3a://uwv-gold/" ~ g ~ "/')"
+                    " WITH (location = 's3a://odap-gold/" ~ g ~ "/')"
                 ) -%}
             {%- endfor -%}
         {%- endif -%}
-        SELECT 1 AS uwv_schemas_ensured_trino
+        SELECT 1 AS schemas_ensured_trino
     {%- elif target.type == 'databricks' -%}
-        SELECT 1 AS uwv_schemas_skipped_databricks_managed_by_uc
+        SELECT 1 AS schemas_skipped_databricks_managed_by_uc
     {%- elif target.type in ('fabric', 'fabricspark') -%}
-        SELECT 1 AS uwv_schemas_skipped_fabric_managed_by_airflow
+        SELECT 1 AS schemas_skipped_fabric_managed_by_airflow
     {%- else -%}
-        {{ log("WARN: ensure_uwv_schemas() — onbekende target.type='" ~ target.type ~ "'; schema-creatie overgeslagen", info=true) }}
-        SELECT 1 AS uwv_schemas_skipped_unknown_target
+        {{ log("WARN: ensure_schemas() — onbekende target.type='" ~ target.type ~ "'; schema-creatie overgeslagen", info=true) }}
+        SELECT 1 AS schemas_skipped_unknown_target
     {%- endif -%}
 {% endmacro %}

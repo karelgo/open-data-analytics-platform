@@ -7,18 +7,18 @@
 #
 # Image hergebruikt openmetadata/ingestion:1.5.7 (Python + requests).
 # Bitnami Keycloak chart bootstrappet admin onder USERNAME `kcadmin`
-# (verifieer met `kubectl -n uwv-auth exec sts/keycloak -- env | grep ADMIN`).
-# Het admin-password secret zit in NS `uwv-auth` als `keycloak` →
-# `admin-password`; bootstrap spiegelt het naar uwv-meta als
+# (verifieer met `kubectl -n odap-auth exec sts/keycloak -- env | grep ADMIN`).
+# Het admin-password secret zit in NS `odap-auth` als `keycloak` →
+# `admin-password`; bootstrap spiegelt het naar odap-meta als
 # `keycloak-admin-secret` zodat de CronJob het kan lezen.
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: keycloak-om-user-sync
-  namespace: uwv-meta
+  namespace: odap-meta
   labels:
-    uwv.nl/component: keycloak-om-sync
+    odap.io/component: keycloak-om-sync
 spec:
   schedule: "30 3 * * *"      # 03:30 UTC daily — low-traffic window
   concurrencyPolicy: Forbid
@@ -31,7 +31,7 @@ spec:
       template:
         metadata:
           labels:
-            uwv.nl/component: keycloak-om-sync
+            odap.io/component: keycloak-om-sync
         spec:
           restartPolicy: OnFailure
           containers:
@@ -42,17 +42,17 @@ spec:
                 - "python /config/keycloak_user_sync.py"
               env:
                 - name: OM_URL
-                  value: "http://openmetadata.uwv-meta.svc.cluster.local:8585"
+                  value: "http://openmetadata.odap-meta.svc.cluster.local:8585"
                 - name: OM_JWT_TOKEN
                   valueFrom:
                     secretKeyRef:
                       name: openmetadata-admin
                       key: jwtToken
-                # Cluster-internal Keycloak Service zit in uwv-auth (Helm-
+                # Cluster-internal Keycloak Service zit in odap-auth (Helm-
                 # release `keycloak`). HTTP (port 80) cluster-intern — geen
                 # TLS-cert nodig binnen het cluster.
                 - name: KEYCLOAK_URL
-                  value: "http://keycloak.uwv-auth.svc.cluster.local"
+                  value: "http://keycloak.odap-auth.svc.cluster.local"
                 - name: KEYCLOAK_REALM
                   value: "uwv"
                 - name: KEYCLOAK_ADMIN_USER
@@ -63,15 +63,15 @@ spec:
                       name: keycloak-admin-secret
                       key: admin-password
                 - name: REQUESTS_CA_BUNDLE
-                  value: /etc/uwv-ca/ca.crt
+                  value: /etc/platform-ca/ca.crt
                 - name: SSL_CERT_FILE
-                  value: /etc/uwv-ca/ca.crt
+                  value: /etc/platform-ca/ca.crt
               volumeMounts:
                 - name: config
                   mountPath: /config
                   readOnly: true
-                - name: uwv-ca
-                  mountPath: /etc/uwv-ca
+                - name: platform-ca
+                  mountPath: /etc/platform-ca
                   readOnly: true
               resources:
                 requests:
@@ -83,7 +83,7 @@ spec:
           volumes:
             - name: config
               configMap:
-                name: openmetadata-uwv-config
-            - name: uwv-ca
+                name: openmetadata-platform-config
+            - name: platform-ca
               configMap:
-                name: uwv-ca-bundle
+                name: platform-ca-bundle

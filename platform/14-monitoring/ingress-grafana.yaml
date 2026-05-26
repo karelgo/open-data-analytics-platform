@@ -1,5 +1,5 @@
-# Ingress voor Grafana onder platform.uwv-platform.local/grafana.
-# Vervangt de chart-managed ingress op grafana.uwv-platform.local
+# Ingress voor Grafana onder platform.odap.local/grafana.
+# Vervangt de chart-managed ingress op grafana.odap.local
 # (uitgeschakeld in infrastructure/helm/prometheus-stack/values.yaml).
 # Same-origin met de portal-shell → /embed/grafana kan z'n iframe
 # laden zonder cross-origin cookie- of CSP-gedoe.
@@ -11,16 +11,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: grafana
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["platform.uwv-platform.local"]
+    - hosts: ["platform.odap.local"]
       secretName: grafana-platform-tls
   rules:
-    - host: platform.uwv-platform.local
+    - host: platform.odap.local
       http:
         paths:
           - path: /grafana

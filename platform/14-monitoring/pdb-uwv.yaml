@@ -15,8 +15,8 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: uwv-opa-pdb
-  namespace: uwv-platform
+  name: opa-pdb
+  namespace: odap-platform
 spec:
   minAvailable: 1
   selector:
@@ -28,7 +28,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: postgres-pdb
-  namespace: uwv-data
+  namespace: odap-data
 spec:
   minAvailable: 1
   selector:
@@ -40,7 +40,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: opensearch-pdb
-  namespace: uwv-meta
+  namespace: odap-meta
 spec:
   minAvailable: 1
   selector:

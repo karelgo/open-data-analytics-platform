@@ -106,7 +106,7 @@ Componenten:
 | Bridge offline tijdens approval | OM retried webhooks 3× exponential backoff; manual replay-endpoint `/replay/{task_id}` voor recovery |
 | Grant-explosie (1 rol per catalog.schema-combi) | Conventie: rollen scopen op `<catalog>.<schema>`, niet per tabel; reviewer kan in OM één grant op glossary-term doen die meerdere assets dekt |
 | Ongebruikte grants blijven hangen | TTL-veld in role-attributes (`grantedAt`, `expiresAt`) + dagelijkse cleanup-CronJob (out of scope deze ADR, separate improvement) |
-| Geen self-registratie in Keycloak | Out of scope; nieuwe gebruikers komen via UWV-IdP federatie (separate improvement). Voor dev-omgeving kan registratie via overlay aanstaan |
+| Geen self-registratie in Keycloak | Out of scope; nieuwe gebruikers komen via Platform IdP federatie (separate improvement). Voor dev-omgeving kan registratie via overlay aanstaan |
 
 ---
 
@@ -138,7 +138,7 @@ Componenten:
 - `platform/18-om-access-bridge/` — nieuwe service-directory met
   `app/`, `deployment.yaml`, `service.yaml`, `configmap.yaml`,
   `secret.yaml`, `kustomization.yaml`.
-- `infrastructure/helm/keycloak/realm-uwv.json` — nieuwe client
+- `infrastructure/helm/keycloak/realm.json` — nieuwe client
   `om-access-bridge` met `serviceAccountsEnabled: true` en
   `realm-management.manage-users` rol.
 - `opa-policies-src/trino/trino-data-access.rego` — grant-policy

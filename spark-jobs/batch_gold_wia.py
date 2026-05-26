@@ -16,7 +16,7 @@ platform/11-airflow/jobs/spark-gold-wia.yaml). Mode: full overwrite met
 dynamicPartitionOverwrite — gold-tabel is volledig deterministisch
 afgeleid uit silver, dus geen MERGE nodig.
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ from lakehouse_io import (  # noqa: E402
     get_spark_with_lakehouse_config,
 )
 
-GOLD_BASE = os.getenv("GOLD_BASE", "s3a://uwv-gold")
+GOLD_BASE = os.getenv("GOLD_BASE", "s3a://odap-gold")
 GOLD_SCHEMA = "uc01_wia_spark"
 GOLD_TABLE = f"{GOLD_SCHEMA}.funnel_daily"
 GOLD_PATH = f"{GOLD_BASE}/{GOLD_SCHEMA}/funnel_daily"
@@ -44,7 +44,7 @@ SOURCE_TABLE = "wia_spark.aanvraag"  # silver.wia_spark.aanvraag in Trino
 
 
 def ensure_gold_schema(spark) -> None:
-    """HMS-database uc01_wia_spark @ s3a://uwv-gold/uc01_wia_spark/ (idempotent)."""
+    """HMS-database uc01_wia_spark @ s3a://odap-gold/uc01_wia_spark/ (idempotent)."""
     spark.sql(
         f"CREATE SCHEMA IF NOT EXISTS {GOLD_SCHEMA} "
         f"LOCATION '{GOLD_BASE}/{GOLD_SCHEMA}/'"
@@ -52,7 +52,7 @@ def ensure_gold_schema(spark) -> None:
 
 
 def main() -> int:
-    spark = get_spark_with_lakehouse_config("uwv-batch-gold-wia")
+    spark = get_spark_with_lakehouse_config("batch-gold-wia")
     spark.sparkContext.setLogLevel("WARN")
     print(
         f"==> Gold batch start: source={SOURCE_TABLE} target={GOLD_TABLE} "

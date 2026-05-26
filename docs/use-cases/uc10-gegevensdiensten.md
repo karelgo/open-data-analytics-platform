@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1c per afnemer; doelbinding strikt afgebakend |
 | Bewaartermijn audit-logs | 7 jaar |
 
-Bron: [`referentiearchitectuur-uwv-data-analytics.md` § 8 UC-10](../../referentiearchitectuur-uwv-data-analytics.md).
+Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-10](../../referentiearchitectuur-odap-data-analytics.md).
 
 ---
 
@@ -51,7 +51,7 @@ gold.uc05_client_360 (intern) + silver.polisadm + silver.doelgroepregister
        [Out-of-scope deze repo]
        API-gateway met:
        - OAuth2 client credentials per afnemer
-       - Doelcode in elke API-call (HTTP header X-UWV-Purpose)
+       - Doelcode in elke API-call (HTTP header X-Purpose)
        - Filter op selectiecriteria (regio, leeftijd) in OPA
        - Volledige audit-log naar SOC + naar afnemende partij
        - Backwards compatibility met SuwiML/XML
@@ -65,7 +65,7 @@ gold.uc05_client_360 (intern) + silver.polisadm + silver.doelgroepregister
 - Per afnemer een **toegestane doelcode-set** (`["WMO", "Inning"]` voor
   gemeente; `["Naturalisatie"]` voor IND).
 - Per afnemer een **mart-toegangs-set** (welke `uc10_*`-tabellen).
-- Header `X-UWV-Purpose` moet matchen met afnemer's toegestane set, **én**
+- Header `X-Purpose` moet matchen met afnemer's toegestane set, **én**
   met de doelbinding-tag van de mart, **anders deny + audit-log**.
 - Logging van afnemer + doelcode + bevraagde BSN (geen response in log).
 
@@ -78,7 +78,7 @@ meta:
   doelbinding: [externe_levering]
   bio_classificatie: vertrouwelijk
   bewaartermijn_jaren: 7
-  eigenaar: data_office_uwv
+  eigenaar: data_office
   pii_kolommen: [bsn, lh_nummer]
   risk_tier: hoog_keten
   audit_log_required: true
@@ -97,7 +97,7 @@ meta:
 
 - `dbt/models/marts/uc10_gegevensdiensten/{mart_uc10_polisadm_dagloon.sql, mart_uc10_uitkering_status.sql, mart_uc10_doelgroepregister.sql, schema.yml}`.
 - `opa-policies-src/trino/trino-uc10-afnemers.rego` (skeleton in fase 9).
-- `opa-policies-src/data/uwv_afnemer_doelcodes.json` (mock-mappings).
+- `opa-policies-src/data/consumer_purpose_codes.json` (mock-mappings).
 
 ## Open vragen / TODO
 

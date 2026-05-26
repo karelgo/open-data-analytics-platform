@@ -1,4 +1,4 @@
-# dbt — UWV Reference Platform
+# dbt — Open Data & Analytics Platform
 
 Transformatielaag van **bronze.uwv.\*** (raw event-envelopes) naar
 **silver.\<domein\>.\***  (CGM-conform getypt) en **gold.\<uc\>.\***

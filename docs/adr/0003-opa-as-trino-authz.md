@@ -88,5 +88,5 @@ als `OpaCluster` (Stackable) en geconfigureerd via een ConfigMap-bundle.
 - `opa-policies-src/` — bron van waarheid; `make build-opa-bundle` rendert
   naar ConfigMap.
 - `platform/09-trino/trinocluster.yaml` — `accessControl.opa.url:
-  http://opa.uwv-platform.svc.cluster.local:8081` (intern endpoint).
+  http://opa.odap-platform.svc.cluster.local:8081` (intern endpoint).
 - CI: `opa fmt --diff` + `opa test` zijn verplichte stappen.

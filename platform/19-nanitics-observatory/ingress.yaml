@@ -1,10 +1,10 @@
 # Ingress for the Nanitics Observatory.
 #
-# Hostname follows the existing platform convention (*.uwv-platform.local),
-# served on the same nginx-ingress + cert-manager + uwv-platform-issuer
+# Hostname follows the existing platform convention (*.odap.local),
+# served on the same nginx-ingress + cert-manager + platform-issuer
 # chain as the portal. Add the host to /etc/hosts:
 #
-#   127.0.0.1 nanitics.uwv-platform.local
+#   127.0.0.1 nanitics.odap.local
 #
 # SSE note: the Observatory uses Server-Sent Events on
 # /api/observatory/runs/{id}/stream. The annotations below tell nginx
@@ -13,9 +13,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nanitics-observatory
-  namespace: uwv-platform
+  namespace: odap-platform
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/proxy-body-size: "1m"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
@@ -23,14 +23,14 @@ metadata:
     # Iframe-allow voor de portal embed-shell (cross-origin).
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;
-      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.uwv-platform.local:8443 https://platform.eu-sovereigndataplatform.com https://platform.freshstackable.com" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["nanitics.uwv-platform.local"]
+    - hosts: ["nanitics.odap.local"]
       secretName: nanitics-observatory-tls
   rules:
-    - host: nanitics.uwv-platform.local
+    - host: nanitics.odap.local
       http:
         paths:
           - path: /

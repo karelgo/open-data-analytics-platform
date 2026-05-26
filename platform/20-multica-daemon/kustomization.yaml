@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: uwv-platform
+namespace: odap-platform
 
 resources:
   - workspace-pvc.yaml
@@ -11,5 +11,5 @@ resources:
   # Secret out-of-band — see secret-token.yaml for the recipe.
 
 commonLabels:
-  app.kubernetes.io/part-of: uwv-platform
+  app.kubernetes.io/part-of: odap-platform
   app.kubernetes.io/component: multica-daemon

@@ -1,19 +1,19 @@
-# In-cluster route voor https://keycloak.uwv-platform.local:8443
+# In-cluster route voor https://keycloak.odap.local:8443
 #
 # Pods (MinIO/Trino/Superset/Airflow/NiFi/OpenMetadata) doen OIDC-discovery
 # tegen de externe URL die Keycloak adverteert
-# (KC_HOSTNAME=https://keycloak.uwv-platform.local:8443). De host-port 8443
+# (KC_HOSTNAME=https://keycloak.odap.local:8443). De host-port 8443
 # is host-only — pods kunnen daar niet bij.
 #
-# Deze Service maakt `keycloak.uwv-platform.local:8443` in-cluster routeerbaar
+# Deze Service maakt `keycloak.odap.local:8443` in-cluster routeerbaar
 # door port 8443 → 443 te mappen naar ingress-nginx-controller pods (via
 # selector, dus auto-discovery, robuust tegen pod-restart).
 #
 # Hoort in `ingress-nginx` namespace omdat selectors alleen pods in dezelfde
 # namespace matchen. Ingress-nginx routeert vervolgens de Host-header
-# (keycloak.uwv-platform.local) naar de Keycloak Service in uwv-auth.
+# (keycloak.odap.local) naar de Keycloak Service in odap-auth.
 #
-# CoreDNS hosts override pinnt `keycloak.uwv-platform.local` op deze ClusterIP
+# CoreDNS hosts override pinnt `keycloak.odap.local` op deze ClusterIP
 # (zie scripts/aks-deploy.sh of full-deploy.sh — runtime patch nodig omdat
 # ClusterIP per cluster verschilt).
 apiVersion: v1

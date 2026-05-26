@@ -4,7 +4,7 @@ Hive Metastore (HMS) als catalog backend voor zowel Delta als Iceberg.
 
 | Resource | Doel |
 |---|---|
-| `HiveCluster uwv-hive` | 1 metastore-pod, Postgres-backed (db `hivemetastore` in `uwv-data`). |
+| `HiveCluster hive` | 1 metastore-pod, Postgres-backed (db `hivemetastore` in `odap-data`). |
 
 ## Hoe Hive het Delta/Iceberg-formaat agnostisch ondersteunt
 
@@ -29,9 +29,9 @@ kubectl apply -k platform/05-hive-metastore/
 ## Validatie
 
 ```bash
-kubectl -n uwv-platform get hivecluster
-kubectl -n uwv-platform get pods -l app.kubernetes.io/name=hive
-kubectl -n uwv-platform logs -l app.kubernetes.io/name=hive --tail=50
+kubectl -n odap-platform get hivecluster
+kubectl -n odap-platform get pods -l app.kubernetes.io/name=hive
+kubectl -n odap-platform logs -l app.kubernetes.io/name=hive --tail=50
 ```
 
 Test (port-forward + simple thrift query is complex; eenvoudiger via Trino in fase 3).

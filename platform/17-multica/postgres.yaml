@@ -15,7 +15,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: multica-postgres
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   clusterIP: None
   selector:
@@ -29,7 +29,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: multica-postgres
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   serviceName: multica-postgres
   replicas: 1

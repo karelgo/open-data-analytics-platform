@@ -1,4 +1,4 @@
-# SparkApplication: streaming JSONL files in s3a://uwv-raw/ → Delta/Iceberg bronze.
+# SparkApplication: streaming JSONL files in s3a://odap-raw/ → Delta/Iceberg bronze.
 #
 # De PySpark-code wordt via een ConfigMap (gegenereerd door kustomize) gemount
 # op /stackable/spark/jobs. `mainApplicationFile` verwijst naar de gemounte
@@ -10,7 +10,7 @@ apiVersion: spark.stackable.tech/v1alpha1
 kind: SparkApplication
 metadata:
   name: streaming-bronze
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   sparkImage:
     productVersion: "3.5.8"

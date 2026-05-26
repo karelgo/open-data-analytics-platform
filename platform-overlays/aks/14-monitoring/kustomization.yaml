@@ -1,6 +1,6 @@
 # AKS overlay voor platform/14-monitoring.
 #
-# In AKS gebruiken we de echte UWV-SMTP-relay (placeholder hieronder) en
+# In AKS gebruiken we de echte Platform SMTP relay (placeholder hieronder) en
 # halen we MailHog (de dev-only sink) eruit. De Slack-/SMTP-credentials
 # horen via External Secrets Operator uit Vault te komen — tot die er is
 # patcht deze overlay het Secret in-place.
@@ -34,7 +34,7 @@ patches:
       group: monitoring.coreos.com
       version: v1alpha1
       kind: AlertmanagerConfig
-      name: uwv-platform-receivers
+      name: odap-platform-receivers
   # Vervang de dev-placeholder SMTP-creds in het Secret.
   - path: secret-smtp-prod.yaml
     target:

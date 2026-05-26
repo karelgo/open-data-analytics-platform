@@ -15,7 +15,7 @@ fmt:
 	opa fmt --diff trino/
 
 test:
-	opa test trino/ data/uwv_role_mappings.json -v
+	opa test trino/ data/role_mappings.json -v
 
 bundle:
 	bash ../scripts/build-opa-bundle.sh

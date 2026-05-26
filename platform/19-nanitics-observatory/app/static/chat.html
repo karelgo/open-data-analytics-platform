@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>UWV Agent Chat</title>
+<title>ODAP Agent Chat</title>
 <style>
   :root {
     --bg: oklch(0.99 0 0);
@@ -132,7 +132,7 @@
   // Apply theme as early as possible to avoid flash.
   (function () {
     try {
-      var stored = localStorage.getItem("uwv-chat-theme");
+      var stored = localStorage.getItem("odap-chat-theme");
       var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       if (stored === "dark" || (stored !== "light" && prefersDark)) {
         document.documentElement.classList.add("dark");
@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>🤖 UWV Agent Chat</h1>
+  <h1>🤖 ODAP Agent Chat</h1>
   <div class="links">
     <button class="toggle" id="themeToggle">🌓 Theme</button>
     <a href="/api/observatory/" target="_blank">Observatory →</a>
@@ -189,7 +189,7 @@
   // Theme toggle.
   $theme.addEventListener("click", () => {
     const isDark = document.documentElement.classList.toggle("dark");
-    try { localStorage.setItem("uwv-chat-theme", isDark ? "dark" : "light"); } catch (_) {}
+    try { localStorage.setItem("odap-chat-theme", isDark ? "dark" : "light"); } catch (_) {}
   });
 
   // Event-type → icon + label

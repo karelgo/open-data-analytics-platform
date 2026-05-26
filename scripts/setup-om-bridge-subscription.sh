@@ -10,10 +10,10 @@
 
 set -euo pipefail
 
-NS="${OM_NS:-uwv-meta}"
+NS="${OM_NS:-odap-meta}"
 SUB_NAME="om-access-bridge"
-BRIDGE_URL="${OM_BRIDGE_WEBHOOK_URL:-http://om-access-bridge.uwv-platform.svc.cluster.local/webhooks/om}"
-WEBHOOK_SECRET="${OM_WEBHOOK_SECRET:-uwv-dev-only-CHANGE-ME-om-webhook-secret}"
+BRIDGE_URL="${OM_BRIDGE_WEBHOOK_URL:-http://om-access-bridge.odap-platform.svc.cluster.local/webhooks/om}"
+WEBHOOK_SECRET="${OM_WEBHOOK_SECRET:-odap-dev-only-CHANGE-ME-om-webhook-secret}"
 PF_PORT="${PF_PORT:-18585}"
 
 log()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }

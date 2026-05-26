@@ -43,7 +43,7 @@ in elke `_*.yml`). Onderstaande items vormen de openstaande gaten.
 
 | # | Pad | Wat ontbreekt | Prio |
 |---|---|---|---|
-| B.1 ✅ | `dbt/dbt_project.yml` | ~~Config-gat~~ — `uc09_reint_effect` toegevoegd aan `models.uwv_data_platform.marts.*`. | 🔴 blocker |
+| B.1 ✅ | `dbt/dbt_project.yml` | ~~Config-gat~~ — `uc09_reint_effect` toegevoegd aan `models.odap_data_platform.marts.*`. | 🔴 blocker |
 | B.2 | `dbt/macros/*.sql` | Geen enkele macro heeft een `{% docs %}` block. De 8 macros (`apply_doelbinding_tag`, `generate_database_name`, `generate_schema_name`, `pseudonymize`, `table_format`, `test_bsn_valid`, `test_iban_valid`, `test_lh_nummer_valid`) verschijnen daardoor leeg in `dbt docs generate`. | 🟠 hoog |
 | B.3 | `dbt/tests/*.sql` | De 2 singular tests hebben header-comments maar geen schema-beschrijving en geen referentie vanuit `compliance-mapping.md`. UC-03-test (R-AI Act-relevant) verdient een expliciete koppeling. | 🟡 polish |
 | B.4 | `dbt/snapshots/` | Lege map. Geen README of `.gitkeep`-uitleg of er bewust geen snapshots zijn (en zo ja, waarom — doelbinding? ARV-bewaartermijnen?). | 🟡 polish |

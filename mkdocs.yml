@@ -1,4 +1,4 @@
-# UWV Reference Data Platform — documentatie-site (MkDocs Material).
+# Open Data & Analytics Platform — documentatie-site (MkDocs Material).
 #
 # Lokaal previewen:
 #   pip install -r requirements-docs.txt
@@ -6,13 +6,13 @@
 #
 # CI bouwt en publiceert via .github/workflows/docs.yml naar GitHub Pages.
 
-site_name: UWV Reference Data Platform
+site_name: Open Data & Analytics Platform
 site_description: >-
-  Documentatie van de UWV referentie-implementatie voor een compliant data-
+  Documentatie van de ODAP reference implementation voor een compliant data-
   en analyticsplatform — architectuur, componenten, rollen, use-cases en
   beslissingen.
 site_url: https://fresh-minds.github.io/FreshStackableDataPlatform/
-site_author: UWV Reference Platform contributors
+site_author: Open Data & Analytics Platform contributors
 
 repo_name: fresh-minds/FreshStackableDataPlatform
 repo_url: https://github.com/fresh-minds/FreshStackableDataPlatform
@@ -251,4 +251,4 @@ validation:
 copyright: >-
   Apache License 2.0 ·
   <a href="https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/LICENSE">LICENSE</a> ·
-  Alle datasets in deze referentie zijn synthetisch — geen echte UWV-data.
+  Alle datasets in deze referentie zijn synthetisch — geen echte ODAP data.

@@ -29,10 +29,10 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **OpenMetadata** | Hoofdwerkplek: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.uwv-platform.local |
-| **Apache Superset** | Dashboards reviewen, ownership-overzichten | https://superset.uwv-platform.local |
-| **Apache Airflow** | DQ-DAGs draaien | https://airflow.uwv-platform.local |
-| **OpenSearch (Kibana-achtig)** | OPA-decision-logs reviewen | https://openmetadata.uwv-platform.local/logs |
+| **OpenMetadata** | Hoofdwerkplek: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.odap.local |
+| **Apache Superset** | Dashboards reviewen, ownership-overzichten | https://superset.odap.local |
+| **Apache Airflow** | DQ-DAGs draaien | https://airflow.odap.local |
+| **OpenSearch (Kibana-achtig)** | OPA-decision-logs reviewen | https://openmetadata.odap.local/logs |
 | **dbt CLI / docs** | dbt-tests + lineage-docs | lokaal of via VS Code remote |
 
 ---

@@ -49,7 +49,7 @@ platform/19-nanitics-observatory/
 ├── rbac.yaml                  ← SA + ClusterRole (events read-only) for the watcher
 ├── deployment.yaml            ← single-pod Deployment
 ├── service.yaml               ← ClusterIP :80 → :8001
-├── ingress.yaml               ← nanitics.uwv-platform.local
+├── ingress.yaml               ← nanitics.odap.local
 └── app/
     ├── Dockerfile             ← Python 3.11 + nanitics[api] + uvicorn + httpx + kubernetes_asyncio
     ├── app.py                 ← FastAPI + Observatory + agent registry
@@ -81,13 +81,13 @@ deploy a chat model (e.g., `gpt-4o-mini`), and grab two values:
 ### 2. Add the hostname to your hosts file
 
 ```sh
-echo "127.0.0.1 nanitics.uwv-platform.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1 nanitics.odap.local" | sudo tee -a /etc/hosts
 ```
 
 > **Note on the port:** the k3d serverlb maps `host:8080 → cluster:80`
 > and `host:8443 → cluster:443`. All UWV ingress URLs are reached at
 > `:8443`, not `:443`. If you see a connection refused / hanging
-> browser, that's why. The portal at `platform.uwv-platform.local`
+> browser, that's why. The portal at `platform.odap.local`
 > behaves the same way — same `:8443` quirk.
 
 ### 3. Set the endpoint in the ConfigMap and the API key as a Secret
@@ -120,7 +120,7 @@ API key goes into a Kubernetes Secret created **out-of-band** — never
 written to disk:
 
 ```sh
-kubectl -n uwv-platform create secret generic nanitics-azure-foundry \
+kubectl -n odap-platform create secret generic nanitics-azure-foundry \
   --from-literal=AZURE_AI_FOUNDRY_API_KEY='<paste-your-key>' \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
@@ -161,13 +161,13 @@ cd platform/19-nanitics-observatory
 kubectl apply -k .
 
 # Watch the pod come up.
-kubectl -n uwv-platform get pods -l app.kubernetes.io/component=nanitics-observatory -w
+kubectl -n odap-platform get pods -l app.kubernetes.io/component=nanitics-observatory -w
 ```
 
 Two browser entry points:
 
-- <https://nanitics.uwv-platform.local:8443/chat> — chat UI to talk to agents
-- <https://nanitics.uwv-platform.local:8443/api/observatory/> — trace viewer
+- <https://nanitics.odap.local:8443/chat> — chat UI to talk to agents
+- <https://nanitics.odap.local:8443/api/observatory/> — trace viewer
 
 The chat UI lets you pick an agent, type a task, and watch each tool
 call / LLM call / evaluation event stream in live as the agent works.
@@ -180,19 +180,19 @@ The first time you'll see an empty run list. Trigger one run per agent
 type from the chat UI, or from curl:
 
 ```sh
-curl -k -X POST https://nanitics.uwv-platform.local:8443/run/react \
+curl -k -X POST https://nanitics.odap.local:8443/run/react \
   -H 'Content-Type: application/json' \
   -d '{"task":"Greet the UWV team in Dutch and describe the platform."}'
 
-curl -k -X POST https://nanitics.uwv-platform.local:8443/run/rewoo \
+curl -k -X POST https://nanitics.odap.local:8443/run/rewoo \
   -H 'Content-Type: application/json' \
   -d '{"task":"Search for data lakehouse and data warehouse, summarize each, then compare in one sentence."}'
 
-curl -k -X POST https://nanitics.uwv-platform.local:8443/run/reflexion \
+curl -k -X POST https://nanitics.odap.local:8443/run/reflexion \
   -H 'Content-Type: application/json' \
   -d '{"task":"Describe the UWV platform storage layer in at least 80 characters."}'
 
-curl -k -X POST https://nanitics.uwv-platform.local:8443/run/lats \
+curl -k -X POST https://nanitics.odap.local:8443/run/lats \
   -H 'Content-Type: application/json' \
   -d '{"task":"Find the best tool to introspect the UWV platform layout. Finish with DONE."}'
 ```
@@ -221,7 +221,7 @@ should review.
 |---|---|---|
 | `list_firing_alerts(severity?)` | Curated list of active Alertmanager alerts with `fingerprint`, `runbook_url`, `severity` | Read-only |
 | `query_prometheus(promql)` | Instant query against in-cluster Prometheus | Read-only |
-| `search_opensearch_logs(query, time_range_minutes?, max_hits?)` | Lucene search over `uwv-logs-*` | Read-only |
+| `search_opensearch_logs(query, time_range_minutes?, max_hits?)` | Lucene search over `logs-*` | Read-only |
 | `recent_k8s_warnings(namespace?, since_minutes?)` | Warning-type K8s events (CrashLoopBackOff, OOMKilled, ImagePullBackOff, …) | Read-only |
 | `find_existing_multica_tasks(fingerprint)` | Dedup check before filing | Read-only |
 | `file_multica_task(title, body, severity, area, fingerprint)` | Create a Multica task in `platform-ops` | **Write** |
@@ -237,7 +237,7 @@ approval gate, and the existing PR review path.
 ### Trigger a run
 
 ```sh
-curl -k -X POST https://nanitics.uwv-platform.local:8443/run/watcher \
+curl -k -X POST https://nanitics.odap.local:8443/run/watcher \
   -H 'Content-Type: application/json' \
   -d '{"task":"Investigate the currently firing PrometheusRule alerts. For the most severe one, dedup against existing Multica tasks and file a new task if needed."}'
 ```
@@ -245,7 +245,7 @@ curl -k -X POST https://nanitics.uwv-platform.local:8443/run/watcher \
 Or, if you want to scope the run to a specific alert:
 
 ```sh
-curl -k -X POST https://nanitics.uwv-platform.local:8443/run/watcher \
+curl -k -X POST https://nanitics.odap.local:8443/run/watcher \
   -H 'Content-Type: application/json' \
   -d '{"task":"Investigate TrinoQueryLatencyP99High. Confirm via PromQL, dedup, then file a Multica task if real."}'
 ```
@@ -263,12 +263,12 @@ end-to-end loop without spamming Multica during early-life tuning.
 
 To go live:
 
-1. In Multica's UI, create user `platform-watcher@uwv`, add to the
+1. In Multica's UI, create user `platform-watcher@example.com`, add to the
    `platform-ops` workspace, and generate a long-lived API token.
 2. Provision the token as a Secret (see `secret-multica.yaml`):
 
    ```sh
-   kubectl -n uwv-platform create secret generic nanitics-multica-token \
+   kubectl -n odap-platform create secret generic nanitics-multica-token \
      --from-literal=MULTICA_API_TOKEN='<paste-token>' \
      --dry-run=client -o yaml | kubectl apply -f -
    ```
@@ -284,12 +284,12 @@ call, so the operator flips it on once dry-run output looks right:
 
 ```sh
 # Inspect the dry-run loop manually first.
-kubectl -n uwv-platform create job --from=cronjob/nanitics-watcher-cron \
+kubectl -n odap-platform create job --from=cronjob/nanitics-watcher-cron \
   watcher-manual-$(date +%s)
-kubectl -n uwv-platform logs -l job-name=watcher-manual-... --tail=200
+kubectl -n odap-platform logs -l job-name=watcher-manual-... --tail=200
 
 # Once happy, enable the schedule.
-kubectl -n uwv-platform patch cronjob nanitics-watcher-cron \
+kubectl -n odap-platform patch cronjob nanitics-watcher-cron \
   -p '{"spec":{"suspend":false}}'
 ```
 
@@ -375,7 +375,7 @@ The pod ships configured for `LLM_PROVIDER=azure-foundry`. To smoke-test
 without burning Azure credits, override at deploy time:
 
 ```sh
-kubectl -n uwv-platform set env deploy/nanitics-observatory LLM_PROVIDER=mock
+kubectl -n odap-platform set env deploy/nanitics-observatory LLM_PROVIDER=mock
 ```
 
 The mock provider is a scripted two-turn ReAct response — useful for
@@ -384,7 +384,7 @@ verifying the trace pipeline works before wiring real keys.
 To switch back:
 
 ```sh
-kubectl -n uwv-platform set env deploy/nanitics-observatory LLM_PROVIDER=azure-foundry
+kubectl -n odap-platform set env deploy/nanitics-observatory LLM_PROVIDER=azure-foundry
 ```
 
 ---
@@ -393,10 +393,10 @@ kubectl -n uwv-platform set env deploy/nanitics-observatory LLM_PROVIDER=azure-f
 
 | Action | Command |
 |---|---|
-| Tail logs | `kubectl -n uwv-platform logs -f deploy/nanitics-observatory` |
-| Restart after secret change | `kubectl -n uwv-platform rollout restart deploy/nanitics-observatory` |
-| Port-forward (if ingress is broken) | `kubectl -n uwv-platform port-forward svc/nanitics-observatory 8001:80` then visit <http://localhost:8001/api/observatory/> |
-| Health check | `curl -k https://nanitics.uwv-platform.local:8443/health` |
+| Tail logs | `kubectl -n odap-platform logs -f deploy/nanitics-observatory` |
+| Restart after secret change | `kubectl -n odap-platform rollout restart deploy/nanitics-observatory` |
+| Port-forward (if ingress is broken) | `kubectl -n odap-platform port-forward svc/nanitics-observatory 8001:80` then visit <http://localhost:8001/api/observatory/> |
+| Health check | `curl -k https://nanitics.odap.local:8443/health` |
 | Tear down | `kubectl delete -k .` |
 
 ---
@@ -413,7 +413,7 @@ kubectl -n uwv-platform set env deploy/nanitics-observatory LLM_PROVIDER=azure-f
                                   │
                                   ▼
             ┌──────────────────────────────────────────────┐
-            │  nanitics-observatory pod (uwv-platform ns)  │
+            │  nanitics-observatory pod (odap-platform ns)  │
             │  ┌────────────────────────────────────────┐  │
             │  │ FastAPI                                │  │
             │  │  ├─ /api/observatory/  (React bundle)  │  │
@@ -451,12 +451,12 @@ tools with ones that call the actual services:
 ```python
 @tool("query_trino", "Run a read-only SQL query against the data warehouse.")
 async def query_trino(sql: str) -> str:
-    # connect to trino-coordinator.uwv-data:8080 internally
+    # connect to trino-coordinator.odap-data:8080 internally
     ...
 
 @tool("trigger_airflow_dag", "Trigger an Airflow DAG by id.")
 async def trigger_airflow_dag(dag_id: str, conf: dict) -> str:
-    # call airflow.uwv-platform internally
+    # call airflow.odap-platform internally
     ...
 ```
 
@@ -495,7 +495,7 @@ the OpenAI Python SDK can't call it directly. Two options:
 The default `InMemoryPersistentTraceStore` loses everything on pod
 restart. To upgrade:
 
-1. Deploy a small Postgres in `uwv-platform` (or reuse an existing
+1. Deploy a small Postgres in `odap-platform` (or reuse an existing
    one — check what `05-hive-metastore` already runs).
 2. Install the `nanitics[postgres]` extra in the Dockerfile.
 3. In `app.py`, replace:
@@ -512,7 +512,7 @@ restart. To upgrade:
 
 | Symptom | Likely cause |
 |---|---|
-| `ERR_CERT_AUTHORITY_INVALID` in browser | cert-manager hasn't issued the cert yet. Check `kubectl -n uwv-platform get certificate nanitics-observatory-tls`. |
+| `ERR_CERT_AUTHORITY_INVALID` in browser | cert-manager hasn't issued the cert yet. Check `kubectl -n odap-platform get certificate nanitics-observatory-tls`. |
 | `502 Bad Gateway` | Pod not ready. `kubectl logs` it; check the readiness probe at `/health`. |
 | `/run` returns 500 with `LLMProviderError: 404 DeploymentNotFound` | `LLM_MODEL` doesn't match a deployment in your Foundry project. Probe with the curl loop in step 3 to find a working name. |
 | `/run` returns 500 with `LLMProviderError: 401 invalid subscription key` | Either the secret is missing/wrong, OR somebody re-applied the placeholder via kustomize. Run the `kubectl create secret` from step 3 again. |
@@ -524,7 +524,7 @@ restart. To upgrade:
 ## Security notes
 
 - The Observatory UI has **no built-in auth**. The ingress is
-  reachable from anything that can resolve `nanitics.uwv-platform.local`
+  reachable from anything that can resolve `nanitics.odap.local`
   — fine on a developer laptop, not fine in shared environments.
   For a shared cluster, put it behind the same `oauth2-proxy` sidecar
   pattern as `15-portal/`.

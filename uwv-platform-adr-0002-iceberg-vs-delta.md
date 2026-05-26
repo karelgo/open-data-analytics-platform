@@ -10,7 +10,7 @@
 
 ## Context
 
-Het UWV-platform gebruikt een **lakehouse**-architectuur. Daarbij is een **open table format** essentieel: het verzorgt ACID-transacties, schema-evolutie, time travel, partition pruning en upserts bovenop Parquet-bestanden in object storage.
+Het ODAP platform gebruikt een **lakehouse**-architectuur. Daarbij is een **open table format** essentieel: het verzorgt ACID-transacties, schema-evolutie, time travel, partition pruning en upserts bovenop Parquet-bestanden in object storage.
 
 Twee serieuze open-source kandidaten:
 
@@ -33,7 +33,7 @@ Deze keuze is structureel: migreren is mogelijk maar duur. Daarom een expliciete
 | C4 | Vendor-neutraliteit / governance van het project (NORA-principe) | Hoog |
 | C5 | Multi-engine interoperabiliteit (toekomstbestendigheid) | Middel |
 | C6 | Operationele features (compaction, partition evolution, branching, MV) | Middel |
-| C7 | Performance op UWV-workloads (cliëntscans, tijdreeksen) | Middel |
+| C7 | Performance op platform workloads (cliëntscans, tijdreeksen) | Middel |
 | C8 | Ecosysteem (catalogs, tools, community-momentum) | Middel |
 | C9 | dbt-trino-compatibiliteit | Hoog |
 | C10 | Toekomstige cloud-keuze (Azure Fabric, Databricks, AWS, sovereign) | Hoog |
@@ -89,15 +89,15 @@ Deze keuze is structureel: migreren is mogelijk maar duur. Daarom een expliciete
 
 Voor UWV (veel correctie-runs op claimbeoordelingen, audits, herbeoordelingen) zijn **branching/tagging** en **partition evolution** nuttige features die alleen Iceberg biedt. **Liquid clustering** van Delta is interessant voor cliëntscans, maar niet kritisch.
 
-### C7 — Performance op UWV-workloads
+### C7 — Performance op platform workloads
 
-Voor de meeste UWV-workloads (analytische queries, dashboards, dbt-runs) is het verschil **klein in de praktijk**. Beide formaten profiteren van vergelijkbare optimalisaties (file pruning, statistics).
+Voor de meeste platform workloads (analytische queries, dashboards, dbt-runs) is het verschil **klein in de praktijk**. Beide formaten profiteren van vergelijkbare optimalisaties (file pruning, statistics).
 
 - Cliënt-360 lookups: Iceberg met hidden partitioning op `bsn_hash_bucket` werkt goed; Delta vereist Liquid Clustering.
 - Tijdreeksen (audit-logs, schadelast): beide hebben sterke partition pruning op datum.
 - Veel-update-workloads (uitkeringen-status, dossierstatus): Delta merge is iets sneller in Spark; Iceberg `MERGE INTO` heeft ingehaald.
 
-Geen duidelijke winnaar zonder benchmark op echte UWV-data.
+Geen duidelijke winnaar zonder benchmark op echte ODAP data.
 
 ### C8 — Ecosysteem
 

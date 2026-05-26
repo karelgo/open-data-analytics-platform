@@ -1,18 +1,18 @@
 # SparkApplication: seed-bronze-wia
 #
 # One-shot batch die N synthetische WIA-aanvraag-rijen direct in bronze
-# Delta-formaat schrijft (s3a://uwv-bronze/uwv/wia_aanvraag/) en in HMS
+# Delta-formaat schrijft (s3a://odap-bronze/uwv/wia_aanvraag/) en in HMS
 # registreert als uwv.wia_aanvraag. Bedoeld om de Spark bronze→silver→gold
 # demo van data te voorzien zolang streaming-bronze uit staat.
 #
 # BEWUST niet in platform/08-spark/kustomization.yaml resources —
 # de seed mag NIET bij elke `kubectl apply -k` opnieuw draaien.
 # Handmatig aanroepen:
-#   kubectl delete sparkapplication seed-bronze-wia -n uwv-platform --ignore-not-found
+#   kubectl delete sparkapplication seed-bronze-wia -n odap-platform --ignore-not-found
 #   kubectl apply -f platform/08-spark/apps/seed-bronze-wia.yaml
 #
 # Status:
-#   kubectl -n uwv-platform get sparkapplication seed-bronze-wia
+#   kubectl -n odap-platform get sparkapplication seed-bronze-wia
 #
 # Verifieer via Trino:
 #   SELECT COUNT(*) FROM bronze.uwv.wia_aanvraag;
@@ -21,10 +21,10 @@ apiVersion: spark.stackable.tech/v1alpha1
 kind: SparkApplication
 metadata:
   name: seed-bronze-wia
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    uwv.nl/zone: bronze
-    uwv.nl/use-case: wia-spark-demo
+    odap.io/zone: bronze
+    odap.io/use-case: wia-spark-demo
 spec:
   sparkImage:
     productVersion: "3.5.8"
@@ -45,7 +45,7 @@ spec:
     spark.kubernetes.executor.deleteOnTermination: "false"
     # Event-logs → SparkHistoryServer (zie platform/08-spark/history-server.yaml).
     spark.eventLog.enabled: "true"
-    spark.eventLog.dir: "s3a://uwv-checkpoints/spark-events/"
+    spark.eventLog.dir: "s3a://odap-checkpoints/spark-events/"
   driver:
     config:
       logging:

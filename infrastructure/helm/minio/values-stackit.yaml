@@ -8,15 +8,15 @@ persistence:
   storageClass: "premium-perf6-stackit"
   size: 100Gi
 
-# Chart-managed ingress hostnames stay on .uwv-platform.local for in-cluster
-# routing. Public hostnames (minio.freshstackable.com / minio-api.freshstackable.com)
+# Chart-managed ingress hostnames stay on .odap.local for in-cluster
+# routing. Public hostnames (minio.example.com / minio-api.example.com)
 # are served by infrastructure/stackit/public-ingresses.yaml in Phase 4.
 #
 # OIDC URLs visible to the browser must match the public hostname.
 # CORS-origin lijst moet de publieke portal-host bevatten zodat de browser
-# vanuit https://platform.freshstackable.com mag PUTten naar
-# https://minio-api.freshstackable.com.
+# vanuit https://platform.example.com mag PUTten naar
+# https://minio-api.example.com.
 environment:
-  MINIO_IDENTITY_OPENID_CONFIG_URL: "https://keycloak.freshstackable.com/realms/uwv/.well-known/openid-configuration"
-  MINIO_IDENTITY_OPENID_REDIRECT_URI: "https://minio.freshstackable.com/oauth_callback"
-  MINIO_API_CORS_ALLOW_ORIGIN: "https://platform.freshstackable.com"
+  MINIO_IDENTITY_OPENID_CONFIG_URL: "https://keycloak.example.com/realms/odap/.well-known/openid-configuration"
+  MINIO_IDENTITY_OPENID_REDIRECT_URI: "https://minio.example.com/oauth_callback"
+  MINIO_API_CORS_ALLOW_ORIGIN: "https://platform.example.com"

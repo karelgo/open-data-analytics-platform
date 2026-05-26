@@ -30,15 +30,15 @@ platform om:
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Airflow** | DAGs maken, runs monitoren | https://airflow.uwv-platform.local |
+| **Apache Airflow** | DAGs maken, runs monitoren | https://airflow.odap.local |
 | **dbt CLI** | Lokaal of in CI | terminal |
 | **kubectl + k9s** | Spark-jobs, pod-status, Hive Metastore | terminal |
-| **Apache Superset** | Eigen build-dashboards reviewen | https://superset.uwv-platform.local |
-| **OpenMetadata** | Service-config, lineage publishing | https://openmetadata.uwv-platform.local |
-| **MinIO Console** | Bucket-debugging | https://minio.uwv-platform.local |
+| **Apache Superset** | Eigen build-dashboards reviewen | https://superset.odap.local |
+| **OpenMetadata** | Service-config, lineage publishing | https://openmetadata.odap.local |
+| **MinIO Console** | Bucket-debugging | https://minio.odap.local |
 
 - NiFi-flows worden as-code beheerd in `nifi-flows/templates/` en geïmporteerd via `kubectl port-forward` (zie `nifi-flows/templates/delta/README.md`).
-- dbt en Airflow benaderen Trino in-cluster; voor ad-hoc debug: `kubectl -n uwv-platform port-forward svc/uwv-trino-coordinator 8443:8443`.
+- dbt en Airflow benaderen Trino in-cluster; voor ad-hoc debug: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443`.
 
 ---
 
@@ -76,9 +76,9 @@ zuinig: **kijk niet meer dan nodig**.
 2. **NiFi-flow**: kopieer template `nifi-flows/templates/delta/source-xyz/` aan, pas processors aan.
 3. **Kafka-topic**: definieer `uwv.xyz.event` in `platform/06-kafka/topics.yaml`.
 4. **Spark-job**: voeg `streaming-bronze-xyz.yaml` toe; gebruik helper `lakehouse_io.write_delta()`.
-5. **Schema in HMS**: `CREATE TABLE bronze.uwv.xyz_events (...) USING DELTA LOCATION 's3a://uwv-bronze/xyz/'`.
+5. **Schema in HMS**: `CREATE TABLE bronze.uwv.xyz_events (...) USING DELTA LOCATION 's3a://odap-bronze/xyz/'`.
 6. **dbt-stg**: `dbt/models/staging/stg_xyz.sql` met basisvalidatie.
-7. **OPA-update**: voeg purpose toe in `data/uwv_role_mappings.json::resource_purposes`.
+7. **OPA-update**: voeg purpose toe in `data/role_mappings.json::resource_purposes`.
 8. **OpenMetadata**: voeg service-config toe (auto-discovery).
 9. **CI**: `make opa-test`, `dbt parse`, smoke tests.
 10. **PR review** door data-steward + platform-admin.
@@ -110,7 +110,7 @@ version: 2
 models:
   - name: mart_xyz_daily
     meta:
-      eigenaar: data.steward@uwv-platform.local
+      eigenaar: data.steward@odap.local
       domain: xyz
       legal_basis: art_6_1e
       doelbinding: [sturingsinfo]
@@ -129,14 +129,14 @@ Run: `dbt run --select mart_xyz_daily && dbt test --select mart_xyz_daily`.
 
 **Scenario.** Spark-job hangt in `streaming-bronze-wia`.
 
-1. `kubectl get sparkapp -n uwv-platform`
-2. `kubectl logs -n uwv-platform <driver-pod>`
+1. `kubectl get sparkapp -n odap-platform`
+2. `kubectl logs -n odap-platform <driver-pod>`
 3. Spark UI port-forwarden:
    ```
-   kubectl port-forward -n uwv-platform svc/spark-streaming-ui 4040:4040
+   kubectl port-forward -n odap-platform svc/spark-streaming-ui 4040:4040
    ```
    Open http://localhost:4040
-4. Checkpoint-bucket inspecteren via MinIO Console: `s3://uwv-checkpoints/<job>/`
+4. Checkpoint-bucket inspecteren via MinIO Console: `s3://odap-checkpoints/<job>/`
 5. Zie [`docs/runbook.md` § 4.3](../runbook.md) voor scenario-stappen.
 
 ### 4.4 Workflow D — Pipeline-falen patchen

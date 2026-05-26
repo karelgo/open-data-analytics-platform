@@ -1,7 +1,7 @@
 """Stream JSONL files uit S3 raw zone → bronze.<domain>.<entity> Delta/Iceberg.
 
 Vervangt streaming_kafka_to_lakehouse.py. Spark Structured Streaming leest
-`s3a://uwv-raw/<domain>/<entity>/dt=<YYYY-MM-DD>/*.jsonl` als text-stream.
+`s3a://odap-raw/<domain>/<entity>/dt=<YYYY-MM-DD>/*.jsonl` als text-stream.
 Iedere regel is een raw event-envelope (JSON). De `stream`-identifier wordt
 uit het bestandspad afgeleid.
 
@@ -34,13 +34,13 @@ from lakehouse_io import (  # noqa: E402
     get_spark_with_lakehouse_config,
 )
 
-RAW_PATH = os.getenv("RAW_PATH", "s3a://uwv-raw/")
-CHECKPOINT_BASE = os.getenv("CHECKPOINT_BASE", "s3a://uwv-checkpoints/streaming")
+RAW_PATH = os.getenv("RAW_PATH", "s3a://odap-raw/")
+CHECKPOINT_BASE = os.getenv("CHECKPOINT_BASE", "s3a://odap-checkpoints/streaming")
 TRIGGER_SECONDS = int(os.getenv("TRIGGER_SECONDS", "20"))
 
-# Verwacht pad: s3a://uwv-raw/<stream-segments>/dt=<date>/part-*.jsonl
+# Verwacht pad: s3a://odap-raw/<stream-segments>/dt=<date>/part-*.jsonl
 # bv. uwv/persona/created/dt=...  → stream 'uwv.persona.created'.
-_STREAM_PATH_RE = re.compile(r"/uwv-raw/(?P<path>.+?)/dt=")
+_STREAM_PATH_RE = re.compile(r"/odap-raw/(?P<path>.+?)/dt=")
 
 
 def stream_to_table(stream: str) -> str | None:
@@ -65,7 +65,7 @@ def _extract_stream_from_path(file_path: str) -> str | None:
     return m.group("path").replace("/", ".")
 
 
-BRONZE_BASE = os.getenv("BRONZE_BASE", "s3a://uwv-bronze/uwv")
+BRONZE_BASE = os.getenv("BRONZE_BASE", "s3a://odap-bronze/uwv")
 
 
 def process_batch(batch_df, batch_id: int) -> None:
@@ -112,7 +112,7 @@ def process_batch(batch_df, batch_id: int) -> None:
 
 
 def main() -> int:
-    spark = get_spark_with_lakehouse_config("uwv-streaming-files-to-bronze")
+    spark = get_spark_with_lakehouse_config("streaming-files-to-bronze")
     spark.sparkContext.setLogLevel("WARN")
     print(
         f"==> Streaming start (TABLE_FORMAT={TABLE_FORMAT}, raw_path={RAW_PATH})",

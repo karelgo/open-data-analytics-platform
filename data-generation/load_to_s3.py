@@ -3,14 +3,14 @@
 SYNTHETIC DATA — NOT FOR REAL USE.
 
 Vervangt load_to_kafka.py: i.p.v. Kafka publishen schrijven we JSONL-bestanden
-naar `s3a://uwv-raw/<domain>/<entity>/dt=<YYYY-MM-DD>/part-<batch>-<ts>.jsonl`.
+naar `s3a://odap-raw/<domain>/<entity>/dt=<YYYY-MM-DD>/part-<batch>-<ts>.jsonl`.
 Eén regel per envelope. Spark Structured Streaming (file source) leest deze
 directory en schrijft naar Delta-bronze. Zie
 `spark-jobs/streaming_files_to_lakehouse.py`.
 
 Voorbeeldgebruik:
   uv run python load_to_s3.py --count 10000 \\
-    --bucket uwv-raw --endpoint http://localhost:9000
+    --bucket odap-raw --endpoint http://localhost:9000
 
 In-cluster: zie data-generation/k8s/seed-job.yaml.
 """
@@ -113,11 +113,11 @@ def _emit(writer, stream: str, items: Iterable, to_envelope) -> int:
 @click.command()
 @click.option("--count", default=10000, show_default=True, help="Aantal personas (anchor count).")
 @click.option("--seed", default=2026, show_default=True, help="RNG-seed.")
-@click.option("--bucket", default="uwv-raw", show_default=True, help="S3 bucket voor de raw zone.")
+@click.option("--bucket", default="odap-raw", show_default=True, help="S3 bucket voor de raw zone.")
 @click.option(
     "--endpoint",
     envvar="S3_ENDPOINT",
-    default="https://minio.uwv-platform.svc.cluster.local:9000",
+    default="https://minio.odap-platform.svc.cluster.local:9000",
     show_default=True,
     help="S3 endpoint URL.",
 )

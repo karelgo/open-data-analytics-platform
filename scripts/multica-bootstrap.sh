@@ -19,7 +19,7 @@
 # Auth precedence:
 #   1. --token / -t flag
 #   2. MULTICA_API_TOKEN env var
-#   3. Secret nanitics-multica-token (key MULTICA_API_TOKEN) in uwv-platform
+#   3. Secret nanitics-multica-token (key MULTICA_API_TOKEN) in odap-platform
 #
 # Re-runs are safe — each step is "create if missing".
 
@@ -32,10 +32,10 @@ warn() { printf '\033[1;33m!!\033[0m %s\n' "$*"; }
 fail() { printf '\033[1;31mFAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
 # ---- defaults ----------------------------------------------------------
-MULTICA_URL="${MULTICA_URL:-https://multica.uwv-platform.local:8443}"
+MULTICA_URL="${MULTICA_URL:-https://multica.odap.local:8443}"
 WORKSPACE_SLUG="${MULTICA_WORKSPACE:-platform-ops}"
 WORKSPACE_NAME=""   # human-readable; falls back to slug
-NAMESPACE="${NAMESPACE:-uwv-platform}"
+NAMESPACE="${NAMESPACE:-odap-platform}"
 CONFIGMAP_NAME="${CONFIGMAP_NAME:-nanitics-observatory-config}"
 DEPLOY_NAME="${DEPLOY_NAME:-nanitics-observatory}"
 TOKEN=""

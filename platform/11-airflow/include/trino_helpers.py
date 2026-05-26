@@ -1,7 +1,7 @@
 """Trino-connectiehelpers — gedeeld door Cosmos en KubernetesPodOperator-DAGs.
 
 Twee paden:
-  - Cosmos: ProfileMapping leest uit een Airflow Connection (default `trino_uwv`).
+  - Cosmos: ProfileMapping leest uit een Airflow Connection (default `trino_default`).
   - KubernetesPodOperator: env-vars voor dbt-image (legacy compat).
 """
 from __future__ import annotations
@@ -13,12 +13,12 @@ from kubernetes.client.models import (
 )
 
 # Defaults — overrideable via Airflow Variables.
-TRINO_HOST = "uwv-trino-coordinator.uwv-platform.svc.cluster.local"
+TRINO_HOST = "trino-coordinator.odap-platform.svc.cluster.local"
 TRINO_PORT = "8443"
 TRINO_USER = "smoketest"
 TRINO_USER_SECRET = "trino-static-users"     # Stackable secret
 TRINO_USER_SECRET_KEY = "smoketest"
-TRINO_CONN_ID = "trino_uwv"                  # Airflow Connection-id voor Cosmos
+TRINO_CONN_ID = "trino_default"                  # Airflow Connection-id voor Cosmos
 
 
 def trino_pod_env() -> list[V1EnvVar]:

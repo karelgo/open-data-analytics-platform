@@ -1,5 +1,5 @@
-# MinIO als OM StorageService (S3-compatible). Catalogiseert de UWV-buckets
-# (uwv-bronze / uwv-silver / uwv-meta / uwv-staging) zodat ze browseable
+# MinIO als OM StorageService (S3-compatible). Catalogiseert de platform buckets
+# (odap-bronze / odap-silver / odap-meta / odap-staging) zodat ze browseable
 # zijn vanuit OM en koppelbaar aan dbt-models en Spark-pipelines.
 #
 # OM 1.5+ ondersteunt het S3 connector-type; `containerFilterPattern.includes`
@@ -9,31 +9,31 @@
 ---
 source:
   type: s3
-  serviceName: uwv-minio
+  serviceName: minio
   serviceConnection:
     config:
       type: S3
       awsConfig:
-        awsAccessKeyId: uwvadmin
+        awsAccessKeyId: platformadmin
         awsSecretAccessKey: ${MINIO_SECRET_KEY}
         awsRegion: eu-nl-1
-        endPointURL: https://minio.uwv-platform.svc.cluster.local:9000
+        endPointURL: https://minio.odap-platform.svc.cluster.local:9000
   sourceConfig:
     config:
       type: StorageMetadata
       containerFilterPattern:
         includes:
-          - uwv-bronze
-          - uwv-silver
-          - uwv-meta
-          - uwv-staging
+          - odap-bronze
+          - odap-silver
+          - odap-meta
+          - odap-staging
 sink:
   type: metadata-rest
   config: {}
 workflowConfig:
   loggerLevel: INFO
   openMetadataServerConfig:
-    hostPort: http://openmetadata.uwv-meta.svc.cluster.local:8585/api
+    hostPort: http://openmetadata.odap-meta.svc.cluster.local:8585/api
     authProvider: openmetadata
     securityConfig:
       jwtToken: ${OM_JWT_TOKEN}

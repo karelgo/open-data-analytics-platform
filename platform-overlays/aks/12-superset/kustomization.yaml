@@ -1,5 +1,5 @@
 # AKS overlay for platform/12-superset.
-# Platform-level ingress on superset.uwv-platform.local stays put for
+# Platform-level ingress on superset.odap.local stays put for
 # in-cluster routing; public AKS ingress is `superset-public` in
 # infrastructure/azure/public-ingresses.yaml.
 #
@@ -13,8 +13,8 @@ patches:
   - target:
       group: superset.stackable.tech
       kind: SupersetCluster
-      name: uwv-superset
+      name: superset
     patch: |-
       - op: replace
         path: /spec/nodes/configOverrides/superset_config.py/WEBSERVER_BASE_URL
-        value: '"https://superset.eu-sovereigndataplatform.com"'
+        value: '"https://superset.example.com"'

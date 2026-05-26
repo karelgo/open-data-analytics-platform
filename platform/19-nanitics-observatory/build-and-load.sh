@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Build the Nanitics Observatory image and import it into the local
-# k3d cluster (uwv-platform).
+# k3d cluster (odap-platform).
 #
 # Steps:
 #   1) Locate the nanitics SDK repo (env var NANITICS_REPO or the default).
 #   2) Sync observatory/dist-embed into ./app/observatory-ui (so Docker can COPY it).
 #   3) docker build with ./app/ as the build context.
-#   4) k3d image import into the uwv-platform cluster (no registry needed).
+#   4) k3d image import into the odap-platform cluster (no registry needed).
 #
 # Idempotent and safe to re-run.
 
@@ -15,8 +15,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="${SCRIPT_DIR}/app"
 NANITICS_REPO="${NANITICS_REPO:-/Users/karelgoense/Documents/programming/sandbox/nanitics}"
-IMAGE_TAG="${IMAGE_TAG:-uwv-platform/nanitics-observatory:dev}"
-CLUSTER_NAME="${CLUSTER_NAME:-uwv-platform}"
+IMAGE_TAG="${IMAGE_TAG:-odap/nanitics-observatory:dev}"
+CLUSTER_NAME="${CLUSTER_NAME:-odap-platform}"
 
 echo "==> nanitics repo:   ${NANITICS_REPO}"
 echo "==> image tag:       ${IMAGE_TAG}"
@@ -60,4 +60,4 @@ echo "Image '${IMAGE_TAG}' is now available inside the '${CLUSTER_NAME}' cluster
 echo "Apply manifests with:"
 echo "  kubectl apply -k ${SCRIPT_DIR}"
 echo "Or trigger a rollout if already deployed:"
-echo "  kubectl -n uwv-platform rollout restart deploy/nanitics-observatory"
+echo "  kubectl -n odap-platform rollout restart deploy/nanitics-observatory"

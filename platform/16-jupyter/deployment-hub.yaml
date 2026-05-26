@@ -1,4 +1,4 @@
-# UWV Lab — JupyterHub Deployment.
+# ODAP Lab — JupyterHub Deployment.
 #
 # One pod runs both the Hub (port 8081) and configurable-http-proxy (port
 # 8000) — the simplest topology and the one used by Z2JH's default chart in
@@ -14,7 +14,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jupyterhub
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
     app.kubernetes.io/name: jupyterhub
     app.kubernetes.io/component: hub
@@ -86,13 +86,13 @@ spec:
                   name: jupyterhub-oidc
                   key: client-secret
             - name: OAUTH_CALLBACK_URL
-              value: "https://platform.uwv-platform.local:8443/jupyter/hub/oauth_callback"
+              value: "https://platform.odap.local:8443/jupyter/hub/oauth_callback"
             # Public URLs visible to the browser; mode-specific (overlays/aks
-            # rewrites these to .eu-sovereigndataplatform.com without :8443).
+            # rewrites these to .example.com without :8443).
             - name: KEYCLOAK_PUBLIC_URL
-              value: "https://keycloak.uwv-platform.local:8443"
+              value: "https://keycloak.odap.local:8443"
             - name: OPENMETADATA_PUBLIC_URL
-              value: "https://openmetadata.uwv-platform.local:8443"
+              value: "https://openmetadata.odap.local:8443"
             - name: CONFIGPROXY_AUTH_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -104,7 +104,7 @@ spec:
                   name: jupyterhub-oidc
                   key: crypt-key
             - name: SINGLEUSER_IMAGE
-              value: "uwv-platform/jupyter-kernel:dev"
+              value: "odap/jupyter-kernel:dev"
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:

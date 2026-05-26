@@ -1,5 +1,5 @@
 {
-  "uwv_role_mappings": {
+  "role_mappings": {
     "resource_purposes": {
       "bronze.uwv.*": [
         "primair_proces"

@@ -41,12 +41,12 @@ customConfig:
       extra_label_selector: "app.kubernetes.io/managed-by!=Helm,!stackable.tech/vector-disabled"
 
   transforms:
-    add_uwv_metadata:
+    add_platform_metadata:
       type: remap
       inputs: [k8s_logs]
       source: |
-        .uwv_platform = "uwv-data-platform"
-        .uwv_zone = "dev-k3d"
+        .odap_platform = "odap-data-platform"
+        .zone = "dev-k3d"
 
         # ---- Cardinality reduction ----
         # OpenSearch index size grows roughly linearly with the number of
@@ -77,27 +77,27 @@ customConfig:
     # en aparte audit-index (R-AVG-15, R-BIO-20).
     route_audit_logs:
       type: route
-      inputs: [add_uwv_metadata]
+      inputs: [add_platform_metadata]
       route:
         # VRL: binary-operator aan eind van regel; `contains` voor strings,
         # `includes` is alleen voor arrays.
         opa_decisions: |
-          (.kubernetes.pod_namespace == "uwv-platform" &&
+          (.kubernetes.pod_namespace == "odap-platform" &&
             contains(string!(.kubernetes.container_name), "opa") &&
             contains(to_string!(.message),"decision_id"))
         trino_audit: |
-          (.kubernetes.pod_namespace == "uwv-platform" &&
+          (.kubernetes.pod_namespace == "odap-platform" &&
             contains(string!(.kubernetes.container_name), "trino") &&
             contains(to_string!(.message),"queryId"))
 
     # Improvements #5.1 (log-based alerts) — detecteer interessante
     # patronen en zet ze om naar Prometheus-tellers. Het sink-blok
     # `prometheus_log_events` hieronder serveert ze op poort 9598; de
-    # PrometheusRule `uwv-log-events` (platform/14-monitoring/
+    # PrometheusRule `log-events` (platform/14-monitoring/
     # vector-log-alerts.yaml) alert daarop.
     detect_alert_events:
       type: remap
-      inputs: [add_uwv_metadata]
+      inputs: [add_platform_metadata]
       source: |
         msg = to_string(.message) ?? ""
         ns  = to_string(.kubernetes.pod_namespace) ?? ""
@@ -149,7 +149,7 @@ customConfig:
       metrics:
         - type: counter
           field: alert_event
-          name: uwv_alert_event_total
+          name: alert_event_total
           namespace: vector
           tags:
             event: '{{`{{ alert_event }}`}}'
@@ -162,32 +162,32 @@ customConfig:
       inputs:
         - "route_audit_logs._unmatched"
       endpoints:
-        - "http://opensearch-uwv.uwv-meta.svc.cluster.local:9200"
+        - "http://opensearch.odap-meta.svc.cluster.local:9200"
       bulk:
-        index: "uwv-logs-%Y.%m.%d"
+        index: "logs-%Y.%m.%d"
       mode: bulk
       api_version: v8
       compression: gzip
       healthcheck:
         enabled: false
 
-    # Aparte audit-index met 7-jaar-retentie (zie OS ILM uwv-audit-logs).
+    # Aparte audit-index met 7-jaar-retentie (zie OS ILM audit-logs).
     opensearch_audit:
       type: elasticsearch
       inputs:
         - "route_audit_logs.opa_decisions"
         - "route_audit_logs.trino_audit"
       endpoints:
-        - "http://opensearch-uwv.uwv-meta.svc.cluster.local:9200"
+        - "http://opensearch.odap-meta.svc.cluster.local:9200"
       bulk:
-        index: "uwv-logs-audit-%Y.%m.%d"
+        index: "logs-audit-%Y.%m.%d"
       mode: bulk
       api_version: v8
       compression: gzip
       healthcheck:
         enabled: false
 
-    # Prometheus-exporter sink — exposes uwv_alert_event_total op poort
+    # Prometheus-exporter sink — exposes alert_event_total op poort
     # 9598. PodMonitor in 14-monitoring scrape't deze poort, PrometheusRule
     # in vector-log-alerts.yaml alert op stijging-snelheid.
     prometheus_log_events:

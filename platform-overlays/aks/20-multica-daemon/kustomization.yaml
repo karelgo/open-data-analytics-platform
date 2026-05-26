@@ -2,7 +2,7 @@
 #
 # Only difference from the base: MULTICA_APP_URL points at the public
 # hostname instead of the local one. The daemon talks to the Multica
-# backend over the in-cluster Service (http://multica-backend.uwv-platform:80),
+# backend over the in-cluster Service (http://multica-backend.odap-platform:80),
 # which is identical on both clusters — so MULTICA_SERVER_URL needs no
 # patch. MULTICA_APP_URL is only used to build task-URL strings that
 # end up in comments / metadata, so it must match the ingress humans
@@ -27,4 +27,4 @@ patches:
               - name: daemon
                 env:
                   - name: MULTICA_APP_URL
-                    value: "https://multica.eu-sovereigndataplatform.com"
+                    value: "https://multica.example.com"

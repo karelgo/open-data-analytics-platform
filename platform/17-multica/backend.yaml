@@ -12,7 +12,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: multica-backend
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   selector:
     app.kubernetes.io/name: multica-backend
@@ -27,7 +27,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: multica-backend-metrics
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
     app.kubernetes.io/component: multica
     prometheus-job: multica-backend
@@ -47,7 +47,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: multica-backend
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   replicas: 1
   strategy:

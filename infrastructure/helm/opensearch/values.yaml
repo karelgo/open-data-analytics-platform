@@ -2,15 +2,15 @@
 # OpenMetadata-search (per gebruikerskeuze, vraag 10 in master agent prompt).
 #
 # Index-prefix-conventie:
-#   uwv-logs-YYYY.MM.DD       (Vector)
+#   logs-YYYY.MM.DD       (Vector)
 #   open_metadata*            (OpenMetadata-search-engine)
 #
 # Chart: opensearch-project/opensearch
 # Productie: ≥ 3 master-eligible nodes met data-tier-rollen + dedicated security.
 ---
-clusterName: opensearch-uwv
+clusterName: opensearch
 nodeGroup: master
-masterService: opensearch-uwv
+masterService: opensearch
 
 # Single-node setup
 singleNode: true

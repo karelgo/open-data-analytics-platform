@@ -10,7 +10,7 @@ description: Hoe kwetsbaarheden te rapporteren — NIS2-compliant disclosure flo
 
 > Improvements #10 / R-NIS2-05.
 
-UWV Reference Data Platform neemt security en privacy serieus. Deze policy
+Open Data & Analytics Platform neemt security en privacy serieus. Deze policy
 beschrijft hoe je een kwetsbaarheid kunt melden, welke versies onderhouden
 worden, en wat je van ons mag verwachten in de respons-flow.
 

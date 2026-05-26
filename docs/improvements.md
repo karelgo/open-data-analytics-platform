@@ -1,4 +1,4 @@
-# Verbeteringen — Roadmap voor het UWV Reference Platform
+# Verbeteringen — Roadmap voor het Open Data & Analytics Platform
 
 Status: **post-fase-10 audit** (2026-05-01). Deze lijst is geen verplichting,
 maar inventariseert verbeterruimte op alle vlakken: security, betrouwbaarheid,
@@ -33,7 +33,7 @@ voor opvolg-werk.
 | 1.5 | ~~Geen ResourceQuota / LimitRange per namespace~~ — opgelost in [`platform/00-namespaces/resourcequota-limitrange.yaml`](../platform/00-namespaces/resourcequota-limitrange.yaml) | `platform/00-namespaces/` | ✅ | — |
 | 1.6 | **Geen pre-built Superset-dashboards** — DoD-anchor "WIA Funnel" niet voltooid | `platform/12-superset/dashboards/` | 🟠 | M |
 | 1.7 | **Geen kustomize `overlays/`** — geen prod-overlay om scaled-down naar production-replicas te flippen | `platform/*/overlays/` | 🟠 | M |
-| 1.8 | ~~Geen Prometheus AlertRules~~ — opgelost in [`platform/14-monitoring/prometheusrule-uwv.yaml`](../platform/14-monitoring/prometheusrule-uwv.yaml); zie runbook §9 voor log-based + metric-based alerts | `platform/14-monitoring/` | ✅ | — |
+| 1.8 | ~~Geen Prometheus AlertRules~~ — opgelost in [`platform/14-monitoring/prometheusrule.yaml`](../platform/14-monitoring/prometheusrule.yaml); zie runbook §9 voor log-based + metric-based alerts | `platform/14-monitoring/` | ✅ | — |
 | 1.9 | **Geen Grafana-dashboards UWV-specifiek** — alleen de defaults uit kube-prometheus-stack | `infrastructure/helm/prometheus-stack/` | 🟡 | M |
 | 1.10 | **Geen KafkaTopic CRDs** — `auto.create.topics=true` in dev | `platform/06-kafka/` | 🟠 | S |
 | 1.11 | **`pseudonymize.sql` macro nergens gebruikt** in de dbt-models | `dbt/models/` | 🟡 | S |
@@ -57,7 +57,7 @@ voor opvolg-werk.
 | 2.1.2 | **External Secrets Operator + Vault** voor productie | 🔴 | L |
 | 2.1.3 | **Secret-rotatie** — Stackable secret-operator kan TLS-certs roteren maar credentials niet | 🟠 | M |
 | 2.1.4 | **JWT-token bootstrap automatiseren** — nu manueel `metadata generate-token` na bootstrap | 🟠 | S |
-| 2.1.5 | **Per-OIDC-client unique secrets** — nu allemaal `uwv-dev-only-CHANGE-ME-<service>-secret`; productie roteert via Keycloak admin-API | 🟠 | M |
+| 2.1.5 | **Per-OIDC-client unique secrets** — nu allemaal `odap-dev-only-CHANGE-ME-<service>-secret`; productie roteert via Keycloak admin-API | 🟠 | M |
 
 ### 2.2 TLS / encryptie
 
@@ -97,7 +97,7 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 2.5.1 | **NetworkPolicy per namespace** — `uwv-platform` mag alleen praten naar `uwv-data` (DB) en `uwv-meta` (OM) | 🔴 | M |
+| 2.5.1 | **NetworkPolicy per namespace** — `odap-platform` mag alleen praten naar `odap-data` (DB) en `odap-meta` (OM) | 🔴 | M |
 | 2.5.2 | **Cilium of Calico** voor L7-NetworkPolicies (productie) | 🟡 | L |
 | 2.5.3 | **Egress-filtering** — pods mogen alleen externe images + Kafka producers van bron-mocks bereiken | 🟠 | M |
 | 2.5.4 | **MinIO en OpenSearch in private VPC** in productie — niet via ingress-nginx | 🟠 | M |
@@ -152,7 +152,7 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 3.3.1 | **Backup-Job CronJob** in `uwv-data` — nu manueel via runbook | 🔴 | M |
+| 3.3.1 | **Backup-Job CronJob** in `odap-data` — nu manueel via runbook | 🔴 | M |
 | 3.3.2 | **Restore-test-script** dat backup-restore daadwerkelijk valideert | 🔴 | M |
 | 3.3.3 | **Off-site / cross-region backup** voor productie — out-of-scope dev | 🟠 | L |
 | 3.3.4 | **MinIO bucket-versioning** voor accidentele deletes | 🟠 | S |
@@ -188,15 +188,15 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 5.1 | **Prometheus AlertRules** — basis-set in [prometheusrule-uwv.yaml](../platform/14-monitoring/prometheusrule-uwv.yaml) (Trino, OPA, Spark-lag, Postgres, kube-state). Uitbreiding (2026-05-18): log-based alerts via Vector → log_to_metric ([vector-log-alerts.yaml](../platform/14-monitoring/vector-log-alerts.yaml)): OPA-deny-spike, Trino access-denied-spike, JVM-OOM, Keycloak-login-error, CSV-upload-fail. | ✅ | done |
+| 5.1 | **Prometheus AlertRules** — basis-set in [prometheusrule.yaml](../platform/14-monitoring/prometheusrule.yaml) (Trino, OPA, Spark-lag, Postgres, kube-state). Uitbreiding (2026-05-18): log-based alerts via Vector → log_to_metric ([vector-log-alerts.yaml](../platform/14-monitoring/vector-log-alerts.yaml)): OPA-deny-spike, Trino access-denied-spike, JVM-OOM, Keycloak-login-error, CSV-upload-fail. | ✅ | done |
 | 5.2 | **Grafana-dashboards UWV** — per UC één + platform-overview | 🟠 | L |
-| 5.3 | **OpenSearch ILM-policy** — hot/warm/cold tier voor `uwv-logs-*` | 🟠 | S |
+| 5.3 | **OpenSearch ILM-policy** — hot/warm/cold tier voor `logs-*` | 🟠 | S |
 | 5.4 | **OpenSearch Dashboards installeren** — log-querying-UI | 🟡 | M |
 | 5.5 | **Distributed tracing** (Jaeger of Tempo) — Trino/Spark ondersteunen OpenTelemetry-spans | 🟡 | L |
 | 5.6 | **Logs-naar-OS schemamapping** — Vector schrijft nu raw; ECS- of OTel-logs-format zou queries beter maken | 🟡 | M |
 | 5.7 | **OpenMetadata observability-tab** — DQ-test-resultaten + lineage-events live | 🟡 | M |
 | 5.8 | **SLO-definities + SLI's** — start met uptime + DQ + ingestion-latency per data-product | 🟠 | M |
-| 5.9 | ~~**Alertmanager met Slack/PagerDuty**~~ — opgepakt 2026-05-18: email-receiver toegevoegd ([alertmanager-config.yaml](../platform/14-monitoring/alertmanager-config.yaml)) + MailHog als k3d-SMTP-sink + AKS-overlay voor UWV-relay. Slack-receiver was er al. PagerDuty blijft uitgeschakeld tot CRD-schema fix. | ✅ | done |
+| 5.9 | ~~**Alertmanager met Slack/PagerDuty**~~ — opgepakt 2026-05-18: email-receiver toegevoegd ([alertmanager-config.yaml](../platform/14-monitoring/alertmanager-config.yaml)) + MailHog als k3d-SMTP-sink + AKS-overlay voor platform relay. Slack-receiver was er al. PagerDuty blijft uitgeschakeld tot CRD-schema fix. | ✅ | done |
 | 5.10 | **Loki of OpenSearch query-saver** voor frequente debug-queries | 🟡 | S |
 
 ---
@@ -209,7 +209,7 @@ voor opvolg-werk.
 | 6.2 | **IAMA template** in `docs/iama/` voor UC-02/UC-03 | 🔴 | M |
 | 6.3 | **`gdpr_request` DAG** — geautomatiseerde inzage/correctie/verwijdering per BSN | 🔴 | L |
 | 6.4 | **Bewaartermijn-DAG** — drop records ouder dan `meta.bewaartermijn_jaren` | 🔴 | M |
-| 6.5 | **Audit-log retention 7 jaar** — ILM-policy op `uwv-logs-audit-*` apart van app-logs | 🟠 | S |
+| 6.5 | **Audit-log retention 7 jaar** — ILM-policy op `logs-audit-*` apart van app-logs | 🟠 | S |
 | 6.6 | **OPA decision-log → OpenSearch + 7-jaar-retention** | 🔴 | M |
 | 6.7 | **Quarterly access-review-script** — exporteert role-mappings + Keycloak-users naar Excel voor manager-bevestiging | 🟠 | M |
 | 6.8 | **Algoritmeregister-export** — JSON-feed met alle `meta.risk_tier=hoog` modellen | 🟠 | M |
@@ -251,7 +251,7 @@ voor opvolg-werk.
 |---|---|---|---|
 | 7.3.1 | **NiFi-flows daadwerkelijk implementeren** — nu placeholder; importeer JSON | 🟡 | L |
 | 7.3.2 | **`spark-jobs/lakehouse_maintenance.py`** — maintenance-DAG verwijst nu naar Trino-procedures, maar voor productie is een Spark-batch met statistics-update + manifest-rewrite-strategie beter | 🟡 | M |
-| 7.3.3 | **dbt-runs in Airflow-DAG echt werkend krijgen** — `uwv_repo_url` Variable instructions in runbook, maar nooit getest | 🟠 | S |
+| 7.3.3 | **dbt-runs in Airflow-DAG echt werkend krijgen** — `repo_url` Variable instructions in runbook, maar nooit getest | 🟠 | S |
 | 7.3.4 | **dbt manifest-upload naar MinIO** als post-task in `dbt_run_per_domain.py` (nu vereist door `om_ingest_dbt`) | 🟠 | S |
 
 ---
@@ -363,7 +363,7 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 15.1 | **Cost-labels per pod** — `uwv.nl/cost-center: <divisie>` | 🟡 | S |
+| 15.1 | **Cost-labels per pod** — `odap.io/cost-center: <divisie>` | 🟡 | S |
 | 15.2 | **Kubecost / OpenCost** voor dev-zichtbaarheid | 🟡 | M |
 | 15.3 | **Off-hours scaling-to-zero** met KEDA | 🟡 | M |
 | 15.4 | **Spot/preemptible nodes** voor batch-workloads | 🟡 | L |

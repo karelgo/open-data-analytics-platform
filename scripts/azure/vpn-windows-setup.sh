@@ -16,7 +16,7 @@ error() { printf '\033[1;31mFAIL\033[0m %s\n' "$*" >&2; exit 1; }
   || error "Cert files missing under $CERT_DIR — run 'make aks-up' first."
 
 # 1. Build PFX (cert + key + chain) for Windows cert store import.
-PFX="$CERT_DIR/uwv-platform-vpn-client.pfx"
+PFX="$CERT_DIR/odap-platform-vpn-client.pfx"
 PFX_PW="${PFX_PW:-uwv}"
 log "Bundling client.crt + client.key + root.crt into $PFX (password: $PFX_PW)"
 openssl pkcs12 -export \
@@ -24,7 +24,7 @@ openssl pkcs12 -export \
   -inkey "$CERT_DIR/client.key" \
   -in "$CERT_DIR/client.crt" \
   -certfile "$CERT_DIR/root.crt" \
-  -name "UWV Platform VPN Client" \
+  -name "Platform VPN Client" \
   -passout "pass:$PFX_PW" \
   >/dev/null 2>&1
 chmod 600 "$PFX"
@@ -49,12 +49,12 @@ fi
 # 3. Print instructions
 GW_IP=$(cd "$TF_DIR" && terraform output -raw vpn_gateway_public_ip 2>/dev/null || echo "<provisioning>")
 AKS_VNET=$(cd "$TF_DIR" && terraform output -json aks_vnet_address_space 2>/dev/null || echo "[]")
-LB_INTERNAL=$(kubectl --context uwv-platform-aks -n ingress-nginx get svc ingress-nginx-controller-internal -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "<not yet allocated>")
+LB_INTERNAL=$(kubectl --context odap-platform-aks -n ingress-nginx get svc ingress-nginx-controller-internal -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "<not yet allocated>")
 
 cat <<EOF
 
   ================================================================
-   UWV Platform VPN — Windows install
+   Platform VPN — Windows install
   ================================================================
 
    1. Copy these two files to your Windows machine:
@@ -72,9 +72,9 @@ cat <<EOF
    4. Connect: Settings → Network & Internet → VPN → "${GW_NAME:-<gw>}" → Connect.
 
    5. Once connected, edit C:\\Windows\\System32\\drivers\\etc\\hosts (admin):
-        $LB_INTERNAL platform.uwv-platform.cloud keycloak.uwv-platform.cloud minio-console.uwv-platform.cloud minio.uwv-platform.cloud grafana.uwv-platform.cloud openmetadata.uwv-platform.cloud
+        $LB_INTERNAL platform.odap-platform.cloud keycloak.odap-platform.cloud minio-console.odap-platform.cloud minio.odap-platform.cloud grafana.odap-platform.cloud openmetadata.odap-platform.cloud
 
-      Then browse to https://platform.uwv-platform.cloud — standard port 443,
+      Then browse to https://platform.odap-platform.cloud — standard port 443,
       TLS via the platform's self-signed CA (browser will warn — accept once).
 
   Reference values (from terraform output):

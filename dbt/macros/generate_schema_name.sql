@@ -2,7 +2,7 @@
 
    - trino: gebruik letterlijk de custom schema-naam (bv. `silver.ww`,
      `gold.uc01_*`). dbt zou anders prefixen met `target.schema_<custom>`.
-   - databricks: UC heeft één catalog (uwv_databricks). Staging + intermediate
+   - databricks: UC heeft één catalog (databricks). Staging + intermediate
      gaan naar `silver`-schema; marts naar `gold`-schema. Mapping op basis
      van `node.config.database` (de `+database:` waarde uit dbt_project.yml,
      die in Trino-context de catalog-naam is).

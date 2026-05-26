@@ -1,7 +1,7 @@
 """CSV-ingest-factory.
 
 Bouwt één DAG per `csv_batch`-bron. Elke DAG heeft één KubernetesPodOperator-
-task die `csv_to_bronze.py` runt — leest CSV uit s3://uwv-staging/<prefix>/...,
+task die `csv_to_bronze.py` runt — leest CSV uit s3://odap-staging/<prefix>/...,
 valideert tegen het schema in de source-YAML, schrijft Delta naar bronze, en
 publiceert de bronze-Dataset zodat silver-DAGs auto-getriggerd worden.
 
@@ -39,9 +39,9 @@ DEFAULT_ARGS = {
 # Image — slank Python-base. pip install van loader-deps gebeurt in args.
 LOADER_IMAGE = "python:3.11-slim"
 
-# Endpoints in-cluster. CA voor TLS-verify komt uit uwv-ca-bundle ConfigMap.
-S3_ENDPOINT = "https://minio.uwv-platform.svc.cluster.local:9000"
-TRINO_HOST = "uwv-trino-coordinator.uwv-platform.svc.cluster.local"
+# Endpoints in-cluster. CA voor TLS-verify komt uit platform-ca-bundle ConfigMap.
+S3_ENDPOINT = "https://minio.odap-platform.svc.cluster.local:9000"
+TRINO_HOST = "trino-coordinator.odap-platform.svc.cluster.local"
 TRINO_PORT = "8443"
 TRINO_USER = "smoketest"                   # static-user voor automation; OPA staat HMS-DDL toe.
 
@@ -50,9 +50,9 @@ SOURCES_CM = "airflow-sources"
 JOBS_CM = "airflow-jobs"
 
 JOBS_VOLUME = "airflow-jobs"
-JOBS_MOUNT = "/opt/uwv/airflow/jobs"
+JOBS_MOUNT = "/opt/odap/airflow/jobs"
 SOURCES_VOLUME = "airflow-sources"
-SOURCES_MOUNT = "/opt/uwv/airflow/sources"
+SOURCES_MOUNT = "/opt/odap/airflow/sources"
 
 
 def _jobs_volume() -> V1Volume:
@@ -73,11 +73,11 @@ def _sources_mount() -> V1VolumeMount:
 
 def _env_vars(source: SourceSpec) -> list[V1EnvVar]:
     return [
-        V1EnvVar(name="UWV_SOURCE_NAME", value=source.name),
+        V1EnvVar(name="SOURCE_NAME", value=source.name),
         # object_key komt uit dag_run.conf — Jinja-rendered op task-level.
-        V1EnvVar(name="UWV_OBJECT_KEY", value="{{ dag_run.conf['object_key'] }}"),
-        V1EnvVar(name="UWV_SOURCES_DIR", value=SOURCES_MOUNT),
-        V1EnvVar(name="UWV_BRONZE_BUCKET", value="uwv-bronze"),
+        V1EnvVar(name="OBJECT_KEY", value="{{ dag_run.conf['object_key'] }}"),
+        V1EnvVar(name="SOURCES_DIR", value=SOURCES_MOUNT),
+        V1EnvVar(name="BRONZE_BUCKET", value="odap-bronze"),
         # MinIO
         V1EnvVar(name="S3_ENDPOINT", value=S3_ENDPOINT),
         V1EnvVar(name="S3_REGION", value="eu-nl-1"),
@@ -88,11 +88,11 @@ def _env_vars(source: SourceSpec) -> list[V1EnvVar]:
         V1EnvVar(name="TRINO_PORT", value=TRINO_PORT),
         V1EnvVar(name="TRINO_USER", value=TRINO_USER),
         V1EnvVar(name="TRINO_HTTP_SCHEME", value="https"),
-        V1EnvVar(name="TRINO_VERIFY", value="/etc/uwv-ca/ca.crt"),
+        V1EnvVar(name="TRINO_VERIFY", value="/etc/platform-ca/ca.crt"),
         secret_env("TRINO_PASSWORD", "trino-static-users", TRINO_USER),
         # CA-bundle voor TLS-verify (MinIO + Trino zijn beide cert-manager).
-        V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/uwv-ca/ca.crt"),
-        V1EnvVar(name="SSL_CERT_FILE", value="/etc/uwv-ca/ca.crt"),
+        V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/platform-ca/ca.crt"),
+        V1EnvVar(name="SSL_CERT_FILE", value="/etc/platform-ca/ca.crt"),
     ]
 
 
@@ -103,7 +103,7 @@ def _pip_args() -> list[str]:
     bumpen, niet in losse YAML-files.
 
     `--trusted-host` is nodig omdat we SSL_CERT_FILE/REQUESTS_CA_BUNDLE op de
-    UWV-CA hebben staan (voor MinIO + Trino TLS-verify in de runtime). Pip's
+    Platform CA hebben staan (voor MinIO + Trino TLS-verify in de runtime). Pip's
     TLS-stack zou dan PyPI's publieke CA niet vertrouwen — daarom expliciet
     de PyPI-hosts whitelisten i.p.v. de CA-vars te unsetten.
     """
@@ -150,7 +150,7 @@ def build_csv_ingest_dag(source: SourceSpec) -> DAG:
     ) as dag:
         KubernetesPodOperator(
             task_id="csv_to_bronze",
-            namespace="uwv-platform",
+            namespace="odap-platform",
             image=LOADER_IMAGE,
             cmds=["bash", "-euo", "pipefail", "-c"],
             arguments=_pip_args(),

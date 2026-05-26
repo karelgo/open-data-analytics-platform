@@ -16,7 +16,7 @@ NEVER applies the `approved` label. The coding-agent daemon filters on
 
 Environment:
     PROMETHEUS_URL          — defaults to in-cluster kube-prometheus-stack
-    MULTICA_API_URL         — defaults to http://multica-backend.uwv-platform:8080
+    MULTICA_API_URL         — defaults to http://multica-backend.odap-platform:8080
     MULTICA_API_TOKEN       — bearer JWT for the platform-watcher Multica user
     MULTICA_WORKSPACE       — workspace slug, defaults to 'platform-ops'
     MULTICA_DRY_RUN         — when 'true', skip POSTs and log the payload
@@ -33,25 +33,25 @@ from typing import Any
 import httpx
 from nanitics import tool
 
-LOG = logging.getLogger("nanitics-observatory-uwv.watcher")
+LOG = logging.getLogger("nanitics-observatory.watcher")
 
 
 PROMETHEUS_URL = os.environ.get(
     "PROMETHEUS_URL",
-    "http://prometheus-kube-prometheus-prometheus.uwv-monitoring:9090",
+    "http://prometheus-kube-prometheus-prometheus.odap-monitoring:9090",
 )
 ALERTMANAGER_URL = os.environ.get(
     "ALERTMANAGER_URL",
-    "http://prometheus-kube-prometheus-alertmanager.uwv-monitoring:9093",
+    "http://prometheus-kube-prometheus-alertmanager.odap-monitoring:9093",
 )
 OPENSEARCH_URL = os.environ.get(
-    "OPENSEARCH_URL", "http://opensearch-uwv.uwv-meta.svc.cluster.local:9200"
+    "OPENSEARCH_URL", "http://opensearch.odap-meta.svc.cluster.local:9200"
 )
-OPENSEARCH_INDEX_PATTERN = os.environ.get("OPENSEARCH_INDEX_PATTERN", "uwv-logs-*")
+OPENSEARCH_INDEX_PATTERN = os.environ.get("OPENSEARCH_INDEX_PATTERN", "logs-*")
 OPENSEARCH_USERNAME = os.environ.get("OPENSEARCH_USERNAME", "")
 OPENSEARCH_PASSWORD = os.environ.get("OPENSEARCH_PASSWORD", "")
 MULTICA_API_URL = os.environ.get(
-    "MULTICA_API_URL", "http://multica-backend.uwv-platform:8080"
+    "MULTICA_API_URL", "http://multica-backend.odap-platform:8080"
 )
 MULTICA_API_TOKEN = os.environ.get("MULTICA_API_TOKEN", "")
 MULTICA_WORKSPACE = os.environ.get("MULTICA_WORKSPACE", "platform-ops")
@@ -275,7 +275,7 @@ _APPROVAL_CHECKLIST = """
 
 ## Approval checklist (read before adding the `approved` label)
 
-This task was filed automatically by `platform-watcher@uwv`. The
+This task was filed automatically by `platform-watcher@example.com`. The
 **Suggested fix** above is a proposal, not a prescription.
 
 Before adding the `approved` label and assigning the task to a coding
@@ -364,7 +364,7 @@ async def list_firing_alerts(severity: str = "") -> str:
     "Returns a JSON list of recent matching log lines (most-recent first). "
     "Use this to gather concrete log-line evidence after a metric or alert "
     "signal points at a workload. "
-    "Args: query (Lucene, e.g. 'kubernetes.namespace_name:uwv-data AND level:ERROR'), "
+    "Args: query (Lucene, e.g. 'kubernetes.namespace_name:odap-data AND level:ERROR'), "
     "time_range_minutes (default 30), "
     "max_hits (default from config, hard-capped at 100).",
 )
@@ -518,7 +518,7 @@ INVESTIGATION FLOW — follow it in this order:
   3. CONFIRM with evidence. Use query_prometheus to verify the metric
      is still elevated *right now*. For log-level corroboration use
      search_opensearch_logs with a tight Lucene query
-     (e.g. `kubernetes.namespace_name:uwv-data AND level:ERROR`).
+     (e.g. `kubernetes.namespace_name:odap-data AND level:ERROR`).
 
   4. DEDUP. Call find_existing_multica_tasks(fingerprint) BEFORE filing.
      If a match exists, stop and report "already tracked: <id>".

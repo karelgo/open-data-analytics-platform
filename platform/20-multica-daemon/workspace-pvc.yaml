@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: multica-daemon-workspace
-  namespace: uwv-platform
+  namespace: odap-platform
 spec:
   accessModes:
     - ReadWriteOnce

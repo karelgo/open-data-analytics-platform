@@ -2,7 +2,7 @@ package trino
 
 # Rol-gebaseerde resource-access.
 #
-# Bron-of-truth: data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.roles (uit data.json).
+# Bron-of-truth: data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.roles (uit data.json).
 # Voor elke rol in user_roles:
 #   1. Zit de target-catalog in roles[r].catalogs?
 #   2. Zo ja, en is roles[r].schemas != null, zit de schema in die lijst?
@@ -17,14 +17,14 @@ import rego.v1
 #   2. role.schemas is een lijst → catalog ÉN schema moeten matchen
 role_allows_resource if {
 	some r in user_roles
-	role := data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.roles[r]
+	role := data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.roles[r]
 	resource_catalog in role.catalogs
 	role.schemas == null
 }
 
 role_allows_resource if {
 	some r in user_roles
-	role := data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.roles[r]
+	role := data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.roles[r]
 	resource_catalog in role.catalogs
 	role.schemas != null
 	resource_schema in role.schemas
@@ -71,7 +71,7 @@ resource_schema := "" if {
 
 # Capability-helpers — gebruikt door column-masks.
 role_has_capability(role_name, cap) if {
-	role := data.configmap["opa-trino-bundle"]["uwv-platform"].uwv_role_mappings.roles[role_name]
+	role := data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.roles[role_name]
 	role[cap] == true
 }
 

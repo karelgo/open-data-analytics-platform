@@ -16,7 +16,7 @@ def _base_url() -> str:
     # public ingress for laptop debugging when running outside the cluster.
     return os.environ.get(
         "OPENMETADATA_HOST",
-        "http://openmetadata.uwv-meta.svc.cluster.local:8585",
+        "http://openmetadata.odap-meta.svc.cluster.local:8585",
     ).rstrip("/")
 
 
@@ -29,7 +29,7 @@ def _headers() -> dict[str, str]:
 
 
 def _verify() -> bool | str:
-    bundle = os.environ.get("UWV_CA_BUNDLE")
+    bundle = os.environ.get("CA_BUNDLE")
     return bundle if bundle else False
 
 
@@ -60,7 +60,7 @@ def lineage_for(fqn: str) -> dict:
     return get(f"lineage/table/name/{fqn}", upstreamDepth=3, downstreamDepth=3)
 
 
-def glossary_terms(glossary: str = "uwv-glossary") -> list[dict]:
+def glossary_terms(glossary: str = "glossary") -> list[dict]:
     """List terms in the given glossary."""
     payload = get(f"glossaryTerms", glossary=glossary, limit=200)
     return payload.get("data", [])
@@ -69,6 +69,6 @@ def glossary_terms(glossary: str = "uwv-glossary") -> list[dict]:
 def ui_link(fqn: str) -> str:
     """Convenience: build the OpenMetadata UI URL for a table FQN."""
     public = os.environ.get(
-        "OPENMETADATA_PUBLIC_URL", "https://openmetadata.uwv-platform.local:8443"
+        "OPENMETADATA_PUBLIC_URL", "https://openmetadata.odap.local:8443"
     )
     return f"{public.rstrip('/')}/table/{fqn}"

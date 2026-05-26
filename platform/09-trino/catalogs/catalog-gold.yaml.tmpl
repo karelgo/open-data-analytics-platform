@@ -3,13 +3,13 @@ apiVersion: trino.stackable.tech/v1alpha1
 kind: TrinoCatalog
 metadata:
   name: gold
-  namespace: uwv-platform
+  namespace: odap-platform
   labels:
-    trino: uwv-trino
-    uwv.nl/zone: gold
-    uwv.nl/format: __TABLE_FORMAT__
+    trino: trino
+    odap.io/zone: gold
+    odap.io/format: __TABLE_FORMAT__
   annotations:
-    uwv.nl/description: "Gold layer — CGM-conforme business products. Domain-rollen via RBAC + doelbinding."
+    odap.io/description: "Gold layer — CGM-conforme business products. Domain-rollen via RBAC + doelbinding."
 spec:
   connector:
 __TABLE_FORMAT_CONNECTOR_BLOCK__

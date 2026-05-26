@@ -4,7 +4,7 @@
 # Voorwaarden: fase 0+1+2+3+7 (en idealiter fase 5/6 voor dbt/airflow).
 set -euo pipefail
 
-NS="${NS:-uwv-platform}"
+NS="${NS:-odap-platform}"
 
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 pass() { printf '\033[1;32m  OK\033[0m  %s\n' "$*"; }
@@ -12,8 +12,8 @@ fail() { printf '\033[1;31m  FAIL\033[0m %s\n' "$*" >&2; exit 1; }
 
 # 1. Pods Ready
 log "SupersetCluster pod Ready"
-kubectl -n "$NS" rollout status deploy/uwv-superset-node-default --timeout=10m >/dev/null 2>&1 \
-  || kubectl -n "$NS" rollout status statefulset/uwv-superset-node-default --timeout=10m >/dev/null 2>&1 \
+kubectl -n "$NS" rollout status deploy/superset-node-default --timeout=10m >/dev/null 2>&1 \
+  || kubectl -n "$NS" rollout status statefulset/superset-node-default --timeout=10m >/dev/null 2>&1 \
   || fail "SupersetCluster pod niet Ready"
 pass "Superset Ready"
 
@@ -32,7 +32,7 @@ else
 fi
 
 # 3. Trino-database geregistreerd via API
-log "Database 'uwv-trino' in Superset"
+log "Database 'trino' in Superset"
 super_pod=$(kubectl -n "$NS" get pod -l app.kubernetes.io/name=superset \
               -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
 if [[ -z "$super_pod" ]]; then
@@ -61,10 +61,10 @@ dbs=$(kubectl -n "$NS" exec "$super_pod" -c superset -- \
        -H "Authorization: Bearer $token" \
   2>/dev/null || echo "{}")
 
-if echo "$dbs" | grep -qE '"database_name":\s*"uwv-trino-(bronze|silver|gold)"'; then
-  pass "Trino-database 'uwv-trino-*' aanwezig"
+if echo "$dbs" | grep -qE '"database_name":\s*"trino-(bronze|silver|gold)"'; then
+  pass "Trino-database 'trino-*' aanwezig"
 else
-  fail "Trino-database 'uwv-trino-*' niet gevonden — response:\n$dbs"
+  fail "Trino-database 'trino-*' niet gevonden — response:\n$dbs"
 fi
 
 # 4. Datasets aanwezig

@@ -11,7 +11,7 @@
 ## Context
 
 [ADR-0002](0002-iceberg-vs-delta.md) bepaalt na een 10-criteria-analyse dat
-**Iceberg** de default is voor het UWV-platform (eindscore 45 vs 37). De
+**Iceberg** de default is voor het ODAP platform (eindscore 45 vs 37). De
 analyse blijft inhoudelijk geldig.
 
 Voor **deze** referentie-implementatie heeft de opdrachtgever desondanks
@@ -42,7 +42,7 @@ Geen code-wijzigingen elders.
 De afwijking is een **bewuste implementatie-keuze**. Mogelijke achtergronden
 (opdrachtgever-perspectief, niet exhaustief gevalideerd):
 
-- Toekomstige UWV-platformkeuze leunt richting Microsoft Fabric of Databricks
+- Toekomstige ODAP platformkeuze leunt richting Microsoft Fabric of Databricks
   (waar Delta first-class is).
 - Bestaande Spark-expertise in het team is sterker met Delta dan met Iceberg.
 - Liquid Clustering / Change Data Feed worden expliciet gewenst voor
@@ -132,7 +132,7 @@ beter; mocht Flink in scope komen, dan is Delta UniForm de upgrade-route.
 - UWV kiest definitief voor sovereign cloud zonder Databricks- of
   Fabric-toekomst → reden om naar Iceberg te switchen krijgt meer gewicht.
 - Performance-onderzoek wijst uit dat een feature van het ándere formaat
-  doorslaggevend is voor UWV-workloads.
+  doorslaggevend is voor platform workloads.
 
 Plan een **6-maandelijkse review** van deze keuze, niet jaarlijks zoals
 ADR-0002, omdat de override-status het kader minder stabiel maakt dan een

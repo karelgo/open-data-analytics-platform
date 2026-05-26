@@ -1,5 +1,5 @@
 # Ingress voor Prometheus UI (op poort 9090) onder
-# platform.uwv-platform.local/prometheus. Same-origin met portal-shell.
+# platform.odap.local/prometheus. Same-origin met portal-shell.
 # Prometheus zelf is met --web.route-prefix=/prometheus geconfigureerd
 # (zie prometheusSpec.routePrefix in infrastructure/helm/prometheus-stack/
 # values.yaml), dus geen rewrite-target nodig — het pad wordt onverkort
@@ -12,16 +12,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: prometheus
-  namespace: uwv-monitoring
+  namespace: odap-monitoring
   annotations:
-    cert-manager.io/cluster-issuer: uwv-platform-issuer
+    cert-manager.io/cluster-issuer: platform-issuer
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: ["platform.uwv-platform.local"]
+    - hosts: ["platform.odap.local"]
       secretName: prometheus-platform-tls
   rules:
-    - host: platform.uwv-platform.local
+    - host: platform.odap.local
       http:
         paths:
           - path: /prometheus

@@ -1,4 +1,4 @@
-# UWV Platform Portal (Astro)
+# ODAP Portal (Astro)
 
 Rol-aware launchpad + klikbare reference-architectuur voor het UWV Referentie
 Data- en Analyseplatform.
@@ -41,13 +41,13 @@ Eén bron van waarheid:
 
 | Wat | Bron | Hoe |
 |---|---|---|
-| Rol-capabilities | [`opa-policies-src/data/uwv_role_mappings.json`](../opa-policies-src/data/uwv_role_mappings.json) | `scripts/sync-data.mjs` kopieert naar `src/data/role-mappings.generated.json` vóór build |
+| Rol-capabilities | [`opa-policies-src/data/role_mappings.json`](../opa-policies-src/data/role_mappings.json) | `scripts/sync-data.mjs` kopieert naar `src/data/role-mappings.generated.json` vóór build |
 | Component-URLs + beschrijvingen + iconen + stages | [`src/data/components.ts`](src/data/components.ts) | handmatig (single-source binnen portal); brand-iconen in [`public/icons/brand/`](public/icons/brand) en stage-iconen in [`public/icons/stage/`](public/icons/stage) |
 | Per-rol shortcuts | [`src/data/role-shortcuts.ts`](src/data/role-shortcuts.ts) | handmatig, gebaseerd op [`docs/handleidingen`](../docs/handleidingen) |
-| Live status | Prometheus, via `/api/status/up?job=…` | nginx proxy_pass naar `prometheus.uwv-monitoring.svc.cluster.local` |
+| Live status | Prometheus, via `/api/status/up?job=…` | nginx proxy_pass naar `prometheus.odap-monitoring.svc.cluster.local` |
 
 ## Productie-deployment
 
 Zie [`platform/15-portal/`](../platform/15-portal/) — Kubernetes manifests
 (Deployment met `oauth2-proxy` sidecar + nginx, Service, Ingress).
-Container-image: `uwv-platform/portal` (build via [`Dockerfile`](Dockerfile)).
+Container-image: `odap/portal` (build via [`Dockerfile`](Dockerfile)).

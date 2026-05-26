@@ -1,22 +1,22 @@
-# PrometheusRule — UWV-platform alerts (improvements #1).
+# PrometheusRule — ODAP platform alerts (improvements #1).
 #
 # Vereist kube-prometheus-stack (provides PrometheusRule CRD).
 # Severity-mapping:
 #   critical → page (Alertmanager → PagerDuty)
-#   warning  → notify (Alertmanager → Slack #uwv-data-platform)
+#   warning  → notify (Alertmanager → Slack #odap-data-platform)
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: uwv-platform-alerts
-  namespace: uwv-monitoring
+  name: odap-platform-alerts
+  namespace: odap-monitoring
   labels:
     prometheus: kube-prometheus
     role: alert-rules
-    uwv.nl/policy-tier: production
+    odap.io/policy-tier: production
 spec:
   groups:
-    - name: uwv-trino
+    - name: trino
       interval: 1m
       rules:
         - alert: TrinoQueryLatencyP99High
@@ -34,7 +34,7 @@ spec:
             runbook_url: "/docs/runbook.md#41-trino-weigert-query-met-access-denied"
 
         - alert: TrinoNoActiveQueries
-          expr: trino_query_active{cluster="uwv-trino"} < 1
+          expr: trino_query_active{cluster="trino"} < 1
           for: 30m
           labels:
             severity: warning
@@ -42,7 +42,7 @@ spec:
           annotations:
             summary: "Trino heeft 30 min geen active query — broker mogelijk down?"
 
-    - name: uwv-opa
+    - name: opa
       interval: 30s
       rules:
         - alert: OpaDecisionDenyRateHigh
@@ -73,7 +73,7 @@ spec:
           annotations:
             summary: "OPA-pod down — Trino weigert ALLE queries (default-deny)"
 
-    - name: uwv-postgres
+    - name: postgres
       interval: 1m
       rules:
         - alert: PostgresDiskUsageHigh
@@ -97,7 +97,7 @@ spec:
           annotations:
             summary: "Postgres down — alle services die 'm gebruiken vallen om (HMS, Airflow, Superset, OM, Keycloak)"
 
-    - name: uwv-platform
+    - name: odap-platform
       interval: 1m
       rules:
         - alert: KubePodNotReadyHigh
@@ -126,7 +126,7 @@ spec:
     # ---- Hive Metastore ----
     # HMS is the single source of truth for Iceberg/Delta table metadata.
     # If it's down, Trino + Spark + dbt all stop being able to read tables.
-    - name: uwv-hive
+    - name: hive
       interval: 1m
       rules:
         - alert: HiveMetastoreDown
@@ -138,7 +138,7 @@ spec:
           annotations:
             summary: "Hive Metastore is down — Trino + Spark + dbt cannot resolve tables"
             description: >-
-              No Prometheus scrape target for uwv-hive-metastore is responding.
+              No Prometheus scrape target for hive-metastore is responding.
               Check pod status and the shared Postgres `hivemetastore` database.
             runbook_url: "/docs/runbook.md#44-hive-metastore-postgres-corruption-of-readiness-fail"
 
@@ -146,7 +146,7 @@ spec:
     # Stackable's AirflowCluster runs scheduler + webserver as separate
     # StatefulSets. The scheduler is the heartbeat — without it, DAGs stop
     # being parsed and tasks stop being scheduled.
-    - name: uwv-airflow
+    - name: airflow
       interval: 1m
       rules:
         - alert: AirflowSchedulerHeartbeatLost
@@ -183,7 +183,7 @@ spec:
     # ---- MinIO ----
     # MinIO holds the lakehouse storage. Disk-pressure means streaming
     # bronze pipelines and dbt-target writes start failing.
-    - name: uwv-minio
+    - name: minio
       interval: 1m
       rules:
         - alert: MinioDiskUsageHigh
@@ -196,8 +196,8 @@ spec:
             summary: "MinIO free capacity < 15%"
             description: >-
               Free usable capacity is {{ $value | humanizePercentage }}.
-              Expand the PVC or expire old objects in uwv-checkpoints +
-              uwv-staging buckets.
+              Expand the PVC or expire old objects in odap-checkpoints +
+              odap-staging buckets.
 
         - alert: MinioDown
           expr: minio_cluster_nodes_online_total < 1
@@ -213,7 +213,7 @@ spec:
     # validity period; if a renewal fails, we want a warning before the
     # cert actually expires. cert-manager exposes `certmanager_certificate_*`
     # via its metrics port (scraped by the kube-prometheus-stack default).
-    - name: uwv-cert-manager
+    - name: cert-manager
       interval: 5m
       rules:
         - alert: CertManagerCertExpiringSoon
@@ -250,7 +250,7 @@ spec:
     # ---- OPA decision latency ----
     # OPA in front of Trino sits in the hot path of every query. Latency
     # spikes here translate directly into user-visible Trino latency.
-    - name: uwv-opa-latency
+    - name: opa-latency
       interval: 30s
       rules:
         - alert: OpaDecisionLatencyP99High

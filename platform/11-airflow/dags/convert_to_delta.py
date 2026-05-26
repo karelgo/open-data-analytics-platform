@@ -2,13 +2,13 @@
 
 Wordt getriggerd door de portal /csv-upload pagina via de airflow-bridge
 sidecar (zie portal/scripts/airflow-bridge.py). Eén task: leest het
-bestand uit `uwv-staging/uploads/...`, parseert op basis van
+bestand uit `odap-staging/uploads/...`, parseert op basis van
 `source_format` (csv/tsv/json/ndjson/parquet), schrijft Delta naar
 `uwv-{target_catalog}/{target_schema}/{target_table}/`, en registreert
 de tabel in Hive Metastore via Trino.
 
 Trigger-conf (verplicht):
-  object_key      str   — s3-key binnen uwv-staging (begint met "uploads/")
+  object_key      str   — s3-key binnen odap-staging (begint met "uploads/")
   source_format   str   — csv | tsv | json | ndjson | parquet
   target_schema   str   — snake_case (gevalideerd door bridge)
   target_table    str   — snake_case (gevalideerd door bridge)
@@ -18,7 +18,7 @@ Trigger-conf (optioneel):
   partition_col   str   — bestaande kolom in input; default = event_date toegevoegd
   source_email    str   — ingelogde gebruiker (audit; alleen voor logging)
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -43,13 +43,13 @@ from k8s_helpers import (
 
 LOADER_IMAGE = "python:3.11-slim"
 
-S3_ENDPOINT = "https://minio.uwv-platform.svc.cluster.local:9000"
-TRINO_HOST = "uwv-trino-coordinator.uwv-platform.svc.cluster.local"
+S3_ENDPOINT = "https://minio.odap-platform.svc.cluster.local:9000"
+TRINO_HOST = "trino-coordinator.odap-platform.svc.cluster.local"
 TRINO_PORT = "8443"
 TRINO_USER = "smoketest"
 
 JOBS_CM = "airflow-jobs"
-JOBS_MOUNT = "/opt/uwv/airflow/jobs"
+JOBS_MOUNT = "/opt/odap/airflow/jobs"
 
 DEFAULT_ARGS = {
     "owner": "data-engineer",
@@ -78,22 +78,22 @@ def _pip_args() -> list[str]:
 def _env_vars() -> list[V1EnvVar]:
     # Conf-velden worden via Jinja templating doorgegeven aan de pod.
     return [
-        V1EnvVar(name="UWV_OBJECT_KEY", value="{{ dag_run.conf['object_key'] }}"),
-        V1EnvVar(name="UWV_SOURCE_FORMAT", value="{{ dag_run.conf['source_format'] }}"),
+        V1EnvVar(name="OBJECT_KEY", value="{{ dag_run.conf['object_key'] }}"),
+        V1EnvVar(name="SOURCE_FORMAT", value="{{ dag_run.conf['source_format'] }}"),
         V1EnvVar(
-            name="UWV_TARGET_CATALOG",
+            name="TARGET_CATALOG",
             value="{{ dag_run.conf.get('target_catalog', 'bronze') }}",
         ),
-        V1EnvVar(name="UWV_TARGET_SCHEMA", value="{{ dag_run.conf['target_schema'] }}"),
-        V1EnvVar(name="UWV_TARGET_TABLE", value="{{ dag_run.conf['target_table'] }}"),
+        V1EnvVar(name="TARGET_SCHEMA", value="{{ dag_run.conf['target_schema'] }}"),
+        V1EnvVar(name="TARGET_TABLE", value="{{ dag_run.conf['target_table'] }}"),
         V1EnvVar(
-            name="UWV_PARTITION_COL",
+            name="PARTITION_COL",
             value="{{ dag_run.conf.get('partition_col', '') }}",
         ),
         V1EnvVar(
-            name="UWV_SOURCE_EMAIL", value="{{ dag_run.conf.get('source_email', '') }}"
+            name="SOURCE_EMAIL", value="{{ dag_run.conf.get('source_email', '') }}"
         ),
-        V1EnvVar(name="UWV_STAGING_BUCKET", value="uwv-staging"),
+        V1EnvVar(name="STAGING_BUCKET", value="odap-staging"),
         # MinIO
         V1EnvVar(name="S3_ENDPOINT", value=S3_ENDPOINT),
         V1EnvVar(name="S3_REGION", value="eu-nl-1"),
@@ -104,11 +104,11 @@ def _env_vars() -> list[V1EnvVar]:
         V1EnvVar(name="TRINO_PORT", value=TRINO_PORT),
         V1EnvVar(name="TRINO_USER", value=TRINO_USER),
         V1EnvVar(name="TRINO_HTTP_SCHEME", value="https"),
-        V1EnvVar(name="TRINO_VERIFY", value="/etc/uwv-ca/ca.crt"),
+        V1EnvVar(name="TRINO_VERIFY", value="/etc/platform-ca/ca.crt"),
         secret_env("TRINO_PASSWORD", "trino-static-users", TRINO_USER),
         # CA-bundle
-        V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/uwv-ca/ca.crt"),
-        V1EnvVar(name="SSL_CERT_FILE", value="/etc/uwv-ca/ca.crt"),
+        V1EnvVar(name="REQUESTS_CA_BUNDLE", value="/etc/platform-ca/ca.crt"),
+        V1EnvVar(name="SSL_CERT_FILE", value="/etc/platform-ca/ca.crt"),
     ]
 
 
@@ -117,7 +117,7 @@ with DAG(
     description=(
         "Generieke any-file → Delta-conversie. Wordt getriggerd vanuit de portal "
         "/csv-upload pagina via de airflow-bridge sidecar; leest het bestand uit "
-        "uwv-staging/uploads/, schrijft Delta naar uwv-<catalog>/<schema>/<table>/, "
+        "odap-staging/uploads/, schrijft Delta naar uwv-<catalog>/<schema>/<table>/, "
         "en registreert in Hive Metastore via Trino."
     ),
     default_args=DEFAULT_ARGS,
@@ -139,7 +139,7 @@ with DAG(
     KubernetesPodOperator(
         task_id="convert",
         name="convert-to-delta",
-        namespace="uwv-platform",
+        namespace="odap-platform",
         image=LOADER_IMAGE,
         cmds=["bash", "-euo", "pipefail", "-c"],
         arguments=_pip_args(),

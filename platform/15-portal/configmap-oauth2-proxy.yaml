@@ -2,51 +2,51 @@
 # Geheimen (cookie-secret, client-secret) komen uit Secret 'portal-oauth2-proxy'.
 #
 # Het split-URL-patroon (issuer extern, token-endpoints intern) lost het
-# k3d-probleem op dat 'keycloak.uwv-platform.local' alleen via /etc/hosts
+# k3d-probleem op dat 'keycloak.odap.local' alleen via /etc/hosts
 # op de host resolveert; in-cluster pods kennen die hostname niet.
 # Issuer-claim in tokens blijft de externe URL omdat Keycloak met
-# `proxy: edge` + `hostname: keycloak.uwv-platform.local` is gestart.
+# `proxy: edge` + `hostname: keycloak.odap.local` is gestart.
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: portal-oauth2-proxy-config
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   oauth2-proxy.cfg: |
     # Provider
     provider                = "keycloak-oidc"
     client_id               = "portal"
-    oidc_issuer_url         = "https://keycloak.uwv-platform.local:8443/realms/uwv"
+    oidc_issuer_url         = "https://keycloak.odap.local:8443/realms/odap"
 
     # Split discovery: server-side endpoints intern, browser-redirect extern.
     skip_oidc_discovery     = true
-    login_url               = "https://keycloak.uwv-platform.local:8443/realms/uwv/protocol/openid-connect/auth"
-    redeem_url              = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/token"
-    profile_url             = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/userinfo"
-    validate_url            = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/userinfo"
-    oidc_jwks_url           = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/certs"
+    login_url               = "https://keycloak.odap.local:8443/realms/odap/protocol/openid-connect/auth"
+    redeem_url              = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/token"
+    profile_url             = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/userinfo"
+    validate_url            = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/userinfo"
+    oidc_jwks_url           = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/certs"
 
     # Sessiebeleid
-    cookie_name             = "_uwv_portal"
+    cookie_name             = "_portal"
     cookie_secure           = true
     cookie_httponly         = true
     cookie_samesite         = "lax"
     cookie_expire           = "8h"
     # MOET korter zijn dan Keycloak's accessTokenLifespan (900s = 15m, zie
-    # realm-uwv.json). Met cookie_refresh=30m had je een 15-min window
+    # realm.json). Met cookie_refresh=30m had je een 15-min window
     # waarin oauth2-proxy het al-verlopen access-token aan upstream gaf;
     # de portal-CSV-upload kreeg dan "STS: Token is expired" van MinIO.
     cookie_refresh          = "10m"
-    cookie_domains          = ["platform.uwv-platform.local"]
+    cookie_domains          = ["platform.odap.local"]
     # NB: whitelist matcht host+port exact. ':8443' is nodig zodat
     # /oauth2/sign_out?rd=… naar de Keycloak end-session endpoint mag
     # redirecten (anders blokkeert validator.go de RP-initiated logout).
-    whitelist_domains       = [".uwv-platform.local", ".uwv-platform.local:8443"]
+    whitelist_domains       = [".odap.local", ".odap.local:8443"]
 
     # Upstream = nginx in dezelfde pod
     http_address            = "0.0.0.0:4180"
     upstreams               = ["http://127.0.0.1:8080"]
-    redirect_url            = "https://platform.uwv-platform.local:8443/oauth2/callback"
+    redirect_url            = "https://platform.odap.local:8443/oauth2/callback"
 
     # Identity headers voor de browser (Layout.astro leest /oauth2/userinfo)
     pass_user_headers       = true
@@ -54,17 +54,17 @@ data:
     set_xauthrequest        = true
     set_authorization_header = false
 
-    # Iedereen met een UWV-realm-account mag in
+    # Iedereen met een ODAP realm-account mag in
     email_domains           = ["*"]
     skip_provider_button    = true
 
-    # Onze realm-uwv.json definieert alleen de 'roles' scope; default
+    # Onze realm.json definieert alleen de 'roles' scope; default
     # 'profile' en 'email' scopes worden niet door realm-import
     # aangemaakt. Vraag alleen wat WEL bestaat.
     scope                   = "openid roles"
     insecure_oidc_allow_unverified_email = true
     # NB: 'email' claim wordt door username-as-email mapper in Keycloak
-    # portal-client geset (zie infrastructure/helm/keycloak/realm-uwv.json).
+    # portal-client geset (zie infrastructure/helm/keycloak/realm.json).
     # Dus oauth2-proxy default oidc_email_claim="email" werkt — geen override.
 
     # Roles uit Keycloak realm-roles claim → groups

@@ -13,12 +13,12 @@ Apply:
     kubectl apply -f platform/08-spark/apps/seed-bronze-wia.yaml
 
 Status:
-    kubectl -n uwv-platform get sparkapplication seed-bronze-wia -w
+    kubectl -n odap-platform get sparkapplication seed-bronze-wia -w
 
 Output:
     bronze.uwv.wia_aanvraag (Trino) / uwv.wia_aanvraag (Spark/HMS)
 
-SYNTHETIC DATA — UWV REFERENCE PLATFORM — NOT FOR REAL USE.
+SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 from __future__ import annotations
@@ -51,7 +51,7 @@ from lakehouse_io import (  # noqa: E402
 )
 
 N_ROWS = int(os.getenv("SEED_ROWS", "200"))
-BRONZE_BASE = os.getenv("BRONZE_BASE", "s3a://uwv-bronze/uwv")
+BRONZE_BASE = os.getenv("BRONZE_BASE", "s3a://odap-bronze/uwv")
 TABLE = "uwv.wia_aanvraag"
 PATH = f"{BRONZE_BASE}/wia_aanvraag"
 
@@ -93,7 +93,7 @@ def _ensure_wia_schema_compat(spark) -> None:
 
 
 def main() -> int:
-    spark = get_spark_with_lakehouse_config("uwv-seed-bronze-wia")
+    spark = get_spark_with_lakehouse_config("seed-bronze-wia")
     spark.sparkContext.setLogLevel("WARN")
     print(
         f"==> Seed start: rows={N_ROWS} format={TABLE_FORMAT} path={PATH}",
@@ -106,7 +106,7 @@ def main() -> int:
     today = date.today()
     now = datetime.now(timezone.utc)
     source_file = (
-        f"s3a://uwv-raw/uwv/wia/aanvraag/dt={today.isoformat()}/seed-{uuid.uuid4()}.jsonl"
+        f"s3a://odap-raw/uwv/wia/aanvraag/dt={today.isoformat()}/seed-{uuid.uuid4()}.jsonl"
     )
 
     rows = [

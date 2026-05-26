@@ -32,7 +32,7 @@ has_data_access_grant if {
 
 # --- uitbreiding van role_allows_resource ------------------------------
 
-# Naast de bestaande paden in trino-uwv-roles.rego: een grant-rol is
+# Naast de bestaande paden in trino-platform-roles.rego: een grant-rol is
 # eveneens voldoende. Resource-catalog/schema moeten niet leeg zijn —
 # anders zou `data_access:.` als universele bypass werken.
 role_allows_resource if {

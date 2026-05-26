@@ -46,7 +46,7 @@ platform/17-multica/
 ├── configmap-oauth2-proxy.yaml     ← oauth2-proxy config — front-door SSO via Keycloak
 ├── secret-oauth2-proxy.yaml        ← dev-only client-secret + cookie-secret (committed; Mirror of 15-portal)
 ├── oauth2-proxy.yaml               ← oauth2-proxy Deployment + Service (separate, multi-upstream)
-├── ingress.yaml                    ← multica.uwv-platform.local — alles via oauth2-proxy
+├── ingress.yaml                    ← multica.odap.local — alles via oauth2-proxy
 └── secrets.template.yaml           ← TEMPLATE — postgres + backend secrets, apply out-of-band
 ```
 
@@ -61,7 +61,7 @@ isn't enabled by default but the upstream client checks for its
 availability at boot. The cluster's existing Postgres images (Hive
 Metastore, OpenMetadata, Keycloak, Airflow, Superset) don't bundle
 pgvector. Cleanest path: run a single-replica StatefulSet of the
-upstream image in the same `uwv-platform` namespace. Production
+upstream image in the same `odap-platform` namespace. Production
 upgrade path: CloudNativePG with a pgvector-enabled image, plus
 replicas.
 
@@ -77,7 +77,7 @@ Upstream docs offer two reverse-proxy patterns:
 
 We picked (2). Better UX (one bookmark), fewer cert-manager certs,
 fewer `/etc/hosts` entries. The browser hits
-`multica.uwv-platform.local:8443`; the ingress routes `/api`,
+`multica.odap.local:8443`; the ingress routes `/api`,
 `/auth`, `/uploads`, `/ws`, `/health`, `/readyz` to the backend; `/`
 to the frontend.
 
@@ -114,7 +114,7 @@ Multica user. Out of scope for now — see
 ### Storage: PVC for uploads in v1, MinIO bucket in v2
 
 `backend-uploads` is a PVC (5 GiB). Switching to MinIO is a one-line
-change (`S3_BUCKET=uwv-multica` in `backend-config.yaml` + bucket
+change (`S3_BUCKET=multica` in `backend-config.yaml` + bucket
 provisioning) — done in v2 after the rest of the deployment shakes
 out.
 
@@ -130,7 +130,7 @@ with `prometheus.io/scrape` annotations, not in `ingress.yaml`.
 `NEXT_PUBLIC_WS_URL` is a build-time variable, baked at image build into
 the Next.js bundle. The official `ghcr.io/multica-ai/multica-web:latest`
 image bakes in `ws://localhost:8080/ws`, which won't work from a browser
-hitting `multica.uwv-platform.local:8443`.
+hitting `multica.odap.local:8443`.
 
 **Effect on v1**: HTTP works (Next.js rewrites `/api`, `/auth`, `/uploads`
 at request time inside the frontend container). Real-time features
@@ -138,7 +138,7 @@ at request time inside the frontend container). Real-time features
 
 **v2 fix**: mirror `19-nanitics-observatory/build-and-load.sh` — clone
 multica, run `docker compose -f docker-compose.selfhost.build.yml build`
-with `NEXT_PUBLIC_WS_URL=wss://multica.uwv-platform.local:8443/ws`, push
+with `NEXT_PUBLIC_WS_URL=wss://multica.odap.local:8443/ws`, push
 to the local k3d registry, swap the `image:` field in `frontend.yaml`.
 
 ---
@@ -148,7 +148,7 @@ to the local k3d registry, swap the `image:` field in `frontend.yaml`.
 ### 1. Add the hostname to `/etc/hosts`
 
 ```sh
-echo "127.0.0.1 multica.uwv-platform.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1 multica.odap.local" | sudo tee -a /etc/hosts
 ```
 
 (Same `:8443` quirk as the rest of the platform — k3d serverlb maps
@@ -159,11 +159,11 @@ echo "127.0.0.1 multica.uwv-platform.local" | sudo tee -a /etc/hosts
 ```sh
 PG_PW=$(openssl rand -hex 24)
 
-kubectl -n uwv-platform create secret generic multica-postgres \
+kubectl -n odap-platform create secret generic multica-postgres \
   --from-literal=POSTGRES_PASSWORD="$PG_PW" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-kubectl -n uwv-platform create secret generic multica-backend \
+kubectl -n odap-platform create secret generic multica-backend \
   --from-literal=JWT_SECRET=$(openssl rand -hex 32) \
   --from-literal=DATABASE_URL="postgres://multica:${PG_PW}@multica-postgres:5432/multica?sslmode=disable" \
   --dry-run=client -o yaml | kubectl apply -f -
@@ -178,17 +178,17 @@ are templates only) — same anti-clobber pattern as
 ```sh
 cd platform/17-multica
 kubectl apply -k .
-kubectl -n uwv-platform get pods -l app.kubernetes.io/component=multica -w
+kubectl -n odap-platform get pods -l app.kubernetes.io/component=multica -w
 ```
 
-Open <https://multica.uwv-platform.local:8443/>.
+Open <https://multica.odap.local:8443/>.
 
 ### 4. Log in
 
 Without `RESEND_API_KEY`, verification codes print to the backend log:
 
 ```sh
-kubectl -n uwv-platform logs -f deploy/multica-backend | grep -i 'verification code'
+kubectl -n odap-platform logs -f deploy/multica-backend | grep -i 'verification code'
 ```
 
 Enter your email at the login page — copy the code from the log.
@@ -202,8 +202,8 @@ laptop. Each user installs the CLI and points it at the cluster:
 
 ```sh
 brew install multica-ai/tap/multica
-multica config set server_url https://multica.uwv-platform.local:8443
-multica config set app_url https://multica.uwv-platform.local:8443
+multica config set server_url https://multica.odap.local:8443
+multica config set app_url https://multica.odap.local:8443
 multica login
 multica daemon start
 ```
@@ -235,11 +235,11 @@ have a swap-base_url hook.
 
 | Action | Command |
 |---|---|
-| Tail backend logs | `kubectl -n uwv-platform logs -f deploy/multica-backend` |
-| Restart after config change | `kubectl -n uwv-platform rollout restart deploy/multica-backend deploy/multica-frontend` |
-| Port-forward (if ingress is broken) | `kubectl -n uwv-platform port-forward svc/multica-frontend 3000:80` |
-| Health check | `curl -k https://multica.uwv-platform.local:8443/readyz` |
-| Postgres shell | `kubectl -n uwv-platform exec -it multica-postgres-0 -- psql -U multica -d multica` |
+| Tail backend logs | `kubectl -n odap-platform logs -f deploy/multica-backend` |
+| Restart after config change | `kubectl -n odap-platform rollout restart deploy/multica-backend deploy/multica-frontend` |
+| Port-forward (if ingress is broken) | `kubectl -n odap-platform port-forward svc/multica-frontend 3000:80` |
+| Health check | `curl -k https://multica.odap.local:8443/readyz` |
+| Postgres shell | `kubectl -n odap-platform exec -it multica-postgres-0 -- psql -U multica -d multica` |
 | Tear down | `kubectl delete -k .` (does not delete the PVCs — `kubectl delete pvc -l app.kubernetes.io/component=multica`) |
 
 ---
@@ -247,7 +247,7 @@ have a swap-base_url hook.
 ## Open work (v2 candidates)
 
 1. **Custom-built web image** with `NEXT_PUBLIC_WS_URL` baked in → enables real-time features. Add `build-and-load.sh` mirroring the nanitics script.
-2. **MinIO-backed S3 uploads** — `S3_BUCKET=uwv-multica`, bucket provisioning in `infrastructure/`, drop the PVC.
+2. **MinIO-backed S3 uploads** — `S3_BUCKET=multica`, bucket provisioning in `infrastructure/`, drop the PVC.
 3. **oauth2-proxy + Keycloak** — only after deciding whether the dual-auth weight is worth it vs. pushing for upstream OIDC support.
 4. **Vector logging** — wire backend stdout to the cluster's Vector → OpenSearch pipeline (audit trail of agent task assignments).
 5. **Portal card** — add Multica next to Nanitics in `portal/src/data/components.ts` under a new `agents` stage. (Done in this branch.)

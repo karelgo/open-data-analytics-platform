@@ -36,7 +36,7 @@ ACTIVE_USE_CASES: list[dict] = [
      "description": "Cliënt 360 — gepseudonimiseerd."},
     {"id": "uc06", "name": "lastprognose", "owner": "divisie_fez",
      "description": "Uitkeringslast 5-jaar prognose + scenarios."},
-    {"id": "uc07", "name": "dq_polisadm", "owner": "data_office_uwv",
+    {"id": "uc07", "name": "dq_polisadm", "owner": "data_office",
      "description": "Data quality dagrapport polisadministratie."},
     {"id": "uc09", "name": "reint_effect", "owner": "divisie_ag",
      "description": "Re-integratie-effect (sandbox, gepseudonimiseerd)."},
@@ -72,7 +72,7 @@ def build_gold_dag(uc: dict) -> DAG:
         ),
         operator_args={
             "image": DBT_IMAGE,
-            "namespace": "uwv-platform",
+            "namespace": "odap-platform",
             "is_delete_operator_pod": True,
             "get_logs": True,
             "container_resources": {

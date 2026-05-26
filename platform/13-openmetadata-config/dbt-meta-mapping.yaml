@@ -1,7 +1,7 @@
 # Declaratieve mapping van dbt `meta` velden naar OpenMetadata-entiteiten.
 #
 # Wordt geconsumeerd door `enrich_from_dbt_meta.py` na de dbt-ingest workflow.
-# Tag-FQNs verwijzen naar classifications-uwv.yaml; glossary-term-FQNs naar
+# Tag-FQNs verwijzen naar classifications.yaml; glossary-term-FQNs naar
 # glossary-cgm.yaml. Onbekende waardes worden gelogd en overgeslagen
 # (fail-soft — een typo in één mart blokkeert de hele run niet).
 
@@ -40,7 +40,7 @@ legal_basis_to_tags:
   "n/a": []
 
 # meta.bio_classificatie → Confidentiality.* (axis = vertrouwelijkheid).
-# BIO.BIV-* (in classifications-uwv.yaml) is een andere axis (BIV-niveau);
+# BIO.BIV-* (in classifications.yaml) is een andere axis (BIV-niveau);
 # dat is niet wat dbt's veld bedoelt — die schaal blijft handmatig.
 bio_classificatie_to_tag:
   publiek: Confidentiality.Public
@@ -87,10 +87,10 @@ eigenaar_to_team:
   divisie_fez: divisie_fez
   divisie_crm: divisie_crm
   divisie_klantcontact: divisie_klantcontact
-  kenniscentrum_uwv: kenniscentrum_uwv
+  knowledge_center: knowledge_center
   data_steward_polisadm: data_steward_polisadm
   data_steward_platform: data_steward_platform
-  data_office_uwv: data_office_uwv
+  data_office: data_office
 
 # Tier-default per tabel. Override-regels overstemmen de default:
 # - DoD-anchor marts (UC01 WIA Funnel, UC11 Klantreis)        → Tier1
@@ -186,7 +186,7 @@ teams:
   - name: divisie_klantcontact
     displayName: "Divisie Klantcontact"
     teamType: Group
-  - name: kenniscentrum_uwv
+  - name: knowledge_center
     displayName: "Kenniscentrum UWV"
     teamType: Group
   - name: data_steward_polisadm
@@ -195,7 +195,7 @@ teams:
   - name: data_steward_platform
     displayName: "Data Steward Platform"
     teamType: Group
-  - name: data_office_uwv
+  - name: data_office
     displayName: "Data Office UWV"
     teamType: Group
 
@@ -243,7 +243,7 @@ domains:
     displayName: "Persoon"
     description: "Persoons-/BRP-spiegel. Eigenaar: Data Office."
     domainType: Source-aligned
-    owner: data_office_uwv
+    owner: data_office
   - name: Cross
     displayName: "Cross-Domain"
     description: "Cross-domain integraties zoals UC-11 Klantreis. Aggregaat."
@@ -308,7 +308,7 @@ data_products:
     displayName: "UC-09 — Re-integratie effectmeting"
     description: "Onderzoekspanel re-integratie (sandbox, pseudonimisering)."
     domain: AG
-    owner: kenniscentrum_uwv
+    owner: knowledge_center
     dbt_tag: uc09
   - name: uc11_klantreis
     displayName: "UC-11 — Integrale Klantreis"

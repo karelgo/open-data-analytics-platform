@@ -1,19 +1,19 @@
-# platform/16-jupyter — UWV Lab (Jupyter notebooks)
+# platform/16-jupyter — ODAP Lab (Jupyter notebooks)
 
 Een Databricks/Microsoft-Fabric-stijl notebook-omgeving die binnen het
-platform draait. Reachable op **`https://jupyter.uwv-platform.local:8443`**
+platform draait. Reachable op **`https://jupyter.odap.local:8443`**
 na `make deploy-platform`.
 
 ## Wat zit erin
 
 | Stuk | Wat | File |
 |---|---|---|
-| RBAC | ServiceAccount + Role voor KubeSpawner (mag Pod/PVC/Service in `uwv-platform` aanmaken) | [`namespace-rbac.yaml`](namespace-rbac.yaml) |
+| RBAC | ServiceAccount + Role voor KubeSpawner (mag Pod/PVC/Service in `odap-platform` aanmaken) | [`namespace-rbac.yaml`](namespace-rbac.yaml) |
 | Hub config | `jupyterhub_config.py` — OAuthenticator (Keycloak), KubeSpawner, per-user env | [`configmap-jupyterhub.yaml`](configmap-jupyterhub.yaml) |
 | Hub-DB | SQLite-PVC voor user/spawn state | [`pvc-hub-db.yaml`](pvc-hub-db.yaml) |
 | Deployment | Hub + configurable-http-proxy in één pod | [`deployment-hub.yaml`](deployment-hub.yaml) |
 | Service | `jupyter` (extern, port 80) + `hub` (intern, port 8081) | [`service.yaml`](service.yaml) |
-| Ingress | `jupyter.uwv-platform.local` met WS-proxy | [`ingress.yaml`](ingress.yaml) |
+| Ingress | `jupyter.odap.local` met WS-proxy | [`ingress.yaml`](ingress.yaml) |
 | Secret | OIDC client-secret + configproxy-token | [`secret.yaml`](secret.yaml) |
 | NetworkPolicy | Wat de Hub en singleuser-pods mogen | [`networkpolicy.yaml`](networkpolicy.yaml) |
 | Starter notebooks | Pre-loaded onboarding-notebooks (welcome / trino / delta / minio / OM / git) | [`starter-notebooks/`](starter-notebooks/) |
@@ -22,7 +22,7 @@ na `make deploy-platform`.
 
 ```
                   ┌──────────────────────────────────┐
-Browser ──┐       │  jupyter.uwv-platform.local:8443 │
+Browser ──┐       │  jupyter.odap.local:8443 │
           │ TLS   │                                  │
           ▼       │   ingress-nginx                  │
 ┌─────────────────┴───────┐
@@ -33,7 +33,7 @@ Browser ──┐       │  jupyter.uwv-platform.local:8443 │
           │ HTTP
           ▼
 ┌──────────────────────────────────────────────────┐
-│  Pod `jupyterhub` (in uwv-platform)              │
+│  Pod `jupyterhub` (in odap-platform)              │
 │  ┌──────────┐         ┌──────────────────────┐   │
 │  │ proxy    │ ◄────── │ JupyterHub :8081     │   │
 │  │ :8000    │   set   │  - OAuthenticator    │   │
@@ -43,7 +43,7 @@ Browser ──┐       │  jupyter.uwv-platform.local:8443 │
          ▼               ▼                          │
 ┌────────────────────┐  ┌───────────────────────┐  │
 │ PVC jupyter-<u>    │  │ Pod jupyter-<username>│  │
-│ ~/work/            │◄─┤ JupyterLab + uwv_lab  │  │
+│ ~/work/            │◄─┤ JupyterLab + odap_lab  │  │
 └────────────────────┘  │ env: TRINO_/S3_/HMS_  │  │
                         └───────┬───────────────┘  │
                                 │                   │
@@ -56,7 +56,7 @@ Browser ──┐       │  jupyter.uwv-platform.local:8443 │
   (zelfde split-URL truc als de portal's oauth2-proxy: extern URL voor de
   browser, intern Service-DNS voor token-redemption).
 - **KubeSpawner** maakt per gebruiker een Pod aan op basis van
-  `uwv-platform/jupyter-kernel:dev`. Een init-container kopieert de starter
+  `odap/jupyter-kernel:dev`. Een init-container kopieert de starter
   notebooks naar `~/work/starter/` op eerste spawn.
 - **OPA-binding**: het notebook-pod krijgt `TRINO_USER = preferred_username`.
   Iedere Trino-query gaat dus onder de Keycloak-identiteit van de gebruiker
@@ -64,15 +64,15 @@ Browser ──┐       │  jupyter.uwv-platform.local:8443 │
 
 ## Image bouwen
 
-Het singleuser-image (kernel + uwv_lab helper + jupyterlab-git) wordt buiten
+Het singleuser-image (kernel + odap_lab helper + jupyterlab-git) wordt buiten
 de Kustomize-bundle gebouwd:
 
 ```bash
 make jupyter-image
 # of:
-docker build -t uwv-platform/jupyter-kernel:dev \
+docker build -t odap/jupyter-kernel:dev \
   -f infrastructure/jupyter/kernel-python/Dockerfile .
-k3d image import uwv-platform/jupyter-kernel:dev -c uwv-platform
+k3d image import odap/jupyter-kernel:dev -c odap-platform
 ```
 
 ## Deploy
@@ -89,7 +89,7 @@ kubectl apply -k platform/16-jupyter/
 
 ## Login-flow
 
-1. Browser → `https://jupyter.uwv-platform.local:8443`
+1. Browser → `https://jupyter.odap.local:8443`
 2. JupyterHub redirect naar Keycloak (`jupyter` client).
 3. Na succesvolle login → KubeSpawner maakt `jupyter-<username>` Pod aan
    met een fresh PVC `jupyter-<username>` (1 GiB, gerecycled bij user-stop).

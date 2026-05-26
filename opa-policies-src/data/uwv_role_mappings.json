@@ -1,5 +1,5 @@
 {
-  "uwv_role_mappings": {
+  "role_mappings": {
     "roles": {
       "smoketest": {
         "_role_purpose": "Static-auth user voor smoke-tests + dbt-runs.",

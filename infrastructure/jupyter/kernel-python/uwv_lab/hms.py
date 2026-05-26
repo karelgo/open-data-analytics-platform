@@ -1,4 +1,4 @@
-"""Hive Metastore inspection for the UWV Lab notebook image.
+"""Hive Metastore inspection for the ODAP Lab notebook image.
 
 Why query HMS directly when Trino already exposes its schemas? Two reasons:
   * It lets you see tables that Trino has filtered out for the current role
@@ -6,7 +6,7 @@ Why query HMS directly when Trino already exposes its schemas? Two reasons:
   * It avoids a round-trip through the query engine for fast schema lookups.
 
 This module talks Thrift to ``HMS_URI`` (default
-``thrift://uwv-hive-metastore.uwv-platform.svc.cluster.local:9083``) using the
+``thrift://hive-metastore.odap-platform.svc.cluster.local:9083``) using the
 lightweight ``hmsclient`` package. If ``hmsclient`` is not available we fall
 back to a Trino ``information_schema`` query so the helper still works.
 """
@@ -18,7 +18,7 @@ from typing import Any
 
 def _uri() -> str:
     return os.environ.get(
-        "HMS_URI", "thrift://uwv-hive-metastore.uwv-platform.svc.cluster.local:9083"
+        "HMS_URI", "thrift://hive-metastore.odap-platform.svc.cluster.local:9083"
     )
 
 

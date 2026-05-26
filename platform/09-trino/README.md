@@ -4,16 +4,16 @@ Trino — distributed SQL engine met OPA-authorisatie en OIDC-authenticatie.
 
 | Resource | Doel |
 |---|---|
-| `AuthenticationClass trino-static-uwv` + `Secret trino-static-users` | Static-user voor smoke-tests + break-glass (dev-only). |
-| `TrinoCluster uwv-trino` | 1 coordinator + 1 worker (scaled-down). |
+| `AuthenticationClass trino-static` + `Secret trino-static-users` | Static-user voor smoke-tests + break-glass (dev-only). |
+| `TrinoCluster trino` | 1 coordinator + 1 worker (scaled-down). |
 | `TrinoCatalog bronze/silver/gold/sensitive` | Vier catalogs, gerenderd uit templates op basis van `platform-config.yaml::table_format`. |
 
 ## Voorvereisten
 
-- `platform/02-authentication/` — `AuthenticationClass keycloak-uwv` + `SecretClass tls-internal`.
+- `platform/02-authentication/` — `AuthenticationClass keycloak` + `SecretClass tls-internal`.
 - `platform/03-storage/` — `S3Connection s3-minio`.
-- `platform/05-hive-metastore/` — `HiveCluster uwv-hive` (Ready).
-- `platform/10-opa/` — `OpaCluster uwv-opa` + base bundle ConfigMap.
+- `platform/05-hive-metastore/` — `HiveCluster hive` (Ready).
+- `platform/10-opa/` — `OpaCluster opa` + base bundle ConfigMap.
 
 ## Apply
 
@@ -27,14 +27,14 @@ kubectl apply -k platform/09-trino/
 ## Validatie
 
 ```bash
-kubectl -n uwv-platform get trinocluster
-kubectl -n uwv-platform get trinocatalog
-kubectl -n uwv-platform get pods -l app.kubernetes.io/name=trino
+kubectl -n odap-platform get trinocluster
+kubectl -n odap-platform get trinocatalog
+kubectl -n odap-platform get pods -l app.kubernetes.io/name=trino
 
 # In-cluster query (static auth)
-kubectl -n uwv-platform exec -it statefulset/uwv-trino-coordinator-default \
+kubectl -n odap-platform exec -it statefulset/trino-coordinator-default \
   -c trino -- \
-  trino --server https://uwv-trino-coordinator:8443 \
+  trino --server https://trino-coordinator:8443 \
         --user smoketest --password \
         --insecure \
         --execute "SHOW CATALOGS"

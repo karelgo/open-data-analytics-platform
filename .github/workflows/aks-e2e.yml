@@ -39,7 +39,7 @@ permissions:
 
 env:
   AKS_RESOURCE_GROUP: dev-stackable-rg
-  AKS_CLUSTER_NAME:   uwv-platform-aks
+  AKS_CLUSTER_NAME:   odap-platform-aks
 
 jobs:
   e2e:
@@ -93,14 +93,14 @@ jobs:
         if: ${{ inputs.flow == 'uc11' || inputs.flow == 'both' }}
         env:
           DEPLOYMENT_MODE: aks
-          PLATFORM_DOMAIN: eu-sovereigndataplatform.com
+          PLATFORM_DOMAIN: example.com
         run: bash tests/e2e/uc11-flow.sh
 
       - name: Dump pod-status bij failure
         if: failure()
         run: |
-          echo "::group::Pods across UWV namespaces"
-          for ns in uwv-platform uwv-auth uwv-data uwv-meta ingress-nginx; do
+          echo "::group::Pods across platform namespaces"
+          for ns in odap-platform odap-auth odap-data odap-meta ingress-nginx; do
             echo "--- $ns ---"
             kubectl -n "$ns" get pods -o wide 2>/dev/null || true
           done

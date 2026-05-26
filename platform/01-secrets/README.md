@@ -1,6 +1,6 @@
 # 01-secrets
 
-Stackable SecretClasses + Kubernetes Secrets voor het UWV-platform.
+Stackable SecretClasses + Kubernetes Secrets voor het ODAP platform.
 
 | Resource | Functie |
 |---|---|
@@ -32,5 +32,5 @@ kubectl apply -k platform/01-secrets/
 
 ```bash
 kubectl get secretclass
-kubectl get secrets -n uwv-platform -l uwv.nl/dev-only=true
+kubectl get secrets -n odap-platform -l odap.io/dev-only=true
 ```

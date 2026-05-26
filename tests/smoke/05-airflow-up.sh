@@ -4,7 +4,7 @@
 # Voorwaarden: fase 0+1+2+3+4+6 deployed.
 set -euo pipefail
 
-NS="${NS:-uwv-platform}"
+NS="${NS:-odap-platform}"
 
 log()  { printf '\033[1;34m  ==>\033[0m %s\n' "$*"; }
 pass() { printf '\033[1;32m  OK\033[0m  %s\n' "$*"; }
@@ -13,8 +13,8 @@ fail() { printf '\033[1;31m  FAIL\033[0m %s\n' "$*" >&2; exit 1; }
 # 1. Pods Ready
 log "AirflowCluster pods"
 for role in webserver-default scheduler-default; do
-  if ! kubectl -n "$NS" rollout status deploy/uwv-airflow-${role} --timeout=5m >/dev/null 2>&1 \
-       && ! kubectl -n "$NS" rollout status statefulset/uwv-airflow-${role} --timeout=5m >/dev/null 2>&1; then
+  if ! kubectl -n "$NS" rollout status deploy/airflow-${role} --timeout=5m >/dev/null 2>&1 \
+       && ! kubectl -n "$NS" rollout status statefulset/airflow-${role} --timeout=5m >/dev/null 2>&1; then
     fail "AirflowCluster ${role} niet Ready"
   fi
 done
@@ -76,7 +76,7 @@ fi
 log "Webserver /health endpoint"
 hc=$(kubectl -n "$NS" exec "$sched_pod" -c airflow -- \
   curl -fsS --max-time 10 \
-    "http://uwv-airflow-webserver:8080/health" 2>/dev/null || true)
+    "http://airflow-webserver:8080/health" 2>/dev/null || true)
 if echo "$hc" | grep -q '"metadatabase"'; then
   pass "Airflow webserver /health antwoord OK"
 else

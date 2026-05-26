@@ -40,8 +40,8 @@ gelogd en periodiek gereviewd."
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards: caseload, trajecten | https://superset.uwv-platform.local:8443 |
-| **OpenMetadata** | Begrippen, glossary, lineage | https://openmetadata.uwv-platform.local:8443 |
+| **Apache Superset** | Dashboards: caseload, trajecten | https://superset.odap.local:8443 |
+| **OpenMetadata** | Begrippen, glossary, lineage | https://openmetadata.odap.local:8443 |
 
 ### 2.3 Vier-ogen-principe
 
@@ -194,7 +194,7 @@ Als je per ongeluk gegevens ziet die niet bedoeld zijn voor jouw doel,
 of als je een incident opmerkt:
 
 1. **Niet verder kijken.** Sluit het scherm.
-2. **Bel** platform-admin direct (binnen werktijd) of de UWV CISO (buiten werktijd).
+2. **Bel** platform-admin direct (binnen werktijd) of de Platform CISO (buiten werktijd).
 3. **Schrijf** een notitie binnen 24 uur (datum, tijd, query, omschrijving).
 
 Dit valt onder de **NIS2-meldplicht 24 uur vroegsignalering**.
@@ -206,7 +206,7 @@ Dit valt onder de **NIS2-meldplicht 24 uur vroegsignalering**.
 | Inloggen / MFA | Platform-admin |
 | Vraag over diagnose-codes | Data-steward → glossary in OpenMetadata |
 | "Ik twijfel of ik dit mag zien" | Data-steward — vraag het vóór je het doet |
-| Vermoeden van inbreuk | Platform-admin telefonisch + UWV CISO |
+| Vermoeden van inbreuk | Platform-admin telefonisch + Platform CISO |
 
 ---
 

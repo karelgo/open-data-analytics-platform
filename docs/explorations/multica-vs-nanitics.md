@@ -103,7 +103,7 @@ Each captured in the deployment README, repeated here for reviewers:
 | Postgres | Dedicated StatefulSet (`pgvector/pgvector:pg17`) | Existing operators don't bundle pgvector; agent/issue/chat is its own data domain |
 | Auth (v1) | Multica's native email-code, codes printed to backend logs | Adding oauth2-proxy creates dual-auth without solving user-model duplication |
 | Auth (v2 candidate) | Either oauth2-proxy + Keycloak, or push for upstream OIDC | Decide after v1 + a compliance-mapping pass |
-| Ingress | Single host (`multica.uwv-platform.local:8443`), path-based: `/api`, `/auth`, `/uploads`, `/ws` → backend; `/` → frontend | Matches upstream Nginx example; one cert, one /etc/hosts entry |
+| Ingress | Single host (`multica.odap.local:8443`), path-based: `/api`, `/auth`, `/uploads`, `/ws` → backend; `/` → frontend | Matches upstream Nginx example; one cert, one /etc/hosts entry |
 | WebSocket (v1) | Broken in browser (build-time URL mismatch), HTTP works | Acknowledged limitation; v2 builds a custom web image |
 | Storage (v1) | PVC for `backend-uploads` | Simplest; defer MinIO until rest stabilises |
 | Metrics | `METRICS_ADDR` enabled, ClusterIP-only Service with `prometheus.io/scrape` annotations | Upstream explicitly forbids public ingress for metrics |
@@ -157,7 +157,7 @@ These are conscious deferrals, not omissions:
 
 - [ ] `kubectl apply -k platform/17-multica/.` brings up all three
       pods Ready on k3d.
-- [ ] `https://multica.uwv-platform.local:8443/` loads the frontend.
+- [ ] `https://multica.odap.local:8443/` loads the frontend.
 - [ ] Login via email-code (from backend logs) succeeds.
 - [ ] At least one coding agent (e.g. Claude Code) registers a daemon
       against the cluster's backend and accepts a task.

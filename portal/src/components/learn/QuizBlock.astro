@@ -106,7 +106,7 @@ const { moduleKey, questions, certifies } = Astro.props;
         setProgress(key, 'done');
         if (certifies) {
           // Trigger certificaat-event — wordt opgevangen op /learn/me.
-          document.dispatchEvent(new CustomEvent('uwv-learn:cert', { detail: { key } }));
+          document.dispatchEvent(new CustomEvent('odap-learn:cert', { detail: { key } }));
         }
       }
     });

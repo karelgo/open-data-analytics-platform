@@ -37,7 +37,7 @@ sequenceDiagram
 
 ## Identity provider — Keycloak
 
-- **Realm:** `uwv` in [`infrastructure/helm/keycloak/realm-uwv.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm-uwv.json)
+- **Realm:** `uwv` in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
 - **Mock-rollen** in deze referentie:
     - Business: `wia_beoordelaar`, `ww_handhaver`, `wajong_arbeidsdeskundige`,
       `crm_medewerker`, `fez_analist`, `smz_planner`, `proactief_dienstverlener`,
@@ -68,7 +68,7 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 | `trino-doelbinding.rego` | Doelbinding (purpose) afdwingen op gold-tabellen |
 | `trino-row-filters.rego` | Rij-filters per rol (bijv. WW-handhaver ziet alleen WW-claims) |
 | `trino-column-masks.rego` | Kolom-maskering (PII, gezondheid → hash of `***`) |
-| `trino-uwv-roles.rego` | UWV-rol-definities (single source) |
+| `trino-platform-roles.rego` | UWV-rol-definities (single source) |
 
 Build van de bundle: `scripts/build-opa-bundle.sh`, geïntegreerd in
 `make deploy-platform`.

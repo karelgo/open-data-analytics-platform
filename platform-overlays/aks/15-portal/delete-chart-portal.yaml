@@ -1,10 +1,10 @@
 # Strategic-merge `$patch: delete` removes the chart-style portal
 # Deployment from the rendered output. On AKS that Deployment can never
-# come up (uses uwv-platform/portal:dev which isn't on a registry AKS can
+# come up (uses odap/portal:dev which isn't on a registry AKS can
 # pull from). The platform-landing Deployment in this overlay replaces it.
 $patch: delete
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: portal
-  namespace: uwv-platform
+  namespace: odap-platform

@@ -29,7 +29,7 @@ const targets: Record<string, ServiceTarget> = {
   nifi:         { componentId: 'nifi',         label: 'Apache NiFi' },
   openmetadata: { componentId: 'openmetadata', label: 'OpenMetadata' },
   prometheus:   { componentId: 'prometheus',   label: 'Prometheus' },
-  keycloak:     { componentId: 'keycloak',     label: 'Keycloak', path: '/realms/uwv/account' },
+  keycloak:     { componentId: 'keycloak',     label: 'Keycloak', path: '/realms/odap/account' },
   opensearch:   { componentId: 'opensearch',   label: 'OpenSearch Dashboards', path: '/app/data-explorer/discover' },
 };
 
@@ -54,7 +54,7 @@ const url = useEmbed
   ? (target.path
     ? `/embed/${target.componentId}/?path=${encodeURIComponent(target.path)}`
     : `/embed/${target.componentId}/`)
-  : `https://${target.componentId === 'keycloak' ? 'keycloak' : target.componentId}.uwv-platform.local:8443${target.path ?? ''}`;
+  : `https://${target.componentId === 'keycloak' ? 'keycloak' : target.componentId}.odap.local:8443${target.path ?? ''}`;
 ---
 <ShellLayout title={`${target.label} — SSO redirect`}>
   <section class="panel">
@@ -77,10 +77,10 @@ const url = useEmbed
       // Voor niet-embed URLs: TLD-rewrite spiegelen (de inline rewrite
       // werkt op anchors, niet op deze JS-variabele).
       if (/^https?:/.test(url)) {
-        if (host.endsWith('.eu-sovereigndataplatform.com')) {
-          dest = url.replace(/uwv-platform\.local(:8443)?/g, 'eu-sovereigndataplatform.com');
-        } else if (host.endsWith('.freshstackable.com')) {
-          dest = url.replace(/uwv-platform\.local(:8443)?/g, 'freshstackable.com');
+        if (host.endsWith('.example.com')) {
+          dest = url.replace(/odap-platform\.local(:8443)?/g, 'example.com');
+        } else if (host.endsWith('.example.com')) {
+          dest = url.replace(/odap-platform\.local(:8443)?/g, 'example.com');
         }
       }
       window.location.replace(dest);

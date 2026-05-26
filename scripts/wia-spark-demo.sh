@@ -20,7 +20,7 @@
 #   scripts/wia-spark-demo.sh         # direct
 #   SKIP_SEED=1 scripts/wia-spark-demo.sh   # gebruik bestaande bronze-data
 #
-# Vereist: kubectl-context op uwv-platform cluster; cluster heeft de
+# Vereist: kubectl-context op odap-platform cluster; cluster heeft de
 # 08-spark + 11-airflow kustomizations al gedeployed.
 
 set -euo pipefail
@@ -28,7 +28,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-NS="uwv-platform"
+NS="odap-platform"
 RUN_ID="${RUN_ID:-$(date +%Y%m%d%H%M%S)}"
 TIMEOUT_LOOPS="${TIMEOUT_LOOPS:-90}"      # 90 × 10s = 15 min per stap
 POLL_INTERVAL=10
@@ -107,12 +107,12 @@ cat <<EOF
 
 Verifieer eindresultaat via Trino:
 
-  kubectl -n $NS exec uwv-airflow-scheduler-default-0 -c airflow -- \\
+  kubectl -n $NS exec airflow-scheduler-default-0 -c airflow -- \\
     python3 -c "
   import urllib3, trino
   urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
   cur = trino.dbapi.connect(
-      host='uwv-trino-coordinator.$NS.svc.cluster.local',
+      host='trino-coordinator.$NS.svc.cluster.local',
       port=8443, user='smoketest', http_scheme='https', verify=False,
   ).cursor()
   for sql in [

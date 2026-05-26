@@ -1,7 +1,7 @@
 # AKS overlay for platform/18-om-access-bridge.
 #
 # The bridge is invoked by the browser at
-# platform.eu-sovereigndataplatform.com/access-request-api/* and must share
+# platform.example.com/access-request-api/* and must share
 # that hostname with the platform-landing Ingress in
 # infrastructure/azure/public-ingresses.yaml. nginx-ingress merges multiple
 # Ingresses on the same host by path — the bridge keeps its /access-request-api*
@@ -18,10 +18,10 @@ patches:
     patch: |-
       - op: replace
         path: /spec/rules/0/host
-        value: platform.eu-sovereigndataplatform.com
+        value: platform.example.com
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: platform.eu-sovereigndataplatform.com
+        value: platform.example.com
       - op: replace
         path: /spec/tls/0/secretName
         value: platform-public-tls
@@ -31,4 +31,4 @@ patches:
     patch: |-
       - op: replace
         path: /data/CORS_ALLOWED_ORIGINS
-        value: "https://platform.eu-sovereigndataplatform.com"
+        value: "https://platform.example.com"

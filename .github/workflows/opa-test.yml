@@ -26,15 +26,15 @@ jobs:
         run: opa fmt --diff opa-policies-src/trino/
 
       - name: Wrap test data (Stackable bundle-path)
-        # Wraps opa-policies-src/data/uwv_role_mappings.json onder
-        # data.configmap["opa-trino-bundle"]["uwv-platform"] zodat
+        # Wraps opa-policies-src/data/role_mappings.json onder
+        # data.configmap["opa-trino-bundle"]["odap-platform"] zodat
         # `opa test` dezelfde paden ziet als de Stackable OpaCluster
         # in productie. Zonder dit falen alle policy-tests omdat de
         # rego-regels via `data.configmap.[...]` lezen.
         run: |
           python3 scripts/opa-test-data-wrap.py \
-            --src opa-policies-src/data/uwv_role_mappings.json \
-            --dst /tmp/uwv-opa-test-data.json
+            --src opa-policies-src/data/role_mappings.json \
+            --dst /tmp/opa-test-data.json
 
       - name: opa test (verbose)
         # `opa test` exits non-zero on any failing test — no extra flag
@@ -43,7 +43,7 @@ jobs:
         run: |
           opa test \
             opa-policies-src/trino/ \
-            /tmp/uwv-opa-test-data.json \
+            /tmp/opa-test-data.json \
             -v
 
       - name: Build bundle (sanity)

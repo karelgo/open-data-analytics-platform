@@ -8,7 +8,7 @@
 # To bring the daemon up locally:
 #   1. Provision both secrets (see platform/19-nanitics-observatory/secret.yaml
 #      and platform/20-multica-daemon/secret-token.yaml for kubectl recipes)
-#   2. kubectl -n uwv-platform scale deploy/multica-daemon --replicas=1
+#   2. kubectl -n odap-platform scale deploy/multica-daemon --replicas=1
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:

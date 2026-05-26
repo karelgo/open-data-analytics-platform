@@ -3,7 +3,7 @@
 # Patroon volgt platform/15-portal/configmap-oauth2-proxy.yaml — split
 # OIDC-discovery (issuer extern voor browser-redirect, token-endpoints
 # intern via cluster-DNS) lost het k3d-probleem op dat
-# 'keycloak.uwv-platform.local' alleen via /etc/hosts op de host
+# 'keycloak.odap.local' alleen via /etc/hosts op de host
 # resolveert.
 #
 # Front-door-model: oauth2-proxy gates ALLEEN '/' (de Next.js bundle).
@@ -20,34 +20,34 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: multica-oauth2-proxy-config
-  namespace: uwv-platform
+  namespace: odap-platform
 data:
   oauth2-proxy.cfg: |
     # Provider
     provider                = "keycloak-oidc"
     client_id               = "multica"
-    oidc_issuer_url         = "https://keycloak.uwv-platform.local:8443/realms/uwv"
+    oidc_issuer_url         = "https://keycloak.odap.local:8443/realms/odap"
 
     # Split discovery
     skip_oidc_discovery     = true
-    login_url               = "https://keycloak.uwv-platform.local:8443/realms/uwv/protocol/openid-connect/auth"
-    redeem_url              = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/token"
-    profile_url             = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/userinfo"
-    validate_url            = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/userinfo"
-    oidc_jwks_url           = "http://keycloak.uwv-auth.svc.cluster.local/realms/uwv/protocol/openid-connect/certs"
+    login_url               = "https://keycloak.odap.local:8443/realms/odap/protocol/openid-connect/auth"
+    redeem_url              = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/token"
+    profile_url             = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/userinfo"
+    validate_url            = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/userinfo"
+    oidc_jwks_url           = "http://keycloak.odap-auth.svc.cluster.local/realms/odap/protocol/openid-connect/certs"
 
     # Sessiebeleid — SameSite=none + Secure zodat de cookie ook in cross-
-    # origin iframe-context (portal embed-shell op platform.uwv-platform.local)
+    # origin iframe-context (portal embed-shell op platform.odap.local)
     # wordt meegestuurd. Anders blokkeert de browser 'm bij iframe-requests
     # en blijft de iframe vastzitten op de Keycloak login-redirect.
-    cookie_name             = "_uwv_multica"
+    cookie_name             = "_multica"
     cookie_secure           = true
     cookie_httponly         = true
     cookie_samesite         = "none"
     cookie_expire           = "8h"
     cookie_refresh          = "30m"
-    cookie_domains          = ["multica.uwv-platform.local"]
-    whitelist_domains       = [".uwv-platform.local", ".uwv-platform.local:8443", "platform.uwv-platform.local:8443"]
+    cookie_domains          = ["multica.odap.local"]
+    whitelist_domains       = [".odap.local", ".odap.local:8443", "platform.odap.local:8443"]
 
     # Listen — ingress wijst hierheen
     http_address            = "0.0.0.0:4180"
@@ -56,16 +56,16 @@ data:
     # /api, /auth, /uploads, /ws, /health, /readyz → backend
     # /                                            → frontend
     upstreams = [
-      "http://multica-backend.uwv-platform.svc.cluster.local/api/",
-      "http://multica-backend.uwv-platform.svc.cluster.local/auth/",
-      "http://multica-backend.uwv-platform.svc.cluster.local/uploads/",
-      "http://multica-backend.uwv-platform.svc.cluster.local/ws",
-      "http://multica-backend.uwv-platform.svc.cluster.local/health",
-      "http://multica-backend.uwv-platform.svc.cluster.local/readyz",
-      "http://multica-frontend.uwv-platform.svc.cluster.local/",
+      "http://multica-backend.odap-platform.svc.cluster.local/api/",
+      "http://multica-backend.odap-platform.svc.cluster.local/auth/",
+      "http://multica-backend.odap-platform.svc.cluster.local/uploads/",
+      "http://multica-backend.odap-platform.svc.cluster.local/ws",
+      "http://multica-backend.odap-platform.svc.cluster.local/health",
+      "http://multica-backend.odap-platform.svc.cluster.local/readyz",
+      "http://multica-frontend.odap-platform.svc.cluster.local/",
     ]
 
-    redirect_url            = "https://multica.uwv-platform.local:8443/oauth2/callback"
+    redirect_url            = "https://multica.odap.local:8443/oauth2/callback"
 
     # Identity headers — niet gebruikt door Multica zelf, wel handig
     # als debug-pijp of voor toekomstige bridge.

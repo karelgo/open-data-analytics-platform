@@ -41,13 +41,13 @@ prometheus:
     # gebruikt voor zelf-gegenereerde links (notification URLs, recordings).
     # routePrefix zorgt dat de UI z'n eigen assets onder /prometheus/* zoekt.
     # values-aks/values-stackit overrulen externalUrl met hun publieke domein.
-    externalUrl: "https://platform.uwv-platform.local:8443/prometheus"
+    externalUrl: "https://platform.odap.local:8443/prometheus"
     routePrefix: "/prometheus"
 
 # Grafana
 grafana:
   enabled: true
-  adminPassword: "uwv-dev-only-CHANGE-ME-2026"
+  adminPassword: "odap-dev-only-CHANGE-ME"
   persistence:
     enabled: true
     # storageClassName is set per-mode in values-{k3d,aks}.yaml.
@@ -59,13 +59,13 @@ grafana:
     limits:
       memory: 256Mi
   # Chart-managed Grafana ingress UIT — we serveren Grafana onder
-  # platform.uwv-platform.local/grafana via een eigen ingress in
+  # platform.odap.local/grafana via een eigen ingress in
   # platform/14-monitoring/ingress-grafana.yaml (path-routing voor de
   # portal embed-shell). Public AKS access blijft via
   # infrastructure/azure/public-ingresses.yaml (`grafana-public`).
   ingress:
     enabled: false
-  # Keycloak SSO via OIDC. De `grafana`-client zit in realm-uwv.json met
+  # Keycloak SSO via OIDC. De `grafana`-client zit in realm.json met
   # redirect-URIs voor alle drie de modes (k3d/aks/stackit). De k3d-defaults
   # staan hier; values-aks.yaml en values-stackit.yaml overrulen root_url +
   # de Keycloak-endpoints met de publieke domeinen.
@@ -77,14 +77,14 @@ grafana:
   # Break-glass admin login blijft bereikbaar via /grafana/login?disableAutoLogin=true.
   #
   # tls_skip_verify_insecure=true is dev-only nodig omdat de pod het self-signed
-  # uwv-platform-issuer-cert van keycloak.uwv-platform.local niet kan verifiëren
-  # (uwv-ca-bundle ConfigMap zit in uwv-platform, niet uwv-monitoring; mounten
+  # platform-issuer-cert van keycloak.odap.local niet kan verifiëren
+  # (platform-ca-bundle ConfigMap zit in odap-platform, niet odap-monitoring; mounten
   # zou kunnen maar voegt complexiteit toe voor een dev-only opstelling).
   # values-aks/values-stackit zetten 'm uit (publieke Let's Encrypt-certs).
   #
   # assertNoLeakedSecrets=false: chart-default lint-check verbiedt secrets
-  # inline in values. Onze hele repo gebruikt `uwv-dev-only-CHANGE-ME-*`
-  # placeholders openlijk (zie realm-uwv.json en dev-secrets.yaml), dus deze
+  # inline in values. Onze hele repo gebruikt `odap-dev-only-CHANGE-ME-*`
+  # placeholders openlijk (zie realm.json en dev-secrets.yaml), dus deze
   # check is hier inconsistent — productie zou via SealedSecrets/SOPS lopen.
   assertNoLeakedSecrets: false
   grafana.ini:
@@ -93,7 +93,7 @@ grafana:
       # ingress-grafana.yaml). De chart-managed ingress is uit; alle
       # toegang gaat via /grafana-prefix. serve_from_sub_path zorgt dat
       # alle static-asset paths het /grafana-prefix krijgen.
-      root_url: "https://platform.uwv-platform.local:8443/grafana/"
+      root_url: "https://platform.odap.local:8443/grafana/"
       serve_from_sub_path: true
     security:
       # Default X-Frame-Options=DENY blokkeert ook same-origin iframes
@@ -109,11 +109,11 @@ grafana:
       name: "Keycloak"
       allow_sign_up: true
       client_id: "grafana"
-      client_secret: "uwv-dev-only-CHANGE-ME-grafana-secret"
+      client_secret: "odap-dev-only-CHANGE-ME-grafana-secret"
       scopes: "openid profile email roles"
-      auth_url: "https://keycloak.uwv-platform.local:8443/realms/uwv/protocol/openid-connect/auth"
-      token_url: "https://keycloak.uwv-platform.local:8443/realms/uwv/protocol/openid-connect/token"
-      api_url: "https://keycloak.uwv-platform.local:8443/realms/uwv/protocol/openid-connect/userinfo"
+      auth_url: "https://keycloak.odap.local:8443/realms/odap/protocol/openid-connect/auth"
+      token_url: "https://keycloak.odap.local:8443/realms/odap/protocol/openid-connect/token"
+      api_url: "https://keycloak.odap.local:8443/realms/odap/protocol/openid-connect/userinfo"
       tls_skip_verify_insecure: true
       role_attribute_path: "contains(roles[*], 'platform_admin') && 'Admin' || contains(roles[*], 'data_engineer') && 'Editor' || 'Viewer'"
       role_attribute_strict: false

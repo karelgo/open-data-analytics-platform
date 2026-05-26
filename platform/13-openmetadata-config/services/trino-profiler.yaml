@@ -3,7 +3,7 @@
 ---
 source:
   type: trino
-  serviceName: uwv-trino
+  serviceName: trino
   sourceConfig:
     config:
       type: Profiler
@@ -18,7 +18,7 @@ source:
       # onder sourceConfig.config als onder processor.config — met
       # "Extra parameter 'processPiiSensitive'". OM heeft het verplaatst
       # naar een eigen `AutoClassification` workflow (`metadata classify`).
-      # Voor UWV-platform reference: zie roadmap voor losse AutoClassification-
+      # Voor ODAP platform reference: zie roadmap voor losse AutoClassification-
       # DAG; nu valt PII-tagging op handmatige tag-assignment via dbt-meta-
       # mapping (zie 13-openmetadata-config/dbt-meta-mapping.yaml en de
       # enrich_om_from_dbt_meta.py-stap in deze DAG).
@@ -44,7 +44,7 @@ sink:
 workflowConfig:
   loggerLevel: INFO
   openMetadataServerConfig:
-    hostPort: http://openmetadata.uwv-meta.svc.cluster.local:8585/api
+    hostPort: http://openmetadata.odap-meta.svc.cluster.local:8585/api
     authProvider: openmetadata
     securityConfig:
       jwtToken: ${OM_JWT_TOKEN}
