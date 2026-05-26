@@ -108,14 +108,14 @@ const RAIL_ICONS: Record<string, string> = {
 // the full name lives in `title` so the tooltip shows the long form.
 const RAIL_MAIN = [
   { id: 'home',          label: 'Home',                    href: '/' },
-  { id: 'workspace',     label: 'Mijn werkplek',           href: '/me/' },
+  { id: 'workspace',     label: 'My workspace',            href: '/me/' },
   // Data-foundation block: where data lives + describing it + how it flows.
   // Storage and Catalog have just one usable service each, so no sub-rail —
   // the parent is the direct link.
   { id: 'storage',       label: 'Storage',                 href: '/embed/minio/' },
   { id: 'catalog',       label: 'Catalog',                 href: '/embed/openmetadata/' },
-  { id: 'lineage',       label: 'Lineage + techn. doc.',   href: '/embed/dbt-docs/',
-    title: 'dbt-docs · lineage + technische documentatie' },
+  { id: 'lineage',       label: 'Lineage + technical docs', href: '/embed/dbt-docs/',
+    title: 'dbt-docs · lineage + technical documentation' },
   // Workflows currently only has Airflow as a working embed; NiFi / Kafka
   // don't have iframe-safe UIs in this deployment so they're hidden until
   // they get linkable destinations.
@@ -157,14 +157,14 @@ const RAIL_MAIN = [
 ] as const;
 const RAIL_FOOT = [
   { id: 'academy',  label: 'Academy',       href: '/learn/' },
-  { id: 'settings', label: 'Instellingen',  href: '/go/keycloak/' },
+  { id: 'settings', label: 'Settings',      href: '/go/keycloak/' },
 ] as const;
 
 const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
 ---
 
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -396,7 +396,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
         </svg>
-        <span class="topbarv2-search-placeholder">Zoek dashboards, DAGs, tabellen, notebooks…</span>
+        <span class="topbarv2-search-placeholder">Search dashboards, DAGs, tables, notebooks…</span>
         <kbd class="topbarv2-kbd">⌘K</kbd>
       </button>
 
@@ -407,7 +407,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
               <path d="M12 5v14M5 12h14" />
             </svg>
-            <span>Nieuw</span>
+            <span>New</span>
           </button>
           <div class="topbarv2-panel topbarv2-panel--right" role="menu">
             <a class="topbarv2-item" href="/embed/superset/?path=/sqllab/">
@@ -416,7 +416,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
             </a>
             <a class="topbarv2-item" href="/embed/jupyter/?path=/lab/">
               <span class="topbarv2-item-icon" data-color="notebook">NB</span>
-              <span class="topbarv2-item-text"><b>Notebook</b><em>Nieuw in Jupyter</em></span>
+              <span class="topbarv2-item-text"><b>Notebook</b><em>New in Jupyter</em></span>
             </a>
             <a class="topbarv2-item" href="/embed/superset/?path=/dashboard/list/">
               <span class="topbarv2-item-icon" data-color="dashboard">DSH</span>
@@ -424,12 +424,12 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
             </a>
             <a class="topbarv2-item" href="/csv-upload/">
               <span class="topbarv2-item-icon" data-color="table">CSV</span>
-              <span class="topbarv2-item-text"><b>CSV upload</b><em>Bron toevoegen via MinIO</em></span>
+              <span class="topbarv2-item-text"><b>CSV upload</b><em>Add source via MinIO</em></span>
             </a>
             <hr class="topbarv2-sep" />
             <a class="topbarv2-item" href="/access-request/">
               <span class="topbarv2-item-icon" data-color="admin">+A</span>
-              <span class="topbarv2-item-text"><b>Toegang aanvragen</b><em>Catalog of schema</em></span>
+              <span class="topbarv2-item-text"><b>Request access</b><em>Catalog or schema</em></span>
             </a>
           </div>
         </div>
@@ -450,7 +450,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
         </div>
 
         <!-- Theme toggle -->
-        <button class="topbarv2-icon-btn" type="button" data-theme-toggle aria-label="Schakel thema">
+        <button class="topbarv2-icon-btn" type="button" data-theme-toggle aria-label="Toggle theme">
           <svg class="topbarv2-theme-icon topbarv2-icon-sun"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" /></svg>
           <svg class="topbarv2-theme-icon topbarv2-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
         </button>
@@ -470,22 +470,22 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
               <span class="topbarv2-user-info-avatar" data-who-avatar-large>{userInitial}</span>
               <span class="topbarv2-user-info-text">
                 <b data-who-name>{userName}</b>
-                <em data-who-email>niet ingelogd</em>
+                <em data-who-email>not signed in</em>
               </span>
             </div>
             <hr class="topbarv2-sep" />
             <a class="topbarv2-item" href="/me/">
               <span class="topbarv2-item-icon" data-color="dashboard">ME</span>
-              <span class="topbarv2-item-text"><b>Mijn werkplek</b><em>Rol, capabilities, shortcuts</em></span>
+              <span class="topbarv2-item-text"><b>My workspace</b><em>Role, capabilities, shortcuts</em></span>
             </a>
             <a class="topbarv2-item" href="/learn/">
               <span class="topbarv2-item-icon" data-color="notebook">AC</span>
-              <span class="topbarv2-item-text"><b>Academy</b><em>Jouw leertraject</em></span>
+              <span class="topbarv2-item-text"><b>Academy</b><em>Your learning path</em></span>
             </a>
             <hr class="topbarv2-sep" />
             <a class="topbarv2-item" href="#logout" data-who-logout>
               <span class="topbarv2-item-icon" data-color="admin">↗</span>
-              <span class="topbarv2-item-text"><b>Uitloggen</b><em>Beëindig sessie</em></span>
+              <span class="topbarv2-item-text"><b>Sign out</b><em>End session</em></span>
             </a>
           </div>
         </div>

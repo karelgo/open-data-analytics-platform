@@ -16,17 +16,17 @@ import ShellLayout from '../layouts/ShellLayout.astro';
 <ShellLayout title="Upload" activeSection="workspace">
   <section class="up">
     <h1 class="up-title">Upload</h1>
-    <p class="up-sub">Bestand → MinIO. Tabulair → optioneel Delta in bronze.</p>
+    <p class="up-sub">File → MinIO. Tabular → optionally Delta in bronze.</p>
 
     <label id="drop-zone" class="up-drop" for="file-input" data-state="idle">
       <input id="file-input" type="file" hidden />
-      <span class="up-drop-title">Klik of sleep een bestand</span>
-      <span class="up-drop-sub">elk type · max 500 MB</span>
+      <span class="up-drop-title">Click or drop a file</span>
+      <span class="up-drop-sub">any type · max 500 MB</span>
     </label>
 
     <div id="upload-status" class="up-status" role="status" aria-live="polite" hidden>
       <div class="up-status-row">
-        <span class="up-status-label" id="status-label">Wachten…</span>
+        <span class="up-status-label" id="status-label">Waiting…</span>
         <span class="up-status-pct mono" id="status-pct"></span>
       </div>
       <div class="up-progress" aria-hidden="true">
@@ -44,7 +44,7 @@ import ShellLayout from '../layouts/ShellLayout.astro';
         <span class="up-form-sep mono">.</span>
         <input id="fld-table" class="up-input mono" type="text"
                pattern="^[a-z][a-z0-9_]{0,62}$" required
-               aria-label="Target tabel" placeholder="tabel" />
+               aria-label="Target table" placeholder="table" />
         <button id="convert-btn" type="button" class="btn btn--accent" disabled>
           Convert to Delta →
         </button>

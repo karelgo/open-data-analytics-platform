@@ -1,16 +1,16 @@
-# Open Data & Analytics Platform — documentatie-site (MkDocs Material).
+# Open Data & Analytics Platform — documentation site (MkDocs Material).
 #
-# Lokaal previewen:
+# Preview locally:
 #   pip install -r requirements-docs.txt
 #   mkdocs serve            # http://127.0.0.1:8000
 #
-# CI bouwt en publiceert via .github/workflows/docs.yml naar GitHub Pages.
+# CI builds and publishes via .github/workflows/docs.yml to GitHub Pages.
 
 site_name: Open Data & Analytics Platform
 site_description: >-
-  Documentatie van de ODAP reference implementation voor een compliant data-
-  en analyticsplatform — architectuur, componenten, rollen, use-cases en
-  beslissingen.
+  Documentation for the ODAP reference implementation of a compliant data and
+  analytics platform — architecture, components, roles, use cases, and
+  decisions.
 site_url: https://fresh-minds.github.io/FreshStackableDataPlatform/
 site_author: Open Data & Analytics Platform contributors
 

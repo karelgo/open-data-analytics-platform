@@ -54,25 +54,25 @@ export interface ExploreCategory {
 // hardcoded sample data in production).
 export const RECENTS: RecentItem[] = [];
 
-// "Verkennen" — all platform services, grouped by stage.
-// Elke tegel landt op de embed-route van die service; voor services
-// zonder iframe-veilige UI (Trino, NiFi, Kafka, Hive, OPA) toont de
-// EmbedLayout een fallback-card met "open in nieuw tabblad".
+// "Explore" — all platform services, grouped by stage.
+// Each tile lands on the embed route for that service; for services
+// without an iframe-safe UI (Trino, NiFi, Kafka, Hive, OPA), the
+// EmbedLayout shows a fallback card with "open in new tab".
 export const EXPLORE: ExploreCategory[] = [
   {
     title: 'Pipeline & Compute',
     sub:   'Ingest, transform, query',
     items: [
-      { type: 'dag',      service: 'airflow', title: 'Airflow', subtitle: 'Orchestratie',        href: '/embed/airflow/' },
+      { type: 'dag',      service: 'airflow', title: 'Airflow', subtitle: 'Orchestration',       href: '/embed/airflow/' },
       { type: 'pipeline', service: 'spark',   title: 'Spark',   subtitle: 'Distributed compute', href: '/embed/spark/' },
-      { type: 'query',    service: 'trino',   title: 'Trino',   subtitle: 'SQL-engine',          href: '/embed/trino/' },
+      { type: 'query',    service: 'trino',   title: 'Trino',   subtitle: 'SQL engine',          href: '/embed/trino/' },
       { type: 'pipeline', service: 'dbt',     title: 'dbt',     subtitle: 'Transformations',     href: '/embed/dbt-docs/' },
       { type: 'dag',      service: 'nifi',    title: 'NiFi',    subtitle: 'Stream ingestion',    href: '/embed/nifi/' },
       { type: 'pipeline', service: 'kafka',   title: 'Kafka',   subtitle: 'Event streaming',     href: '/embed/kafka/' },
     ],
   },
   {
-    title: 'BI & Analyse',
+    title: 'BI & Analytics',
     sub:   'Dashboards, queries, notebooks',
     items: [
       { type: 'dashboard', service: 'superset', title: 'Superset', subtitle: 'Dashboards + SQLLab',          href: '/embed/superset/' },

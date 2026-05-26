@@ -23,14 +23,14 @@ const tech     = tracks.filter((t) => roleById(t.role)?.category === 'tech');
       <a href="https://vscode.dev" rel="noreferrer">vscode.dev</a>.
     </p>
     <p class="muted">
-      Voortgang slaan we lokaal op in je browser. Na inlog via Keycloak
-      synchroniseert de Academy je voortgang automatisch over apparaten.
+      Progress is stored locally in your browser. After signing in via Keycloak,
+      the Academy automatically syncs your progress across devices.
     </p>
   </section>
 
   <section class="panel">
-    <h2>Eindgebruikers</h2>
-    <p class="muted">Voor wie het platform raadpleegt voor het eigen werk.</p>
+    <h2>End users</h2>
+    <p class="muted">For people who use the platform to do their own work.</p>
     <div class="grid-2 track-grid">
       {business.map((t) => (
         <TrackCard role={t.role} moduleCount={counts.get(t.role) ?? 0} />
@@ -39,8 +39,8 @@ const tech     = tracks.filter((t) => roleById(t.role)?.category === 'tech');
   </section>
 
   <section class="panel">
-    <h2>Platform-team</h2>
-    <p class="muted">Voor wie het platform bouwt en beheert.</p>
+    <h2>Platform team</h2>
+    <p class="muted">For people who build and operate the platform.</p>
     <div class="grid-2 track-grid">
       {tech.map((t) => (
         <TrackCard role={t.role} moduleCount={counts.get(t.role) ?? 0} />

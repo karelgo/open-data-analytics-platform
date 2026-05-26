@@ -258,13 +258,13 @@ export default function CommandPalette() {
           {state.kind === 'error' && (
             <div className="cmdk-empty">
               <strong>{state.msg}</strong>
-              <span>De portal-backend is nu niet bereikbaar — probeer over een paar seconden opnieuw.</span>
+              <span>The portal backend is currently unreachable — try again in a few seconds.</span>
             </div>
           )}
           {state.kind === 'ok' && flat.length === 0 && (
             <div className="cmdk-empty">
-              <strong>Geen resultaten voor "{query}"</strong>
-              <span>Tip: probeer een DAG-naam, dashboard-titel of <code>schema.tabel</code>.</span>
+              <strong>No results for "{query}"</strong>
+              <span>Tip: try a DAG name, dashboard title, or <code>schema.table</code>.</span>
             </div>
           )}
           {state.kind === 'ok' && flat.length > 0 && groups.map((group) => (

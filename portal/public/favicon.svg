@@ -2,5 +2,5 @@
   <rect width="64" height="64" rx="10" fill="#0e1116"/>
   <text x="32" y="40" text-anchor="middle"
         font-family="ui-sans-serif, system-ui, sans-serif"
-        font-size="22" font-weight="700" fill="#f59e0b">UWV</text>
+        font-size="20" font-weight="700" fill="#f59e0b">ODAP</text>
 </svg>

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="6" fill="#d68f00"/>
-  <text x="16" y="22" font-family="Inter, sans-serif" font-weight="700" font-size="13"
-        fill="#1a1a1a" text-anchor="middle">UWV</text>
+  <text x="16" y="22" font-family="Inter, sans-serif" font-weight="700" font-size="11"
+        fill="#1a1a1a" text-anchor="middle">ODAP</text>
 </svg>

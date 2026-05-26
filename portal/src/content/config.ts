@@ -68,12 +68,12 @@ const learn = defineCollection({
   }),
 });
 
-// Rol-handleidingen — uitgebreide referentiedocumenten ("Wat doet jouw rol?",
-// workflows, foutmeldingen, escalatie). Source-of-truth is docs/handbooks/
-// in de repo-root; portal/scripts/sync-handleidingen.mjs kopieert ze bij elke
-// build naar portal/src/content/handbooks/<role-id>.md met frontmatter.
-// Gerenderd door pages/handbooks/[role].astro.
-const handleidingen = defineCollection({
+// Role handbooks — extended reference documents ("What does your role do?",
+// workflows, error messages, escalation). Source of truth is docs/handbooks/
+// at the repo root; portal/scripts/sync-handbooks.mjs copies them each build
+// into portal/src/content/handbooks/<role-id>.md with frontmatter.
+// Rendered by pages/handbooks/[role].astro.
+const handbooks = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
@@ -81,6 +81,6 @@ const handleidingen = defineCollection({
   }),
 });
 
-export const collections = { learn, handleidingen };
+export const collections = { learn, handbooks };
 export type RoleId = (typeof roleIds)[number];
 export type Level = (typeof levels)[number];

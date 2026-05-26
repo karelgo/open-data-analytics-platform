@@ -18,11 +18,11 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..', '..');
-const srcDir = resolve(repoRoot, 'docs', 'handleidingen');
-const destDir = resolve(__dirname, '..', 'src', 'content', 'handleidingen');
+const srcDir = resolve(repoRoot, 'docs', 'handbooks');
+const destDir = resolve(__dirname, '..', 'src', 'content', 'handbooks');
 
-// Mapping role-id → docs/handbooks/-basename. Houd in sync met
-// portal/src/data/roles.ts (handleidingPath).
+// Mapping role-id → docs/handbooks/-basename. Keep in sync with
+// portal/src/data/roles.ts (handbookPath).
 const MAP = {
   wia_beoordelaar:          '01-wia-beoordelaar.md',
   ww_handhaver:             '02-ww-handhaver.md',
@@ -38,7 +38,7 @@ const MAP = {
 };
 
 if (!existsSync(srcDir) || !statSync(srcDir).isDirectory()) {
-  console.warn(`[sync-handleidingen] ${srcDir} ontbreekt — skip (verse checkout zonder docs/?)`);
+  console.warn(`[sync-handbooks] ${srcDir} missing — skip (fresh checkout without docs/?)`);
   process.exit(0);
 }
 
@@ -53,25 +53,25 @@ for (const [roleId, filename] of Object.entries(MAP)) {
 
   if (!existsSync(srcPath)) {
     missing += 1;
-    console.warn(`[sync-handleidingen] ontbreekt: ${srcPath} — skip`);
+    console.warn(`[sync-handbooks] missing: ${srcPath} — skip`);
     continue;
   }
 
   const md = readFileSync(srcPath, 'utf8');
 
-  // Eerste H1 = titel. Fallback: bestandsnaam zonder volgnummer + extensie.
+  // First H1 = title. Fallback: filename without sequence number + extension.
   const titleMatch = md.match(/^#\s+(.+)$/m);
   const title = titleMatch
     ? titleMatch[1].trim()
     : filename.replace(/^\d+-/, '').replace(/\.md$/, '').replace(/-/g, ' ');
 
-  // Strip de eerste H1 uit de body zodat de Astro-page-template'm
-  // niet dubbel toont (de page rendert de titel uit frontmatter).
+  // Strip the first H1 from the body so the Astro page template doesn't
+  // render it twice (the page renders the title from frontmatter).
   const body = titleMatch
     ? md.replace(/^#\s+.+\n+/m, '')
     : md;
 
-  // Quote-escape title voor YAML-frontmatter.
+  // Quote-escape title for YAML frontmatter.
   const safeTitle = title.replace(/"/g, '\\"');
 
   const out = `---\ntitle: "${safeTitle}"\nrole: ${roleId}\n---\n\n${body}`;
@@ -79,7 +79,7 @@ for (const [roleId, filename] of Object.entries(MAP)) {
   copied += 1;
 }
 
-console.log(`[sync-handleidingen] ${copied} gekopieerd → ${destDir}`);
+console.log(`[sync-handbooks] ${copied} copied → ${destDir}`);
 if (missing > 0) {
-  console.warn(`[sync-handleidingen] ${missing} ontbrekende bron-bestanden`);
+  console.warn(`[sync-handbooks] ${missing} missing source files`);
 }

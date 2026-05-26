@@ -30,8 +30,8 @@ const {
   <!-- ─── Hero ─── -->
   <header class="v2-hero">
     <div class="v2-hero-text">
-      <span class="v2-eyebrow">Mijn werkplek</span>
-      <h1 class="v2-hero-title">Welkom terug<span data-who-prefix>{userName ? ', ' : ''}</span><em data-who-name>{userName}</em></h1>
+      <span class="v2-eyebrow">My workspace</span>
+      <h1 class="v2-hero-title">Welcome back<span data-who-prefix>{userName ? ', ' : ''}</span><em data-who-name>{userName}</em></h1>
       <p class="v2-hero-sub" data-persona-sub>
         Persona: <b>{personaLabel}</b>
       </p>
@@ -54,7 +54,7 @@ const {
        staan zodat de page niet leeg oogt. -->
   <section class="v2-section">
     <header class="v2-section-head">
-      <h2>Recent geopend</h2>
+      <h2>Recently opened</h2>
     </header>
     <div class="v2-grid" data-recents-grid>
       {RECENTS.map((r) => (
@@ -77,8 +77,8 @@ const {
   <!-- ─── Verkennen ─── -->
   <section class="v2-section">
     <header class="v2-section-head">
-      <h2>Verkennen</h2>
-      <a class="v2-section-more" href="/embed/dbt-docs/">Lineage-diagram →</a>
+      <h2>Explore</h2>
+      <a class="v2-section-more" href="/embed/dbt-docs/">Lineage diagram →</a>
     </header>
     <div class="v2-explore">
       {EXPLORE.map((cat) => (
@@ -107,8 +107,8 @@ const {
   <footer class="v2-foot">
     <span class="mono">Portal v2 · {new Date().toISOString().slice(0, 10)}</span>
     <span class="v2-foot-keys">
-      <kbd>⌘K</kbd> zoek &nbsp;·&nbsp;
-      <kbd>esc</kbd> sluit &nbsp;·&nbsp;
+      <kbd>⌘K</kbd> search &nbsp;·&nbsp;
+      <kbd>esc</kbd> close &nbsp;·&nbsp;
       Hover left rail
     </span>
   </footer>

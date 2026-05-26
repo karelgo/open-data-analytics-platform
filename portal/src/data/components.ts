@@ -99,8 +99,8 @@ export const components: PlatformComponent[] = [
     name: 'Keycloak',
     layer: 'auth',
     stage: 'identity',
-    short: 'OIDC-identity provider — single sign-on en MFA voor alle componenten.',
-    purpose: 'Eén keer inloggen, overal toegang volgens je rol. MFA en audit-log centraal.',
+    short: 'OIDC identity provider — single sign-on and MFA for every component.',
+    purpose: 'One sign-in, role-based access everywhere. Central MFA and audit log.',
     icon: '/icons/brand/keycloak.svg',
     url: 'https://keycloak.odap.local:8443',
     // Keycloak admin-console is bewust niet iframe-baar — login-redirects
@@ -115,8 +115,8 @@ export const components: PlatformComponent[] = [
     name: 'Apache NiFi',
     layer: 'streaming',
     stage: 'ingestion',
-    short: 'Visuele ingestion-flows — bronsystemen → Kafka.',
-    purpose: 'Data uit UWV-bronsystemen ophalen en in het platform binnenbrengen.',
+    short: 'Visual ingestion flows — source systems → Kafka.',
+    purpose: 'Pull data from source systems into the platform.',
     icon: '/icons/brand/nifi.svg',
     // Flows worden as-code beheerd (process-group JSON, REST-import); de UI
     // is geen onderdeel van de dagelijkse workflow. Geen klikbare link op /me.
@@ -130,8 +130,8 @@ export const components: PlatformComponent[] = [
     name: 'Kafka',
     layer: 'streaming',
     stage: 'ingestion',
-    short: 'Event-bus tussen NiFi-ingestion en Spark Structured Streaming.',
-    purpose: 'Data-events bufferen en doorzetten naar verwerking. Schaalbare doorvoer.',
+    short: 'Event bus between NiFi ingestion and Spark Structured Streaming.',
+    purpose: 'Buffer data events and forward them to processing. Scalable throughput.',
     icon: '/icons/brand/kafka.svg',
     url: null,
     embed: { mode: 'none' },
@@ -143,8 +143,8 @@ export const components: PlatformComponent[] = [
     name: 'MinIO',
     layer: 'storage',
     stage: 'storage',
-    short: 'S3-compatible object store met buckets bronze/silver/gold/sensitive.',
-    purpose: 'Het lakehouse waar alle data fysiek staat — gelaagd in zones met aparte toegangsregels.',
+    short: 'S3-compatible object store with buckets bronze/silver/gold/sensitive.',
+    purpose: 'The lakehouse where all data physically lives — layered in zones with separate access rules.',
     icon: '/icons/brand/minio.svg',
     // /go/minio/ — minimale iframe-bootstrap die de Keycloak SSO-flow
     // start (via portal-nginx in-cluster proxy naar de MinIO Console
@@ -170,8 +170,8 @@ export const components: PlatformComponent[] = [
     name: 'Hive Metastore',
     layer: 'metadata',
     stage: 'storage',
-    short: 'Catalog backend — houdt tabel-schemas en partities bij voor Trino en Spark.',
-    purpose: 'Vertaalt bestanden in MinIO naar tabellen met kolommen en types.',
+    short: 'Catalog backend — tracks table schemas and partitions for Trino and Spark.',
+    purpose: 'Translates files in MinIO into tables with columns and types.',
     icon: '/icons/brand/hive.svg',
     url: null,
     embed: { mode: 'none' },
@@ -183,8 +183,8 @@ export const components: PlatformComponent[] = [
     name: 'Apache Spark',
     layer: 'compute',
     stage: 'transformation',
-    short: 'Streaming + batch jobs die Delta-tabellen op MinIO schrijven.',
-    purpose: 'Zware data-bewerkingen — opschonen, joinen, aggregeren — in stream of batch.',
+    short: 'Streaming + batch jobs that write Delta tables on MinIO.',
+    purpose: 'Heavy data work — cleaning, joining, aggregating — in stream or batch.',
     icon: '/icons/brand/spark.svg',
     // Wijst naar de live driver-UI van de `streaming-bronze` SparkApplication
     // (via een eigen Service+Ingress, zie platform/08-spark/ingress.yaml).
@@ -200,8 +200,8 @@ export const components: PlatformComponent[] = [
     name: 'Trino',
     layer: 'query',
     stage: 'transformation',
-    short: 'SQL query-engine over Delta-lakehouse, met OPA-authorisatie.',
-    purpose: 'Snel SQL draaien over de hele lakehouse — voor dbt-modellen én eindgebruikers.',
+    short: 'SQL query engine over the Delta lakehouse, with OPA authorization.',
+    purpose: 'Run SQL fast over the entire lakehouse — for dbt models and end users alike.',
     icon: '/icons/brand/trino.svg',
     // Trino-UI is bereikbaar onder de portal Compute-tab (embed iframe,
     // zelfde patroon als Spark). Eindgebruikers blijven Trino vooral via
@@ -228,8 +228,8 @@ export const components: PlatformComponent[] = [
     name: 'OPA',
     layer: 'policy',
     stage: 'transformation',
-    short: 'Open Policy Agent — beslist per Trino-query wat een rol mag zien (rij-filters, kolom-maskers, doelbinding).',
-    purpose: 'Doelbinding, rij-filters en kolom-maskering afdwingen op iedere query.',
+    short: 'Open Policy Agent — decides per Trino query what a role may see (row filters, column masks, purpose limitation).',
+    purpose: 'Enforce purpose limitation, row filters, and column masking on every query.',
     icon: '/icons/brand/opa.svg',
     url: null,
     embed: { mode: 'none' },
@@ -241,8 +241,8 @@ export const components: PlatformComponent[] = [
     name: 'Apache Superset',
     layer: 'bi',
     stage: 'consumption',
-    short: 'Dashboards en SQL Lab — primaire UI voor de meeste eindgebruikers.',
-    purpose: 'Dashboards en ad-hoc analyse voor business-rollen — zonder SQL hoeven kennen.',
+    short: 'Dashboards and SQL Lab — primary UI for most end users.',
+    purpose: 'Dashboards and ad-hoc analysis for business roles — no SQL knowledge required.',
     icon: '/icons/brand/superset.svg',
     url: 'https://superset.odap.local:8443',
     // Subdomain-routing — Superset hard-codet /superset als blueprint-
@@ -270,8 +270,8 @@ export const components: PlatformComponent[] = [
     name: 'OpenMetadata',
     layer: 'governance',
     stage: 'discovery',
-    short: 'Catalog, glossary, lineage, data-quality.',
-    purpose: 'Wat hebben we, wie is eigenaar, hoe is het opgebouwd, en is het op orde?',
+    short: 'Catalog, glossary, lineage, data quality.',
+    purpose: 'What do we have, who owns it, how is it built, and is it in good shape?',
     icon: '/icons/brand/openmetadata.svg',
     url: 'https://openmetadata.odap.local:8443',
     // OpenMetadata 1.x heeft geen configureerbare context-path (alle /api/v1,
@@ -300,8 +300,8 @@ export const components: PlatformComponent[] = [
     // Statisch geëxporteerde `dbt docs generate --static`-bundel. Geserveerd
     // door de portal-nginx zelf op /dbt-docs/ — geen aparte service, geen
     // Prometheus-job (vandaar geen status-dot).
-    short: 'Modellen, tests, sources en lineage van de dbt-projectdefinities.',
-    purpose: 'Wat doen onze dbt-modellen, welke tests draaien er, en hoe vloeit data van staging naar marts?',
+    short: 'Models, tests, sources, and lineage from the dbt project definitions.',
+    purpose: 'What do our dbt models do, which tests run, and how does data flow from staging to marts?',
     icon: '/icons/brand/dbt.svg',
     url: '/dbt-docs.html',
     // dbt-docs is een statische bundle die door portal-nginx zelf wordt
@@ -314,8 +314,8 @@ export const components: PlatformComponent[] = [
     name: 'ODAP Lab (Jupyter)',
     layer: 'compute',
     stage: 'consumption',
-    short: 'Notebook-werkomgeving — Python/SQL op bronze/silver/gold/sensitive, met Git-integratie.',
-    purpose: 'Interactief data verkennen en analyseren — Trino, Delta, MinIO, OpenMetadata vanuit één Python-kernel; werk versioneren met Git.',
+    short: 'Notebook environment — Python/SQL on bronze/silver/gold/sensitive, with Git integration.',
+    purpose: 'Interactively explore and analyse data — Trino, Delta, MinIO, OpenMetadata from one Python kernel; version work with Git.',
     icon: '/icons/brand/jupyter.svg',
     url: 'https://jupyter.odap.local:8443',
     // JupyterHub draait onder c.JupyterHub.base_url = '/jupyter/'.
@@ -336,8 +336,8 @@ export const components: PlatformComponent[] = [
     name: 'Apache Airflow',
     layer: 'orchestration',
     stage: 'pipeline',
-    short: 'DAG-orchestratie voor batch-jobs en dbt-runs.',
-    purpose: 'Plant en bewaakt alle scheduled jobs — wat draait wanneer, in welke volgorde.',
+    short: 'DAG orchestration for batch jobs and dbt runs.',
+    purpose: 'Schedules and monitors all scheduled jobs — what runs when, in what order.',
     icon: '/icons/brand/airflow.svg',
     url: 'https://airflow.odap.local:8443',
     // Airflow 3 — AIRFLOW__API__BASE_URL en AIRFLOW__FAB__BASE_URL beide
@@ -352,8 +352,8 @@ export const components: PlatformComponent[] = [
     name: 'Prometheus',
     layer: 'observability',
     stage: 'observability',
-    short: 'Metrics + alerts; voedt de status-badges in deze portal.',
-    purpose: 'Metrics verzamelen en alerteren als iets stuk dreigt te gaan.',
+    short: 'Metrics + alerts; feeds the status badges in this portal.',
+    purpose: 'Collect metrics and alert when something is about to break.',
     icon: '/icons/brand/prometheus.svg',
     url: 'https://prometheus.odap.local:8443',
     // --web.external-url=/prometheus + --web.route-prefix=/prometheus in
@@ -367,8 +367,8 @@ export const components: PlatformComponent[] = [
     name: 'Grafana',
     layer: 'observability',
     stage: 'observability',
-    short: 'Dashboards over Prometheus-metrics — cluster-health en service-latency.',
-    purpose: 'Visualisatie van Prometheus-metrics in dashboards; gateway voor SRE-werk.',
+    short: 'Dashboards on Prometheus metrics — cluster health and service latency.',
+    purpose: 'Visualise Prometheus metrics in dashboards; gateway for SRE work.',
     icon: '/icons/brand/grafana.svg',
     // Login via Keycloak SSO (auth.generic_oauth in helm/prometheus-stack/values.yaml).
     // Klik op "Sign in with Keycloak" op de Grafana-loginpagina; admin-account
@@ -385,8 +385,8 @@ export const components: PlatformComponent[] = [
     name: 'OpenSearch',
     layer: 'observability',
     stage: 'observability',
-    short: 'Logs (Vector) + search-backend voor OpenMetadata.',
-    purpose: 'Logs centraal doorzoekbaar maken — debugging en audit-trail.',
+    short: 'Logs (Vector) + search backend for OpenMetadata.',
+    purpose: 'Make logs centrally searchable — debugging and audit trail.',
     icon: '/icons/brand/opensearch.svg',
     // Externe URL wijst naar OpenSearch Dashboards (port 5601). De REST-API
     // (port 9200) is alleen intern bereikbaar via cluster-DNS.
@@ -405,8 +405,8 @@ export const components: PlatformComponent[] = [
     // Dev-loop-lane: coördineert coding agents (Claude Code/Codex/Copilot CLI/…)
     // die op de laptop van de developer draaien — de server houdt taken,
     // voortgang en skills bij. Niet hetzelfde als Nanitics (runtime).
-    short: 'Coördinatie van coding agents (Claude Code, Codex, Copilot CLI, …) — taken, voortgang, skills.',
-    purpose: 'Taken toewijzen aan coding agents; voortgang volgen. Agents draaien op je laptop.',
+    short: 'Coordination of coding agents (Claude Code, Codex, Copilot CLI, …) — tasks, progress, skills.',
+    purpose: 'Assign tasks to coding agents; track progress. Agents run on your laptop.',
     icon: '/icons/brand/multica.svg',
     url: 'https://multica.odap.local:8443',
     // Cross-origin op eigen subdomein achter oauth2-proxy; behoeft alleen
@@ -435,8 +435,8 @@ export const components: PlatformComponent[] = [
     // FreshLakehouse/docs/research/powerbi-as-bi-and-self-service-layer.md
     // (Fase 4). Tot dat geïmplementeerd is, blijft 'subdomain' + fallback
     // de pragmatische default — sluit aan op bestaande embed-patronen.
-    short: 'Dashboards en self-service exploration via Microsoft Fabric / Power BI (eigen Azure-tenant SSO).',
-    purpose: 'Curated dashboards bovenop het lakehouse + composite-model self-service voor analisten met DAX/Excel-skills.',
+    short: 'Dashboards and self-service exploration via Microsoft Fabric / Power BI (own Azure-tenant SSO).',
+    purpose: 'Curated dashboards on top of the lakehouse + composite-model self-service for analysts with DAX/Excel skills.',
     icon: '/icons/brand/powerbi.svg',
     url: 'https://app.fabric.microsoft.com',
     embed: { mode: 'subdomain', iframeBase: 'https://app.fabric.microsoft.com' },
@@ -464,8 +464,8 @@ export const components: PlatformComponent[] = [
     // Prometheus/K8s-events/OpenSearch leest en bevindingen als Multica-tasks
     // filed in `platform-ops`. URL wijst naar de Observatory trace-viewer;
     // /chat is een tweede entry voor handmatige watcher-triggers.
-    short: 'In-cluster agent-runtime + trace-viewer. Watcher monitort het platform en filed issues naar Multica.',
-    purpose: 'Bekijk watcher-runs (span tree, LLM-calls, tool-calls) en triggert handmatige investigations.',
+    short: 'In-cluster agent runtime + trace viewer. Watcher monitors the platform and files issues to Multica.',
+    purpose: 'Inspect watcher runs (span tree, LLM calls, tool calls) and trigger manual investigations.',
     // Geen eigen brand-svg; valt terug op het generieke agents-stage-icoon
     // tot er een Nanitics-logo aan public/icons/brand/ is toegevoegd.
     icon: '/icons/stage/agents.svg',
@@ -617,19 +617,19 @@ export interface StageMeta {
 }
 
 export const stages: StageMeta[] = [
-  { id: 'sources',        title: 'Bronnen',                  blurb: 'Synthetische UWV-bronsystemen — batches en streams.',                  icon: '/icons/stage/sources.svg',        kind: 'side',          tags: ['BATCH', 'STREAM'] },
-  { id: 'ingestion',      title: 'Ingestie',                 blurb: 'Data binnenhalen en op een event-bus zetten.',                          icon: '/icons/stage/ingestion.svg',      kind: 'pipeline-step', tags: ['BATCH', 'STREAM'] },
-  { id: 'storage',        title: 'Opslag & Verwerking',      blurb: 'Lakehouse met zones en een tabel-catalog.',                              icon: '/icons/stage/storage.svg',        kind: 'pipeline-step', tags: ['LAKEHOUSE'] },
-  { id: 'transformation', title: 'Transformatie & Modellen', blurb: 'Opschonen, joinen, modelleren — met policy-checks per query.',          icon: '/icons/stage/transformation.svg', kind: 'pipeline-step', tags: ['BATCH', 'POLICY'] },
-  { id: 'consumption',    title: 'BI / Analytics',           blurb: 'Eindgebruikers consumeren via dashboards en SQL.',                       icon: '/icons/stage/consumption.svg',    kind: 'output',        tags: ['QUERY'] },
-  { id: 'discovery',      title: 'Data Discovery',           blurb: 'Catalog, lineage en data-kwaliteit — wat hebben we eigenlijk?',         icon: '/icons/stage/discovery.svg',      kind: 'overlay',       category: 'discovery' },
-  { id: 'pipeline',       title: 'Pipeline-orkestratie',     blurb: 'Wat draait wanneer, in welke volgorde, met welke afhankelijkheid.',     icon: '/icons/stage/pipeline.svg',       kind: 'overlay',       category: 'pipeline' },
-  { id: 'observability',  title: 'Observability',            blurb: 'Metrics, logs en alerts om de gezondheid van het platform te zien.',    icon: '/icons/stage/observability.svg',  kind: 'overlay',       category: 'observability' },
-  { id: 'identity',       title: 'Identiteit & Toegang',     blurb: 'SSO regelt wie wat mag — elk onderdeel checkt het token.',              icon: '/icons/stage/identity.svg',       kind: 'side',          category: 'identity' },
-  // Agents-lane: Multica coördineert coding-agents (dev-loop, op de laptop
-  // van de developer), Nanitics Observatory is de in-cluster runtime + trace-
-  // viewer voor platform-watcher-agents. Beide zijn onderdeel van het platform.
-  { id: 'agents',         title: 'Agents & AI-tooling',      blurb: 'Coördinatie van coding agents (Multica) plus de in-cluster agent-runtime (Nanitics Observatory).', icon: '/icons/stage/agents.svg',         kind: 'overlay',       category: 'agents' },
+  { id: 'sources',        title: 'Sources',                  blurb: 'Synthetic source systems — batches and streams.',                       icon: '/icons/stage/sources.svg',        kind: 'side',          tags: ['BATCH', 'STREAM'] },
+  { id: 'ingestion',      title: 'Ingestion',                blurb: 'Pull data from source systems onto an event bus.',                      icon: '/icons/stage/ingestion.svg',      kind: 'pipeline-step', tags: ['BATCH', 'STREAM'] },
+  { id: 'storage',        title: 'Storage & Processing',     blurb: 'Lakehouse with zones and a table catalog.',                             icon: '/icons/stage/storage.svg',        kind: 'pipeline-step', tags: ['LAKEHOUSE'] },
+  { id: 'transformation', title: 'Transformation & Models',  blurb: 'Clean, join, and model — with policy checks per query.',                icon: '/icons/stage/transformation.svg', kind: 'pipeline-step', tags: ['BATCH', 'POLICY'] },
+  { id: 'consumption',    title: 'BI / Analytics',           blurb: 'End users consume through dashboards and SQL.',                         icon: '/icons/stage/consumption.svg',    kind: 'output',        tags: ['QUERY'] },
+  { id: 'discovery',      title: 'Data Discovery',           blurb: 'Catalog, lineage, and data quality — what do we actually have?',        icon: '/icons/stage/discovery.svg',      kind: 'overlay',       category: 'discovery' },
+  { id: 'pipeline',       title: 'Pipeline orchestration',   blurb: 'What runs when, in what order, with which dependencies.',               icon: '/icons/stage/pipeline.svg',       kind: 'overlay',       category: 'pipeline' },
+  { id: 'observability',  title: 'Observability',            blurb: 'Metrics, logs, and alerts for monitoring platform health.',             icon: '/icons/stage/observability.svg',  kind: 'overlay',       category: 'observability' },
+  { id: 'identity',       title: 'Identity & Access',        blurb: 'SSO governs who may do what — every component checks the token.',       icon: '/icons/stage/identity.svg',       kind: 'side',          category: 'identity' },
+  // Agents lane: Multica coordinates coding agents (dev loop, on the developer's
+  // laptop); Nanitics Observatory is the in-cluster runtime + trace viewer for
+  // platform-watcher agents. Both are part of the platform.
+  { id: 'agents',         title: 'Agents & AI tooling',      blurb: 'Coordination of coding agents (Multica) plus the in-cluster agent runtime (Nanitics Observatory).', icon: '/icons/stage/agents.svg',         kind: 'overlay',       category: 'agents' },
 ];
 
 export function stageById(id: ComponentStage): StageMeta | undefined {

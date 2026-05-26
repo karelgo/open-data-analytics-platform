@@ -1,12 +1,12 @@
 ---
-// /handbooks/<role-id>/ — rendert de rol-handleiding uit
-// portal/src/content/handbooks/<role-id>.md (auto-gesynct uit
-// docs/handbooks/ door scripts/sync-handleidingen.mjs).
+// /handbooks/<role-id>/ — renders the role handbook from
+// portal/src/content/handbooks/<role-id>.md (auto-synced from
+// docs/handbooks/ by scripts/sync-handbooks.mjs).
 //
-// Linkt vanuit /me/ → "Lees jouw rol-handleiding". Bevat workflows,
-// foutmeldingen en escalatie-procedures per rol. Source-of-truth blijft
-// in docs/handbooks/ — wijzig daar, niet hier; sync-script kopieert
-// bij elke build.
+// Linked from /me/ → "Read your role handbook". Contains workflows,
+// error messages, and escalation procedures per role. Source of truth stays
+// in docs/handbooks/ — edit there, not here; the sync script copies on
+// every build.
 
 import ShellLayout from '../../layouts/ShellLayout.astro';
 import { getCollection } from 'astro:content';
@@ -19,7 +19,7 @@ export async function getStaticPaths() {
 const { role } = Astro.params as { role: RoleId };
 const meta = roleById(role);
 
-const entries = await getCollection('handleidingen', ({ data }) => data.role === role);
+const entries = await getCollection('handbooks', ({ data }) => data.role === role);
 const entry = entries[0];
 
 if (!meta || !entry) {
@@ -29,18 +29,18 @@ if (!meta || !entry) {
 const { Content } = await entry.render();
 ---
 <ShellLayout
-  title={`${entry.data.title} · Handleiding`}
+  title={`${entry.data.title} · Handbook`}
   activeSection="workspace"
 >
-  <article class="handleiding-prose">
-    <p class="handleiding-crumbs">
-      <a href="/me/">Mijn werkplek</a>
+  <article class="handbook-prose">
+    <p class="handbook-crumbs">
+      <a href="/me/">My workspace</a>
       <span class="sep">·</span>
-      <span>Handleiding</span>
+      <span>Handbook</span>
     </p>
 
-    <header class="handleiding-head">
-      <p class="handleiding-eyebrow">{meta.displayName} · {meta.domain}</p>
+    <header class="handbook-head">
+      <p class="handbook-eyebrow">{meta.displayName} · {meta.domain}</p>
       <h1>{entry.data.title}</h1>
     </header>
 
@@ -49,7 +49,7 @@ const { Content } = await entry.render();
 </ShellLayout>
 
 <style>
-  .handleiding-prose {
+  .handbook-prose {
     max-width: 760px;
     margin: 0 auto;
     padding: var(--space-7) var(--space-5) var(--space-11);
@@ -58,24 +58,24 @@ const { Content } = await entry.render();
     font-size: 0.98rem;
   }
 
-  .handleiding-crumbs {
+  .handbook-crumbs {
     color: var(--ink-3);
     font-size: var(--text-meta);
     margin: 0 0 var(--space-4);
   }
-  .handleiding-crumbs a { color: var(--ink-3); }
-  .handleiding-crumbs a:hover { color: var(--ink-1); }
-  .handleiding-crumbs .sep { margin: 0 var(--space-2); color: var(--ink-4); }
+  .handbook-crumbs a { color: var(--ink-3); }
+  .handbook-crumbs a:hover { color: var(--ink-1); }
+  .handbook-crumbs .sep { margin: 0 var(--space-2); color: var(--ink-4); }
 
-  .handleiding-head { margin-bottom: var(--space-7); }
-  .handleiding-eyebrow {
+  .handbook-head { margin-bottom: var(--space-7); }
+  .handbook-eyebrow {
     color: var(--ink-3);
     font-size: var(--text-eyebrow);
     text-transform: uppercase;
     letter-spacing: var(--tracking-eyebrow);
     margin: 0 0 var(--space-2);
   }
-  .handleiding-head h1 {
+  .handbook-head h1 {
     font-size: 2rem;
     line-height: 1.2;
     margin: 0;
@@ -85,23 +85,23 @@ const { Content } = await entry.render();
   }
 
   /* Markdown chrome — een paar UWV-tweaks bovenop Astro defaults. */
-  .handleiding-prose :global(h2) {
+  .handbook-prose :global(h2) {
     font-size: 1.45rem;
     margin: var(--space-8) 0 var(--space-3);
     color: var(--ink-1);
     border-bottom: 1px solid var(--line);
     padding-bottom: var(--space-2);
   }
-  .handleiding-prose :global(h3) {
+  .handbook-prose :global(h3) {
     font-size: 1.15rem;
     margin: var(--space-6) 0 var(--space-2);
     color: var(--ink-1);
   }
-  .handleiding-prose :global(p) { margin: 0 0 var(--space-3); }
-  .handleiding-prose :global(ul),
-  .handleiding-prose :global(ol) { margin: 0 0 var(--space-4) var(--space-5); }
-  .handleiding-prose :global(li) { margin: var(--space-1) 0; }
-  .handleiding-prose :global(blockquote) {
+  .handbook-prose :global(p) { margin: 0 0 var(--space-3); }
+  .handbook-prose :global(ul),
+  .handbook-prose :global(ol) { margin: 0 0 var(--space-4) var(--space-5); }
+  .handbook-prose :global(li) { margin: var(--space-1) 0; }
+  .handbook-prose :global(blockquote) {
     border-left: 3px solid var(--accent);
     padding: var(--space-3) var(--space-4);
     background: var(--bg-elev);
@@ -109,8 +109,8 @@ const { Content } = await entry.render();
     margin: var(--space-4) 0;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   }
-  .handleiding-prose :global(blockquote p) { margin: 0; }
-  .handleiding-prose :global(code) {
+  .handbook-prose :global(blockquote p) { margin: 0; }
+  .handbook-prose :global(code) {
     font-family: var(--font-mono);
     background: var(--bg-elev);
     border: 1px solid var(--line);
@@ -118,7 +118,7 @@ const { Content } = await entry.render();
     padding: 0.05rem 0.35em;
     font-size: 0.88em;
   }
-  .handleiding-prose :global(pre) {
+  .handbook-prose :global(pre) {
     background: var(--bg-sunken);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
@@ -126,31 +126,31 @@ const { Content } = await entry.render();
     overflow-x: auto;
     margin: var(--space-4) 0;
   }
-  .handleiding-prose :global(pre code) {
+  .handbook-prose :global(pre code) {
     background: none;
     border: 0;
     padding: 0;
     font-size: 0.85em;
   }
-  .handleiding-prose :global(table) {
+  .handbook-prose :global(table) {
     width: 100%;
     border-collapse: collapse;
     margin: var(--space-4) 0;
     font-size: var(--text-meta);
   }
-  .handleiding-prose :global(th),
-  .handleiding-prose :global(td) {
+  .handbook-prose :global(th),
+  .handbook-prose :global(td) {
     border: 1px solid var(--line);
     padding: var(--space-2) var(--space-3);
     text-align: left;
   }
-  .handleiding-prose :global(th) {
+  .handbook-prose :global(th) {
     background: var(--bg-elev);
     color: var(--ink-1);
     font-weight: var(--weight-semibold);
   }
-  .handleiding-prose :global(a) { color: var(--c-link, var(--accent)); }
-  .handleiding-prose :global(hr) {
+  .handbook-prose :global(a) { color: var(--c-link, var(--accent)); }
+  .handbook-prose :global(hr) {
     border: 0;
     border-top: 1px solid var(--line);
     margin: var(--space-7) 0;

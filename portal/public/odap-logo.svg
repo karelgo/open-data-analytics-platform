@@ -5,7 +5,7 @@
      role="img"
      aria-label="Open Data & Analytics Platform — visuele referentie-architectuur">
   <title>Open Data & Analytics Platform</title>
-  <desc>Reference-architectuur in Monte-Carlo-stijl: bronnen, ingestie, opslag en verwerking, transformatie en modellen, en BI/data-producten — met overlay-lagen voor data-discovery, pipeline-orkestratie en observability, en een identiteit-pijler aan de rechterkant.</desc>
+  <desc>Reference architecture in Monte Carlo style: sources, ingestion, storage and processing, transformation and models, and BI/data products — with overlay layers for data discovery, pipeline orchestration, and observability, plus an identity pillar on the right.</desc>
 
   <defs>
     <!-- ─── Filters ─── -->
@@ -193,7 +193,7 @@
   <!-- ═════════════════════ TITEL ═════════════════════ -->
   <g aria-label="Titel">
     <text x="30" y="58" font-size="30" font-weight="700" fill="#e6edf3">UWV Reference Data- &amp; Analyseplatform</text>
-    <text x="30" y="86" font-size="13" fill="#9ba6b1">Synthetische data · referentie-implementatie · open-source componenten</text>
+    <text x="30" y="86" font-size="13" fill="#9ba6b1">Synthetic data · reference implementation · open-source components</text>
 
     <!-- Lane-legenda rechtsboven -->
     <g transform="translate(1100,55)" font-size="11" fill="#9ba6b1">
@@ -211,7 +211,7 @@
       </g>
       <g transform="translate(335,0)">
         <rect width="14" height="14" rx="4" fill="#f87171" opacity="0.85"/>
-        <text x="20" y="11">Identiteit</text>
+        <text x="20" y="11">Identity</text>
       </g>
       <g transform="translate(445,0)">
         <rect width="14" height="14" rx="4" fill="#34d399" opacity="0.85"/>
@@ -256,8 +256,8 @@
   <g aria-label="Bronnen" transform="translate(30,200)">
     <rect width="170" height="540" rx="10" fill="#141a21" stroke="#2a323b"/>
     <use href="#stage-sources" x="20" y="20" width="22" height="22" color="#38bdf8"/>
-    <text x="50" y="37" font-size="14" font-weight="700" letter-spacing="1.4" fill="#38bdf8">BRONNEN</text>
-    <text x="20" y="62" font-size="11" fill="#9ba6b1">Synthetische UWV-bronsystemen.</text>
+    <text x="50" y="37" font-size="14" font-weight="700" letter-spacing="1.4" fill="#38bdf8">SOURCES</text>
+    <text x="20" y="62" font-size="11" fill="#9ba6b1">Synthetic source systems.</text>
 
     <!-- Batches tag -->
     <g transform="translate(20,110)" filter="url(#tile-shadow)">
@@ -275,7 +275,7 @@
 
     <!-- Voetnoot -->
     <text x="20" y="490" font-size="10" fill="#6b7682" font-style="italic">2 ingangsmodi.</text>
-    <text x="20" y="505" font-size="10" fill="#6b7682" font-style="italic">Geen productie-PII.</text>
+    <text x="20" y="505" font-size="10" fill="#6b7682" font-style="italic">No production PII.</text>
   </g>
 
   <!-- Pijl 1: Sources → Ingestion -->
@@ -285,9 +285,9 @@
   <g aria-label="Ingestie" transform="translate(230,200)">
     <rect width="270" height="540" rx="10" fill="#161b22" stroke="#30363d"/>
     <use href="#stage-ingestion" x="20" y="20" width="22" height="22" color="#e6edf3"/>
-    <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Ingestie</text>
-    <text x="20" y="62" font-size="11" fill="#9ba6b1">Data uit bronsystemen ophalen</text>
-    <text x="20" y="78" font-size="11" fill="#9ba6b1">en op een event-bus zetten.</text>
+    <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Ingestion</text>
+    <text x="20" y="62" font-size="11" fill="#9ba6b1">Pull data from source systems</text>
+    <text x="20" y="78" font-size="11" fill="#9ba6b1">onto an event bus.</text>
 
     <!-- NiFi tile -->
     <g transform="translate(15,120)" filter="url(#tile-shadow)">
@@ -315,9 +315,9 @@
   <g aria-label="Opslag en verwerking" transform="translate(530,200)">
     <rect width="270" height="540" rx="10" fill="#161b22" stroke="#30363d"/>
     <use href="#stage-storage" x="20" y="20" width="22" height="22" color="#e6edf3"/>
-    <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Opslag &amp; Verwerking</text>
-    <text x="20" y="62" font-size="11" fill="#9ba6b1">Lakehouse met zones en een</text>
-    <text x="20" y="78" font-size="11" fill="#9ba6b1">tabel-catalog.</text>
+    <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Storage &amp; Processing</text>
+    <text x="20" y="62" font-size="11" fill="#9ba6b1">Lakehouse with zones and a</text>
+    <text x="20" y="78" font-size="11" fill="#9ba6b1">table catalog.</text>
 
     <!-- MinIO tile -->
     <g transform="translate(15,120)" filter="url(#tile-shadow)">
@@ -333,7 +333,7 @@
       <rect width="240" height="64" rx="8" fill="#1f262d" stroke="#3a434c"/>
       <use href="#brand-hive" x="12" y="12" width="40" height="40"/>
       <text x="62"  y="30" font-size="14" font-weight="600" fill="#e6edf3">Hive Metastore</text>
-      <text x="62"  y="46" font-size="11" fill="#9ba6b1">tabellen · partities</text>
+      <text x="62"  y="46" font-size="11" fill="#9ba6b1">tables · partitions</text>
       <circle cx="220" cy="32" r="4" fill="#3fb950"/>
     </g>
 
@@ -362,16 +362,16 @@
   <g aria-label="Transformatie en modellen" transform="translate(830,200)">
     <rect width="310" height="540" rx="10" fill="#161b22" stroke="#30363d"/>
     <use href="#stage-transformation" x="20" y="20" width="22" height="22" color="#e6edf3"/>
-    <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Transformatie &amp; Modellen</text>
-    <text x="20" y="62" font-size="11" fill="#9ba6b1">Opschonen, joinen, modelleren —</text>
-    <text x="20" y="78" font-size="11" fill="#9ba6b1">met policy-checks per query.</text>
+    <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Transformation &amp; Models</text>
+    <text x="20" y="62" font-size="11" fill="#9ba6b1">Clean, join, model —</text>
+    <text x="20" y="78" font-size="11" fill="#9ba6b1">with policy checks per query.</text>
 
     <!-- Spark tile -->
     <g transform="translate(15,110)" filter="url(#tile-shadow)">
       <rect width="280" height="64" rx="8" fill="#1f262d" stroke="#3a434c"/>
       <use href="#brand-spark" x="12" y="12" width="40" height="40"/>
       <text x="62"  y="30" font-size="14" font-weight="600" fill="#e6edf3">Apache Spark</text>
-      <text x="62"  y="46" font-size="11" fill="#9ba6b1">streaming + batch transformaties</text>
+      <text x="62"  y="46" font-size="11" fill="#9ba6b1">streaming + batch transformations</text>
       <circle cx="260" cy="32" r="4" fill="#3fb950"/>
     </g>
 
@@ -380,7 +380,7 @@
       <rect width="280" height="64" rx="8" fill="#1f262d" stroke="#3a434c"/>
       <use href="#brand-trino" x="12" y="12" width="40" height="40"/>
       <text x="62"  y="30" font-size="14" font-weight="600" fill="#e6edf3">Trino</text>
-      <text x="62"  y="46" font-size="11" fill="#9ba6b1">SQL-engine · dbt-modellen</text>
+      <text x="62"  y="46" font-size="11" fill="#9ba6b1">SQL engine · dbt models</text>
       <circle cx="260" cy="32" r="4" fill="#3fb950"/>
     </g>
 
@@ -407,7 +407,7 @@
     <rect width="280" height="540" rx="10" fill="#161b22" stroke="#34d399" stroke-opacity="0.45"/>
     <use href="#stage-consumption" x="20" y="20" width="22" height="22" color="#34d399"/>
     <text x="50" y="37" font-size="14" font-weight="700" letter-spacing="1" fill="#34d399">OUTPUTS</text>
-    <text x="20" y="62" font-size="11" fill="#9ba6b1">Eindgebruikers consumeren via</text>
+    <text x="20" y="62" font-size="11" fill="#9ba6b1">End users consume through</text>
     <text x="20" y="78" font-size="11" fill="#9ba6b1">dashboards en data-producten.</text>
 
     <!-- BI / Analytics tile (Superset) -->
@@ -433,7 +433,7 @@
 
     <!-- Doelgroep-uitleg -->
     <g transform="translate(15,320)">
-      <text x="0" y="0" font-size="10" font-weight="700" letter-spacing="1" fill="#9ba6b1">VOOR WIE?</text>
+      <text x="0" y="0" font-size="10" font-weight="700" letter-spacing="1" fill="#9ba6b1">FOR WHOM?</text>
       <g font-size="10" fill="#9ba6b1">
         <text x="0" y="20">→ business-rollen (WIA, WW, …)</text>
         <text x="0" y="36">→ analisten (FEZ, SMZ)</text>
@@ -446,7 +446,7 @@
     <g transform="translate(15,430)">
       <rect width="250" height="46" rx="6" fill="#1a1a25" stroke="#3a3a55" stroke-dasharray="3 3"/>
       <text x="125" y="20" text-anchor="middle" font-size="11" fill="#7d7d99">Machine Learning</text>
-      <text x="125" y="36" text-anchor="middle" font-size="10" fill="#5a5a75" font-style="italic">— niet in deze referentie —</text>
+      <text x="125" y="36" text-anchor="middle" font-size="10" fill="#5a5a75" font-style="italic">— not in this reference —</text>
     </g>
   </g>
 
@@ -454,7 +454,7 @@
   <g aria-label="Identiteit en toegang" transform="translate(1470,200)">
     <rect width="100" height="540" rx="10" fill="#181a23" stroke="#f87171" stroke-opacity="0.45"/>
     <use href="#stage-identity" x="40" y="20" width="22" height="22" color="#f87171"/>
-    <text x="50" y="60" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.4" fill="#f87171">IDENTITEIT</text>
+    <text x="50" y="60" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.4" fill="#f87171">IDENTITY</text>
 
     <!-- Keycloak tile (gecentreerd) -->
     <g transform="translate(20,110)" filter="url(#tile-shadow)">
@@ -476,7 +476,7 @@
     <text x="50" y="430" text-anchor="middle" font-size="10" fill="#9ba6b1">SSO over</text>
     <text x="50" y="445" text-anchor="middle" font-size="10" fill="#9ba6b1">alle componenten</text>
     <text x="50" y="460" text-anchor="middle" font-size="10" fill="#9ba6b1">— elk valideert</text>
-    <text x="50" y="475" text-anchor="middle" font-size="10" fill="#9ba6b1">het OIDC-token</text>
+    <text x="50" y="475" text-anchor="middle" font-size="10" fill="#9ba6b1">the OIDC token</text>
 
     <!-- Ondertitel -->
     <text x="50" y="510" text-anchor="middle" font-size="9" fill="#6b7682" font-style="italic">audit-log</text>
@@ -560,7 +560,7 @@
     <g transform="translate(80,15)" font-size="11" fill="#9ba6b1">
       <g transform="translate(0,5)">
         <rect width="16" height="16" rx="8" fill="none" stroke="#d946ef" stroke-width="1.5"/>
-        <text x="22" y="13">overlay-banner = laag boven de keten heen</text>
+        <text x="22" y="13">overlay-banner = layer above the chain</text>
       </g>
     </g>
 

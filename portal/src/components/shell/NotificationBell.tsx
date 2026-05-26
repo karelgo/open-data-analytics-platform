@@ -142,7 +142,7 @@ export default function NotificationBell() {
       <button
         className="topbarv2-icon-btn"
         type="button"
-        aria-label="Meldingen"
+        aria-label="Notifications"
         aria-expanded={open}
         onClick={toggleOpen}
       >
@@ -159,11 +159,11 @@ export default function NotificationBell() {
 
       <div className="topbarv2-panel topbarv2-panel--right topbarv2-panel--wide" role="menu">
         <div className="topbarv2-panel-head">
-          Meldingen
-          <span>{unread > 0 ? `${unread} nieuw` : 'allemaal gelezen'}</span>
+          Notifications
+          <span>{unread > 0 ? `${unread} new` : 'all read'}</span>
         </div>
         {events.length === 0 ? (
-          <div className="topbarv2-event-empty">Geen meldingen.</div>
+          <div className="topbarv2-event-empty">No notifications.</div>
         ) : (
           events.map((evt) => (
             <a
