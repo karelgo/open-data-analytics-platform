@@ -196,6 +196,10 @@ om-demo-seed: ## Vul OpenMetadata met UC-mart tabel-entities + governance-meta v
 om-glossary-link: ## Koppel CGM-glossary-termen aan logisch passende tables (idempotent).
 	bash scripts/om-glossary-link.sh
 
+.PHONY: om-fix-search-mapping
+om-fix-search-mapping: ## Patch OS-mappings zodat OM 1.12 Explore-UI werkt (idempotent).
+	bash scripts/om-fix-search-mapping.sh
+
 .PHONY: test
 test: smoke ## Alias voor smoke tests
 

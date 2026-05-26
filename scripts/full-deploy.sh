@@ -321,20 +321,26 @@ bash tests/smoke/09-portal-up.sh   || warn "smoke 09 meldt fouten"
 bash tests/smoke/14-embed-shell.sh || warn "smoke 14 meldt fouten"
 
 # ---------------------------------------------------------------------- 11
-log "11/11 OpenMetadata demo-seed: UC-mart entities + CGM-glossary links"
-# Twee idempotente Jobs die OM representatief maken voor de demo:
-#  - om-demo-seed   : synthetiseert UC-mart tabel-entities + governance-meta
-#                     (owner/domain/dataProduct/Tier/CGM/PII) voor UCs die
-#                     dbt nog niet in Trino heeft gematerialiseerd.
-#  - om-glossary-link: koppelt CGM-termen (Klantreis, EventStream, Fase,
-#                      Persona, Werknemer, Werkgever, Dienstverband, etc.)
-#                      aan bronze stg_- en mart-tables die de standaard
-#                      enrichment niet dekt.
-# Beide Jobs wachten zelf op de openmetadata-init job (teams/domains/
-# dataProducts/glossary). Faalt onschadelijk als OM nog opspint — re-run
-# met 'make om-demo-seed && make om-glossary-link' is altijd veilig.
-bash "$ROOT/scripts/om-demo-seed.sh"     || warn "om-demo-seed meldt fouten — re-run handmatig"
-bash "$ROOT/scripts/om-glossary-link.sh" || warn "om-glossary-link meldt fouten — re-run handmatig"
+log "11/11 OpenMetadata demo-seed: UI-fix + UC-mart entities + CGM-glossary links"
+# Drie idempotente acties die OM representatief maken voor de demo:
+#  - om-fix-search-mapping: patcht OS-index mappings — OM 1.12 markeert
+#                           glossaryTags/classificationTags als plain text
+#                           waardoor de Explore-UI 500't bij elke search.
+#                           Geen rebuild nodig; fielddata=true online.
+#  - om-demo-seed         : synthetiseert UC-mart tabel-entities + governance-
+#                           meta (owner/domain/dataProduct/Tier/CGM/PII) voor
+#                           UCs die dbt nog niet in Trino heeft gematerialiseerd.
+#  - om-glossary-link     : koppelt CGM-termen (Klantreis, EventStream, Fase,
+#                           Persona, Werknemer, Werkgever, Dienstverband, etc.)
+#                           aan bronze stg_- en mart-tables die de standaard
+#                           enrichment niet dekt.
+# Demo-seed + glossary-link wachten zelf op de openmetadata-init Job
+# (teams/domains/dataProducts/glossary). Faalt onschadelijk als OM nog
+# opspint — re-run met 'make om-fix-search-mapping && make om-demo-seed
+# && make om-glossary-link' is altijd veilig.
+bash "$ROOT/scripts/om-fix-search-mapping.sh" || warn "om-fix-search-mapping meldt fouten — UI Explore kan leeg blijven"
+bash "$ROOT/scripts/om-demo-seed.sh"          || warn "om-demo-seed meldt fouten — re-run handmatig"
+bash "$ROOT/scripts/om-glossary-link.sh"      || warn "om-glossary-link meldt fouten — re-run handmatig"
 
 echo
 ok "Alles klaar. Open: https://platform.${PLATFORM_DOMAIN}:${PLATFORM_PORT}/"
