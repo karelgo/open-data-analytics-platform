@@ -27,7 +27,7 @@ docs_dir: docs
 # docs/README.md blijft bestaan voor GitHub-browse-gebruikers, maar de
 # gegenereerde docs/index.md is de site-landing. Mkdocs zou ze allebei
 # als `/` willen renderen — sluit alleen de top-level README expliciet uit.
-# (Sub-READMEs zoals handleidingen/README.md moeten WEL in de site.)
+# (Sub-READMEs zoals handbooks/README.md moeten WEL in de site.)
 exclude_docs: |
   /README.md
   /README.md.bak
@@ -160,19 +160,19 @@ nav:
       - Originele referentie: architectuur/referentie.md
   - Voor wie:
       - Overzicht: rollen/index.md
-      - WIA-beoordelaar: handleidingen/01-wia-beoordelaar.md
-      - WW-handhaver: handleidingen/02-ww-handhaver.md
-      - Wajong-arbeidsdeskundige: handleidingen/03-wajong-arbeidsdeskundige.md
-      - CRM-medewerker: handleidingen/04-crm-medewerker.md
-      - FEZ-analist: handleidingen/05-fez-analist.md
-      - SMZ-planner: handleidingen/06-smz-planner.md
-      - Proactief dienstverlener: handleidingen/07-proactief-dienstverlener.md
-      - Researcher: handleidingen/08-researcher.md
-      - Data-steward: handleidingen/09-data-steward.md
-      - Data-engineer: handleidingen/10-data-engineer.md
-      - Platform-admin: handleidingen/11-platform-admin.md
-      - Smoketest (systeemrol): handleidingen/12-smoketest-systeem.md
-      - CSV-upload (alle rollen): handleidingen/csv-upload.md
+      - WIA-beoordelaar: handbooks/01-wia-beoordelaar.md
+      - WW-handhaver: handbooks/02-ww-handhaver.md
+      - Wajong-arbeidsdeskundige: handbooks/03-wajong-arbeidsdeskundige.md
+      - CRM-medewerker: handbooks/04-crm-medewerker.md
+      - FEZ-analist: handbooks/05-fez-analist.md
+      - SMZ-planner: handbooks/06-smz-planner.md
+      - Proactief dienstverlener: handbooks/07-proactief-dienstverlener.md
+      - Researcher: handbooks/08-researcher.md
+      - Data-steward: handbooks/09-data-steward.md
+      - Data-engineer: handbooks/10-data-engineer.md
+      - Platform-admin: handbooks/11-platform-admin.md
+      - Smoketest (systeemrol): handbooks/12-smoketest-systeem.md
+      - CSV-upload (alle rollen): handbooks/csv-upload.md
       - Toegang aanvragen: access-request-guide.md
   - Use cases:
       - Overzicht: use-cases/index.md
@@ -214,8 +214,8 @@ nav:
   - Audit & overig:
       - Architectuur (legacy stub): architecture.md
       - Redesign-inventaris: redesign-inventory.md
-      - Handleidingen — index: handleidingen/README.md
-      - Handboek (alle rollen gebundeld): handleidingen/00-handboek.md
+      - Handleidingen — index: handbooks/README.md
+      - Handboek (alle rollen gebundeld): handbooks/00-handboek.md
       - Exploraties — Multica vs Nanitics: explorations/multica-vs-nanitics.md
       - Exploraties — Multica Foundry: explorations/multica-foundry.md
       - Exploraties — Wachter design: explorations/wachter-design.md

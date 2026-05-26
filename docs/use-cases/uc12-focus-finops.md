@@ -23,7 +23,7 @@ UWV draait workloads bij meerdere cloud-providers (primair OCI). Finance wil per
 ```
 Finance medewerker
    │  Upload focus-yyyymm.csv via mc CLI of MinIO Console
-   │  (portal /csv-upload is sinds 2026-05 generiek — zie handleidingen/csv-upload.md Pad B)
+   │  (portal /csv-upload is sinds 2026-05 generiek — zie handbooks/csv-upload.md Pad B)
    ▼
 MinIO  s3://odap-staging/incoming/focus/<ts>-<file>.csv
    │  (handmatige trigger: Airflow UI of REST API)

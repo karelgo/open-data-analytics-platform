@@ -73,9 +73,9 @@ Beide hebben geen externe service nodig.
 
 ### Persona-handleidingen
 
-Onder [`handleidingen/`](handleidingen/) staan 13 stap-voor-stap-handleidingen
+Onder [`handbooks/`](handbooks/) staan 13 stap-voor-stap-handleidingen
 voor verschillende rollen (WIA-beoordelaar, WW-handhaver, FEZ-analist,
-data-steward, platform-admin, …). Zie [handleidingen/README.md](handleidingen/README.md)
+data-steward, platform-admin, …). Zie [handbooks/README.md](handbooks/README.md)
 voor de index.
 
 ## Conventies

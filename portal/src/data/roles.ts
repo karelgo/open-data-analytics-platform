@@ -23,23 +23,23 @@ export interface RoleMeta {
   domain: string;
   category: 'business' | 'tech';
   // Portal-pad naar de gebundelde rol-handleiding (zie
-  // portal/src/pages/handleidingen/[role].astro). Sync'ed door
-  // portal/scripts/sync-handleidingen.mjs vanuit docs/handleidingen/.
+  // portal/src/pages/handbooks/[role].astro). Sync'ed door
+  // portal/scripts/sync-handleidingen.mjs vanuit docs/handbooks/.
   handleidingPath: string;
 }
 
 export const roles: RoleMeta[] = [
-  { id: 'wia_beoordelaar',          displayName: 'WIA-beoordelaar',          domain: 'AG / WIA',           category: 'business', handleidingPath: 'handleidingen/wia_beoordelaar/' },
-  { id: 'ww_handhaver',             displayName: 'WW-handhaver',             domain: 'WW',                 category: 'business', handleidingPath: 'handleidingen/ww_handhaver/' },
-  { id: 'wajong_arbeidsdeskundige', displayName: 'Wajong-arbeidsdeskundige', domain: 'AG / Wajong',        category: 'business', handleidingPath: 'handleidingen/wajong_arbeidsdeskundige/' },
-  { id: 'crm_medewerker',           displayName: 'CRM-medewerker',           domain: 'CRM / Klantcontact', category: 'business', handleidingPath: 'handleidingen/crm_medewerker/' },
-  { id: 'fez_analist',              displayName: 'FEZ-analist',              domain: 'Financiën',          category: 'business', handleidingPath: 'handleidingen/fez_analist/' },
-  { id: 'smz_planner',              displayName: 'SMZ-planner',              domain: 'Sociaal-medisch',    category: 'business', handleidingPath: 'handleidingen/smz_planner/' },
-  { id: 'proactief_dienstverlener', displayName: 'Proactief dienstverlener', domain: 'TW (proactief)',     category: 'business', handleidingPath: 'handleidingen/proactief_dienstverlener/' },
-  { id: 'researcher',               displayName: 'Researcher',               domain: 'Onderzoek (sandbox)',category: 'business', handleidingPath: 'handleidingen/researcher/' },
-  { id: 'data_steward',             displayName: 'Data-steward',             domain: 'Governance',         category: 'tech',     handleidingPath: 'handleidingen/data_steward/' },
-  { id: 'data_engineer',            displayName: 'Data-engineer',            domain: 'Pipelines',          category: 'tech',     handleidingPath: 'handleidingen/data_engineer/' },
-  { id: 'platform_admin',           displayName: 'Platform-admin',           domain: 'Cluster / security', category: 'tech',     handleidingPath: 'handleidingen/platform_admin/' },
+  { id: 'wia_beoordelaar',          displayName: 'WIA-beoordelaar',          domain: 'AG / WIA',           category: 'business', handleidingPath: 'handbooks/wia_beoordelaar/' },
+  { id: 'ww_handhaver',             displayName: 'WW-handhaver',             domain: 'WW',                 category: 'business', handleidingPath: 'handbooks/ww_handhaver/' },
+  { id: 'wajong_arbeidsdeskundige', displayName: 'Wajong-arbeidsdeskundige', domain: 'AG / Wajong',        category: 'business', handleidingPath: 'handbooks/wajong_arbeidsdeskundige/' },
+  { id: 'crm_medewerker',           displayName: 'CRM-medewerker',           domain: 'CRM / Klantcontact', category: 'business', handleidingPath: 'handbooks/crm_medewerker/' },
+  { id: 'fez_analist',              displayName: 'FEZ-analist',              domain: 'Financiën',          category: 'business', handleidingPath: 'handbooks/fez_analist/' },
+  { id: 'smz_planner',              displayName: 'SMZ-planner',              domain: 'Sociaal-medisch',    category: 'business', handleidingPath: 'handbooks/smz_planner/' },
+  { id: 'proactief_dienstverlener', displayName: 'Proactief dienstverlener', domain: 'TW (proactief)',     category: 'business', handleidingPath: 'handbooks/proactief_dienstverlener/' },
+  { id: 'researcher',               displayName: 'Researcher',               domain: 'Onderzoek (sandbox)',category: 'business', handleidingPath: 'handbooks/researcher/' },
+  { id: 'data_steward',             displayName: 'Data-steward',             domain: 'Governance',         category: 'tech',     handleidingPath: 'handbooks/data_steward/' },
+  { id: 'data_engineer',            displayName: 'Data-engineer',            domain: 'Pipelines',          category: 'tech',     handleidingPath: 'handbooks/data_engineer/' },
+  { id: 'platform_admin',           displayName: 'Platform-admin',           domain: 'Cluster / security', category: 'tech',     handleidingPath: 'handbooks/platform_admin/' },
 ];
 
 export interface RoleCapability {

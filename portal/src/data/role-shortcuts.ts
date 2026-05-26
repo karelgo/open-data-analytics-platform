@@ -1,5 +1,5 @@
 // Curated shortcuts per rol — handmatig onderhouden, geen afgeleide data.
-// Past bij de "dagelijkse workflows" uit docs/handleidingen/<rol>.md.
+// Past bij de "dagelijkse workflows" uit docs/handbooks/<rol>.md.
 //
 // Toevoegen van een shortcut = één entry hier; verschijnt automatisch op /me.
 

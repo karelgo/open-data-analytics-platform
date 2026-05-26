@@ -13,7 +13,7 @@ De huidige implementatie volgt:
 - [`referentiearchitectuur-odap-data-analytics.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/referentiearchitectuur-odap-data-analytics.md)
   — 12 architectuurprincipes, 10 use-cases, CGM-entiteiten, Sensitive Vault,
   data-mesh, wettelijke mappen.
-- [`requirements-compliant-data-analyseplatform.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/requirements-compliant-data-analyseplatform.md)
+- [`requirements.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/requirements.md)
   — Volledige requirements-matrix: NORA, AVG, BIO/BIO2, NIS2, AI Act met
   R-* codes (70+ rules).
 - [`odap-platform-mapping-research.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/odap-platform-mapping-research.md)

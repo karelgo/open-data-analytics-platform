@@ -117,14 +117,14 @@ workflows met voorbeelden · escalatie bij problemen.
 
 | Rol | Domein | Handleiding |
 |---|---|---|
-| WIA-beoordelaar | AG / WIA | [01-wia-beoordelaar](../handleidingen/01-wia-beoordelaar.md) |
-| WW-handhaver | WW / Handhaving | [02-ww-handhaver](../handleidingen/02-ww-handhaver.md) |
-| Wajong-arbeidsdeskundige | AG / Wajong (4-eyes) | [03-wajong-arbeidsdeskundige](../handleidingen/03-wajong-arbeidsdeskundige.md) |
-| CRM-medewerker | Klantcontact | [04-crm-medewerker](../handleidingen/04-crm-medewerker.md) |
-| FEZ-analist | Financiën / Beleid | [05-fez-analist](../handleidingen/05-fez-analist.md) |
-| SMZ-planner | Sociaal-medische zaken | [06-smz-planner](../handleidingen/06-smz-planner.md) |
-| Proactief dienstverlener | Toeslagenwet | [07-proactief-dienstverlener](../handleidingen/07-proactief-dienstverlener.md) |
-| Researcher | Onderzoek (sandbox) | [08-researcher](../handleidingen/08-researcher.md) |
+| WIA-beoordelaar | AG / WIA | [01-wia-beoordelaar](../handbooks/01-wia-beoordelaar.md) |
+| WW-handhaver | WW / Handhaving | [02-ww-handhaver](../handbooks/02-ww-handhaver.md) |
+| Wajong-arbeidsdeskundige | AG / Wajong (4-eyes) | [03-wajong-arbeidsdeskundige](../handbooks/03-wajong-arbeidsdeskundige.md) |
+| CRM-medewerker | Klantcontact | [04-crm-medewerker](../handbooks/04-crm-medewerker.md) |
+| FEZ-analist | Financiën / Beleid | [05-fez-analist](../handbooks/05-fez-analist.md) |
+| SMZ-planner | Sociaal-medische zaken | [06-smz-planner](../handbooks/06-smz-planner.md) |
+| Proactief dienstverlener | Toeslagenwet | [07-proactief-dienstverlener](../handbooks/07-proactief-dienstverlener.md) |
+| Researcher | Onderzoek (sandbox) | [08-researcher](../handbooks/08-researcher.md) |
 
 ### Stap 5 · Extra data nodig?
 
@@ -171,8 +171,8 @@ Lees in deze volgorde:
 
 ### Stap 4 · Lees jouw rol-handleiding
 
-- [09 · Data-steward](../handleidingen/09-data-steward.md) — datakwaliteit, governance, lineage, sensitive-review.
-- [10 · Data-engineer](../handleidingen/10-data-engineer.md) — pipelines, ingestion, transformaties, JIT op bronze.
+- [09 · Data-steward](../handbooks/09-data-steward.md) — datakwaliteit, governance, lineage, sensitive-review.
+- [10 · Data-engineer](../handbooks/10-data-engineer.md) — pipelines, ingestion, transformaties, JIT op bronze.
 
 ### Stap 5 · Eerste hands-on
 
@@ -221,7 +221,7 @@ backup/restore, schaling, debug-commando's.
 
 ### Stap 5 · Lees jouw rol-handleiding
 
-- [11 · Platform-admin](../handleidingen/11-platform-admin.md) — cluster, security, break-glass, incident-respons.
+- [11 · Platform-admin](../handbooks/11-platform-admin.md) — cluster, security, break-glass, incident-respons.
 
 ---
 

@@ -462,7 +462,7 @@ Gebruik deze als "Saskia" in je demo.
 ## 8. Verder lezen
 
 - [docs/architecture.md](../architecture.md) — algemene platform-architectuur
-- [docs/handleidingen/00-handboek.md](../handleidingen/00-handboek.md) — per-rol handleidingen
+- [docs/handbooks/00-handboek.md](../handbooks/00-handboek.md) — per-rol handleidingen
 - [docs/access-request-guide.md](../access-request-guide.md) — hoe een gebruiker toegang aanvraagt
 - [docs/compliance-mapping.md](../compliance-mapping.md) — R-NORA/AVG/BIO/NIS2 → bestand
 - [docs/adr/](../adr/) — architectuurbeslissingen

@@ -1,7 +1,7 @@
 # Compliance Mapping
 
 Tabel met elke requirement uit
-[`requirements-compliant-data-analyseplatform.md`](../requirements-compliant-data-analyseplatform.md)
+[`requirements.md`](../requirements.md)
 gemapt op concrete maatregelen, fase waarin geleverd, en evidence (bestand of
 setting). Status-kolom geeft fase 0-skeleton — `TBD` betekent "fase X levert
 het bestand of de setting".

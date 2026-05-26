@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Build-time loader: kopieert docs/handleidingen/<NN-rol>.md (source-of-truth
-// per rol) naar portal/src/content/handleidingen/<role-id>.md met de juiste
+// Build-time loader: kopieert docs/handbooks/<NN-rol>.md (source-of-truth
+// per rol) naar portal/src/content/handbooks/<role-id>.md met de juiste
 // frontmatter (`title`, `role`) zodat Astro's content-collection het kan
-// renderen via /handleidingen/<role-id>/.
+// renderen via /handbooks/<role-id>/.
 //
 // We dupliceren BEWUST de bestanden — de source blijft in docs/, maar de
 // portal-build heeft een gebundelde kopie zodat we niet runtime van buiten
@@ -21,7 +21,7 @@ const repoRoot = resolve(__dirname, '..', '..');
 const srcDir = resolve(repoRoot, 'docs', 'handleidingen');
 const destDir = resolve(__dirname, '..', 'src', 'content', 'handleidingen');
 
-// Mapping role-id → docs/handleidingen/-basename. Houd in sync met
+// Mapping role-id → docs/handbooks/-basename. Houd in sync met
 // portal/src/data/roles.ts (handleidingPath).
 const MAP = {
   wia_beoordelaar:          '01-wia-beoordelaar.md',

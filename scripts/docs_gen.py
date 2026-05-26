@@ -852,7 +852,7 @@ De huidige implementatie volgt:
 - [`referentiearchitectuur-odap-data-analytics.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/referentiearchitectuur-odap-data-analytics.md)
   — 12 architectuurprincipes, 10 use-cases, CGM-entiteiten, Sensitive Vault,
   data-mesh, wettelijke mappen.
-- [`requirements-compliant-data-analyseplatform.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/requirements-compliant-data-analyseplatform.md)
+- [`requirements.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/requirements.md)
   — Volledige requirements-matrix: NORA, AVG, BIO/BIO2, NIS2, AI Act met
   R-* codes (70+ rules).
 - [`odap-platform-mapping-research.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/odap-platform-mapping-research.md)
@@ -904,28 +904,28 @@ en [`opa-policies-src/data/role_mappings.json`](https://github.com/fresh-minds/F
 
 | # | Rol | Domein | Handleiding |
 |---|---|---|---|
-| 1 | WIA-beoordelaar | AG / WIA | [01-wia-beoordelaar](../handleidingen/01-wia-beoordelaar.md) |
-| 2 | WW-handhaver | WW | [02-ww-handhaver](../handleidingen/02-ww-handhaver.md) |
-| 3 | Wajong-arbeidsdeskundige | AG / Wajong | [03-wajong-arbeidsdeskundige](../handleidingen/03-wajong-arbeidsdeskundige.md) |
-| 4 | CRM-medewerker | CRM / Klantcontact | [04-crm-medewerker](../handleidingen/04-crm-medewerker.md) |
-| 5 | FEZ-analist | Financiën | [05-fez-analist](../handleidingen/05-fez-analist.md) |
-| 6 | SMZ-planner | Sociaal-medische zaken | [06-smz-planner](../handleidingen/06-smz-planner.md) |
-| 7 | Proactief dienstverlener | Toeslagenwet (proactief) | [07-proactief-dienstverlener](../handleidingen/07-proactief-dienstverlener.md) |
-| 8 | Researcher | Onderzoek (sandbox) | [08-researcher](../handleidingen/08-researcher.md) |
+| 1 | WIA-beoordelaar | AG / WIA | [01-wia-beoordelaar](../handbooks/01-wia-beoordelaar.md) |
+| 2 | WW-handhaver | WW | [02-ww-handhaver](../handbooks/02-ww-handhaver.md) |
+| 3 | Wajong-arbeidsdeskundige | AG / Wajong | [03-wajong-arbeidsdeskundige](../handbooks/03-wajong-arbeidsdeskundige.md) |
+| 4 | CRM-medewerker | CRM / Klantcontact | [04-crm-medewerker](../handbooks/04-crm-medewerker.md) |
+| 5 | FEZ-analist | Financiën | [05-fez-analist](../handbooks/05-fez-analist.md) |
+| 6 | SMZ-planner | Sociaal-medische zaken | [06-smz-planner](../handbooks/06-smz-planner.md) |
+| 7 | Proactief dienstverlener | Toeslagenwet (proactief) | [07-proactief-dienstverlener](../handbooks/07-proactief-dienstverlener.md) |
+| 8 | Researcher | Onderzoek (sandbox) | [08-researcher](../handbooks/08-researcher.md) |
 
 ## Technische rollen (platform-team)
 
 | # | Rol | Verantwoordelijkheid | Handleiding |
 |---|---|---|---|
-| 9 | Data-steward | Datakwaliteit, governance, lineage | [09-data-steward](../handleidingen/09-data-steward.md) |
-| 10 | Data-engineer | Pipelines, ingestion, transformaties | [10-data-engineer](../handleidingen/10-data-engineer.md) |
-| 11 | Platform-admin | Cluster, security, break-glass | [11-platform-admin](../handleidingen/11-platform-admin.md) |
+| 9 | Data-steward | Datakwaliteit, governance, lineage | [09-data-steward](../handbooks/09-data-steward.md) |
+| 10 | Data-engineer | Pipelines, ingestion, transformaties | [10-data-engineer](../handbooks/10-data-engineer.md) |
+| 11 | Platform-admin | Cluster, security, break-glass | [11-platform-admin](../handbooks/11-platform-admin.md) |
 
 ## Systeemrol
 
 | # | Rol | Functie | Handleiding |
 |---|---|---|---|
-| 12 | Smoketest | Service-account voor automated tests + dbt-runs | [12-smoketest-systeem](../handleidingen/12-smoketest-systeem.md) |
+| 12 | Smoketest | Service-account voor automated tests + dbt-runs | [12-smoketest-systeem](../handbooks/12-smoketest-systeem.md) |
 
 ## Zes regels die voor iedereen gelden
 

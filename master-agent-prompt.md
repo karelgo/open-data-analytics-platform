@@ -13,7 +13,7 @@ directory staan als deze prompt. Ze zijn cumulatief: elk bouwt op het vorige.
 
 | # | Bestand | Wat het bevat | Waarom je het nodig hebt |
 |---|---|---|---|
-| 1 | `requirements-compliant-data-analyseplatform.md` | Generieke requirementsbaseline (~75 genummerde requirements) op basis van NORA, AVG, BIO/BIO2, NIS2 voor een modern data- en analyticsplatform | Het wettelijke en architectonische fundament. Elke maatregel die je bouwt moet hier op te herleiden zijn (R-NORA-xx, R-AVG-xx, R-BIO-xx, R-NIS2-xx). |
+| 1 | `requirements.md` | Generieke requirementsbaseline (~75 genummerde requirements) op basis van NORA, AVG, BIO/BIO2, NIS2 voor een modern data- en analyticsplatform | Het wettelijke en architectonische fundament. Elke maatregel die je bouwt moet hier op te herleiden zijn (R-NORA-xx, R-AVG-xx, R-BIO-xx, R-NIS2-xx). |
 | 2 | `referentiearchitectuur-odap-data-analytics.md` | UWV-specifieke referentiearchitectuur, 10 uitgewerkte fictieve use cases (UC-01 t/m UC-10), CGM-mapping, AVG-grondslagen per UC | De inhoudelijke scope. Wanneer je een use case bouwt, ga **terug naar dit document** voor de details (welke bronnen, welke entiteiten, welke compliance-eisen, welke risico's). |
 | 3 | `odap-platform-mapping-research.md` | Hoe Stackable, dbt-trino en OpenMetadata samen het platform vormen; component-tot-component-mapping | De technische blauwdruk. Hier staat exact welk component welke rol vervult. Geen overlap, geen gaten. |
 | 4 | `odap-platform-adr-0002-iceberg-vs-delta.md` | Architectural Decision Record over tabelformaat (Iceberg vs Delta Lake) | Toelichting op de default-keuze (Iceberg) en wanneer/hoe je naar Delta switcht. |
@@ -560,7 +560,7 @@ afweging in een markdown blok (opties + voor/tegen + voorstel) en wacht op input
 ## §9 Bronnen
 
 ### Achtergronddocumenten in deze folder (lees eerst!)
-1. `requirements-compliant-data-analyseplatform.md`
+1. `requirements.md`
 2. `referentiearchitectuur-odap-data-analytics.md`
 3. `odap-platform-mapping-research.md`
 4. `odap-platform-adr-0002-iceberg-vs-delta.md`

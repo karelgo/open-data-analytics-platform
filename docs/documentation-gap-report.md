@@ -74,7 +74,7 @@ Voor de volledigheid: deze onderdelen zijn **al goed**:
   OpenMetadata-catalog, dbt-trino-transform, Delta-keuze).
 - 10 use-case-specs onder `docs/use-cases/`, alle 10 voorzien van CGM-
   entiteiten en compliance-koppeling.
-- 13 handleidingen onder `docs/handleidingen/` (per persona) inclusief
+- 13 handleidingen onder `docs/handbooks/` (per persona) inclusief
   README-index.
 - Compliance-mapping (NORA / AVG / BIO / NIS2 / AI Act) als één tabel.
 - `WORKLOG.md` (54k regels) als sessie-log — uitstekend voor traceability,

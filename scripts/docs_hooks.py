@@ -50,7 +50,7 @@ EXTERNAL_REPO_FILES: tuple[str, ...] = (
     "platform-config.yaml",
     "docker-compose.yml",
     "referentiearchitectuur-odap-data-analytics.md",
-    "requirements-compliant-data-analyseplatform.md",
+    "requirements.md",
     "odap-platform-adr-0002-iceberg-vs-delta.md",
     "odap-platform-mapping-research.md",
     "odap-platform-master-agent-prompt-v2.md",
