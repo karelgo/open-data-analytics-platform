@@ -3,7 +3,7 @@
 # Vector wordt in fase 8 ingezet (volgens master prompt §5). Hier alleen de
 # values-template; bootstrap.sh installeert Vector niet in fase 1.
 #
-# Vector schrijft logs naar de gedeelde OpenSearch (uit fase 8) zodat
+# Vector schrijft logs to the gedeelde OpenSearch (uit fase 8) zodat
 # OpenMetadata-search en logs in één cluster zitten.
 #
 # Chart: timberio/vector (of vector / vector via OCI)
@@ -16,7 +16,7 @@ role: Agent
 service:
   enabled: false
 
-# Prometheus-exporter poort op de Vector-pod (improvements #5.1 — log-based
+# Prometheus-exporter poort on the Vector-pod (improvements #5.1 — log-based
 # alerting). PodMonitor in platform/14-monitoring/podmonitor-vector.yaml
 # scrape't deze poort.
 containerPorts:
@@ -131,7 +131,7 @@ customConfig:
           .alert_event = "csv_upload_failed"
         }
 
-    # Filter: alleen events met een ingevulde alert_event.
+    # Filter: alleen events with a ingevulde alert_event.
     filter_alert_events:
       type: filter
       inputs: [detect_alert_events]

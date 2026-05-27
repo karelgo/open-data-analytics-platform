@@ -10,7 +10,7 @@ prereqs:
 labs:
   - title: "Open NiFi"
     href: "/go/nifi/"
-  - title: "Open Airflow voor de dbt-run"
+  - title: "Open Airflow for the dbt-run"
     href: "/go/airflow/"
   - title: "Werk in vscode.dev — repo"
     href: "/dbt-docs/"
@@ -24,14 +24,14 @@ labs:
 checks:
   - id: "engineer_practitioner_pipeline"
     title: "End-to-end smoke test groen"
-    hint: "make test slaagt op de nieuwe pipeline"
+    hint: "make test slaagt on the nieuwe pipeline"
 quiz:
-  - q: "Welke volgorde is correct voor de PR-checklist?"
+  - q: "Welke volgorde is correct for the PR-checklist?"
     options:
       - "merge → test → docs"
       - "1) NiFi-template → 2) Kafka-topic → 3) Spark-job → 4) dbt-staging → 5) OPA-update → 6) OpenMetadata-config → 7) smoke-test groen → 8) PR + review"
       - "Alles tegelijk pushen"
-      - "Eerst productie, dan dev"
+      - "Eerst production, dan dev"
     correct: 1
   - q: "Wat doet de helper `lakehouse_io.write_delta()` voor je?"
     options:
@@ -40,7 +40,7 @@ quiz:
       - "Hij verzendt mail"
       - "Hij scheduled de job"
     correct: 1
-  - q: "Bronze-toegang nodig om je nieuwe pipeline te debuggen. Hoe?"
+  - q: "Bronze-access nodig om je nieuwe pipeline te debuggen. Hoe?"
     options:
       - "Direct in Trino — je bent engineer"
       - "JIT-procedure: ticket met scope + reden, platform-admin keurt goed (4 uur), elke query met TICKET-id; niet werken zonder ticket"

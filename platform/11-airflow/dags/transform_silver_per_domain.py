@@ -1,6 +1,6 @@
 """DAG-aanroeper — silver_<domain> voor alle 8 domeinen.
 
-Genereert 8 DAGs (één per bron uit de YAML-registry):
+Genereert 8 DAGs (één per bron from the YAML-registry):
   silver_persoon, silver_polisadm, silver_ww, silver_wia,
   silver_wajong, silver_zw, silver_crm, silver_fez
 

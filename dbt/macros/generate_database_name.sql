@@ -1,6 +1,6 @@
 {# Database resolutie per target:
 
-   - trino: gebruik letterlijk `+database:` waarde uit het project
+   - trino: gebruik letterlijk `+database:` waarde from the project
      (bv. `silver`, `gold` — Trino-catalogs).
    - databricks: Unity Catalog heeft één catalog per workspace-binding
      (bv. `databricks`). Negeer `+database:` uit dbt_project.yml

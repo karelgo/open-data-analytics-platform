@@ -9,14 +9,14 @@ import roleMappings from '../data/role-mappings.generated.json';
 import { DOCS_URL } from '../data/external-links';
 
 // Bouw een client-side payload zodat de pagina puur statisch kan zijn:
-// alle 11 rollen + componenten + shortcuts in één JSON, en de browser
+// alle 11 rollen + components + shortcuts in één JSON, en de browser
 // kiest op basis van Keycloak-claim of ?role=<id> wat zichtbaar wordt.
 
 const capabilities = (roleMappings as { role_mappings: { roles: Record<string, unknown> } })
   .role_mappings.roles;
 
 // Wikkel shortcut-hrefs in /embed/<id>?path=... zodat klikken in de portal
-// shell landt voor iframe-bare services; niet-embed-bare componenten en
+// shell landt voor iframe-bare services; niet-embed-bare components en
 // portal-interne URLs blijven ongemoeid (zie toEmbedHref).
 const embeddedShortcuts: typeof shortcuts = Object.fromEntries(
   Object.entries(shortcuts).map(([role, items]) => [
@@ -41,8 +41,8 @@ const payload = {
       <h1>Kies een rol om <em>door hun bril</em> te kijken.</h1>
       <p class="me-hero-body">
         Je bent niet ingelogd via Keycloak — dit is de demo-modus. Kies
-        hieronder een rol om te zien wat die persoon op het platform mag
-        doen. In productie wordt deze pagina automatisch ingevuld na SSO.
+        hieronder een rol om te zien wat die persoon on the platform mag
+        doen. In production wordt deze pagina automatisch ingevuld na SSO.
       </p>
     </header>
     <div class="role-picker-grid" id="picker-grid"></div>
@@ -51,7 +51,7 @@ const payload = {
   <!-- ═══════════ Role view ═══════════ -->
   <section class="me-view" id="role-view" hidden>
     <header class="me-hero">
-      <Eyebrow rule><span id="rh-eyebrow">Mijn werkplek</span></Eyebrow>
+      <Eyebrow rule><span id="rh-eyebrow">Mijn workspace</span></Eyebrow>
       <h1 id="rh-name">…</h1>
       <p class="me-hero-body" id="rh-purpose"></p>
       <div class="me-hero-meta">
@@ -84,10 +84,10 @@ const payload = {
     </header>
     <ul class="help-list">
       <li>
-        <a id="help-handleiding" href="#">Lees jouw rol-handleiding</a>
-        <span> — workflows, foutmeldingen, escalatie.</span>
+        <a id="help-handbook" href="#">Lees jouw rol-handbook</a>
+        <span> — workflows, errors, escalatie.</span>
       </li>
-      <li><a href={DOCS_URL} target="_blank" rel="noopener noreferrer">Open de platform-documentatie ↗</a></li>
+      <li><a href={DOCS_URL} target="_blank" rel="noopener noreferrer">Open de platform-documentation ↗</a></li>
       <li>Bij vragen over data: neem contact op met je data steward</li>
       <li>Bel platform-admin bij vermoede inbreuk (niet via mail)</li>
     </ul>
@@ -166,15 +166,15 @@ const payload = {
       });
       document.getElementById('role-picker')!.hidden = true;
 
-      document.getElementById('rh-eyebrow')!.textContent = `${role.id} · ${role.category === 'tech' ? 'platform-team' : 'eindgebruiker'}`;
+      document.getElementById('rh-eyebrow')!.textContent = `${role.id} · ${role.category === 'tech' ? 'platform team' : 'eindgebruiker'}`;
       document.getElementById('rh-name')!.textContent = role.displayName;
       document.getElementById('rh-purpose')!.textContent = cap._role_purpose ?? '';
       document.getElementById('rh-domain')!.textContent = role.domain;
       document.getElementById('rh-category')!.textContent =
-        role.category === 'tech' ? 'platform-team' : 'eindgebruiker';
+        role.category === 'tech' ? 'platform team' : 'eindgebruiker';
 
-      const handleiding = document.getElementById('help-handleiding') as HTMLAnchorElement;
-      handleiding.href = `/${role.handbookPath}`;
+      const handbook = document.getElementById('help-handbook') as HTMLAnchorElement;
+      handbook.href = `/${role.handbookPath}`;
 
       // ─── Capabilities ───
       const caps: string[] = [];

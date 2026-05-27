@@ -1,4 +1,4 @@
-# ADR-0007: Airflow pipeline-architectuur — Cosmos, Datasets, YAML-registry
+# ADR-0007: Airflow pipeline-architecture — Cosmos, Datasets, YAML-registry
 
 | Status | **Geaccepteerd** (deels gewijzigd 2026-05-19) |
 |---|---|
@@ -7,7 +7,7 @@
 | Gerelateerd | [ADR-0001](0001-stackable-as-base.md) (Stackable), [ADR-0005](0005-dbt-trino-as-transform.md) (dbt-trino), [ADR-0004](0004-openmetadata-as-catalog.md) (OpenMetadata) |
 
 > **2026-05-19 update**: Airflow 2.9.3 → 3.0.6 (LTS). Stackable operator
-> 26.3.0 ondersteunt 3.0.6 LTS én 3.1.6; we kiezen LTS voor de langere
+> 26.3.0 ondersteunt 3.0.6 LTS én 3.1.6; we kiezen LTS for the langere
 > security-backport-horizon (R-BIO-19, R-NIS2-03). Stackable's 3.0.6 image
 > draait op Python 3.12, waardoor de oorspronkelijke `astronomer-cosmos
 > ≥ 1.7` aanname uit dit ADR nu daadwerkelijk haalbaar is — we pinnen op
@@ -17,9 +17,9 @@
 > (was `airflow.www.security`), env-vars `AIRFLOW__WEBSERVER__*` zijn
 > hernoemd naar `AIRFLOW__API__*` / `AIRFLOW__FAB__*`, en de directe
 > `DagModel`-ORM unpause in `uc11_full_setup.py` is vervangen door
-> `is_paused_upon_creation=False` op de getriggerde DAGs.
+> `is_paused_upon_creation=False` on the getriggerde DAGs.
 >
-> **2026-05-18 update**: Kafka + NiFi zijn verwijderd uit de referentie-stack.
+> **2026-05-18 update**: Kafka + NiFi zijn verwijderd from the referentie-stack.
 > De `kafka:` blokken in `platform/11-airflow/sources/*.yml` heten nu `stream:`,
 > de Spark-streaming-job leest JSONL uit `s3a://odap-raw/` i.p.v. Kafka-topics,
 > en de bronze-tabellen hebben `source_ts`/`source_file` i.p.v.
@@ -41,7 +41,7 @@ crm, fez) en 10 use cases met cross-domein marts. De eerste DAG-opzet
    (dbt) → Gold (dbt) → OM-ingest → Superset draaien op losse `@hourly`
    schedules. Een mislukte streaming-batch leidt nog steeds tot een gold-run
    op stale silver.
-3. **vereist 4 wijzigingen voor een nieuwe bron.** dbt-staging, Kafka-topic,
+3. **vereist 4 wijzigingen for a nieuwe bron.** dbt-staging, Kafka-topic,
    `models:` blok in `dbt_project.yml`, en de `DOMAINS`-lijst in de DAG. Geen
    single source of truth.
 4. **bevat copy-paste boilerplate.** `_trino_env`, git-sync init, resources —
@@ -60,7 +60,7 @@ Drie ontwerppijlers voor alle ETL-orkestratie op dit platform:
 Eén bestand per bron in `platform/11-airflow/sources/<domain>.yml` definieert:
 
 - topic-pattern (Kafka) en bronze-tabel-naam
-- eigenaar, classificatie (BIO), bewaartermijn
+- eigenaar, classificatie (BIO), retention period
 - staging-model-naam (matcht dbt) en gerelateerde use-cases
 - SLA: verwachte event-frequentie, lag-drempel voor alerting
 
@@ -68,7 +68,7 @@ Alle DAG-factories lezen dit; ook `nifi-flows/` en de OM-source-registratie
 kunnen er later op aansluiten. Een nieuwe bron = één YAML toevoegen + dbt
 staging-model schrijven. De DAGs verschijnen automatisch in Airflow.
 
-### Pijler 2 — DAG-factory per pijplijnstap
+### Pijler 2 — DAG-factory per pipelinestap
 
 Vijf factories in `platform/11-airflow/include/`:
 
@@ -77,7 +77,7 @@ Vijf factories in `platform/11-airflow/include/`:
 | `bronze_factory` | 1 watch-DAG | Sensor op alle bronze-tabellen (Spark schrijft, DAG bevestigt). Publiceert dataset per bron. |
 | `silver_factory` | 1 DAG per domein (8) | Cosmos-rendered dbt run+test op `tag:<domain> tag:staging`. Triggered op bronze-dataset. |
 | `gold_factory` | 1 DAG per use case (6 actief) | Cosmos-rendered dbt run+test op `tag:uc<NN>`. Triggered op silver-datasets van benodigde domeinen. |
-| `governance_factory` | 1 DAG per scope | OM-ingest (Trino + dbt artifacts), bewaartermijn-enforcer, DQ-checks per UC. |
+| `governance_factory` | 1 DAG per scope | OM-ingest (Trino + dbt artifacts), retention period-enforcer, DQ-checks per UC. |
 | `ops_factory` | losse DAGs | Synthetic seed, lakehouse-maintenance — geen vaste structuur, wel gemeenschappelijke helpers. |
 
 Elke factory is een functie `build_*_dag(spec) -> DAG` die uit een YAML-spec
@@ -103,7 +103,7 @@ Concreet:
 - `gold_factory` voor `uc01` heeft `schedule=[Dataset("silver://wia/aanvraag")]`.
 - UC-05 (5 datasets in schedule) draait pas wanneer alle vijf bronnen geüpdatet zijn.
 
-Geen tijd-gebaseerde aannames meer; pijplijn rijgt zich op data-events.
+Geen tijd-gebaseerde aannames meer; pipeline rijgt zich op data-events.
 
 ## Tooling-keuzes
 
@@ -117,7 +117,7 @@ in plaats van één pod per dbt-run. Voordelen:
 - behoudt de bestaande `KubernetesPodOperator`-uitvoering — Cosmos `ExecutionMode.KUBERNETES` spawnt nog steeds een dbt-trino pod per model
 
 **Configuratie:**
-- `LoadMode.DBT_MANIFEST` — Cosmos parseert `manifest.json` (geen DB-toegang
+- `LoadMode.DBT_MANIFEST` — Cosmos parseert `manifest.json` (geen DB-access
   bij DAG-parse). Manifest wordt door een eenmalige Job (`dbt-manifest-job`)
   voor-gerenderd en in een ConfigMap gezet.
 - `ProfileConfig` met `TrinoBaseProfileMapping` — leest Trino-creds uit een
@@ -132,7 +132,7 @@ Twee paden, beiden gedocumenteerd:
 | Pad | Wanneer | Hoe |
 |---|---|---|
 | **A. initContainer + shared volume** (default voor dev) | k3d, geen registry | Init-container `python:3.12-slim` doet `pip install --target=/cosmos-pkgs astronomer-cosmos==1.12.0`. Airflow-containers krijgen `PYTHONPATH=/cosmos-pkgs:...`. Cold-start kost ~5s op cached pip-wheels. |
-| **B. Custom image** (productie) | OCI-registry beschikbaar | Build `infrastructure/airflow/Dockerfile` met `FROM docker.stackable.tech/.../airflow:3.0.6-...` + `RUN pip install astronomer-cosmos==1.12.0`. Push naar interne registry; verwijs ernaar via `spec.image.custom`. |
+| **B. Custom image** (production) | OCI-registry beschikbaar | Build `infrastructure/airflow/Dockerfile` met `FROM docker.stackable.tech/.../airflow:3.0.6-...` + `RUN pip install astronomer-cosmos==1.12.0`. Push naar interne registry; verwijs ernaar via `spec.image.custom`. |
 
 Pad A is geactiveerd. Pad B wordt voorbereid (Dockerfile + README) maar niet
 gebouwd in deze referentie.
@@ -149,7 +149,7 @@ platform/11-airflow/
 │   ├── transform_silver_per_domain.py
 │   ├── transform_gold_per_usecase.py
 │   ├── governance_om_ingest.py
-│   ├── governance_bewaartermijn.py
+│   ├── governance_retention period.py
 │   ├── ops_synthetic_data_load.py
 │   └── ops_lakehouse_maintenance.py
 ├── include/                     # importable factories + helpers
@@ -196,7 +196,7 @@ Mounts in pod:
 - **Testbare factories**: pytest kan factory-output asserten zonder cluster.
 - **Cosmos opent deur** naar `dbt build`-mode (run+test+source freshness in
   één graph), partial reruns op model-niveau, en `select`-filters die
-  meegegroeid zijn met de dbt CLI.
+  meegegroeid zijn with the dbt CLI.
 
 ### Negatief / mitigatie
 
@@ -212,7 +212,7 @@ Mounts in pod:
 - **Dataset-fan-in voor UC-05** (5 schedule-deps): bij vertraagde domein-DAG
   blijft UC-05 wachten. Acceptabel — alternatief ("partial gold runs") leidt
   tot inconsistente client-360 views.
-- **Init-container 20s** verlengt cold-start. Productie gebruikt custom image.
+- **Init-container 20s** verlengt cold-start. Production gebruikt custom image.
 
 ### Migratiepad
 
@@ -223,23 +223,23 @@ Mounts in pod:
 4. Bestaande `om_ingest_trino.py` + `om_ingest_dbt.py` consolideren naar
    `governance_om_ingest.py` zodra de factory-coverage compleet is.
 5. `dbt_run_per_domain.py` verwijderen wanneer alle 6 actieve UC-DAGs groen
-   zijn op de nieuwe stack.
+   zijn on the nieuwe stack.
 
 ## Alternatieven overwogen
 
 | Alternatief | Reden afgewezen |
 |---|---|
 | **Eén mega-DAG** met TaskGroups voor alle laagovergangen | Onleesbaar bij 8 domeinen × 10 UCs; één failure blokkeert alles; geen onafhankelijke schedules per UC. |
-| **Pure `KubernetesPodOperator` zonder Cosmos** (huidige patroon doortrekken) | Geen per-model granulariteit; logs per pod ipv per task; dbt model-failure mengt met andere modellen in dezelfde run. |
+| **Pure `KubernetesPodOperator` zonder Cosmos** (huidige patroon doortrekken) | Geen per-model granulariteit; logs per pod ipv per task; dbt model-failure mengt met andere models in dezelfde run. |
 | **Apache Beam / Flink** voor ETL ipv dbt | Overkill voor batch-aggregatie op een lakehouse; team-skills al op SQL/dbt; OPA-policies binden op Trino-tabellen niet op stream-records. |
 | **Argo Workflows** ipv Airflow | Stackable bevat Airflow-operator; geen tweede orkestratie-engine introduceren. |
 | **Dagster** | Krachtige asset-graph maar Stackable supportet het niet; dubbele leercurve. |
-| **Cosmos `LoadMode.DBT_LS`** (live `dbt ls` bij DAG-parse) | Vereist Trino-conn bij elke scheduler-restart; trage parse; niet air-gap-vriendelijk. |
+| **Cosmos `LoadMode.DBT_LS`** (live `dbt ls` bij DAG-parse) | Required Trino-conn bij elke scheduler-restart; trage parse; niet air-gap-vriendelijk. |
 | **Geen Cosmos, hand-rolled task-per-model** | Mogelijk maar herproduceert Cosmos slechter; niet onderhoudbaar. |
 
 ## Open punten
 
-- **`dbt build` ipv `dbt run + dbt test`** — aanrader voor productie (single
+- **`dbt build` ipv `dbt run + dbt test`** — aanrader voor production (single
   graph traversal). Cosmos ondersteunt dit via `render_config.test_behavior =
   TestBehavior.AFTER_EACH`. Default in onze setup.
 - **Source freshness** — Cosmos heeft `dbt source freshness` integratie. Voor

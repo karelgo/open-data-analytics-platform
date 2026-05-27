@@ -7,14 +7,14 @@ models:
       Bron: stg_customer_satisfaction (csv_batch upload). Voor Superset-dashboard
       "Klanttevredenheid trend".
     config:
-      tags: ["marts", "uc_customer_satisfaction", "klantcontact", "sturingsinfo"]
+      tags: ["marts", "uc_customer_satisfaction", "customer interaction", "sturingsinfo"]
     meta:
-      domain: klantcontact
+      domain: customer interaction
       legal_basis: AVG_art_6_1_e
-      doelbinding: ["sturingsinfo"]
+      purpose-limitation: ["sturingsinfo"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 5
-      eigenaar: divisie_klantcontact
+      retention period_jaren: 5
+      eigenaar: divisie_customer interaction
       pii_kolommen: []
       risk_tier: laag
     columns:

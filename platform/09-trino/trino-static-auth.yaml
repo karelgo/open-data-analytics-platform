@@ -1,7 +1,7 @@
 # Static-user AuthenticationClass voor smoke-tests en break-glass.
 #
 # Naast de OIDC-flow (keycloak) ondersteunen we één static user voor
-# smoke-tests en geautomatiseerde queries. Productie zou ALLEEN OIDC hebben.
+# smoke-tests en geautomatiseerde queries. Production zou ALLEEN OIDC hebben.
 #
 # Stackable's static-provider verwacht een Secret met username -> password.
 ---

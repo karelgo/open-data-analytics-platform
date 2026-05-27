@@ -37,7 +37,7 @@ quiz:
     options:
       - "Laten staan"
       - "Vraag de data-engineer om gold-model te updaten als de kolom relevant is voor sturing; documenteer in glossary anders"
-      - "Direct in productie wijzigen"
+      - "Direct in production wijzigen"
       - "Ticket sluiten"
     correct: 1
 ---
@@ -54,7 +54,7 @@ In de PR-queue staat:
 Engineer-comment: "Nieuwe kolom uit polisadm; SBI-code 4-cijferig. Heb
 schema.yml aangevuld; geen tag toegevoegd, vraag data-steward."
 
-## Stap 1 — review aanvragen
+## Stap 1 — review request
 
 Open de [tabelpagina](/go/openmetadata/) op `silver.service_requests.application`. Klik
 "Nieuwe kolom: branchecode" → tab "Tags". Leeg.
@@ -84,7 +84,7 @@ Definitie: Vier-cijferige code volgens de Standaard Bedrijfsindeling van
    het CBS (2008-versie), aangeleverd door werkgever bij polisinschrijving.
 Bron: silver.service_requests.application.werkgever_branchecode
 Eigenaar: data.steward@odap.local
-Use cases: UC-03 (handhaving), UC-06 (lastprognose) — branche-trends
+Use cases: UC-03 (handhaving), UC-06 (cost forecast) — branche-trends
 ```
 
 ## Stap 4 — DQ-tests checken
@@ -111,13 +111,13 @@ is "niet zichtbaar" voor onbekende rollen, dat is bewust restrictief.
 
 ## Stap 6 — review afsluiten
 
-Comment op de PR:
+Comment on the PR:
 
 ```
 Approved.
 Tags: bedrijfsdata, intern_gebruik
 Glossary: branchecode (SBI) — koppeling toegevoegd
-OPA: fraud_analyst krijgt unmasked toegang; andere rollen niet
+OPA: fraud_analyst krijgt unmasked access; andere rollen niet
 DQ: not_null + relationships geconfigureerd door @engineer
 ```
 

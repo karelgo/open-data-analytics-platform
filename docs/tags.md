@@ -4,7 +4,7 @@ description: Browsing per tag — handig om alle "compliance"-pagina's of alle "
 ---
 
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
 # Tags
 

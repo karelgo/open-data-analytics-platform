@@ -7,14 +7,14 @@ models:
       Geen PII; vrije opmerking is intern. Bron: csv_batch via
       ingest_csv_customer_satisfaction DAG (zie airflow).
     config:
-      tags: ["staging", "klantcontact"]
+      tags: ["staging", "customer interaction"]
     meta:
-      domain: klantcontact
+      domain: customer interaction
       legal_basis: AVG_art_6_1_e
-      doelbinding: ["sturingsinfo", "klantonderzoek"]
+      purpose-limitation: ["sturingsinfo", "klantonderzoek"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 5
-      eigenaar: divisie_klantcontact
+      retention period_jaren: 5
+      eigenaar: divisie_customer interaction
       pii_kolommen: []
       risk_tier: laag
     columns:

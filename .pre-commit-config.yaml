@@ -18,7 +18,7 @@ repos:
         args: [--allow-multiple-documents, --unsafe]
         # --unsafe staat Python-tags toe (mkdocs.yml gebruikt
         # !!python/name:material.extensions.emoji.twemoji); zonder die
-        # vlag faalt check-yaml op de root config.
+        # vlag faalt check-yaml on the root config.
         exclude: '^(platform/09-trino/catalogs/.*\.yaml\.tmpl)$'
       - id: check-json
       - id: check-added-large-files
@@ -78,10 +78,10 @@ repos:
         files: '^dbt/models/.*_.*\.yml$'
         pass_filenames: false
 
-      # Regenereer MkDocs-pagina's uit de portal-registry zodra de bron óf de
+      # Regenereer MkDocs-pagina's from the portal-registry zodra de bron óf de
       # generator zelf wijzigt. Pure stdlib, geen externe deps. Spiegelt de
       # `docs_gen.py --check` stap in .github/workflows/docs.yml — die blijft
-      # als safety net staan voor het geval pre-commit geskipt wordt.
+      # als safety net staan for the geval pre-commit geskipt wordt.
       - id: docs-gen
         name: regenerate component pages
         entry: python3 scripts/docs_gen.py

@@ -22,7 +22,7 @@ quiz:
   - q: "Streaming-job hangt op stage 4. Eerste check?"
     options:
       - "Restart"
-      - "Spark History Server: tasks per stage; OpenSearch logs voor de specifieke executor; Kafka consumer-group lag — combineer voor diagnose voordat je wat doet"
+      - "Spark History Server: tasks per stage; OpenSearch logs for the specifieke executor; Kafka consumer-group lag — combineer voor diagnose voordat je wat doet"
       - "Schaal op"
       - "Kill"
     correct: 1
@@ -36,7 +36,7 @@ quiz:
   - q: "Recovery-stap die data-verlies kan veroorzaken?"
     options:
       - "Job restart met behoud checkpoint"
-      - "`rm -rf` van checkpoint-directory om ‘fresh te starten’ — verliest exact-once garantie; in plaats daarvan: schema-fix, restart, herverwerking laten plaatsvinden via offset-replay"
+      - "`rm -rf` van checkpoint-directory om ‘fresh te starten’ — verliest exact-once garantie; in plaats daarvan: schema-fix, restart, herprocessing laten plaatsvinden via offset-replay"
       - "Schema-fix"
       - "Wachten"
     correct: 1
@@ -44,7 +44,7 @@ certifies: true
 ---
 
 In deze module krijg je het scenario dat elke engineer een keer
-meemaakt: een streaming-job die hangt op productie. Doel: diagnose en
+meemaakt: een streaming-job die hangt op production. Doel: diagnose en
 recovery zonder paniekaccie.
 
 ## Casus

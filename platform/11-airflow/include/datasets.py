@@ -1,4 +1,4 @@
-"""Airflow Dataset URI-conventies voor de platform pipeline.
+"""Airflow Dataset URI-conventies for the platform pipeline.
 
 Conventie:
     bronze://demo/<table>                 # bronze.demo.<table>
@@ -20,7 +20,7 @@ def bronze_dataset(source: SourceSpec) -> Dataset:
 
 
 def silver_dataset(source: SourceSpec) -> Dataset:
-    # Strip 'stg_' van de model-naam voor een nettere URI.
+    # Strip 'stg_' van de model-naam for a nettere URI.
     entity = source.silver.staging_model.removeprefix("stg_")
     return Dataset(f"silver://{source.domain}/{entity}")
 
@@ -30,7 +30,7 @@ def gold_dataset(use_case: str, mart_table: str) -> Dataset:
 
 
 def silver_datasets_for_use_case(use_case: str) -> list[Dataset]:
-    """Triggers voor een UC = silver-datasets van alle gebruikte bronnen."""
+    """Triggers for a UC = silver-datasets van alle gebruikte bronnen."""
     return [silver_dataset(s) for s in sources_for_use_case(use_case)]
 
 

@@ -12,7 +12,7 @@ source:
         provider: db
         # Superset application-admin (zie platform/01-secrets/dev-secrets.yaml
         # secret superset-postgres-credentials → adminUser.username/password).
-        # NIET de Postgres-user 'odap' — die is voor de SQLAlchemy-DB.
+        # NIET de Postgres-user 'odap' — die is for the SQLAlchemy-DB.
         username: admin
         password: ${SUPERSET_ADMIN_PW}
   sourceConfig:

@@ -6,11 +6,11 @@
 # die ConfigMap onder /opt/odap/dbt/manifest.json.
 #
 # Trigger:
-#   - Eenmalig na bootstrap (handmatig: `kubectl apply -f`)
+#   - One-off na bootstrap (handmatig: `kubectl apply -f`)
 #   - Bij elke dbt-model-wijziging:
 #       make airflow-manifest    (target voegen we nog toe)
 #
-# Productie: in CI als post-merge-hook op main.
+# Production: in CI als post-merge-hook op main.
 #
 # SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 ---
@@ -98,7 +98,7 @@ spec:
             - -c
             - |
               # git-sync v4 plaatst de checkout op /workspace/<commit-sha>
-              # met een symlink /workspace/<branch> (hier: main). Vind de
+              # with a symlink /workspace/<branch> (hier: main). Vind de
               # actieve dbt-dir robuust ipv hardcoded pad.
               DBT_DIR=$(find /workspace -maxdepth 3 -type d -name dbt -path '*/repo/dbt' -o -maxdepth 3 -type d -name dbt -path '*/main/dbt' 2>/dev/null | head -1)
               if [ -z "$DBT_DIR" ]; then
@@ -106,14 +106,14 @@ spec:
               fi
               echo "DBT_DIR=$DBT_DIR"
               cd "$DBT_DIR"
-              # Override env-DBT_PROFILES_DIR (Job-level) met de echte path
+              # Override env-DBT_PROFILES_DIR (Job-level) with the echte path
               # waar git-sync de repo neerzet.
               export DBT_PROFILES_DIR="$DBT_DIR"
               ls -la
               pip install --quiet --disable-pip-version-check 'dbt-core==1.9.*' 'dbt-trino==1.9.*' 2>&1 | tail -3
               cp profiles.yml.template profiles.yml
               dbt deps
-              # Parse-only: rendert manifest.json zonder DB-toegang.
+              # Parse-only: rendert manifest.json zonder DB-access.
               dbt parse --target dev || true
               cp target/manifest.json /artifacts/manifest.json
               # Tar alleen de project-bron (dbt_project.yml + models/seeds/
@@ -202,7 +202,7 @@ spec:
               import json, os
               from minio import Minio
 
-              # OM 1.5's dbt-ingestor parsed manifest.json met een strict ManifestV12
+              # OM 1.5's dbt-ingestor parsed manifest.json with a strict ManifestV12
               # pydantic-model en weigert:
               #  - metadata.invocation_started_at / metadata.run_started_at (komen in
               #    dbt 1.10+ manifesten erbij)
@@ -215,7 +215,7 @@ spec:
               for k in ("invocation_started_at", "run_started_at", "quoting"):
                   m.get("metadata", {}).pop(k, None)
               m.pop("functions", None)
-              # In ons cluster materialiseren alle dbt-models op de bronze catalog
+              # In ons cluster materialiseren alle dbt-models on the bronze catalog
               # (dbt-Trino target schrijft `bronze.<schema>.<table>` ongeacht zone-
               # tag). Manifest zegt nog database=silver/gold; herschrijven naar
               # bronze zodat OM-lineage de tabellen in OM kan matchen via FQN.

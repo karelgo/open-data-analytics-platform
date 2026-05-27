@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Smoke test 04 — dbt project parses and compiles correct.
 #
-# Geen warehouse-toegang nodig: `dbt parse` valideert YAML/Jinja en
+# Geen warehouse-access nodig: `dbt parse` valideert YAML/Jinja en
 # `dbt compile` rendert SQL zonder query's te draaien.
 #
 # Voorkeur: lokaal pip-installed dbt-trino. Fallback: docker image

@@ -1,9 +1,9 @@
-# Handleiding — Data-steward
+# Handbook — Data-steward
 
-> Rol-key: `data_steward` · Domein: Datakwaliteit & governance · Risiconiveau toegang: hoog (PII voor DQ-controle)
+> Rol-key: `data_steward` · Domein: Datakwaliteit & governance · Risiconiveau access: hoog (PII voor DQ-controle)
 
-Deze handleiding is voor **data-stewards**. Jij bent de spil tussen
-data-engineers (die pipelines bouwen) en eindgebruikers (die data
+Deze handbook is voor **data-stewards**. Jij bent de spil tussen
+data-engineers (die pipelines bouwen) en eindusers (die data
 gebruiken). Je zorgt voor kwaliteit, lineage, eigenaarschap en juiste
 classificatie. Je ziet PII voor controledoeleinden, **niet** medische data.
 
@@ -16,19 +16,19 @@ classificatie. Je ziet PII voor controledoeleinden, **niet** medische data.
 Je bewaakt de governance van het platform. Je gebruikt het platform om:
 
 - Datakwaliteit te bewaken (dbt-tests, OpenMetadata-profiler)
-- Eigenaarschap, classificaties en doelbindingen actueel te houden
+- Eigenaarschap, classificaties en purpose-limitationen actueel te houden
 - Lineage te valideren (van bron tot dashboard)
 - Glossary (CGM-begrippen) te onderhouden
 - Sensitive-queries van Claims Analystn te reviewen
-- Eindgebruikers te helpen bij begrip en interpretatie van data
+- Eindusers te helpen bij begrip en interpretatie van data
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **OpenMetadata** | Hoofdwerkplek: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.odap.local:8443 |
+| **OpenMetadata** | Hoofdworkspace: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.odap.local:8443 |
 | **Apache Superset** | Dashboards reviewen, ownership-overzichten | https://superset.odap.local:8443 |
 | **Apache Airflow** | DQ-DAGs draaien | https://airflow.odap.local:8443 |
 | **OpenSearch (Kibana-achtig)** | OPA-decision-logs reviewen | https://opensearch.odap.local:8443/logs |
@@ -40,7 +40,7 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 
 ### 3.1 Catalogs
 
-| Catalog | Toegang | Doel |
+| Catalog | Access | Doel |
 |---|---|---|
 | `bronze` | **Ja** (kwaliteitscontrole) | Vergelijken bron met silver |
 | `silver` | **Ja** | DQ-bewaking, profiler |
@@ -53,10 +53,10 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 PII (BSN, naam, IBAN) zie je **volledig** voor DQ-controle. Medisch
 (`diagnose`, `icd10`) zie je **niet** — daarvoor heb je geen doel.
 
-> **Vuistregel.** Je hebt PII-toegang om datakwaliteit te valideren, niet om
+> **Vuistregel.** Je hebt PII-access om datakwaliteit te valideren, niet om
 > dossiers te lezen. Steekproeven, niet bulk-exports.
 
-### 3.3 Doelbindingen
+### 3.3 Purpose limitationen
 
 Purposes: **"sturingsinfo"** en **"kwaliteitscontrole"**. Sommige
 doel-specifieke marts (UC-04, UC-05) zijn voor jou alleen vanuit
@@ -70,7 +70,7 @@ kwaliteitscontrole-perspectief beschikbaar.
 
 1. Open **OpenMetadata** → **Quality** → **Test Suites**.
 2. Bekijk welke dbt-tests vannacht faalden (rood).
-3. Per fout: klik door naar de testbeschrijving + de records die faalden.
+3. Per fout: klik door to the testbeschrijving + de records die faalden.
 
 Of via Trino:
 
@@ -100,7 +100,7 @@ GROUP  BY 1
 ORDER  BY 1;
 ```
 
-Vermoeden: ingestion-issue. Je escaleert naar de data-engineer.
+Vermoeden: ingestion-issue. Je escaleert to the data-engineer.
 
 ### 4.3 Workflow C — Sensitive-review
 
@@ -128,7 +128,7 @@ de arbeidsdeskundige om context. Anomalieën meld je bij platform-admin.
 1. Open OpenMetadata → **Glossary** → **CGM**.
 2. Voeg term toe: definitie, eigenaar, gerelateerd aan welke kolommen.
 3. Koppel de term aan `silver.claims.voorschot.bedrag`.
-4. Communiceer naar gebruikers (e-mail of dashboard-update).
+4. Communiceer naar users (e-mail of dashboard-update).
 
 ### 4.6 Workflow F — Lineage valideren
 
@@ -151,17 +151,17 @@ Voor periodieke audits exporteer je:
 - dbt-test-history van de laatste 30 dagen
 - Decision-log statistieken
 
-Zie [`docs/runbook.md` § 10](../runbook.md) voor de volledige procedure.
+Zie [`docs/runbook.md` § 10](../runbook.md) for the volledige procedure.
 
 ---
 
 ## 5. Verantwoordelijkheden in volgorde van prioriteit
 
-1. **Kwaliteit van productie-zones** (silver/gold) — fouten hier raken besluiten.
+1. **Kwaliteit van production-zones** (silver/gold) — fouten hier raken besluiten.
 2. **Sensitive-review** — dagelijks, 1e taak van de ochtend.
 3. **Eigenaarschap-coverage** — > 95% van datasets moet een eigenaar hebben.
 4. **DPIA-evidence** — actueel en toegankelijk voor toezichthouders.
-5. **Glossary-onderhoud** — gebruikers moeten begrippen kunnen vinden.
+5. **Glossary-onderhoud** — users moeten begrippen kunnen vinden.
 
 ---
 

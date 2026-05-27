@@ -1,7 +1,7 @@
-# Keycloak — OIDC IdP voor het ODAP platform.
+# Keycloak — OIDC IdP for the ODAP platform.
 #
 # Mock ODAP realm wordt geïmporteerd via realm.json (ConfigMap).
-# Productie: separate instance, MFA verplicht, externe IdP-federatie (DigiD/eHerkenning).
+# Production: separate instance, MFA verplicht, externe IdP-federatie (DigiD/eHerkenning).
 #
 # Chart: bitnami/keycloak
 #
@@ -29,7 +29,7 @@ externalDatabase:
   password: "odap-dev-only-CHANGE-ME"
   database: keycloak
 
-# Productie-mode (vereist EXTERNAL DB)
+# Production-mode (vereist EXTERNAL DB)
 production: true
 
 # TLS staat aan via ingress (cert-manager); intern http.
@@ -86,7 +86,7 @@ extraEnvVars:
   # Beschikbaar gemaakt voor post-import patch-Job en debugging. De
   # realm-import zelf gebruikt deze NIET automatisch — Keycloak doet
   # geen env-substitutie in realm-import-files. Zie 02-authentication/
-  # README voor de feitelijke vervangingsstrategie (sed/jq pre-deploy
+  # README for the feitelijke vervangingsstrategie (sed/jq pre-deploy
   # of Admin REST patch post-deploy).
   - name: ENTRA_TENANT_ID
     valueFrom:
@@ -113,7 +113,7 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: platform-issuer
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-    # Iframe-allow voor de portal embed-shell. Keycloak stuurt standaard
+    # Iframe-allow for the portal embed-shell. Keycloak stuurt standaard
     # `X-Frame-Options: SAMEORIGIN` PLUS een eigen CSP met
     # `frame-ancestors 'self'` — beide blokkeren cross-origin iframe-
     # rendering. In iframe-context (user op /embed/airflow → Airflow

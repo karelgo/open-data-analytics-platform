@@ -1,6 +1,6 @@
 {# Engine-agnostische SQL helpers via dbt's adapter.dispatch.
 
-   Modellen die op zowel Trino als Databricks (Spark) moeten werken
+   Models die op zowel Trino als Databricks (Spark) moeten werken
    gebruiken deze macros i.p.v. engine-specifieke functies.
 
      {{ cast_string(field) }}        — Trino: varchar, Spark: string

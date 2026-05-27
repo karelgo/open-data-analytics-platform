@@ -1,24 +1,24 @@
-# UC-11 — Integrale Klantreis (event-stream + fase-reconstructie)
+# UC-11 — Integrale Customer journey (event-stream + fase-reconstructie)
 
 | Status in deze repo | **Volledig geïmplementeerd** (presentatie-anchor) |
 |---|---|
 | Domein | Cross-domein (persoon, polisadm, ww, zw, wia, wajong, crm) |
 | Risicoclassificatie | Laag-midden (geen besluit, wel cross-domein aggregatie) |
 | AVG-grondslag | Art. 6 lid 1e (publieke taak) — gecombineerd uit wettelijke grondslag per bron |
-| Bewaartermijn | Erft langste bewaartermijn van bronnen (30 jaar — polisadm) |
+| Retention period | Erft langste retention period van bronnen (30 jaar — polisadm) |
 
-Bron-aanvulling: deze UC is **niet** in `referentiearchitectuur-odap-data-analytics.md`
-beschreven. Toegevoegd in deze referentie-implementatie als **integrale demo**
+Bron-aanvulling: deze UC is **niet** in `referentiearchitecture-odap-data-analytics.md`
+beschreven. Toegevoegd in deze reference implementation als **integrale demo**
 die alle platform-facetten in één klantverhaal samenbrengt.
 
 ---
 
 ## Probleem
 
-platform-cliënten doorlopen vaak meerdere wetten en domeinen: werknemer → ziek →
-WIA-aanvraag → re-integratie → werkhervatting → bezwaar. Vandaag zien
-medewerkers **fragmenten** per systeem (Werkmap, polisadm, CRM, WIA-claim).
-Een **temporele**, **cross-domein** klantreis bestaat niet — terwijl die
+platform-cliënten doorlopen vaak meerdere laws en domeinen: werknemer → ziek →
+WIA-aanvraag → reintegration → werkhervatting → bezwaar. Vandaag zien
+medewerkers **fragmenten** per systeem (Workspace, polisadm, CRM, WIA-claim).
+Een **temporele**, **cross-domein** customer journey bestaat niet — terwijl die
 informatie wel in de bronsystemen aanwezig is, alleen nooit als
 event-stream is gemodelleerd.
 
@@ -33,38 +33,38 @@ Twee samenhangende data products in `gold.uc11_customer_journey`:
 
 1. **`mart_uc11_journey_events`** — denormalized event-stream met één rij
    per gebeurtenis (`bsn`, `event_ts`, `domein`, `event_type`, `label`, ...).
-   Bron voor klantreis-tijdlijn-visualisaties in Superset + voor downstream
+   Bron voor customer journey-tijdlijn-visualisaties in Superset + voor downstream
    API-consumptie door CRM-applicaties.
 2. **`mart_uc11_journey_phases`** — gereconstrueerde fasen per cliënt via
    gaps-and-islands (`werknemer` → `ziek` → `wia_in_behandeling` → `wga` →
    `re_integratie` → `werkhervatter`), met doorlooptijden en
    eind-uitkomsten.
 
-**Doelbinding strikt**: dezelfde gold-tabel levert per rol een ander
+**Purpose limitation strikt**: dezelfde gold-tabel levert per rol een ander
 verhaal. OPA filtert kolommen + rijen at-query-time; er bestaat geen
-"klantreis-met-volledige-PII"-view.
+"customer journey-met-volledige-PII"-view.
 
 ## Data — bronnen en CGM-entiteiten
 
-| Bron (silver) | Bijdrage aan klantreis | CGM-entiteit |
+| Bron (silver) | Bijdrage aan customer journey | CGM-entiteit |
 |---|---|---|
 | `silver.persons.stg_persons` | Geboorte van cliënt-record, NAW | `Cliënt`, `Persona` |
 | `silver.policies.stg_policy_holders` | Dienstverband-aanvang/einde, inkomen | `IKV`, `Werknemer`, `Werkgever`, `Dienstverband`, `Ontslag` |
-| `silver.service_requests.stg_service_request_application` | WW-aanvraag, reden ontslag, status-overgang | `Aanvraag`, `Uitkering` |
+| `silver.service_requests.stg_service_request_application` | WW-aanvraag, reden ontslag, status-overgang | `Aanvraag`, `Claim payout` |
 | `silver.incidents.stg_incident_report` | Ziekmelding, duur ziektewet | `Aanvraag` |
-| `silver.claims.stg_claim_application` | WIA-aanvraag, ao-percentage, regio, status | `Aanvraag`, `Beoordeling`, `Uitkering` |
-| `silver.eligibility_cases.stg_eligibility_case` | Wajong-regime, arbeidsvermogen | `Aanvraag`, `Uitkering` |
-| `silver.customers.stg_customer_interaction` | Klantcontact-events per kanaal | `Contact`, `Kanaal` |
+| `silver.claims.stg_claim_application` | WIA-aanvraag, ao-percentage, regio, status | `Aanvraag`, `Assessment`, `Claim payout` |
+| `silver.eligibility_cases.stg_eligibility_case` | Wajong-regime, arbeidsvermogen | `Aanvraag`, `Claim payout` |
+| `silver.customers.stg_customer_interaction` | Customer interaction-events per kanaal | `Contact`, `Kanaal` |
 
-**Geen** nieuwe bron-generator — de klantreis is een **derivaat** van
+**Geen** nieuwe bron-generator — de customer journey is een **derivaat** van
 bestaande gegenereerde events. Dat is een bewuste designkeuze: het
 demonstreert dat het platform de informatie al heeft; UC-11 ontsluit het
 alleen.
 
-## Architectuur-pad in deze repo
+## Architecture-pad in deze repo
 
 ```
-silver.<domain>.stg_*  (7 staging-views; bestaande modellen, ongewijzigd)
+silver.<domain>.stg_*  (7 staging-views; bestaande models, ongewijzigd)
                 │
                 ▼
    silver.intermediate.int_customer_journey_events   (view: UNION ALL → unified schema)
@@ -76,7 +76,7 @@ silver.<domain>.stg_*  (7 staging-views; bestaande modellen, ongewijzigd)
                        ┌──────────────────────────┼──────────────────────────┐
                        ▼                          ▼                          ▼
                 Superset dashboard       Trino REST API → CRM-app    OpenMetadata lineage
-                "Klantreis-tijdlijn"     (Purpose-header verplicht)  (per kolom Doelbinding-tag)
+                "Customer journey-tijdlijn"     (Purpose-header verplicht)  (per kolom Purpose limitation-tag)
 ```
 
 Auth/authz/audit-pad (cross-cutting, ongewijzigd t.o.v. UC-05):
@@ -85,10 +85,10 @@ Auth/authz/audit-pad (cross-cutting, ongewijzigd t.o.v. UC-05):
 Keycloak (OIDC, rol-claim) ──► Trino ──► OPA bundle ──► allow + rowFilters + columnMask
                                                              │
                                                              ▼
-                              Trino event-listener ──► Kafka uwv.audit.klantreis
+                              Trino event-listener ──► Kafka uwv.audit.customer journey
                                                              │
                                                              ▼
-                                            Spark batch ──► bronze.audit.klantreis_reads (Delta, 7y)
+                                            Spark batch ──► bronze.audit.customer journey_reads (Delta, 7y)
 ```
 
 ## Event-schema (uniform over alle domeinen)
@@ -115,7 +115,7 @@ Vanuit `mart_uc11_journey_events` worden **fasen** afgeleid:
 | `werknemer` | `polisadm.ikv.start` (eerste of nieuwe) | `polisadm.ikv.einde` of nieuwe fase |
 | `ziek` | `zw.melding` | `ziek + duur_dagen` of WIA-aanvraag |
 | `service_request_application` | `ww.aanvraag.ingediend` | `ww.aanvraag.toegekend` of `_afgewezen` |
-| `ww_uitkering` | `ww.aanvraag.toegekend` | nieuw IKV-start of einde reeks |
+| `ww_claim payout` | `ww.aanvraag.toegekend` | nieuw IKV-start of einde reeks |
 | `wia_in_behandeling` | `wia.aanvraag.ingediend` | `wia.aanvraag.toegekend_*` of `_afgewezen` |
 | `wga` | `wia.aanvraag.toegekend_wga` | nieuw IKV-start |
 | `iva` | `wia.aanvraag.toegekend_iva` | — (geen einde in synthetische data) |
@@ -125,7 +125,7 @@ Vanuit `mart_uc11_journey_events` worden **fasen** afgeleid:
 Implementatie via window-functions (`row_number()`, `lag()`) over
 `event_ts` per `bsn`.
 
-## OPA — kolom-projectie en row-filter per rol (kritiek voor de demo)
+## OPA — kolom-projectie en row-filter per rol (kritiek for the demo)
 
 Eén query op `gold.uc11_customer_journey.mart_uc11_journey_events`, acht
 weergaves. Volledige matrix in `opa-policies-src/trino/`:
@@ -141,7 +141,7 @@ weergaves. Volledige matrix in `opa-policies-src/trino/`:
 
 **Row-filters:**
 - `claims_analyst` met `extraCredentials.regio=AMS` → `regio_code = 'AMS' OR regio_code IS NULL`
-- `klantreis_demo_persona` capability → `bsn = 'XXXXX-XXX01'` (voor presentatie-modus, één persona)
+- `customer journey_demo_persona` capability → `bsn = 'XXXXX-XXX01'` (voor presentatie-modus, één persona)
 - `fraud_analyst` → medische event-types weggefilterd (`domein != 'claims' OR event_status != 'TOEGEKEND_IVA'`)
 
 Implementatie:
@@ -154,15 +154,15 @@ Implementatie:
 meta:
   domain: cross
   legal_basis: AVG_art_6_1e   # publieke taak, gecombineerd
-  doelbinding: [klantcontact, behandeling, sturingsinfo]
+  purpose-limitation: [customer interaction, behandeling, sturingsinfo]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 30     # langste van bronnen (polisadm)
-  eigenaar: divisie_klantcontact   # primair consumer; cross-domein-product
+  retention period_jaren: 30     # langste van bronnen (polisadm)
+  eigenaar: divisie_customer interaction   # primair consumer; cross-domein-product
   pii_kolommen: [bsn, event_label, source_ref_id]
   risk_tier: laag-midden
   human_in_the_loop: true
-  toegang_via_OPA_policies: true
-  cgm_entiteiten: [Cliënt, IKV, Aanvraag, Beoordeling, Uitkering, Contact, Kanaal]
+  access_via_OPA_policies: true
+  cgm_entiteiten: [Cliënt, IKV, Aanvraag, Assessment, Claim payout, Contact, Kanaal]
 ```
 
 ## "Glass box logging"
@@ -172,22 +172,22 @@ de bestaande Trino event-listener gelogd. Audit-record bevat:
 
 - gebruiker (Keycloak `sub`)
 - rol (Keycloak `roles`)
-- doelcode (HTTP header `X-Trino-Extra-Credential: purpose=klantcontact`)
+- doelcode (HTTP header `X-Trino-Extra-Credential: purpose=customer interaction`)
 - aanleiding (`X-Trino-Extra-Credential: reason=ticket-12345`)
 - gequeried BSN (uit WHERE-clause; pseudonimiseerd in audit-log)
 - timestamp + applied-row-filter + applied-column-mask
 
-Pad: Trino event-listener → Kafka `uwv.audit.klantreis` → Spark batch →
-`bronze.audit.klantreis_reads` (Delta, retentie 7 jaar).
+Pad: Trino event-listener → Kafka `uwv.audit.customer journey` → Spark batch →
+`bronze.audit.customer journey_reads` (Delta, retentie 7 jaar).
 
 ## OpenMetadata
 
 - Service: Trino → schema `gold.uc11_customer_journey` ingest.
-- Dashboard: Superset-service → "Klantreis-tijdlijn" met lineage naar marts.
-- Tags: `Domain.Cross`, `Doelbinding.Klantcontact`, `Doelbinding.Behandeling`,
-  `Doelbinding.Sturingsinfo`, `PII.Sensitive`, `AccessControl.OPA`.
-- Glossary-koppeling: nieuwe term `Klantreis` (cross-CGM aggregaat).
-- Per kolom een specifieke `Doelbinding.*`-tag — voedt OPA via
+- Dashboard: Superset-service → "Customer journey-tijdlijn" met lineage naar marts.
+- Tags: `Domain.Cross`, `Purpose limitation.Customer interaction`, `Purpose limitation.Behandeling`,
+  `Purpose limitation.Sturingsinfo`, `PII.Sensitive`, `AccessControl.OPA`.
+- Glossary-koppeling: nieuwe term `Customer journey` (cross-CGM aggregaat).
+- Per kolom een specifieke `Purpose limitation.*`-tag — voedt OPA via
   reverse-metadata pad.
 
 ## Outputs (artefacten in repo)
@@ -200,30 +200,30 @@ Pad: Trino event-listener → Kafka `uwv.audit.klantreis` → Spark batch →
 - `opa-policies-src/trino/trino-row-filters_test.rego` + `trino-column-masks_test.rego` — uitbreiding.
 - `platform/11-airflow/include/gold_factory.py` — UC-11 in `ACTIVE_USE_CASES`.
 - Source-YAMLs (`platform/11-airflow/sources/*.yml`) — `used_by_use_cases += uc11`.
-- `platform/13-openmetadata-config/glossary-cgm.yaml` — term `Klantreis`.
+- `platform/13-openmetadata-config/glossary-cgm.yaml` — term `Customer journey`.
 - `tests/smoke/11-uc11-customer-journey.sh` — dbt-parse + OPA-decisions voor UC-11.
 - `tests/e2e/uc11-flow.sh` — end-to-end (cluster vereist).
 - `Makefile` — `make dbt-build-uc11`, `make test-uc11`.
 
 ## Presentatie-leidraad (10 slides)
 
-1. **De cliënt** — Saskia Bakker, 47 jaar, BSN 99999-901. Cartoon-tijdlijn werknemer → ziek → WIA → re-integratie → werkhervatter.
+1. **De cliënt** — Saskia Bakker, 47 jaar, BSN 99999-901. Cartoon-tijdlijn werknemer → ziek → WIA → reintegration → werkhervatter.
 2. **Eén tabel, acht waarheden** — dezelfde gold-tabel door zes rol-brillen (uit OPA-matrix hierboven).
 3. **Dataflow** — generators → NiFi → Kafka → Spark → Delta → dbt → Trino → Superset (uit `docs/architecture.md` §1).
 4. **Medallion + sensitive** — vier zones, waarom (uit `docs/architecture.md` §3).
 5. **dbt-lineage** — staging × 7 → intermediate → 2 marts. Toon `dbt docs` lineage-graaf.
-6. **Doelbinding als code** — OpenMetadata tag → OPA Rego → Trino-query-resultaat. Live demo van één query met `purpose=klantcontact` vs. zonder.
+6. **Purpose limitation als code** — OpenMetadata tag → OPA Rego → Trino-query-resultaat. Live demo van één query met `purpose=customer interaction` vs. zonder.
 7. **AI-laag (minimaal)** — "next best contact" heuristiek; AI Act-classificatie `Laag`; algoritmeregister-stub.
 8. **Audit demo** — `marketing_analyst` probeert WIA-medische details te zien → OPA deny → 30s later in audit-dashboard.
-9. **Access-request** — nieuwe verzekeringsarts wil toegang tot `sensitive.wia.medisch_dossier` → OM-bridge → Keycloak realm-role.
+9. **Access-request** — nieuwe verzekeringsarts wil access tot `sensitive.wia.medisch_dossier` → OM-bridge → Keycloak realm-role.
 10. **Wat dit kost** — k3d cluster, één `make` commando, geen cloud-bill.
 
 ## Open vragen / TODO
 
-- Het fase-model gebruikt vereenvoudigde regels; productie zou state-machine
+- Het fase-model gebruikt vereenvoudigde regels; production zou state-machine
   per cliënt nodig hebben (Spark Structured Streaming met stateful
   aggregation). Voor demo-doeleinden voldoende.
-- Audit-Kafka-topic `uwv.audit.klantreis` is symmetrisch met de bestaande
+- Audit-Kafka-topic `uwv.audit.customer journey` is symmetrisch with the bestaande
   `uwv.audit.client_360`. Eén Spark-job kan beide consumeren (out-of-scope).
 - "Saskia"-persona wordt nu **gevonden** in de mart (BSN met meest diverse
   events). Voor reproducerbare demo: in een volgende iteratie een dbt seed

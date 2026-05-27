@@ -120,7 +120,7 @@ spec:
                   key: grafana-api-key
                   optional: true
             # ─── Power BI embed (ADR-0008) ────────────────────────────
-            # Service Principal credentials voor het minten van
+            # Service Principal credentials for the minten van
             # short-lived embed-tokens via POST /api/portal/powerbi/embed.
             # Komt uit `powerbi-embed-creds` Secret (zie
             # platform/15-portal/powerbi-embed-creds-template.yaml of de

@@ -79,7 +79,7 @@ Model: [dbt/models/staging/finops/stg_focus_billing.sql](../../dbt/models/stagin
 | `mart_uc12_focus_top_resources` | `billing_month × resource_id` (+ `rank_in_month`) | Top-50 resources tabel |
 | `mart_uc12_focus_savings` | `billing_month × provider × pricing_category × service_category` | Savings-breakdown |
 
-Modellen in [dbt/models/marts/uc12_focus_finops/](../../dbt/models/marts/uc12_focus_finops/).
+Models in [dbt/models/marts/uc12_focus_finops/](../../dbt/models/marts/uc12_focus_finops/).
 
 ---
 

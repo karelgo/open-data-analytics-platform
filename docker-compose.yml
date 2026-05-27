@@ -12,7 +12,7 @@ services:
     ports:
       - "8090:8080"
     volumes:
-      # Override de productie nginx.conf door een compose-vriendelijke versie.
+      # Override de production nginx.conf door een compose-vriendelijke versie.
       # 127.0.0.11 als resolver, geen kube-dns, academy via service-name.
       - ./portal/nginx.compose.conf:/etc/nginx/nginx.conf:ro
     depends_on:

@@ -1,11 +1,11 @@
 ---
-title: "Handleiding — Platform-admin"
+title: "Handbook — Platform-admin"
 role: platform_admin
 ---
 
-> Rol-key: `platform_admin` · Domein: Cluster + security · Risiconiveau toegang: maximaal (break-glass)
+> Rol-key: `platform_admin` · Domein: Cluster + security · Risiconiveau access: maximaal (break-glass)
 
-Deze handleiding is voor **platform-admins**. Je hebt break-glass-toegang
+Deze handbook is voor **platform-admins**. Je hebt break-glass-access
 tot **alle catalogs**, inclusief `sensitive` en `sandbox`. Je rol is **niet
 voor day-to-day werk** — je bent er voor incidenten, structurele wijzigingen
 en governance van het platform zelf. **Elke break-glass-actie wordt gelogd
@@ -15,24 +15,24 @@ en achteraf gereviewd.**
 
 ## 1. Wat doet jouw rol?
 
-Je bent eindverantwoordelijk voor de werking en veiligheid van het
+Je bent eindverantwoordelijk for the werking en veiligheid van het
 platform. Je gebruikt het platform om:
 
 - Cluster-incidenten op te lossen
-- Toegang en rollen te beheren in Keycloak
+- Access en rollen te beheren in Keycloak
 - OPA-policies te beoordelen en te deployen
 - Backups en restores uit te voeren
 - Compliance-evidence te exporteren
-- JIT-aanvragen van data-engineers goed te keuren
-- Structurele wijzigingen (architectuur, ADR's, security) te begeleiden
+- JIT-request van data-engineers goed te keuren
+- Structurele wijzigingen (architecture, ADR's, security) te begeleiden
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Keycloak Admin** | Rolbeheer, gebruikers, MFA-policies | https://keycloak.odap.local/admin |
+| **Keycloak Admin** | Rolbeheer, users, MFA-policies | https://keycloak.odap.local/admin |
 | **kubectl + k9s** | Alle clusters, alle pods | terminal |
 | **Apache Airflow** | Maintenance-DAGs | https://airflow.odap.local |
 | **OpenSearch / OPA-logs** | Audit-log review | via Vector ingestion |
@@ -42,7 +42,7 @@ platform. Je gebruikt het platform om:
 
 - Trino break-glass queries: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443` en dan via DBeaver op `localhost:8443`.
 
-> **MFA verplicht en hardware-gebonden.** Voor productie: WebAuthn-passkey of
+> **MFA verplicht en hardware-gebonden.** Voor production: WebAuthn-passkey of
 > hardware-token (YubiKey). Geen TOTP-app op een mobiel.
 
 ---
@@ -51,12 +51,12 @@ platform. Je gebruikt het platform om:
 
 ### 3.1 Catalogs
 
-Je hebt toegang tot **alles**: `bronze`, `silver`, `gold`, `sensitive`,
-`sandbox`. Toegang valt onder **break-glass**: elke query staat de
-volgende ochtend op het reviewscherm van de data-steward.
+Je hebt access tot **alles**: `bronze`, `silver`, `gold`, `sensitive`,
+`sandbox`. Access valt onder **break-glass**: elke query staat de
+volgende ochtend on the reviewscherm van de data-steward.
 
 > **Vuistregel break-glass.** Doe het alleen voor:
-> 1. Incident-respons (productie down, data corrupt)
+> 1. Incident-respons (production down, data corrupt)
 > 2. Compliance-evidence verzamelen
 > 3. Onderhouds-validatie (niet voor begripsmatige queries)
 >
@@ -64,7 +64,7 @@ volgende ochtend op het reviewscherm van de data-steward.
 
 ### 3.2 Audit-discipline
 
-Elke break-glass-query begint met een comment:
+Elke break-glass-query begint with a comment:
 
 ```sql
 -- BREAK-GLASS REASON: incident INC-2026-04-30 / cliënt 999000123 / data corruptie review
@@ -96,7 +96,7 @@ kubectl get trinocluster,kafkacluster,hivecluster,opacluster,airflowcluster,supe
 
 ### 4.2 Workflow B — Nieuwe gebruiker toevoegen
 
-> In productie: gebeurt via SSO-federatie (DigiD/eHerkenning of Entra ID).
+> In production: gebeurt via SSO-federatie (DigiD/eHerkenning of Entra ID).
 > In deze referentie via Keycloak Admin.
 
 1. Open https://keycloak.odap.local/admin → realm `uwv` → **Users → Add user**.
@@ -109,13 +109,13 @@ kubectl get trinocluster,kafkacluster,hivecluster,opacluster,airflowcluster,supe
 
 1. Data-engineer maakt ticket "TICKET-1234: bronze access 4u, doel debug iban".
 2. Lees doel + scope. Bij twijfel: bel de data-engineer voor toelichting.
-3. Activeer rol via Keycloak (4 uur). In productie: dit gaat via een
+3. Activeer rol via Keycloak (4 uur). In production: dit gaat via een
    automatiseringsscript dat de mapping in OPA tijdelijk aanpast.
 4. Sluit het ticket met je goedkeuring; markeer in audit-log waarom.
 
 ### 4.4 Workflow D — OPA-policy deployen
 
-Wijzigingen aan policies gebeuren in `opa-policies-src/`. Process:
+Changes aan policies gebeuren in `opa-policies-src/`. Process:
 
 ```bash
 # 1. Test lokaal
@@ -210,7 +210,7 @@ Templates en escalatie-paden: out-of-platform via Platform CISO.
 In volgorde van prioriteit:
 
 1. **Beschikbaarheid en integriteit** van het platform.
-2. **Toegangs-discipline**: alleen wie het nodig heeft, alleen wat nodig is.
+2. **Accesss-discipline**: alleen wie het nodig heeft, alleen wat nodig is.
 3. **Incident-respons**: snel, gestructureerd, navolgbaar.
 4. **Backup en restore**: getest, niet alleen "ingericht".
 5. **Compliance-evidence**: actueel, exporteerbaar.
@@ -222,7 +222,7 @@ In volgorde van prioriteit:
 
 | Probleem | Contact |
 |---|---|
-| Productie-incident | Volg runbook + UWV SRE-team |
+| Production-incident | Volg runbook + UWV SRE-team |
 | Beleidsvraag | Platform CISO + Data Office |
 | Wettelijke vraag | Privacy Officer (FG) |
 | Burnout / overbelasting | Manager + collega-admin (rol moet redundant zijn!) |
@@ -231,9 +231,9 @@ In volgorde van prioriteit:
 
 ## 7. Wat je nooit doet
 
-- Break-glass-toegang gebruiken voor "snelle vragen" — maak een non-admin account.
-- Een productie-OPA-policy patchen zonder PR + tweede paar ogen.
-- Direct `kubectl edit` op productie-CRDs — altijd via GitOps.
+- Break-glass-access gebruiken voor "snelle vragen" — maak een non-admin account.
+- Een production-OPA-policy patchen zonder PR + tweede paar ogen.
+- Direct `kubectl edit` op production-CRDs — altijd via GitOps.
 - Een wachtwoord in plaintext doorsturen, ook niet "tijdelijk".
 - MFA disable-en voor "even debuggen".
 - Nieuwe rollen creëren zonder vermelding in `role_mappings.json` + ADR.

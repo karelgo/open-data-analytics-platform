@@ -20,7 +20,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    # Iframe-allow voor de portal embed-shell (cross-origin).
+    # Iframe-allow for the portal embed-shell (cross-origin).
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;
       add_header Content-Security-Policy "frame-ancestors 'self' https://platform.odap.local:8443 https://platform.example.com https://platform.example.com" always;

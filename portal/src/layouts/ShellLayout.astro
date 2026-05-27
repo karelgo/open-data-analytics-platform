@@ -134,11 +134,11 @@ const RAIL_MAIN = [
     ],
   },
   // Dashboarding block — consumption-laag voor business-rollen. Power BI is
-  // de primary landing (Microsoft Fabric tenant SSO via gebruikers' eigen
+  // de primary landing (Microsoft Fabric tenant SSO via users' eigen
   // Azure-tenant); Superset blijft toegankelijk als legacy/open-source
   // alternatief tot de migratie compleet is. Zie
   // FreshLakehouse/docs/research/powerbi-as-bi-and-self-service-layer.md
-  // voor de migratie-roadmap.
+  // for the migratie-roadmap.
   { id: 'dashboarding', label: 'Dashboarding',             href: '/embed/powerbi/',
     children: [
       { id: 'powerbi',  label: 'Power BI',  href: '/embed/powerbi/' },
@@ -196,7 +196,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
       // `embed.mode === 'subdomain'`. Path-routed services are already
       // portal-relative (/grafana etc) and don't need rewriting.
       // .embed-topbar links (in EmbedLayout) are skipped so the
-      // "open in nieuw tabblad"-knop blijft naar het service-subdomein
+      // "open in nieuw tabblad"-knop blijft to the service-subdomein
       // wijzen.
       (function () {
         var EMBED_MAP = {
@@ -250,7 +250,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
         new MutationObserver(rewriteEmbed).observe(document.documentElement,
           { childList: true, subtree: true });
         // Click-time safety net voor anchors die programmatisch worden
-        // gezet vlak voor de klik (MutationObserver mist die race).
+        // gezet vlak for the klik (MutationObserver mist die race).
         document.addEventListener('click', function (ev) {
           var a = ev.target && ev.target.closest && ev.target.closest('a[href]');
           if (!a) return;
@@ -498,7 +498,7 @@ const userInitial = (userName.trim().charAt(0) || '?').toUpperCase();
       {!embedMode && (
         <footer class="shell-footer">
           <div class="shell-footer-inner">
-            <span class="mono">Referentie-implementatie · synthetische data</span>
+            <span class="mono">Reference implementation · synthetische data</span>
             <span class="shell-footer-links">
               <a href="/ODAP_Platform_Handbook_per_role.pdf">Handboek</a>
               <span aria-hidden="true">·</span>

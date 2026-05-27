@@ -47,7 +47,7 @@ jobs:
             -exec shellcheck -e SC1091,SC2086 -S error {} +
 
   portal-typecheck:
-    # Astro + TypeScript: `astro check` valideert .astro componenten en .ts
+    # Astro + TypeScript: `astro check` valideert .astro components en .ts
     # bestanden tegen het project tsconfig + content-collections schema.
     # Catched type-fouten zonder dat we de portal hoeven te builden.
     runs-on: ubuntu-24.04

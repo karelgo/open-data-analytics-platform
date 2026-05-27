@@ -6,7 +6,7 @@
 //
 // Bewust een single file (geen public/dbt-docs/index.html): Astro's dev
 // server routeert /dbt-docs/ via z'n eigen pages-resolver en negeert
-// public/<dir>/index.html, dus dat zou alleen in productie werken. Single
+// public/<dir>/index.html, dus dat zou alleen in production werken. Single
 // file is identiek in dev en prod.
 //
 // Als de static-bundel ontbreekt (typisch op een verse checkout zonder
@@ -38,7 +38,7 @@ if (existsSync(src)) {
   console.log(`[sync-dbt-docs] ${src} -> ${dest}`);
 } else if (existsSync(dest) && statSync(dest).size > PLACEHOLDER_THRESHOLD_BYTES) {
   // Source ontbreekt (typisch: Docker-build zonder dbt/ in de context), maar
-  // er staat al een grote bundel op de bestemming — laat 'm staan.
+  // er staat al een grote bundel on the bestemming — laat 'm staan.
   console.log(`[sync-dbt-docs] ${src} ontbreekt — bestaande ${dest} (groot bestand) wordt behouden.`);
 } else {
   // Placeholder — toont een nette uitleg i.p.v. een 404. Geen externe assets,
@@ -59,15 +59,15 @@ if (existsSync(src)) {
   </style>
 </head>
 <body>
-  <h1>dbt-documentatie nog niet gegenereerd</h1>
+  <h1>dbt-documentation nog niet gegenereerd</h1>
   <p>
     Deze pagina toont normaal de <strong>statisch geëxporteerde dbt docs</strong>
-    (modellen, tests, sources, lineage) van het ODAP platform. De build-bundel
-    <code>dbt/target/static_index.html</code> ontbreekt op het moment dat de
+    (models, tests, sources, lineage) van het ODAP platform. De build-bundel
+    <code>dbt/target/static_index.html</code> ontbreekt on the moment dat de
     portal-image gebouwd is.
   </p>
   <h2>Lokaal genereren</h2>
-  <p>Vanaf de repo-root, met een bereikbare Trino:</p>
+  <p>Vanaf de repo-root, with a bereikbare Trino:</p>
   <pre>make dbt-docs</pre>
   <p>
     Dit runt <code>dbt deps &amp;&amp; dbt docs generate --static</code> en kopieert
@@ -75,7 +75,7 @@ if (existsSync(src)) {
     de portal-image (of refresh in dev-mode) en deze pagina toont de docs.
   </p>
   <p class="muted">
-    In productie wordt deze stap door CI of een Airflow-job uitgevoerd zodra de
+    In production wordt deze stap door CI of een Airflow-job uitgevoerd zodra de
     silver/gold-runs slagen. Lineage staat ook in
     <a href="https://openmetadata.odap.local:8443">OpenMetadata</a>
     via de <code>governance_om_ingest</code> DAG.
@@ -85,5 +85,5 @@ if (existsSync(src)) {
 `;
   writeFileSync(dest, placeholder);
   console.warn(`[sync-dbt-docs] ${src} ontbreekt — placeholder geschreven naar ${dest}`);
-  console.warn('[sync-dbt-docs] Run `make dbt-docs` om echte dbt-documentatie te genereren.');
+  console.warn('[sync-dbt-docs] Run `make dbt-docs` om echte dbt-documentation te genereren.');
 }

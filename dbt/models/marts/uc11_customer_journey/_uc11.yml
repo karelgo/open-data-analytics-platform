@@ -3,24 +3,24 @@ version: 2
 models:
   - name: mart_uc11_journey_events
     description: |
-      UC-11 — Integrale Klantreis (event-stream). Eén rij per cliënt-gebeurtenis
+      UC-11 — Integrale Customer journey (event-stream). Eén rij per cliënt-gebeurtenis
       over zeven domeinen (persoon, polisadm, ww, zw, wia, wajong, crm). Gebruikt
       voor tijdlijn-visualisatie in Superset en voor downstream CRM-API. OPA
       maskeert `bsn` / `event_label` / `source_ref_id` per rol; row-filter
       regio_code voor claims_analyst.
     config:
-      tags: ["marts", "uc11", "cross", "klantcontact"]
+      tags: ["marts", "uc11", "cross", "customer interaction"]
     meta:
       domain: cross
       legal_basis: AVG_art_6_1e
-      doelbinding: ["klantcontact", "behandeling", "sturingsinfo"]
+      purpose-limitation: ["customer interaction", "behandeling", "sturingsinfo"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 30      # erft langste van bronnen (polisadm)
-      eigenaar: divisie_klantcontact
+      retention period_jaren: 30      # erft langste van bronnen (polisadm)
+      eigenaar: divisie_customer interaction
       pii_kolommen: [bsn, event_label, source_ref_id]
       risk_tier: laag-midden
       human_in_the_loop: true
-      toegang_via_OPA_policies: true
+      access_via_OPA_policies: true
       profilering: false
       opt_out_supported: true
       sandbox_only: false
@@ -28,7 +28,7 @@ models:
       publiek_te_publiceren: false
       juistheid_AVG_art_5_1d: true
       dpia_id: DPIA-UC11-KLANTREIS-2025
-      cgm_entiteiten: [Cliënt, IKV, Aanvraag, Beoordeling, Uitkering, Contact, Kanaal]
+      cgm_entiteiten: [Cliënt, IKV, Aanvraag, Assessment, Claim payout, Contact, Kanaal]
     columns:
       - name: bsn
         description: "BSN van de cliënt. Wordt door OPA gemaskeerd per rol."
@@ -60,7 +60,7 @@ models:
 
   - name: mart_uc11_journey_phases
     description: |
-      UC-11 — Integrale Klantreis (fase-reconstructie). Gaps-and-islands over de
+      UC-11 — Integrale Customer journey (fase-reconstructie). Gaps-and-islands over de
       event-stream: één rij per (BSN × fase × periode). Toont hoe een cliënt
       door verschillende claim phases heen is gegaan (werknemer → ziek → wia → ...).
       Lopende fase: `is_lopend = true` en `fase_eind_ts is null`.
@@ -69,14 +69,14 @@ models:
     meta:
       domain: cross
       legal_basis: AVG_art_6_1e
-      doelbinding: ["klantcontact", "behandeling", "sturingsinfo"]
+      purpose-limitation: ["customer interaction", "behandeling", "sturingsinfo"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 30
-      eigenaar: divisie_klantcontact
+      retention period_jaren: 30
+      eigenaar: divisie_customer interaction
       pii_kolommen: [bsn]
       risk_tier: laag-midden
       human_in_the_loop: true
-      toegang_via_OPA_policies: true
+      access_via_OPA_policies: true
       profilering: false
       opt_out_supported: true
       sandbox_only: false
@@ -84,7 +84,7 @@ models:
       publiek_te_publiceren: false
       juistheid_AVG_art_5_1d: true
       dpia_id: DPIA-UC11-KLANTREIS-2025
-      cgm_entiteiten: [Cliënt, Traject, Uitkering, Werkhervatting]
+      cgm_entiteiten: [Cliënt, Traject, Claim payout, Werkhervatting]
     columns:
       - name: bsn
         tests:
@@ -104,7 +104,7 @@ models:
                 - tussen_dienstverband
                 - ziek
                 - service_request_application
-                - ww_uitkering
+                - ww_claim payout
                 - wia_in_behandeling
                 - wga
                 - iva

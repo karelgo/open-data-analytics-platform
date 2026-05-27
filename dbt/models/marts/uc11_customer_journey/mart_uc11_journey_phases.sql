@@ -3,7 +3,7 @@
     properties=table_format_properties()
 ) }}
 
--- UC-11 — Integrale Klantreis (fase-reconstructie).
+-- UC-11 — Integrale Customer journey (fase-reconstructie).
 --
 -- Gaps-and-islands op `mart_uc11_journey_events`: voor elke cliënt de
 -- chronologische reeks van fasen die zijn afgeleid uit fase-triggerende
@@ -30,7 +30,7 @@ with_fase as (
             when event_type = 'zw.melding'                              then 'ziek'
             when event_type like 'ww.aanvraag.%'
                  and event_status in ('INGEDIEND', 'IN_BEHANDELING')    then 'service_request_application'
-            when event_type = 'ww.aanvraag.toegekend'                   then 'ww_uitkering'
+            when event_type = 'ww.aanvraag.toegekend'                   then 'ww_claim payout'
             when event_type = 'ww.aanvraag.afgewezen'                   then 'tussen_dienstverband'
             when event_type like 'wia.aanvraag.%'
                  and event_status in ('INGEDIEND', 'IN_BEHANDELING')    then 'wia_in_behandeling'

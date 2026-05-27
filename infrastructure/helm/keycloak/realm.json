@@ -45,11 +45,11 @@
     "realm": [
       {
         "name": "claims_analyst",
-        "description": "Claims Analyst — toegang tot WIA-claim-velden in eigen regio."
+        "description": "Claims Analyst — access tot WIA-claim-velden in eigen regio."
       },
       {
         "name": "fraud_analyst",
-        "description": "Fraud Analyst — toegang tot WW-risk-data en handhavings-relevante kolommen."
+        "description": "Fraud Analyst — access tot WW-risk-data en handhavings-relevante kolommen."
       },
       {
         "name": "marketing_analyst",
@@ -65,7 +65,7 @@
       },
       {
         "name": "data_engineer",
-        "description": "Data engineer — pipeline-eigenaar, JIT-toegang tot bronze."
+        "description": "Data engineer — pipeline-eigenaar, JIT-access tot bronze."
       },
       {
         "name": "platform_admin",
@@ -73,11 +73,11 @@
       },
       {
         "name": "researcher",
-        "description": "Researcher — alleen sandbox-zone (UC-09), geen productie-PII."
+        "description": "Researcher — alleen sandbox-zone (UC-09), geen production-PII."
       },
       {
         "name": "operations_manager",
-        "description": "SMZ planner — capaciteitsplanning UC-08."
+        "description": "SMZ planner — capacity planning UC-08."
       },
       {
         "name": "csv_uploader",
@@ -607,7 +607,7 @@
     {
       "clientId": "portal-backend",
       "name": "UDP Academy Backend (service account)",
-      "description": "Service-account voor de Academy-backend; schrijft voortgang naar user-attribute udp_progress.",
+      "description": "Service-account for the Academy-backend; schrijft voortgang naar user-attribute udp_progress.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
@@ -629,7 +629,7 @@
     {
       "clientId": "om-access-bridge",
       "name": "OpenMetadata Access Bridge (service account)",
-      "description": "Service-account voor de om-access-bridge; kent realm-roles 'data_access:<catalog>.<schema>' toe na approval in OpenMetadata. Zie ADR-0008.",
+      "description": "Service-account for the om-access-bridge; kent realm-roles 'data_access:<catalog>.<schema>' toe na approval in OpenMetadata. Zie ADR-0008.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
@@ -667,7 +667,7 @@
     {
       "clientId": "jupyter",
       "name": "ODAP Lab (Jupyter)",
-      "description": "OIDC-client voor JupyterHub OAuthenticator op https://jupyter.odap.local — per-user notebook-pods met identiteit gekoppeld aan OPA-policy.",
+      "description": "OIDC-client voor JupyterHub OAuthenticator op https://jupyter.odap.local — per-user notebook-pods met identity gekoppeld aan OPA-policy.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
@@ -701,7 +701,7 @@
     {
       "clientId": "multica",
       "name": "ODAP Platform — Multica",
-      "description": "OIDC-client voor de oauth2-proxy voor https://multica.odap.local — gates de Next.js bundle (front-door SSO). Multica's eigen email-code login draait nog op API-niveau.",
+      "description": "OIDC-client for the oauth2-proxy voor https://multica.odap.local — gates de Next.js bundle (front-door SSO). Multica's eigen email-code login draait nog op API-niveau.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,

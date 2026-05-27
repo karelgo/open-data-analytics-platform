@@ -25,18 +25,18 @@ rowFilters := [{"expression": expr}] if {
 	expr := sprintf("regio_code = '%s'", [upper(regio)])
 }
 
-# UC-04 opt-out filter — verbergt opt-out cliënten voor de werklijst.
+# UC-04 opt-out filter — verbergt opt-out cliënten for the werklijst.
 rowFilters := [{"expression": "opt_out = false"}] if {
 	resource_schema == "uc04_eligibility_outreach"
 }
 
-# Sandbox UC-09: alleen records met pseudo-IDs (defensief; in productie
+# Sandbox UC-09: alleen records met pseudo-IDs (defensief; in production
 # is `sandbox.*` al exclusief gepseudonimiseerd).
 rowFilters := [{"expression": "bsn_pseudo IS NOT NULL"}] if {
 	resource_catalog == "sandbox"
 }
 
-# UC-11 — claims_analyst ziet klantreis-events alleen voor eigen regio.
+# UC-11 — claims_analyst ziet customer journey-events alleen voor eigen regio.
 # `regio_code` is alleen gevuld voor WIA-events; non-WIA events (regio_code IS NULL)
 # blijven zichtbaar zodat de tijdlijn niet onnodig leeg is.
 rowFilters := [{"expression": expr}] if {

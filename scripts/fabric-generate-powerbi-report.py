@@ -39,7 +39,7 @@ def measure(entity: str, prop: str) -> dict:
 
 
 def column(entity: str, prop: str) -> dict:
-    """Projection voor een kale kolom (groupby / axis / row)."""
+    """Projection for a kale kolom (groupby / axis / row)."""
     return {
         "field": {
             "Column": {
@@ -91,22 +91,22 @@ def all_visuals() -> list[dict]:
     # ─── Rij 1: 4 KPI cards (y=16, h=120) ─────────────────────────
     visuals.append(visual(
         "v01_kpi_clienten", 16, 16, 308, 120, "cardVisual",
-        {"Data": {"projections": [measure("klantreis_events", "Aantal_clienten")]}},
-        title="Unieke cliënten in klantreis",
+        {"Data": {"projections": [measure("customer journey_events", "Aantal_clienten")]}},
+        title="Unieke cliënten in customer journey",
     ))
     visuals.append(visual(
         "v02_kpi_events", 332, 16, 308, 120, "cardVisual",
-        {"Data": {"projections": [measure("klantreis_events", "Aantal_events")]}},
+        {"Data": {"projections": [measure("customer journey_events", "Aantal_events")]}},
         title="Totaal events",
     ))
     visuals.append(visual(
         "v03_kpi_fases", 648, 16, 308, 120, "cardVisual",
-        {"Data": {"projections": [measure("klantreis_phases", "Aantal_fases")]}},
+        {"Data": {"projections": [measure("customer journey_phases", "Aantal_fases")]}},
         title="Totaal fase-overgangen",
     ))
     visuals.append(visual(
         "v04_kpi_duur", 964, 16, 300, 120, "cardVisual",
-        {"Data": {"projections": [measure("klantreis_phases", "Gem_duur_dagen")]}},
+        {"Data": {"projections": [measure("customer journey_phases", "Gem_duur_dagen")]}},
         title="Gem. fase-duur (dagen)",
     ))
 
@@ -114,18 +114,18 @@ def all_visuals() -> list[dict]:
     visuals.append(visual(
         "v05_line_events_per_maand", 16, 144, 624, 240, "lineChart",
         {
-            "Category": {"projections": [column("klantreis_events", "event_date")]},
-            "Y": {"projections": [measure("klantreis_events", "Aantal_events")]},
-            "Series": {"projections": [column("klantreis_events", "domein")]},
+            "Category": {"projections": [column("customer journey_events", "event_date")]},
+            "Y": {"projections": [measure("customer journey_events", "Aantal_events")]},
+            "Series": {"projections": [column("customer journey_events", "domein")]},
         },
         title="Events per maand — alle domeinen",
     ))
     visuals.append(visual(
         "v06_line_fases_per_maand", 648, 144, 616, 240, "lineChart",
         {
-            "Category": {"projections": [column("klantreis_phases", "fase_start_ts")]},
-            "Y": {"projections": [measure("klantreis_phases", "Aantal_fases")]},
-            "Series": {"projections": [column("klantreis_phases", "fase")]},
+            "Category": {"projections": [column("customer journey_phases", "fase_start_ts")]},
+            "Y": {"projections": [measure("customer journey_phases", "Aantal_fases")]},
+            "Series": {"projections": [column("customer journey_phases", "fase")]},
         },
         title="Nieuwe fases per maand",
     ))
@@ -134,24 +134,24 @@ def all_visuals() -> list[dict]:
     visuals.append(visual(
         "v07_pie_events_per_domein", 16, 400, 413, 240, "donutChart",
         {
-            "Category": {"projections": [column("klantreis_events", "domein")]},
-            "Y": {"projections": [measure("klantreis_events", "Aantal_events")]},
+            "Category": {"projections": [column("customer journey_events", "domein")]},
+            "Y": {"projections": [measure("customer journey_events", "Aantal_events")]},
         },
         title="Events per domein",
     ))
     visuals.append(visual(
         "v08_pie_fases_per_type", 437, 400, 413, 240, "donutChart",
         {
-            "Category": {"projections": [column("klantreis_phases", "fase")]},
-            "Y": {"projections": [measure("klantreis_phases", "Aantal_fases")]},
+            "Category": {"projections": [column("customer journey_phases", "fase")]},
+            "Y": {"projections": [measure("customer journey_phases", "Aantal_fases")]},
         },
         title="Fases per type",
     ))
     visuals.append(visual(
         "v09_pie_events_per_regio", 858, 400, 406, 240, "donutChart",
         {
-            "Category": {"projections": [column("klantreis_events", "regio_code")]},
-            "Y": {"projections": [measure("klantreis_events", "Aantal_events")]},
+            "Category": {"projections": [column("customer journey_events", "regio_code")]},
+            "Y": {"projections": [measure("customer journey_events", "Aantal_events")]},
         },
         title="Events per regio (WIA)",
     ))
@@ -160,16 +160,16 @@ def all_visuals() -> list[dict]:
     visuals.append(visual(
         "v10_bar_top_event_types", 16, 656, 624, 220, "clusteredBarChart",
         {
-            "Category": {"projections": [column("klantreis_events", "event_type")]},
-            "Y": {"projections": [measure("klantreis_events", "Aantal_events")]},
+            "Category": {"projections": [column("customer journey_events", "event_type")]},
+            "Y": {"projections": [measure("customer journey_events", "Aantal_events")]},
         },
         title="Top event-types",
     ))
     visuals.append(visual(
         "v11_bar_duur_per_fase", 648, 656, 616, 220, "clusteredBarChart",
         {
-            "Category": {"projections": [column("klantreis_phases", "fase")]},
-            "Y": {"projections": [measure("klantreis_phases", "Gem_duur_dagen")]},
+            "Category": {"projections": [column("customer journey_phases", "fase")]},
+            "Y": {"projections": [measure("customer journey_phases", "Gem_duur_dagen")]},
         },
         title="Gem. duur per fase-type (dagen)",
     ))
@@ -180,9 +180,9 @@ def all_visuals() -> list[dict]:
         {
             "Values": {
                 "projections": [
-                    column("klantreis_events", "bsn"),
-                    measure("klantreis_events", "Aantal_events"),
-                    measure("klantreis_events", "Aantal_domeinen"),
+                    column("customer journey_events", "bsn"),
+                    measure("customer journey_events", "Aantal_events"),
+                    measure("customer journey_events", "Aantal_domeinen"),
                 ],
             },
         },
@@ -243,7 +243,7 @@ def page_json() -> dict:
     return {
         "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
         "name": PAGE_ID,
-        "displayName": "UC-11 Integrale Klantreis",
+        "displayName": "UC-11 Integrale Customer journey",
         "displayOption": "FitToPage",
         "height": PAGE_H,
         "width": PAGE_W,

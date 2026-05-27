@@ -4,7 +4,7 @@
 Eind-tot-eind:
   1. Upload `data-generation/focus-test.csv` naar
      `Files/uc12_seed/focus-test.csv` in `uc11_lakehouse` (OneLake DFS).
-  2. Upload notebook `uc12_focus_seed` naar de workspace (REST).
+  2. Upload notebook `uc12_focus_seed` to the workspace (REST).
   3. Trigger het notebook met workspace_id + lakehouse_id parameters.
   4. Poll tot de notebook-run klaar is.
   5. Refresh het `uc12_focus_finops` semantic model zodat Direct Lake
@@ -65,7 +65,7 @@ EXPECTED_MARTS = (
 
 # ─── OneLake DFS upload ────────────────────────────────────────────────
 def _dfs_url(relative_path: str) -> str:
-    """OneLake DFS URL voor een Files/-pad in uc11_lakehouse."""
+    """OneLake DFS URL for a Files/-pad in uc11_lakehouse."""
     return (
         f"https://onelake.dfs.fabric.microsoft.com/"
         f"{FABRIC_WORKSPACE_ID}/{FABRIC_LAKEHOUSE_ID}/Files/"
@@ -77,7 +77,7 @@ def _onelake_request(
     method: str, url: str, token: str, body: bytes | None = None,
     extra_headers: dict | None = None,
 ) -> tuple[int, dict, bytes]:
-    """Laagje boven urllib voor de OneLake DFS REST API."""
+    """Laagje boven urllib for the OneLake DFS REST API."""
     headers = {"Authorization": f"Bearer {token}"}
     if extra_headers:
         headers.update(extra_headers)

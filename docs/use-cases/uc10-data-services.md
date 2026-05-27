@@ -4,10 +4,10 @@
 |---|---|
 | Domein | Polisadministratie (cross-keten) |
 | Risicoclassificatie | Hoog uit ketenoogpunt (lessons learned Suwinet AP-onderzoek 2014) |
-| AVG-grondslag | Art. 6 lid 1c per afnemer; doelbinding strikt afgebakend |
-| Bewaartermijn audit-logs | 7 jaar |
+| AVG-grondslag | Art. 6 lid 1c per afnemer; purpose-limitation strikt afgebakend |
+| Retention period audit-logs | 7 jaar |
 
-Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-10](../../referentiearchitectuur-odap-data-analytics.md).
+Bron: [`referentiearchitecture-odap-data-analytics.md` § 8 UC-10](../../referentiearchitecture-odap-data-analytics.md).
 
 ---
 
@@ -15,13 +15,13 @@ Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-10](../../referen
 
 Suwinet-Inkijk en weekleveringen zijn verouderd. Ketenpartners (gemeenten,
 IND, DUO, Belastingdienst, deurwaarders) verwachten moderne API's met
-fijnmazige doelbinding. Lessons learned uit AP-onderzoek Suwinet (2014):
+fijnmazige purpose-limitation. Lessons learned uit AP-onderzoek Suwinet (2014):
 verwerkersovereenkomsten compleet, periodieke controle op afnemer-naleving.
 
 ## Doel
 
 API-gateway voor real-time bevraging op CGM gold-data-products, met
-**expliciete doelbinding per call** en backwards compatibility met SuwiML
+**expliciete purpose-limitation per call** en backwards compatibility met SuwiML
 voor partijen die nog niet over zijn.
 
 ## Data
@@ -29,19 +29,19 @@ voor partijen die nog niet over zijn.
 | Data product | Inhoud | Afnemers (illustratief) |
 |---|---|---|
 | `gold.uc10_polisadm_dagloon` | Recente daglonen per BSN + periode | Gemeente WMO, IND, DUO |
-| `gold.uc10_uitkering_status` | Lopend ja/nee + soort | Gemeente WMO, deurwaarders |
+| `gold.uc10_claim payout_status` | Lopend ja/nee + soort | Gemeente WMO, deurwaarders |
 | `gold.uc10_doelgroepregister` | Banenafspraak indicatie | Werkgevers (eHerkenning) |
 
-**CGM-entiteiten**: `Polisadministratie`, `Doelgroepregister`, `Uitkering`.
+**CGM-entiteiten**: `Polisadministratie`, `Doelgroepregister`, `Claim payout`.
 
-## Architectuur-pad (in deze repo)
+## Architecture-pad (in deze repo)
 
 ```
 gold.uc05_customer_360 (intern) + silver.polisadm + silver.doelgroepregister
                        │
                        ▼
             mart_uc10_polisadm_dagloon.sql
-            mart_uc10_uitkering_status.sql
+            mart_uc10_claim payout_status.sql
             mart_uc10_doelgroepregister.sql
                        │
                        ▼
@@ -64,9 +64,9 @@ gold.uc05_customer_360 (intern) + silver.polisadm + silver.doelgroepregister
 - Per afnemer een **client-id** in JWT.
 - Per afnemer een **toegestane doelcode-set** (`["WMO", "Inning"]` voor
   gemeente; `["Naturalisatie"]` voor IND).
-- Per afnemer een **mart-toegangs-set** (welke `uc10_*`-tabellen).
+- Per afnemer een **mart-accesss-set** (welke `uc10_*`-tabellen).
 - Header `X-Purpose` moet matchen met afnemer's toegestane set, **én**
-  met de doelbinding-tag van de mart, **anders deny + audit-log**.
+  with the purpose-limitation-tag van de mart, **anders deny + audit-log**.
 - Logging van afnemer + doelcode + bevraagde BSN (geen response in log).
 
 ## dbt-model `meta`
@@ -75,9 +75,9 @@ gold.uc05_customer_360 (intern) + silver.polisadm + silver.doelgroepregister
 meta:
   domain: polisadm
   legal_basis: Wet_SUWI+Wfsv
-  doelbinding: [externe_levering]
+  purpose-limitation: [externe_levering]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: data_office
   pii_kolommen: [bsn, lh_nummer]
   risk_tier: hoog_keten
@@ -87,15 +87,15 @@ meta:
 
 ## OpenMetadata
 
-- Tags: `Domain.Polisadm`, `LegalBasis.Wet_SUWI`, `Doelbinding.externe_levering`,
+- Tags: `Domain.Polisadm`, `LegalBasis.Wet_SUWI`, `Purpose limitation.externe_levering`,
   `Audit.LogPerCall.true`.
 - Custom property `afnemer_contracten`: link naar verwerkersovereenkomsten
   (placeholder).
 - Per UC-10-mart een aparte glossary-entry "Gegevensdienst <name>".
 
-## Outputs (referentie-implementatie)
+## Outputs (reference implementation)
 
-- `dbt/models/marts/uc10_gegevensdiensten/{mart_uc10_polisadm_dagloon.sql, mart_uc10_uitkering_status.sql, mart_uc10_doelgroepregister.sql, schema.yml}`.
+- `dbt/models/marts/uc10_gegevensdiensten/{mart_uc10_polisadm_dagloon.sql, mart_uc10_claim payout_status.sql, mart_uc10_doelgroepregister.sql, schema.yml}`.
 - `opa-policies-src/trino/trino-uc10-afnemers.rego` (skeleton in fase 9).
 - `opa-policies-src/data/consumer_purpose_codes.json` (mock-mappings).
 
@@ -109,7 +109,7 @@ meta:
 ## Compliance koppeling
 
 - R-NORA-02 (open API's): adresseert deze UC primair.
-- R-AVG-06 (doelbinding): kritiek — geïmplementeerd via OPA.
+- R-AVG-06 (purpose-limitation): kritiek — geïmplementeerd via OPA.
 - R-BIO-20 (logging): elke API-call gelogd, 7 jaar retentie.
 - Lessons learned Suwinet-AP-onderzoek 2014: doelcode-per-call is **non-
   negotiable**.

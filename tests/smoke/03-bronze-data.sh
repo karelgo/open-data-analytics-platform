@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Smoke test 03 — synthetische data is door de Kafka→Spark→Delta pijp gekomen
+# Smoke test 03 — synthetische data is through the Kafka→Spark→Delta pijp gekomen
 # en queryable in Trino.
 #
 # Voorwaarden:

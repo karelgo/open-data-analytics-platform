@@ -13,13 +13,13 @@ from ._common import envelope, make_rng
 
 
 @dataclass
-class UitkeringslastAggregaat:
+class Claim payoutslastAggregaat:
     jaar: int
     maand: int
     wet: str  # 'WW' | 'WIA' | 'Wajong' | 'ZW' | 'TW' | 'WAO'
     regio_code: str
     uitbetaald_bruto_eur: int
-    aantal_uitkeringen: int
+    aantal_claim payouten: int
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -29,7 +29,7 @@ _WETTEN = ["WW", "WIA", "Wajong", "ZW", "TW", "WAO"]
 _REGIOS = ["AMS", "RTM", "DHN", "UTR", "EHV", "GRO", "ZWO", "ARN", "BRD"]
 
 
-def generate_fez_aggregaten(seed: int | None = None) -> Iterator[UitkeringslastAggregaat]:
+def generate_fez_aggregaten(seed: int | None = None) -> Iterator[Claim payoutslastAggregaat]:
     """Maandelijkse aggregaten 2023-2025 per wet x regio."""
     rng = make_rng(seed)
     for jaar in (2023, 2024, 2025):
@@ -44,15 +44,15 @@ def generate_fez_aggregaten(seed: int | None = None) -> Iterator[UitkeringslastA
                         "TW": 1_500_000,
                         "WAO": 22_000_000,
                     }[wet]
-                    yield UitkeringslastAggregaat(
+                    yield Claim payoutslastAggregaat(
                         jaar=jaar,
                         maand=maand,
                         wet=wet,
                         regio_code=regio,
                         uitbetaald_bruto_eur=int(base * rng.uniform(0.7, 1.3) / len(_REGIOS)),
-                        aantal_uitkeringen=rng.randint(500, 5000),
+                        aantal_claim payouten=rng.randint(500, 5000),
                     )
 
 
-def to_kafka_envelope(a: UitkeringslastAggregaat) -> dict[str, Any]:
+def to_kafka_envelope(a: Claim payoutslastAggregaat) -> dict[str, Any]:
     return envelope(a.to_dict(), event_type="fez.claim_cost.maand")

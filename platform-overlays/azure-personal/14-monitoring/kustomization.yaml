@@ -12,7 +12,7 @@
 #
 # Activatie (na bootstrap+deploy in k3d):
 #   1. Run `bash scripts/azure/setup-acs-email-test.sh`  (creëert Entra
-#      app + secret + role en patcht het k8s-Secret met de ACS-credentials).
+#      app + secret + role en patcht het k8s-Secret with the ACS-credentials).
 #   2. kubectl apply -k platform-overlays/azure-personal/14-monitoring/
 #   3. make alert-test
 #

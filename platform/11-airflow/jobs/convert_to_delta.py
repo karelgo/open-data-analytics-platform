@@ -137,7 +137,7 @@ def parse_table(data: bytes, fmt: str) -> pa.Table:
     if fmt == "parquet":
         return pa_parquet.read_table(buf)
     fail(f"onbekend formaat {fmt!r}")
-    raise SystemExit(1)  # unreachable; voor de type-checker
+    raise SystemExit(1)  # unreachable; for the type-checker
 
 
 # ---------------------------------------------------------------------------

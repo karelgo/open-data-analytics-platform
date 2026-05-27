@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Smoke test 11 — UC-11 Integrale Klantreis (rego-only).
+# Smoke test 11 — UC-11 Integrale Customer journey (rego-only).
 #
 # Valideert dat de UC-11 OPA-rules correct gemodelleerd zijn via `opa test`.
 # Geen cluster nodig — de cluster-aware OPA-decision-calls staan in tests/e2e/uc11-flow.sh.

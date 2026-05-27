@@ -1,5 +1,5 @@
 # Ingress voor Airflow webserver onder platform.odap.local/airflow.
-# Same-origin met de portal embed-shell (/embed/airflow).
+# Same-origin with the portal embed-shell (/embed/airflow).
 #
 # X-Forwarded-Prefix wordt door FAB gelezen (PROXY_FIX_X_PREFIX=1 in
 # airflowcluster.yaml) om redirect_uri's correct op te bouwen.

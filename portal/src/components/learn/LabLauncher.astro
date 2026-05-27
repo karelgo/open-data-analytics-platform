@@ -66,7 +66,7 @@ const isExternal = href.startsWith('http');
 <script>
   // vscode.dev URL bouwen. We respecteren window.REPO override (kan in
   // dev gezet worden zodat de knop naar je eigen fork wijst), anders fallback
-  // naar de default uit het data-attribute.
+  // to the default from the data-attribute.
   function buildVscodeUrl(path: string, defaultRepo: string): string {
     const repo = (window as any).REPO ?? defaultRepo;
     const branch = (window as any).BRANCH ?? 'main';

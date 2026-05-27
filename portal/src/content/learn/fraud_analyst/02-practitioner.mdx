@@ -4,7 +4,7 @@ role: fraud_analyst
 level: practitioner
 order: 2
 duration: "45 min"
-summary: "Eén dossier met hoge risk-score: drill-down op de top-features, een ad-hoc query voor het IBAN-detail, en de juiste vastlegging in tracker — incl. menselijk-oordeel-stap."
+summary: "Eén dossier met hoge risk-score: drill-down on the top-features, een ad-hoc query for the IBAN-detail, en de juiste vastlegging in tracker — incl. menselijk-oordeel-stap."
 prereqs:
   - "fraud_analyst/foundation/1"
 labs:
@@ -36,14 +36,14 @@ quiz:
   - q: "Hoe registreer je dat een hoge score na onderzoek tóch geen handhaving rechtvaardigt?"
     options:
       - "Niets — gewoon doorgaan"
-      - "TICKET-id sluiten met motivering ‘false positive: ondersteuning vermoedelijk ongeldig wegens X’ + verwijzing naar bron-data; dit is de feedback-lus voor het model"
+      - "TICKET-id sluiten met motivering ‘false positive: ondersteuning vermoedelijk ongeldig wegens X’ + verwijzing naar bron-data; dit is de feedback-lus for the model"
       - "Alleen mondeling melden"
-      - "Mailen naar de directeur"
+      - "Mailen to the directeur"
     correct: 1
 ---
 
 In deze module verwerk je één signaal van het WW-risk-model. Doel: het
-volledige proces — van score op het dashboard tot een menselijke beslissing
+volledige proces — van score on the dashboard tot een menselijke beslissing
 met onderbouwing — onder je vingers krijgen.
 
 ## Casus
@@ -59,7 +59,7 @@ Top-3 signalen:
 2. IBAN-mutatie 3 dagen voor aanvraag (+9);
 3. inkomen-discrepantie BRP↔polisadm (+6).
 
-## Stap 1 — drill-down op het dashboard
+## Stap 1 — drill-down on the dashboard
 
 Open de [risk-card](/go/superset/) voor WW-2025-1142. Het dashboard toont
 naast de score de drie sterkste features. Belangrijk: **dit is geen bewijs**.
@@ -110,7 +110,7 @@ Maak een ticket aan in de tracker met:
 - vervolgactie + uiterste datum.
 
 Dit is geen administratieve last: het is de feedback-lus waarmee het model
-verbetert (false-positives komen terug naar de data-engineer).
+verbetert (false-positives komen terug to the data-engineer).
 
 ## Verificatie
 

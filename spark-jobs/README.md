@@ -1,6 +1,6 @@
 # spark-jobs
 
-PySpark-jobs voor het ODAP platform.
+PySpark-jobs for the ODAP platform.
 
 | Bestand | Doel |
 |---|---|

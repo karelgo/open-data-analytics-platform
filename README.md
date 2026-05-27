@@ -1,43 +1,43 @@
 # Open Data & Analytics Platform
 
-Een **fictieve, illustratieve** referentie-implementatie van een modern data-
-en analyticsplatform voor UWV, gebouwd op open source en gericht op compliance
-met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
+A **fictive, illustrative** reference implementation of a modern data and
+analytics platform built on open source and designed for compliance with
+GDPR, ISO 27001 / 27002, NIS2, the EU AI Act, and SOC 2-aligned controls.
 
-> **Disclaimer.** Geen echte ODAP data, geen echte BSN's, geen echte productiecode.
-> Alle datasets zijn synthetisch en gemarkeerd met
+> **Disclaimer.** No real data, no real personal identifiers, no production code.
+> All datasets are synthetic and marked with
 > `# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`.
-> Deze repo is geen ODAP product en geen aanbestedingsstuk.
+> This repository is not a product and not a procurement document.
 
 ---
 
-## Wat dit platform doet
+## What the platform does
 
-Een Kubernetes-native lakehouse + analytics-stack:
+A Kubernetes-native lakehouse + analytics stack:
 
 - **Storage**: MinIO (S3-compatible).
-- **Tabelformaat**: Delta Lake (default voor deze implementatie — zie [ADR-0006](docs/adr/0006-delta-chosen-for-this-implementation.md)). Iceberg-pad blijft afgedekt via abstractie.
+- **Table format**: Delta Lake (default for this implementation — see [ADR-0006](docs/adr/0006-delta-chosen-for-this-implementation.md)). The Iceberg path stays covered through an abstraction.
 - **Catalog backend**: Apache Hive Metastore (Postgres-backed).
-- **Ingestion**: file-source → Spark Structured Streaming → Delta op MinIO. NiFi/Kafka-flows zijn als template aanwezig ([`nifi-flows/templates/`](nifi-flows/templates/)) maar de bijbehorende Stackable-operators staan in deze release **uit** — UC-11 leest direct uit de S3 raw-zone.
-- **Query engine**: Trino, met OPA-authorisatie (Rego: doelbinding, row filters, column masking).
-- **Transformatie**: dbt-trino, format-agnostisch via macro `table_format()`.
-- **Orchestratie**: Apache Airflow 3 + astronomer-cosmos voor dbt-DAGs.
+- **Ingestion**: file-source → Spark Structured Streaming → Delta on MinIO. NiFi/Kafka flows live as templates ([`nifi-flows/templates/`](nifi-flows/templates/)) but the corresponding Stackable operators are **off** in this release — UC-11 reads directly from the S3 raw zone.
+- **Query engine**: Trino, with OPA authorization (Rego: purpose limitation, row filters, column masking).
+- **Transformation**: dbt-trino, table-format-agnostic through the `table_format()` macro.
+- **Orchestration**: Apache Airflow 3 + astronomer-cosmos for dbt DAGs.
 - **BI**: Apache Superset.
-- **Notebooks**: JupyterHub + KubeSpawner (ODAP Lab) — Python/SQL op alle data-lagen, Git-integratie. Zie [`platform/16-jupyter/`](platform/16-jupyter/).
-- **Catalog/governance/lineage/DQ**: OpenMetadata, met een self-service [om-access-bridge](platform/18-om-access-bridge/) (OM task-approval → Keycloak realm-role → OPA grant).
-- **AuthN**: Keycloak (OIDC).
-- **Portal**: Astro/React workspace-shell die alle service-UIs embed onder één URL ([`portal/`](portal/), [`platform/15-portal/`](platform/15-portal/)).
-- **Agent-tooling**: Multica server + Nanitics observatory (zie [`platform/17-multica/`](platform/17-multica/), [`platform/19-nanitics-observatory/`](platform/19-nanitics-observatory/), [`platform/20-multica-daemon/`](platform/20-multica-daemon/)). Exploratory, niet aangesloten op de governance-flow.
-- **Logs/metrics/tracing**: Vector + Prometheus; OpenSearch single-node gedeeld voor logs en OM-search. OpenTelemetry-tracing is bekabeld voor support op Trino/Airflow maar nog niet aangesloten op een backend.
+- **Notebooks**: JupyterHub + KubeSpawner (ODAP Lab) — Python/SQL across all data layers, with Git integration. See [`platform/16-jupyter/`](platform/16-jupyter/).
+- **Catalog / governance / lineage / data quality**: OpenMetadata, with a self-service [om-access-bridge](platform/18-om-access-bridge/) (OM task approval → Keycloak realm role → OPA grant).
+- **Authentication**: Keycloak (OIDC).
+- **Portal**: Astro/React workspace shell that embeds all service UIs under one URL ([`portal/`](portal/), [`platform/15-portal/`](platform/15-portal/)).
+- **Agent tooling**: Multica server + Nanitics observatory (see [`platform/17-multica/`](platform/17-multica/), [`platform/19-nanitics-observatory/`](platform/19-nanitics-observatory/), [`platform/20-multica-daemon/`](platform/20-multica-daemon/)). Exploratory, not yet hooked into the governance flow.
+- **Logs / metrics / tracing**: Vector + Prometheus; OpenSearch single-node shared between logs and OM search. OpenTelemetry tracing is wired up for Trino/Airflow but not yet connected to a backend.
 
-Stackable Data Platform-operators in deze release (zie [`infrastructure/stackablectl/release.yaml`](infrastructure/stackablectl/release.yaml)): **airflow, commons, hive, listener, opa, secret, spark-k8s, superset, trino**. NiFi/Kafka/ZooKeeper zijn in [`release.yaml`](infrastructure/stackablectl/release.yaml) **uitgecommentarieerd** — UC-11 vraagt ze niet en ze besparen ~2 vCPU + 4 GiB op k3d.
+Stackable Data Platform operators in this release (see [`infrastructure/stackablectl/release.yaml`](infrastructure/stackablectl/release.yaml)): **airflow, commons, hive, listener, opa, secret, spark-k8s, superset, trino**. NiFi/Kafka/ZooKeeper are **commented out** in [`release.yaml`](infrastructure/stackablectl/release.yaml) — UC-11 doesn't need them and skipping them saves ~2 vCPU + 4 GiB on k3d.
 
 ---
 
-## Snelstart
+## Quick start
 
-Het platform draait in drie deployment-modes; alle Make-targets accepteren
-`MODE={k3d|aks|stackit}` (default `k3d`). De mode bepaalt:
+The platform runs in three deployment modes; all Make targets accept
+`MODE={k3d|aks|stackit}` (default `k3d`). The mode controls:
 
 | Aspect | k3d (default) | aks | stackit |
 |---|---|---|---|
@@ -50,16 +50,16 @@ Het platform draait in drie deployment-modes; alle Make-targets accepteren
 
 ### Mode 1 — k3d (developer laptop)
 
-Voorvereisten:
+Prerequisites:
 
-- Docker Desktop met ≥ 8 GB RAM en ≥ 4 CPU's beschikbaar voor containers.
+- Docker Desktop with ≥ 8 GB RAM and ≥ 4 CPUs available to containers.
 - `k3d` ≥ 5.6, `kubectl` ≥ 1.29, `helm` ≥ 3.14, `stackablectl` ≥ 25.x, `make`.
 
 ```bash
-# 1. Doctor — controleert tooling + /etc/hosts + kubectl context
+# 1. Doctor — checks tooling + /etc/hosts + kubectl context
 make doctor MODE=k3d
 
-# 2. /etc/hosts injectie (vereist sudo, eenmalig)
+# 2. /etc/hosts injection (requires sudo, one-off)
 echo "127.0.0.1 keycloak.odap.local \
   superset.odap.local airflow.odap.local \
   minio.odap.local openmetadata.odap.local \
@@ -68,7 +68,7 @@ echo "127.0.0.1 keycloak.odap.local \
 # 3. End-to-end deploy (~15-30 min)
 make deploy MODE=k3d   # cluster + bootstrap + platform + portal + smoke
 
-# Of stap voor stap:
+# Or step by step:
 make cluster MODE=k3d
 make bootstrap MODE=k3d
 make deploy-platform MODE=k3d
@@ -79,41 +79,41 @@ make test
 make clean
 ```
 
-### Mode 2 — aks (Azure productie)
+### Mode 2 — aks (Azure production)
 
 ```bash
-# Vereist: az login, terraform, SP-secret in scripts/azure/env.sh
+# Requires: az login, terraform, SP-secret in scripts/azure/env.sh
 make doctor MODE=aks
-make aks-up           # terraform: AKS + VNet + LB + DNS-zone
+make aks-up           # terraform: AKS + VNet + LB + DNS zone
 make aks-context      # kubeconfig
 make aks-all          # bootstrap + deploy + smoke
 
-# Of in CI: gebruik de aks-deploy.yml workflow (handmatige dispatch).
+# Or in CI: use the aks-deploy.yml workflow (manual dispatch).
 ```
 
-### Mode 3 — stackit (StackIT SKE productie)
+### Mode 3 — stackit (StackIT SKE production)
 
 ```bash
-# Vereist: stackit CLI + STACKIT_SERVICE_ACCOUNT_TOKEN, terraform.
-# Floating IP 188.34.84.39 + DNS-zone example.com worden door
-# Terraform beheerd (zie infrastructure/stackit/terraform/).
+# Requires: stackit CLI + STACKIT_SERVICE_ACCOUNT_TOKEN, terraform.
+# A reserved Floating IP + DNS zone for example.com are managed by Terraform
+# (see infrastructure/stackit/terraform/).
 make doctor MODE=stackit
 make stackit-up                              # terraform: SKE + reserved Floating IP
 eval "$(make stackit-context)"               # export KUBECONFIG=...
 make stackit-all                             # bootstrap + deploy + portal + smoke (~40 min)
 
-# Pauzeren (workers naar 0 — control plane sleeps, PVCs + IP behouden):
+# Pause (workers scale to 0 — control plane sleeps, PVCs + IP retained):
 make stackit-hibernate
-make stackit-wake                            # ~3-5 min terug
+make stackit-wake                            # ~3-5 min to come back
 make stackit-status                          # HEALTHY / HIBERNATED / RECONCILING
 
-# Of in CI: zie stackit-cd.yml + stackit-smoke.yml workflows.
+# Or in CI: see the stackit-cd.yml + stackit-smoke.yml workflows.
 ```
 
-### Mode mismatch-bescherming
+### Mode mismatch protection
 
-`scripts/bootstrap.sh` en `scripts/deploy-platform.sh` weigeren te draaien als
-de kubectl-context niet matcht met `--mode`. Een typische foutmelding:
+`scripts/bootstrap.sh` and `scripts/deploy-platform.sh` refuse to run when
+the kubectl context doesn't match `--mode`. A typical error:
 
 ```
 FAIL mode=aks but kubectl context 'k3d-odap-platform' is not an AKS cluster.
@@ -123,44 +123,44 @@ Run 'make aks-context'.
 
 ---
 
-## Repository-layout
+## Repository layout
 
-| Directory | Inhoud |
+| Directory | Contents |
 |---|---|
-| `platform-config.yaml` | Centrale configuratie. Wijzig `table_format` hier, niet elders. |
-| `docs/` | Architectuur, ADRs, use-case specs, compliance-mapping, runbook. |
-| `infrastructure/` | k3d-config, externe Helm-values (cert-manager, Keycloak, MinIO, Postgres, OpenMetadata), Stackable release-pinning. |
-| `platform/` | Kubernetes-manifests per laag (00-namespaces … 13-openmetadata-config). |
-| `dbt/` | dbt-project, models (staging/intermediate/marts/uc01..uc10), macros, tests. |
-| `data-generation/` | Synthetische data-generators (Python). |
-| `nifi-flows/` | NiFi-flow templates (iceberg/delta varianten). |
-| `spark-jobs/` | PySpark-jobs (streaming + batch + ML demo). |
-| `opa-policies-src/` | Rego-policies + tests. |
-| `scripts/` | Bash-helpers voor `make`-targets. |
+| `platform-config.yaml` | Central configuration. Change `table_format` here, not elsewhere. |
+| `docs/` | Architecture, ADRs, use-case specs, compliance mapping, runbook. |
+| `infrastructure/` | k3d config, external Helm values (cert-manager, Keycloak, MinIO, Postgres, OpenMetadata), Stackable release pinning. |
+| `platform/` | Kubernetes manifests per layer (00-namespaces … 13-openmetadata-config). |
+| `dbt/` | dbt project, models (staging/intermediate/marts/uc01..uc12), macros, tests. |
+| `data-generation/` | Synthetic data generators (Python). |
+| `nifi-flows/` | NiFi flow templates (Iceberg / Delta variants). |
+| `spark-jobs/` | PySpark jobs (streaming + batch + ML demo). |
+| `opa-policies-src/` | Rego policies + tests. |
+| `scripts/` | Bash helpers for `make` targets. |
 | `tests/` | Smoke / integration / e2e tests. |
-| `ci/` | GitHub Actions workflows (in opzet). |
+| `ci/` | GitHub Actions workflows. |
 
 ---
 
-## Documentatie
+## Documentation
 
-- [Architectuur](docs/architectuur/index.md)
-- [Achtergrondsamenvatting](docs/context-summary.md)
-- [Compliance-mapping](docs/compliance-mapping.md)
+- [Architecture](docs/architecture/index.md)
+- [Context summary](docs/context-summary.md)
+- [Compliance mapping](docs/compliance-mapping.md)
 - [Runbook](docs/runbook.md)
 - ADRs: [0001](docs/adr/0001-stackable-as-base.md) · [0002](docs/adr/0002-iceberg-vs-delta.md) · [0003](docs/adr/0003-opa-as-trino-authz.md) · [0004](docs/adr/0004-openmetadata-as-catalog.md) · [0005](docs/adr/0005-dbt-trino-as-transform.md) · [0006](docs/adr/0006-delta-chosen-for-this-implementation.md) · [0007](docs/adr/0007-airflow-pipeline-architecture.md) · [0008](docs/adr/0008-self-service-data-access.md) · [0009](docs/adr/0009-networkpolicies-strategy.md) · [0010](docs/adr/0010-platform-config-single-source.md)
-- Use cases: [UC-01](docs/use-cases/uc01-claims-funnel.md) · [UC-02](docs/use-cases/uc02-complex-cases-ai.md) · [UC-03](docs/use-cases/uc03-fraud-risk.md) · [UC-04](docs/use-cases/uc04-proactieve-tw.md) · [UC-05](docs/use-cases/uc05-customer-360.md) · [UC-06](docs/use-cases/uc06-schadelast.md) · [UC-07](docs/use-cases/uc07-dq-policies.md) · [UC-08](docs/use-cases/uc08-capacity-planning-planning.md) · [UC-09](docs/use-cases/uc09-reintegration-effect.md) · [UC-10](docs/use-cases/uc10-gegevensdiensten.md) · [UC-11](docs/use-cases/uc11-customer-journey.md) · [UC-12](docs/use-cases/uc12-focus-finops.md)
+- Use cases: [UC-01](docs/use-cases/uc01-claims-funnel.md) · [UC-02](docs/use-cases/uc02-complex-cases-ai.md) · [UC-03](docs/use-cases/uc03-fraud-risk.md) · [UC-04](docs/use-cases/uc04-eligibility-outreach.md) · [UC-05](docs/use-cases/uc05-customer-360.md) · [UC-06](docs/use-cases/uc06-cost-forecast.md) · [UC-07](docs/use-cases/uc07-dq-policies.md) · [UC-08](docs/use-cases/uc08-capacity-planning.md) · [UC-09](docs/use-cases/uc09-reintegration-effect.md) · [UC-10](docs/use-cases/uc10-data-services.md) · [UC-11](docs/use-cases/uc11-customer-journey.md) · [UC-12](docs/use-cases/uc12-focus-finops.md)
 
 ---
 
 ## Status
 
-Werk-in-uitvoering. Zie [WORKLOG.md](WORKLOG.md) voor laatste fase en openstaande
-items. De [Definition of Done](docs/architecture.md#definition-of-done) staat
+Work in progress. See [WORKLOG.md](WORKLOG.md) for the latest phase and open
+items. The [Definition of Done](docs/architecture.md#definition-of-done) lives
 in `docs/architecture.md`.
 
 ---
 
-## Licentie
+## License
 
-Apache License 2.0 — zie [LICENSE](LICENSE).
+Apache License 2.0 — see [LICENSE](LICENSE).

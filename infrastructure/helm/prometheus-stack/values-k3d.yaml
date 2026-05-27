@@ -2,7 +2,7 @@
 
 # Alertmanager AAN in k3d zodat devs alerts kunnen testen tegen MailHog
 # (zie platform/14-monitoring/mailhog.yaml). De receivers + routing komen
-# uit de AlertmanagerConfig CR in platform/14-monitoring/.
+# from the AlertmanagerConfig CR in platform/14-monitoring/.
 alertmanager:
   enabled: true
   alertmanagerSpec:

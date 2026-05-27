@@ -1,8 +1,8 @@
-# Handleiding — Operations Manager
+# Handbook — Operations Manager
 
-> Rol-key: `operations_manager` · Domein: Sociaal-medische zaken · Risiconiveau toegang: laag (geen cliënt-PII)
+> Rol-key: `operations_manager` · Domein: Operationale zaken · Risiconiveau access: laag (geen cliënt-PII)
 
-Deze handleiding is voor **planners die SMZ-capaciteit beheren**:
+Deze handbook is voor **planners die SMZ-capaciteit beheren**:
 verzekeringsartsen, arbeidsdeskundigen, roosters en wachttijden. Je werkt
 op **planningsdata zonder cliënt-PII** — je ziet wel beoordelaar-roosters
 en case-counts, maar geen individuele dossiers.
@@ -23,7 +23,7 @@ waar je op werkt. Je gebruikt het platform om:
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
@@ -36,7 +36,7 @@ waar je op werkt. Je gebruikt het platform om:
 
 ### 3.1 Catalogs en schemas
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
 | `gold` | `uc08_capacity_planning` | Capaciteits-aggregaten | **Ja** |
 | `silver` | `smz` | SMZ-rooster en case-counts | **Ja** |
@@ -57,7 +57,7 @@ In `gold.uc08_capacity_planning.*` en `silver.smz.*`:
 | `bsn`, naam, diagnose, etc. | NULL (kolom-mask) — geen cliënt-PII |
 | `doorlooptijd_dagen` (geaggregeerd) | Volledig |
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
 Purpose: **"planning"**. Je rol kan dus geen behandelingsdoelen aanspreken.
 
@@ -137,7 +137,7 @@ teamleider — geen BSN's, alleen aggregaten.
 
 | Probleem | Contact |
 |---|---|
-| Inloggen | Platform-admin |
+| Sign in | Platform-admin |
 | Definities | Data-steward |
 | Onverwachte wachttijdpiek | Teamleider (operationeel), data-steward (data) |
 

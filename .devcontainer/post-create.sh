@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Post-create stap voor de UDP devcontainer / GitHub Codespace.
+# Post-create stap for the UDP devcontainer / GitHub Codespace.
 # Doel: alle CLI's die in de Academy-modules genoemd worden meteen werken.
 
 set -euo pipefail

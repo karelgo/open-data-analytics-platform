@@ -4,7 +4,7 @@ description: Eén platform-config bepaalt Delta of Iceberg overal.
 ---
 
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
 # Tabel-formaat abstractie
 
@@ -34,13 +34,13 @@ platform:
 
 Zie [ADR-0002 · Iceberg vs Delta](../adr/0002-iceberg-vs-delta.md) voor de
 afweging en [ADR-0006 · Delta gekozen voor deze implementatie](../adr/0006-delta-chosen-for-this-implementation.md)
-voor waarom deze referentie-implementatie Delta default.
+voor waarom deze reference implementation Delta default.
 
 ## Ingestion-pad bij Delta (afwijking van Iceberg-demo)
 
 Stackable's referentie-demo `data-lakehouse-iceberg-trino-spark` gebruikt
 NiFi's native `PutIceberg`-processor. Voor **Delta is er geen native NiFi-
-processor**. Daarom wordt voor de Delta-route alle bron-data via NiFi naar
+processor**. Daarom wordt for the Delta-route alle bron-data via NiFi naar
 **Kafka** geschreven; Spark Structured Streaming consumeert Kafka en schrijft
 naar Delta op MinIO.
 
@@ -54,4 +54,4 @@ flowchart LR
 ```
 
 Iceberg-pad (toekomstig of switch-back): NiFi's `PutIceberg` schrijft direct
-naar bronze; Spark blijft beschikbaar voor silver/gold-transformaties.
+naar bronze; Spark blijft beschikbaar voor silver/gold-transformations.

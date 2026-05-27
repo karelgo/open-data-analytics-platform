@@ -1,7 +1,7 @@
 # ADR-0002: Iceberg of Delta Lake als tabelformaat
 
 > **Noot:** Dit ADR is de generieke afweging tussen Apache Iceberg en
-> Delta Lake. Voor déze referentie-implementatie is in
+> Delta Lake. Voor déze reference implementation is in
 > [ADR-0006](0006-delta-chosen-for-this-implementation.md) gekozen voor
 > Delta Lake — een afwijking van de hieronder voorgestelde default Iceberg.
 
@@ -17,7 +17,7 @@
 
 ## Context
 
-Het ODAP platform gebruikt een **lakehouse**-architectuur. Daarbij is een **open table format** essentieel: het verzorgt ACID-transacties, schema-evolutie, time travel, partition pruning en upserts bovenop Parquet-bestanden in object storage.
+Het ODAP platform gebruikt een **lakehouse**-architecture. Daarbij is een **open table format** essentieel: het verzorgt ACID-transacties, schema-evolutie, time travel, partition pruning en upserts bovenop Parquet-bestanden in object storage.
 
 Twee serieuze open-source kandidaten:
 
@@ -30,7 +30,7 @@ Deze keuze is structureel: migreren is mogelijk maar duur. Daarom een expliciete
 
 ---
 
-## Beoordelingscriteria
+## Assessmentscriteria
 
 | # | Criterium | Gewicht |
 |---|---|---|
@@ -57,13 +57,13 @@ Deze keuze is structureel: migreren is mogelijk maar duur. Daarom een expliciete
 
 ### C2 — Spark-integratie
 
-**Delta (winnaar).** Eerstelijns op Databricks Spark; alle features (liquid clustering, deletion vectors, change data feed, generated columns) komen daar als eerste. Open-source Spark heeft alle features ook, maar soms met een release-vertraging.
+**Delta (winnaar).** Eerstelijns op Databricks Spark; alle features (liquid clustering, deletion vectors, change data feed, generated columns) komen daar als eerste. Open-source Spark heeft alle features ook, maar soms with a release-vertraging.
 
 **Iceberg.** Werkt goed met Apache Spark via `iceberg-spark-runtime`. Branching/tagging alleen via Spark, niet (nog) in Trino.
 
 ### C3 — Stackable-ondersteuning
 
-**Iceberg (duidelijke winnaar).** De Stackable-referentie-demo `data-lakehouse-iceberg-trino-spark` is volledig op Iceberg gebouwd: NiFi heeft `PutIceberg`-processor, Spark Structured Streaming `MERGE INTO Iceberg`, Trino-catalog `iceberg`, complete maintenance-procedures. Documentatie en troubleshooting zijn op Iceberg geschreven.
+**Iceberg (duidelijke winnaar).** De Stackable-referentie-demo `data-lakehouse-iceberg-trino-spark` is volledig op Iceberg gebouwd: NiFi heeft `PutIceberg`-processor, Spark Structured Streaming `MERGE INTO Iceberg`, Trino-catalog `iceberg`, complete maintenance-procedures. Documentation en troubleshooting zijn op Iceberg geschreven.
 
 **Delta.** Stackable Trino heeft wel een Delta Lake-catalog (`trinocatalog-delta-lake.yaml`), maar geen end-to-end demo. NiFi heeft geen native Delta-processor; Delta-writes via Spark werken, maar zijn niet pre-geconfigureerd. Te bouwen, maar de eerste 4–8 weken zijn moeilijker.
 
@@ -100,8 +100,8 @@ Voor UWV (veel correctie-runs op claimbeoordelingen, audits, herbeoordelingen) z
 Voor de meeste platform workloads (analytische queries, dashboards, dbt-runs) is het verschil **klein in de praktijk**. Beide formaten profiteren van vergelijkbare optimalisaties (file pruning, statistics).
 
 - Cliënt-360 lookups: Iceberg met hidden partitioning op `bsn_hash_bucket` werkt goed; Delta vereist Liquid Clustering.
-- Tijdreeksen (audit-logs, schadelast): beide hebben sterke partition pruning op datum.
-- Veel-update-workloads (uitkeringen-status, dossierstatus): Delta merge is iets sneller in Spark; Iceberg `MERGE INTO` heeft ingehaald.
+- Tijdreeksen (audit-logs, cost forecast): beide hebben sterke partition pruning op datum.
+- Veel-update-workloads (claim payouten-status, dossierstatus): Delta merge is iets sneller in Spark; Iceberg `MERGE INTO` heeft ingehaald.
 
 Geen duidelijke winnaar zonder benchmark op echte ODAP data.
 
@@ -150,11 +150,11 @@ Geen duidelijke winnaar zonder benchmark op echte ODAP data.
 Belangrijkste redenen:
 1. Stackable's referentie-demo en operator-features zijn op Iceberg gebouwd → meetbaar minder bouw- en onderhoudsrisico.
 2. Trino is de centrale query-engine; Iceberg-integratie is daar het meest volwassen.
-3. Past bij NORA-principe vendor-neutraliteit; Iceberg is breed gegoverneerd via ASF.
+3. Past bij SOC 2-principe vendor-neutraliteit; Iceberg is breed gegoverneerd via ASF.
 4. Sovereign cloud / on-prem als realistische deployment-doelen; Iceberg werkt daar zonder Databricks-afhankelijkheid.
 
 > **Voor déze implementatie** is desondanks Delta Lake gekozen — zie
-> [ADR-0006](0006-delta-chosen-for-this-implementation.md) voor de redenen
+> [ADR-0006](0006-delta-chosen-for-this-implementation.md) for the redenen
 > en de mitigaties die de ADR-0002-risico's adresseren.
 
 ---
@@ -177,7 +177,7 @@ Plan een herziening **één jaar na go-live** of bij een van bovenstaande trigge
 Het platform moet **agnostisch genoeg gebouwd worden** dat een latere switch werkbaar is. Concreet:
 
 - Trino-catalogs zijn **per-formaat** geconfigureerd (`iceberg_*` of `delta_*`); de catalogs zijn als losse YAML-bestanden te swappen.
-- dbt models gebruiken een **`+materialized` config in `dbt_project.yml`** met een variabele:
+- dbt models gebruiken een **`+materialized` config in `dbt_project.yml`** with a variabele:
   ```yaml
   vars:
     table_format: iceberg   # iceberg | delta
@@ -196,7 +196,7 @@ Met deze abstractie kost een migratie weken, niet maanden.
 ## Niet gekozen alternatieven
 
 - **Apache Hudi.** Goed voor incremental processing, maar minder volwassen Trino-integratie, minder Stackable-support, kleiner ecosysteem.
-- **Apache Paimon.** Veelbelovend voor streaming + lakehouse, maar te jong voor productie-overheid.
+- **Apache Paimon.** Veelbelovend voor streaming + lakehouse, maar te jong voor production-overheid.
 - **Plain Parquet (geen tabelformaat).** Geen ACID, geen schema-evolutie, geen time travel. Niet acceptabel voor compliance-eisen (audit, correctie, retentie).
 
 ---

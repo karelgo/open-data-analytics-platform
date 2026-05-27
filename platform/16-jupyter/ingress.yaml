@@ -1,7 +1,7 @@
 # Ingress voor ODAP Lab under platform.odap.local/jupyter.
-# Same-origin met de portal embed-shell (/embed/jupyter).
+# Same-origin with the portal embed-shell (/embed/jupyter).
 #
-# WebSocket support is vereist voor de kernel-message channel tussen
+# WebSocket support is vereist for the kernel-message channel tussen
 # browser en notebook-pod; ingress-nginx handelt WS upgrades default.
 # Proxy buffers verhogen omdat notebook-output groot kan zijn.
 # Lange proxy-timeouts voor live kernel-output (3600s = 1u).

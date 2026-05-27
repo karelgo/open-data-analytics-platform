@@ -3,22 +3,22 @@ version: 2
 models:
   - name: mart_uc05_customer_360
     description: |
-      360°-cliëntbeeld voor klantcontact. Alle kolommen aanwezig; OPA-policies
+      360°-cliëntbeeld voor customer interaction. Alle kolommen aanwezig; OPA-policies
       (fase 9) maskeren BSN/medische velden per rol.
     config:
       tags: ["marts", "uc05", "customers"]
     meta:
       domain: crm
       legal_basis: WIA+WW+Wajong+TW
-      doelbinding: ["klantcontact", "behandeling"]
+      purpose-limitation: ["customer interaction", "behandeling"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_crm
       pii_kolommen: [bsn, voornaam, achternaam, birth_date, straat, huisnummer, postcode]
       risk_tier: laag-midden
       human_in_the_loop: true
-      toegang_via_OPA_policies: true
-      cgm_entiteiten: [Cliënt, Uitkering, Contact, Kanaal]
+      access_via_OPA_policies: true
+      cgm_entiteiten: [Cliënt, Claim payout, Contact, Kanaal]
     columns:
       - name: bsn
         description: "BSN — wordt door OPA gemaskeerd voor `marketing_analyst`."

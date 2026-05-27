@@ -1,11 +1,11 @@
 {{ config(materialized='view') }}
 
--- UC-11 — Integrale Klantreis: unified event-stream.
+-- UC-11 — Integrale Customer journey: unified event-stream.
 -- UNION ALL over zeven staging-equivalents; één rij per cliënt-gebeurtenis.
--- Geen nieuwe brongegevens; de klantreis is een derivaat.
+-- Geen nieuwe brongegevens; de customer journey is een derivaat.
 --
 -- Cross-engine portable:
---   - bron via `klantreis_entity(name)` — ref('stg_*') op Trino,
+--   - bron via `customer journey_entity(name)` — ref('stg_*') op Trino,
 --     source('silver', name) op Fabric (silver_* Lakehouse-tabellen).
 --   - types via `dbt.type_timestamp()` / `dbt.type_string()` zodat
 --     dezelfde SQL compileert op Trino (timestamp(6)/varchar) én
@@ -23,7 +23,7 @@ with persoon as (
         cast(null as {{ dbt.type_string() }})                       as regio_code,
         cast(null as double)                                        as numeric_value,
         bsn                                                         as source_ref_id
-    from {{ klantreis_entity('persona') }}
+    from {{ customer journey_entity('persona') }}
 ),
 
 ikv_start as (
@@ -39,7 +39,7 @@ ikv_start as (
         cast(null as {{ dbt.type_string() }})                       as regio_code,
         cast(loon_bruto_jaar as double)                             as numeric_value,
         ikv_id                                                      as source_ref_id
-    from {{ klantreis_entity('policy_holders') }}
+    from {{ customer journey_entity('policy_holders') }}
     where aanvang_dienstverband is not null
 ),
 
@@ -56,7 +56,7 @@ ikv_einde as (
         cast(null as {{ dbt.type_string() }})                       as regio_code,
         cast(null as double)                                        as numeric_value,
         ikv_id                                                      as source_ref_id
-    from {{ klantreis_entity('policy_holders') }}
+    from {{ customer journey_entity('policy_holders') }}
     where einde_dienstverband is not null
 ),
 
@@ -76,7 +76,7 @@ ww_evt as (
         cast(null as {{ dbt.type_string() }})                       as regio_code,
         cast(null as double)                                        as numeric_value,
         application_id                                                 as source_ref_id
-    from {{ klantreis_entity('service_request_application') }}
+    from {{ customer journey_entity('service_request_application') }}
 ),
 
 zw_evt as (
@@ -93,7 +93,7 @@ zw_evt as (
         cast(null as {{ dbt.type_string() }})                       as regio_code,
         cast(duur_dagen as double)                                  as numeric_value,
         incident_id                                                  as source_ref_id
-    from {{ klantreis_entity('incident_report') }}
+    from {{ customer journey_entity('incident_report') }}
 ),
 
 wia_evt as (
@@ -115,7 +115,7 @@ wia_evt as (
         regio_code                                                  as regio_code,
         cast(arbeidsongeschikt_pct as double)                       as numeric_value,
         application_id                                                 as source_ref_id
-    from {{ klantreis_entity('claim_application') }}
+    from {{ customer journey_entity('claim_application') }}
 ),
 
 wajong_evt as (
@@ -133,7 +133,7 @@ wajong_evt as (
         cast(null as {{ dbt.type_string() }})                       as regio_code,
         cast(null as double)                                        as numeric_value,
         case_id                                                  as source_ref_id
-    from {{ klantreis_entity('eligibility_case') }}
+    from {{ customer journey_entity('eligibility_case') }}
     where ingangsdatum is not null
 ),
 
@@ -145,13 +145,13 @@ crm_evt as (
         cast('customers' as {{ dbt.type_string() }})                      as domein,
         concat('crm.contact.',
                lower(coalesce(kanaal, 'onbekend')))                 as event_type,
-        concat('Klantcontact ', coalesce(kanaal, '?'),
+        concat('Customer interaction ', coalesce(kanaal, '?'),
                ' over ', coalesce(onderwerp, '?'))                  as event_label,
         cast(null as {{ dbt.type_string() }})                       as event_status,
         cast(null as {{ dbt.type_string() }})                       as regio_code,
         cast(duur_seconden as double)                               as numeric_value,
         contact_id                                                  as source_ref_id
-    from {{ klantreis_entity('customer_interaction') }}
+    from {{ customer journey_entity('customer_interaction') }}
 )
 
 select * from persoon

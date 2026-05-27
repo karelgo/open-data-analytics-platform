@@ -1,6 +1,6 @@
 # azure-personal/14-monitoring
 
-Test-overlay voor de alert-email-pijp tegen een eigen Azure-tenant —
+Test-overlay for the alert-email-pijp tegen een eigen Azure-tenant —
 in dit geval `freshminds.nl` / `dev-stackable-rg` / `acs`. Bedoeld
 om te bewijzen dat Alertmanager → Azure Communication Services Email →
 echte inbox werkt, zonder een Platform SMTP relay nodig te hebben.
@@ -10,14 +10,14 @@ echte inbox werkt, zonder een Platform SMTP relay nodig te hebben.
 | Overlay | Doel | SMTP-target |
 |---|---|---|
 | `platform/14-monitoring/` (base) | k3d-dev | MailHog in-cluster |
-| `platform-overlays/aks/14-monitoring/` | productie | `smtp-relay.uwv.nl:587` |
+| `platform-overlays/aks/14-monitoring/` | production | `smtp-relay.uwv.nl:587` |
 | `platform-overlays/azure-personal/14-monitoring/` | **persoonlijke test** | ACS Email + MailHog (parallel) |
 
 Deze overlay **vervangt MailHog niet** — alerts gaan parallel naar beide.
 Zo zie je in MailHog dat Alertmanager 'm aanmaakte én in je echte inbox
 dat de Azure-route werkt.
 
-## Eenmalig: Azure-resources + Entra-app
+## One-off: Azure-resources + Entra-app
 
 Resources `emailcs` (Email Communication Services + AzureManaged
 sender-domain) en `acs` (Communication Services) zijn al aangemaakt
@@ -57,7 +57,7 @@ aangemaakt — niet apart doen.
 In de app → **Certificates & secrets → + New client secret**.
 Description `alertmanager-smtp`, expiry 12 maanden, **Add**.
 
-Kopieer **direct** de waarde uit de kolom **Value** (NIET *Secret ID*) —
+Kopieer **direct** de waarde from the kolom **Value** (NIET *Secret ID*) —
 die verdwijnt na page-refresh.
 
 **B.3 — Contributor-rol op `acs`**
@@ -137,7 +137,7 @@ Test-runs blijven ruim binnen gratis.
 ## Opruimen
 
 ```bash
-# Verwijder de overlay-config uit het cluster (laat base intact)
+# Verwijder de overlay-config from the cluster (laat base intact)
 kubectl delete -k platform-overlays/azure-personal/14-monitoring/
 
 # Of nuke alle Azure-resources

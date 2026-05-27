@@ -11,14 +11,14 @@
 ## Context
 
 `platform-config.yaml` (repo-root) is sinds dag-1 bedoeld als centrale
-plek voor implementatie-keuzes die meerdere componenten beïnvloeden:
+plek voor implementatie-keuzes die meerdere components beïnvloeden:
 table_format, catalog_backend, object_store, bucket-namen, DNS-suffix
 per mode. De header van het bestand zegt:
 
 > Eén bron van waarheid voor implementatie-keuzes die door meerdere
-> componenten worden gelezen (Trino-catalogs, dbt-macros, Spark-env,
+> components worden gelezen (Trino-catalogs, dbt-macros, Spark-env,
 > NiFi-templates, Airflow-DAGs). Wijzig hier — niet hardcoden in
-> componenten.
+> components.
 
 In de praktijk werd dit ondergeconsumeerd. De audit van 2026-05-21
 vond drie duidelijke divergenties:
@@ -54,7 +54,7 @@ buckets.bronze ────────────────────►  
 
 | Laag | Hoe het de config leest |
 |---|---|
-| Python scripts (render-trino-catalogs, mode.sh) | Lezen direct uit `platform-config.yaml` op het filesystem (build-time) |
+| Python scripts (render-trino-catalogs, mode.sh) | Lezen direct uit `platform-config.yaml` on the filesystem (build-time) |
 | Spark (driver+executor) | `envFrom: configMapRef: platform-config` injecteert alle keys als env-vars |
 | Airflow (DAGs + tasks) | `kubernetesExecutors.envFrom: configMapRef: platform-config` (zie [`airflowcluster.yaml`](../../platform/11-airflow/airflowcluster.yaml)) |
 | dbt | Macros lezen via `env_var('TABLE_FORMAT', 'delta')`; Airflow injects |
@@ -80,7 +80,7 @@ buckets.bronze ────────────────────►  
   worden uitgerold.
 - Cloud-mode-domain swaps werken consistent (mode.sh leest dezelfde
   bron als ConfigMap).
-- Nieuwe componenten weten waar te kijken (`envFrom: platform-config`).
+- Nieuwe components weten waar te kijken (`envFrom: platform-config`).
 
 **Negatief / mitigaties:**
 - **Drift-risico**: YAML en ConfigMap kunnen out-of-sync raken.
@@ -88,7 +88,7 @@ buckets.bronze ────────────────────►  
   (TODO; specificeert te valideren key-pairs) faalt als ze divergeren.
 - **Twee-staps-edit**: bij wijziging update je beide. Mitigatie:
   pre-commit-hint of (toekomstig) een `make sync-platform-config`
-  target die de YAML naar de ConfigMap kopieert.
+  target die de YAML to the ConfigMap kopieert.
 
 ## Migratie & evidence
 
@@ -97,6 +97,6 @@ buckets.bronze ────────────────────►  
 2. `platform/08-spark/apps/streaming-bronze.yaml` — `envFrom: configMapRef`
    ipv hardcoded `TABLE_FORMAT`.
 3. Toekomst: `platform/11-airflow/airflowcluster.yaml` + andere
-   componenten geleidelijk migreren.
+   components geleidelijk migreren.
 4. CI-gate landt in `ci/scripts/check-platform-config-sync.py` zodra
    PR's beginnen te driften.

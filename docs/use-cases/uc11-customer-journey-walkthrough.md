@@ -1,7 +1,7 @@
 # UC-11 — Walkthrough & Platform-tour
 
 **Voor wie**: jezelf, demo-publiek, nieuwe collega's. Doel: stap-voor-stap door UC-11
-heen wandelen op het draaiende platform, met directe links naar elk onderdeel.
+heen wandelen on the draaiende platform, met directe links naar elk onderdeel.
 
 > Inhoudelijke UC-beschrijving: zie [uc11-customer-journey.md](uc11-customer-journey.md).
 > Dit document is de **rondleiding** — wat staat waar, welke URL toont wat.
@@ -14,7 +14,7 @@ heen wandelen op het draaiende platform, met directe links naar elk onderdeel.
 
 Het platform draait op `*.odap.local:8443` (k3d-cluster met
 self-signed certs). Zorg dat je `/etc/hosts` deze entries heeft (één regel
-volstaat — IP wijst naar de ingress-controller):
+volstaat — IP wijst to the ingress-controller):
 
 ```
 127.0.0.1   platform.odap.local:8443 keycloak.odap.local:8443 airflow.odap.local:8443 superset.odap.local:8443 openmetadata.odap.local:8443 minio.odap.local:8443 minio-console.odap.local:8443 grafana.odap.local:8443 prometheus.odap.local:8443 opensearch.odap.local:8443
@@ -51,8 +51,8 @@ Wachtwoorden in [`infrastructure/helm/keycloak/realm.json`](../../infrastructure
 |---|---|---|
 | **Portal** (deze docs + dbt-docs + architecture) | https://platform.odap.local:8443/ | startpunt; lineage-viewer |
 | **dbt docs** (lineage, kolom-metadata, tests) | https://platform.odap.local:8443/dbt-docs.html | toon graaf van `mart_uc11_*` ← intermediate ← 7 staging |
-| **OpenMetadata** (catalog, glossary, tags, lineage) | https://openmetadata.odap.local:8443 | CGM-glossary `Klantreis`, doelbinding-tags |
-| **Superset** (BI / dashboards) | https://superset.odap.local:8443 | klantreis-tijdlijn-dashboard |
+| **OpenMetadata** (catalog, glossary, tags, lineage) | https://openmetadata.odap.local:8443 | CGM-glossary `Customer journey`, purpose-limitation-tags |
+| **Superset** (BI / dashboards) | https://superset.odap.local:8443 | customer journey-tijdlijn-dashboard |
 | **Airflow** (orkestratie) | https://airflow.odap.local:8443 | DAG `gold_uc11_customer_journey` |
 | **Keycloak** (SSO + rollen) | https://keycloak.odap.local:8443 | rol-switch, realm-export |
 | **MinIO console** (lakehouse buckets) | https://minio-console.odap.local:8443 | bronze/silver/gold/sensitive Delta-bestanden |
@@ -65,16 +65,16 @@ Wachtwoorden in [`infrastructure/helm/keycloak/realm.json`](../../infrastructure
 
 ## 2. UC-11 in 10 stappen — de demo-volgorde
 
-Een logische volgorde voor een presentatie. Volg deze links in een nieuw
+Een logische volgorde for a presentatie. Volg deze links in een nieuw
 tabblad terwijl je vertelt.
 
 ### Stap 1 — Het verhaal van Saskia
 
 Open [docs/use-cases/uc11-customer-journey.md](uc11-customer-journey.md). Vertel de
-klantreis: werknemer → ziek → WIA → re-integratie → werkhervatter.
+customer journey: werknemer → ziek → WIA → reintegration → werkhervatter.
 Geen technologie — alleen het probleem.
 
-### Stap 2 — De architectuur op één pagina
+### Stap 2 — De architecture op één pagina
 
 Open https://platform.odap.local:8443/architecture. Wijs aan: 7
 domeinen, medallion, sensitive bucket, cross-cutting auth/audit. Sluit af
@@ -83,7 +83,7 @@ met "alles wat we straks zien is dit plaatje in detail".
 ### Stap 3 — De data-graaf in dbt docs
 
 Open https://platform.odap.local:8443/dbt-docs.html. Zoek
-`mart_uc11_journey_events` → klik linksonder op het **lineage-icoon**.
+`mart_uc11_journey_events` → klik linksonder on the **lineage-icoon**.
 De graaf toont:
 
 ```
@@ -99,14 +99,14 @@ stg_customer_interaction     ┘
 **Vertel**: "alle bronnen waren er al — UC-11 voegt alleen het mart toe dat
 de tijdlijn reconstrueert."
 
-### Stap 4 — Catalog & doelbinding-tags in OpenMetadata
+### Stap 4 — Catalog & purpose-limitation-tags in OpenMetadata
 
 Open https://openmetadata.odap.local:8443. Navigeer:
-**Glossaries → CGM → Klantreis**. Toon de relatie tussen `Klantreis`,
+**Glossaries → CGM → Customer journey**. Toon de relatie tussen `Customer journey`,
 `Fase`, `EventStream` en bestaande CGM-termen (`Cliënt`, `IKV`, `Contact`...).
 
 Daarna **Tables → trino.gold.uc11_customer_journey.mart_uc11_journey_events** →
-tabblad **Lineage** voor een tweede lineage-view (dezelfde graaf, andere
+tabblad **Lineage** for a tweede lineage-view (dezelfde graaf, andere
 tool). Tabblad **Sample Data** toont een paar rijen.
 
 ### Stap 5 — Eén query, zes brillen (live OPA-demo)
@@ -122,7 +122,7 @@ LIMIT 20;
 ```
 
 Toon alle kolommen ongemaskeerd (smoketest heeft `can_see_pii`). Log dan uit
-en in als `marketing.analyst` (purpose header `klantcontact` zetten in client).
+en in als `marketing.analyst` (purpose header `customer interaction` zetten in client).
 Run dezelfde query → `bsn` gemaskeerd, `event_label` vervangen door
 `<domein>.<event_type>`. Login als `claims.analyst` met `regio=AMS` →
 alleen rows met `regio_code IN ('AMS', NULL)`.
@@ -176,14 +176,14 @@ een realm-role `data_access:gold.uc11_customer_journey` in Keycloak.
 
 ### Stap 10 — De kosten
 
-Sluit af op de portal-homepage: "dit hele platform draait nu op één
+Sluit af on the portal-homepage: "dit hele platform draait nu op één
 laptop in een k3d-cluster. Eén `make portal-publish-dbt-docs` en de docs
-zijn live. Geen cloud-bill — net zoals een productie-deploy op AKS er
+zijn live. Geen cloud-bill — net zoals een production-deploy op AKS er
 verder uitziet."
 
 ---
 
-## 3. Architectuur — per laag, waar in de repo
+## 3. Architecture — per laag, waar in de repo
 
 Volgt de dataflow van bron naar consument. **Klik door** om de code te zien.
 
@@ -204,14 +204,14 @@ Geen nieuwe generator voor UC-11; we hergebruiken de bestaande:
 Loader: [data-generation/load_to_kafka.py](../../data-generation/load_to_kafka.py).
 Aanroepen via `make seed` (zie [scripts/seed.sh](../../scripts/seed.sh)).
 
-Live verkennen: `kubectl -n odap-platform port-forward svc/nifi-node-default 8443:8443` en open `https://localhost:8443/` → flow per topic.
+Live explore: `kubectl -n odap-platform port-forward svc/nifi-node-default 8443:8443` en open `https://localhost:8443/` → flow per topic.
 
 ### 3.2 Kafka → bronze Delta — Spark Structured Streaming
 
 [spark-jobs/streaming_kafka_to_lakehouse.py](../../spark-jobs/streaming_kafka_to_lakehouse.py)
 schrijft elke topic in een Delta-tabel onder `bronze.*`.
 
-Live verkennen: https://minio-console.odap.local:8443 →
+Live explore: https://minio-console.odap.local:8443 →
 bucket `odap-bronze` → onder `<domain>_<event>/` zie je Delta `_delta_log/`
 + parquet-files.
 
@@ -258,7 +258,7 @@ naar [platform/10-opa/policies/](../../platform/10-opa/policies/).
 ### 3.7 Orkestratie — Airflow + Cosmos
 
 UC-11 staat in [platform/11-airflow/include/gold_factory.py](../../platform/11-airflow/include/gold_factory.py)
-in `ACTIVE_USE_CASES`. Silver-dependencies komen uit de 7 source-YAMLs
+in `ACTIVE_USE_CASES`. Silver-dependencies komen from the 7 source-YAMLs
 onder [platform/11-airflow/sources/](../../platform/11-airflow/sources/)
 (`used_by_use_cases: [..., uc11]`).
 
@@ -266,12 +266,12 @@ onder [platform/11-airflow/sources/](../../platform/11-airflow/sources/)
 
 Glossary-uitbreiding in
 [platform/13-openmetadata-config/glossary-cgm.yaml](../../platform/13-openmetadata-config/glossary-cgm.yaml):
-termen `Klantreis`, `Fase`, `EventStream`. Wordt geladen door de
+termen `Customer journey`, `Fase`, `EventStream`. Wordt geladen door de
 init-job [init-job.yaml](../../platform/13-openmetadata-config/init-job.yaml).
 
 ### 3.9 Consumptie — Superset
 
-Trino-datasource auto-geregistreerd. Dashboard `UC-11 Klantreis` bouw je
+Trino-datasource auto-geregistreerd. Dashboard `UC-11 Customer journey` bouw je
 interactief in Superset; exporteer als `.zip` naar
 [platform/12-superset/dashboards/](../../platform/12-superset/) voor
 herhalbare deploy.
@@ -280,7 +280,7 @@ herhalbare deploy.
 
 ## 4. Bestandsindex (alles van UC-11 op één plek)
 
-**Documentatie**
+**Documentation**
 - [docs/use-cases/uc11-customer-journey.md](uc11-customer-journey.md) — technische UC-beschrijving
 - [docs/use-cases/uc11-customer-journey-walkthrough.md](uc11-customer-journey-walkthrough.md) — *dit document*
 
@@ -310,7 +310,7 @@ herhalbare deploy.
 - [platform/11-airflow/sources/crm.yml](../../platform/11-airflow/sources/crm.yml)
 
 **OpenMetadata**
-- [platform/13-openmetadata-config/glossary-cgm.yaml](../../platform/13-openmetadata-config/glossary-cgm.yaml) (CGM-termen `Klantreis`, `Fase`, `EventStream`)
+- [platform/13-openmetadata-config/glossary-cgm.yaml](../../platform/13-openmetadata-config/glossary-cgm.yaml) (CGM-termen `Customer journey`, `Fase`, `EventStream`)
 
 **Tests**
 - [tests/smoke/11-uc11-customer-journey.sh](../../tests/smoke/11-uc11-customer-journey.sh) — cluster-loos
@@ -336,7 +336,7 @@ herhalbare deploy.
    [mart_uc11_journey_events.sql](../../dbt/models/marts/uc11_customer_journey/mart_uc11_journey_events.sql).
 3. Voeg een column-entry toe in [_uc11.yml](../../dbt/models/marts/uc11_customer_journey/_uc11.yml).
 4. `make dbt-build-uc11` (vereist cluster).
-5. `make portal-publish-dbt-docs` om dbt-docs te updaten op het platform.
+5. `make portal-publish-dbt-docs` om dbt-docs te updaten on the platform.
 
 ### Een fase toevoegen
 
@@ -354,12 +354,12 @@ voeg een regel toe, schrijf een test in `*_test.rego`. Run:
 ```bash
 make opa-test        # 33/33 PASS
 make opa-bundle      # build + sync naar platform/10-opa/policies/
-kubectl apply -k platform/10-opa/   # deploy bundle naar de cluster
+kubectl apply -k platform/10-opa/   # deploy bundle to the cluster
 ```
 
 Wacht ~30s tot Stackable's bundle-loader het opgepikt heeft.
 
-### Een nieuw domein toevoegen aan de klantreis
+### Een nieuw domein toevoegen aan de customer journey
 
 1. Voeg generator toe in `data-generation/generators/<nieuw>.py`.
 2. Maak source-YAML in `platform/11-airflow/sources/<nieuw>.yml` met
@@ -370,16 +370,16 @@ Wacht ~30s tot Stackable's bundle-loader het opgepikt heeft.
 
 ---
 
-## 6. Periodieke updates op het platform
+## 6. Periodieke updates on the platform
 
 ```bash
-# Volledig opnieuw zaaien (bestaande events behouden, nieuwe events ingestie):
+# Volledig opnieuw zaaien (bestaande events behouden, nieuwe events ingestion):
 make seed
 
 # Alleen UC-11 marts herbouwen:
 make dbt-build-uc11
 
-# dbt-docs op het platform actueel houden (na model-wijzigingen):
+# dbt-docs on the platform actueel houden (na model-wijzigingen):
 make portal-publish-dbt-docs
 
 # OPA-policies hergeneren + deployen (na rego-wijzigingen):
@@ -392,11 +392,11 @@ make opa-bundle && kubectl apply -k platform/10-opa/
 
 ### Kan de portal niet openen / certificaatwaarschuwing
 
-Self-signed CA. Eenmalig accepteren in de browser, of importeer
+Self-signed CA. One-off accepteren in de browser, of importeer
 `~/.odap-platform-ca.crt` in je systeem-keystore. Zie
 [docs/runbook.md](../runbook.md).
 
-### dbt-docs op het platform is verouderd
+### dbt-docs on the platform is verouderd
 
 ```bash
 make portal-publish-dbt-docs
@@ -428,7 +428,7 @@ bundle-loader herpolt elke 20s; geef het een halve minuut.
 ### `make opa-test` faalt
 
 ```bash
-# Pad-issue tussen test-env en Stackable productie-bundle.
+# Pad-issue tussen test-env en Stackable production-bundle.
 # De wrapper script lost dit op:
 python3 scripts/opa-test-data-wrap.py --dst /tmp/opa-test-data.json
 opa test opa-policies-src/trino/ /tmp/opa-test-data.json -v
@@ -445,7 +445,7 @@ run lokaal:
 make dbt-build-uc11
 ```
 
-### Welke BSN heeft de rijkste klantreis?
+### Welke BSN heeft de rijkste customer journey?
 
 ```sql
 SELECT bsn, COUNT(*) AS n_events, COUNT(DISTINCT domein) AS n_domeinen
@@ -461,9 +461,9 @@ Gebruik deze als "Saskia" in je demo.
 
 ## 8. Verder lezen
 
-- [docs/architecture.md](../architecture.md) — algemene platform-architectuur
-- [docs/handbooks/00-handboek.md](../handbooks/00-handboek.md) — per-rol handleidingen
-- [docs/access-request-guide.md](../access-request-guide.md) — hoe een gebruiker toegang aanvraagt
-- [docs/compliance-mapping.md](../compliance-mapping.md) — R-NORA/AVG/BIO/NIS2 → bestand
-- [docs/adr/](../adr/) — architectuurbeslissingen
+- [docs/architecture.md](../architecture.md) — algemene platform-architecture
+- [docs/handbooks/00-handboek.md](../handbooks/00-handboek.md) — per-rol handbooken
+- [docs/access-request-guide.md](../access-request-guide.md) — hoe een gebruiker access aanvraagt
+- [docs/compliance-mapping.md](../compliance-mapping.md) — R-GDPR/ISO27001/NIS2/NIS2 → bestand
+- [docs/adr/](../adr/) — architecturebeslissingen
 - [docs/runbook.md](../runbook.md) — operations

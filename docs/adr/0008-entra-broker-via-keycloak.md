@@ -4,7 +4,7 @@
 |---|---|
 | Datum | 2026-05-05 |
 | Beslissers | Platform Architect, IAM, Security |
-| Gerelateerd | [ADR-0001](0001-stackable-as-base.md) (Stackable als basis), [`platform/02-authentication/`](../../platform/02-authentication/), [referentiearchitectuur § Centraal IdP](../../referentiearchitectuur-odap-data-analytics.md) |
+| Gerelateerd | [ADR-0001](0001-stackable-as-base.md) (Stackable als basis), [`platform/02-authentication/`](../../platform/02-authentication/), [referentiearchitecture § Centraal IdP](../../referentiearchitecture-odap-data-analytics.md) |
 
 ---
 
@@ -19,13 +19,13 @@ OPA-policies lezen `input.context.identity.groups` ([`trino-base.rego`](../../op
 en mappen die naar
 [`role_mappings.json`](../../opa-policies-src/data/role_mappings.json).
 
-UWV's strategische identiteits-stack is **Microsoft Entra ID**. De
-referentiearchitectuur ([§ Centraal IdP](../../referentiearchitectuur-odap-data-analytics.md))
+UWV's strategische identitys-stack is **Microsoft Entra ID**. De
+referentiearchitecture ([§ Centraal IdP](../../referentiearchitecture-odap-data-analytics.md))
 benoemt expliciet "**Entra ID** of Keycloak met SAML/OIDC" — beide zijn
 kandidaten, niet beide zijn nodig.
 
 De vraag: **kunnen Entra-medewerkers en interne ODAP realm-accounts naast
-elkaar inloggen op het platform, met een keuze op de loginpagina?**
+elkaar sign in on the platform, with a keuze on the loginpagina?**
 
 ## Beslissing
 
@@ -38,7 +38,7 @@ username/password-veld. De gebruiker kiest:
 - **Lokaal platform account** → standaard Keycloak-flow (zoals nu).
 - **Microsoft Entra ID** → redirect naar `login.microsoftonline.com`,
   Entra authenticeert (incl. eigen MFA / Conditional Access), Keycloak
-  ontvangt een Entra-token, mapt Entra-security-group-GUIDs op de 11
+  ontvangt een Entra-token, mapt Entra-security-group-GUIDs on the 11
   realm-rollen via `oidc-role-idp-mapper`, en geeft een gewoon
   Keycloak-token uit aan de downstream service.
 
@@ -74,7 +74,7 @@ Verwijder Keycloak, point alle Stackable-services naar Entra ID direct.
 **Niet gekozen omdat:**
 - **Geen lokale dev-accounts.** De 11 realm-test-users in
   [`realm.json`](../../infrastructure/helm/keycloak/realm.json) (één per rol)
-  geven een reproduceerbare dev/demo-omgeving zonder Azure-tenant-toegang.
+  geven een reproduceerbare dev/demo-omgeving zonder Azure-tenant-access.
 - **MinIO-policy-claim mapping.** Keycloak's `minio-policy` mapper
   (oidc-usermodel-attribute-mapper, [`realm.json:339-348`](../../infrastructure/helm/keycloak/realm.json))
   kent MinIO-S3-policies toe op user-attribute-niveau. Entra ondersteunt dit
@@ -89,7 +89,7 @@ Verwijder Keycloak, point alle Stackable-services naar Entra ID direct.
 Entra ondersteunt SAML 2.0 als alternatief voor OIDC.
 
 **Niet gekozen omdat:**
-- OIDC v2.0 sluit aan op de bestaande OIDC-stack (alle clients zijn OIDC).
+- OIDC v2.0 sluit aan on the bestaande OIDC-stack (alle clients zijn OIDC).
 - SAML-attribuut-mapping is verboser dan OIDC-claim-mapping.
 - Geen functionele voordelen voor onze use case; SAML is alleen interessant
   als Entra OIDC zou ontbreken.
@@ -101,7 +101,7 @@ Entra ondersteunt SAML 2.0 als alternatief voor OIDC.
 1. **Nul wijziging downstream.** AuthenticationClass, oauth2-proxy,
    OPA-policies, Stackable cluster-CRDs en de portal-Astro-app blijven
    ongewijzigd. Audit-impact: minimaal.
-2. **Gebruikerskeuze op één pagina.** Keycloak's loginscherm rendert
+2. **Userskeuze op één pagina.** Keycloak's loginscherm rendert
    automatisch beide opties.
 3. **MFA delegatie.** Entra Conditional Access kan MFA afdwingen voor
    `platform_admin`-groep zonder dat Keycloak-policies dat per gebruiker
@@ -158,15 +158,15 @@ Entra ondersteunt SAML 2.0 als alternatief voor OIDC.
       uitvoeren met dezelfde row/column-policies als de equivalente
       lokale rol.
 - [ ] OPA decision-log toont `input.context.identity.groups: ["claims_analyst"]`
-      voor de Entra-user.
+      for the Entra-user.
 
 ## Open vraagstukken
 
 1. **eHerkenning/DigiD-broker** — toekomstig; vergelijkbare aanpak (extra
    IdentityProvider in `uwv` realm).
 2. **Account-link UI** — moet UWV-medewerkers de mogelijkheid bieden om
-   hun bestaande realm-account te koppelen aan hun Entra-identiteit, voor
+   hun bestaande realm-account te koppelen aan hun Entra-identity, voor
    geleidelijke migratie. Out-of-scope voor deze branch.
 3. **Logout-flow** — Entra logout invalideert de Keycloak-sessie niet
    automatisch (single-logout vereist back-channel-config). Acceptabel
-   voor dev, productie eis nog te bepalen.
+   voor dev, production eis nog te bepalen.

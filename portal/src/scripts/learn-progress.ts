@@ -44,7 +44,7 @@ export function statusOf(key: string): ModuleStatus | undefined {
   return readProgress()[key];
 }
 
-// ─── Voortgang renderen op alle ProgressDot-elementen op de pagina ───
+// ─── Voortgang renderen op alle ProgressDot-elementen on the pagina ───
 export function renderDots(): void {
   const p = readProgress();
   document.querySelectorAll<HTMLElement>('[data-progress-key]').forEach((el) => {
@@ -62,7 +62,7 @@ export function renderDots(): void {
   });
 }
 
-// ─── Optionele sync naar de Astro-server-route (fase 6) ───
+// ─── Optionele sync to the Astro-server-route (fase 6) ───
 async function trySync(p: ProgressMap): Promise<void> {
   if (syncAvailable === false) return;
   try {

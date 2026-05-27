@@ -34,9 +34,9 @@ silver:
 # Compliance / governance
 governance:
   legal_basis: Wet_SUWI_art_56
-  doelbinding: [primair_proces]
+  purpose-limitation: [primair_proces]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: data_office
   pii_kolommen: [bsn, voornaam, achternaam, birth_date, straat, huisnummer, postcode]
   risk_tier: laag

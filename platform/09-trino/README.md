@@ -8,7 +8,7 @@ Trino — distributed SQL engine met OPA-authorisatie en OIDC-authenticatie.
 | `TrinoCluster trino` | 1 coordinator + 1 worker (scaled-down). |
 | `TrinoCatalog bronze/silver/gold/sensitive` | Vier catalogs, gerenderd uit templates op basis van `platform-config.yaml::table_format`. |
 
-## Voorvereisten
+## Prerequisites
 
 - `platform/02-authentication/` — `AuthenticationClass keycloak` + `SecretClass tls-internal`.
 - `platform/03-storage/` — `S3Connection s3-minio`.
@@ -46,7 +46,7 @@ Zie [`catalogs/README.md`](catalogs/README.md). Wijziging in
 `platform-config.yaml` + `make render-catalogs` + apply is genoeg —
 geen wijziging in `trinocluster.yaml` of policies nodig.
 
-## Productie
+## Production
 
 - ≥ 2 coordinators (HA via Stackable's coordinator role).
 - Multiple workers + fault-tolerant execution (`exchange-manager`).

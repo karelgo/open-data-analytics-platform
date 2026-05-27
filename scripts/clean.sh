@@ -17,5 +17,5 @@ else
 fi
 
 echo
-echo "Tip: voor een complete reset (incl. volumes) ook k3d-volume opruimen:"
+echo "Tip: for a complete reset (incl. volumes) ook k3d-volume opruimen:"
 echo "  docker volume ls | awk '/odap-platform-data/ {print \$2}' | xargs -r docker volume rm"

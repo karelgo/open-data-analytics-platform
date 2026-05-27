@@ -1,33 +1,33 @@
 ---
-title: "Handleiding — Finance Analyst"
+title: "Handbook — Finance Analyst"
 role: finance_analyst
 ---
 
-> Rol-key: `finance_analyst` · Domein: Financiën / Beleid · Risiconiveau toegang: laag (alleen aggregaten, geen PII)
+> Rol-key: `finance_analyst` · Domein: Financiën / Beleid · Risiconiveau access: laag (alleen aggregaten, geen PII)
 
-Deze handleiding is voor **financieel-economische analisten** die werken
-aan schadelast, prognoses en beleidsanalyses. Je werkt op **geaggregeerde
+Deze handbook is voor **financieel-economische analisten** die werken
+aan cost forecast, prognoses en beleidsanalyses. Je werkt op **geaggregeerde
 data**: geen ruwe BSN, geen individuele claim_amounten.
 
 ---
 
 ## 1. Wat doet jouw rol?
 
-Je maakt prognoses voor schadelast, doorrekent beleidsscenario's en levert
+Je maakt prognoses voor cost forecast, doorrekent beleidsscenario's en levert
 input voor begrotingen. Je gebruikt het platform om:
 
-- UC-06 lastprognose-mart te raadplegen
+- UC-06 cost forecast-mart te raadplegen
 - Scenario-analyses te draaien op aggregaten
 - Trends in instroom/uitstroom te volgen
 - Geen individuele dossiers te zien
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards: schadelast, prognoses | https://superset.odap.local |
+| **Apache Superset** | Dashboards: cost forecast, prognoses | https://superset.odap.local |
 | **OpenMetadata** | Definities, eigenaarschap | https://openmetadata.odap.local |
 
 ---
@@ -36,9 +36,9 @@ input voor begrotingen. Je gebruikt het platform om:
 
 ### 3.1 Catalog en schema
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
-| `gold` | `uc06_cost_forecast` | Schadelast-aggregaten en prognoses | **Ja** |
+| `gold` | `uc06_cost_forecast` | Cost forecast-aggregaten en prognoses | **Ja** |
 | `silver` | * | PII en domein-data | **Nee** |
 | `bronze`, `sensitive` | * | (geen) | **Nee** |
 
@@ -53,16 +53,16 @@ Je werkt op aggregaten:
 | `leeftijdsgroep` | Buckets van 5 jaar |
 | `instroom_aantal` | Aantal nieuwe instromers per maand |
 | `uitstroom_aantal` | Aantal uitstroom per maand |
-| `gem_duur_dagen` | Gemiddelde uitkeringsduur |
+| `gem_duur_dagen` | Gemiddelde claim payoutsduur |
 | `totale_last_eur` | Totaal uitbetaald per maand |
 | `prognose_komende_12_mnd` | Prognose-getallen |
 
 > **Geen ruwe BSN.** Het platform weigert je rauwe persoons-queries
 > (`silver.persons.*`) — niet jouw doel.
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
-Purposes: **"actuarie"** en **"beleid"**. Modellen in `gold.uc06_*` zijn
+Purposes: **"actuarie"** en **"beleid"**. Models in `gold.uc06_*` zijn
 gemarkeerd met deze purposes; queries op andere marts zonder geldig doel
 worden geweigerd.
 
@@ -70,7 +70,7 @@ worden geweigerd.
 
 ## 4. Dagelijkse workflows met voorbeelden
 
-### 4.1 Workflow A — Schadelast huidig jaar
+### 4.1 Workflow A — Cost forecast huidig jaar
 
 ```sql
 SELECT
@@ -140,14 +140,14 @@ WHERE peilkwartaal = '2026-Q1';
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
 | `Access Denied: silver.persons.*` | Geen PII voor jouw rol | Werk op aggregaat-marts |
-| `Access Denied: gold.uc05_customer_360` | Andere doelbinding | Niet jouw scope |
+| `Access Denied: gold.uc05_customer_360` | Andere purpose-limitation | Niet jouw scope |
 | `Result has only 8 rows` | Te kleine groep, mogelijk privacy-onderdrukking | Aggregeer ruwer |
 
 | Probleem | Contact |
 |---|---|
-| Inloggen, MFA | Platform-admin |
+| Sign in, MFA | Platform-admin |
 | Definitie van een prognose-veld | Data-steward |
-| "De cijfers verschillen van Werkmap" | Data-steward (kwaliteit) |
+| "De cijfers verschillen van Workspace" | Data-steward (kwaliteit) |
 
 ---
 

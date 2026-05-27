@@ -3,7 +3,7 @@
 # Patroon volgt platform/15-portal/configmap-oauth2-proxy.yaml — split
 # OIDC-discovery (issuer extern voor browser-redirect, token-endpoints
 # intern via cluster-DNS) lost het k3d-probleem op dat
-# 'keycloak.odap.local' alleen via /etc/hosts op de host
+# 'keycloak.odap.local' alleen via /etc/hosts on the host
 # resolveert.
 #
 # Front-door-model: oauth2-proxy gates ALLEEN '/' (de Next.js bundle).
@@ -39,7 +39,7 @@ data:
     # Sessiebeleid — SameSite=none + Secure zodat de cookie ook in cross-
     # origin iframe-context (portal embed-shell op platform.odap.local)
     # wordt meegestuurd. Anders blokkeert de browser 'm bij iframe-requests
-    # en blijft de iframe vastzitten op de Keycloak login-redirect.
+    # en blijft de iframe vastzitten on the Keycloak login-redirect.
     cookie_name             = "_multica"
     cookie_secure           = true
     cookie_httponly         = true

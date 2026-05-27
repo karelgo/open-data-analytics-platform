@@ -6,11 +6,11 @@
 // fetcht via portal-nginx z'n in-cluster proxy (/api/minio-sso/login)
 // het Keycloak-redirect-URL en `window.location.replace`'t direct
 // — iframe gaat naar Keycloak SSO → terug naar minio-console →
-// gebruiker landt op de MinIO Console UI, ingelogd.
+// gebruiker landt on the MinIO Console UI, ingelogd.
 //
 // Waarom in-cluster proxy ipv directe call op
 // https://minio-console.odap.local:8443/api/v1/login?
-// Die endpoint returnt over de EXTERNE ingress `redirectRules: null`
+// Die endpoint returnt about the EXTERNE ingress `redirectRules: null`
 // (MinIO Console-quirk; SSO-knop alleen via de in-cluster Service).
 // portal/nginx.conf locatie `/api/minio-sso/login` proxyt naar
 // minio-console.odap-platform.svc.cluster.local:9001/api/v1/login.

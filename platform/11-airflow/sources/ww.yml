@@ -1,4 +1,4 @@
-# Source registry — WW-aanvragen.
+# Source registry — WW-request.
 schema_version: 1
 
 name: ww
@@ -22,9 +22,9 @@ silver:
 
 governance:
   legal_basis: WW_art_22
-  doelbinding: [uitkering, handhaving]
+  purpose-limitation: [claim payout, handhaving]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 5
+  retention period_jaren: 5
   eigenaar: divisie_uitkeren
   pii_kolommen: [bsn]
   risk_tier: laag

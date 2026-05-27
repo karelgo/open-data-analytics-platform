@@ -1,5 +1,5 @@
 ---
-title: "Het platform voor de Fraud Analyst"
+title: "Het platform for the Fraud Analyst"
 role: fraud_analyst
 level: foundation
 order: 1
@@ -16,11 +16,11 @@ quiz:
   - q: "Waarom mag jij IBAN ongelinkt zien terwijl andere rollen het gemaskeerd krijgen?"
     options:
       - "Omdat IBAN technisch geen PII is"
-      - "Omdat handhaving een wettelijke grondslag heeft die deze data nodig maakt voor het onderzoeksdoel"
+      - "Omdat handhaving een wettelijke grondslag heeft die deze data nodig maakt for the onderzoeksdoel"
       - "Omdat de handhavers het zelf hebben aangevraagd"
       - "Omdat het in jouw rolnaam staat"
     correct: 1
-    explain: "OPA staat unmasked IBAN toe als je doelbinding 'handhaving' is. Andere rollen op dezelfde tabel zien IBAN gehasht."
+    explain: "OPA staat unmasked IBAN toe als je purpose-limitation 'handhaving' is. Andere rollen op dezelfde tabel zien IBAN gehasht."
   - q: "Wat is de juiste reactie op een hoge risk-score?"
     options:
       - "Direct sanctioneren"
@@ -28,7 +28,7 @@ quiz:
       - "Het dossier verbergen tot de score lager wordt"
       - "Naar de data-engineer mailen"
     correct: 1
-    explain: "Een score is een signaal, geen besluit. Beslissingen vereisen menselijke beoordeling — AI Act art. 14."
+    explain: "Een score is een signaal, geen besluit. Decisions vereisen menselijke beoordeling — AI Act art. 14."
   - q: "Welke laag bevat de samengestelde risk-score per dossier?"
     options:
       - "bronze.uwv"
@@ -38,7 +38,7 @@ quiz:
     correct: 2
 ---
 
-Welkom. Handhaving is een rol met een hoge bevoegdheid en een hoge
+Welcome. Handhaving is een rol with a hoge bevoegdheid en een hoge
 verantwoordelijkheid. Deze module zet de spelregels uiteen voordat je het
 platform ingaat.
 
@@ -60,15 +60,15 @@ Dat regelt OPA op kolomniveau:
 | `regio_code` | landelijk | regio-gefilterd |
 | `risk_score` | volledig | nvt — kolom hidden |
 
-Reden: jouw doelbinding (`handhaving`) is een aparte grondslag in
-[role-mappings](/opa-policies-src/data/role_mappings.json) en geeft toegang
-tot data die voor klantcontact niet relevant is.
+Reden: jouw purpose-limitation (`handhaving`) is een aparte grondslag in
+[role-mappings](/opa-policies-src/data/role_mappings.json) en geeft access
+tot data die voor customer interaction niet relevant is.
 
 ## Drie principes die altijd gelden
 
 1. **Geen besluit op cijfers alleen.** Een hoge score is signaal, niet bewijs.
    De [AI Act art. 14](https://eur-lex.europa.eu/eli/reg/2024/1689/oj) eist
-   menselijke regie bij dergelijke modellen — die *ben jij*.
+   menselijke regie bij dergelijke models — die *ben jij*.
 2. **Doelregistratie.** Bij elke ad-hoc query zet je de ticket-id of dossier-id
    als comment in de SQL: `-- HANDH-1234`. Dat is je papieren spoor.
 3. **Geen vermenging.** Data uit `gold.uc03_fraud_risk` deel je niet met collega's

@@ -7,7 +7,7 @@
 # In K8s draait een sidecar oauth2-proxy ervoor (:4180 -> :8080) voor SSO.
 #
 # Build VANUIT REPO-ROOT zodat opa-policies-src/data mee-gekopieerd kan
-# worden voor de prebuild-stap (single source of truth voor rol-mappings):
+# worden for the prebuild-stap (single source of truth voor rol-mappings):
 #
 #   docker build -f portal/Dockerfile -t odap/portal:dev .
 
@@ -17,12 +17,12 @@ WORKDIR /app
 # 1. Astro/portal-bron + node deps.
 # --legacy-peer-deps omdat de embed-ui-shell branch @types/react@19 introduceerde
 # terwijl @astrojs/react@3.x nog 17/18 peer-pinned heeft. Niet runtime-relevant
-# (Astro-React-island wordt niet gebruikt op de pagina's die we bouwen) maar
+# (Astro-React-island wordt niet gebruikt on the pagina's die we bouwen) maar
 # blokkeert wel een verse npm ci.
 COPY portal/package.json portal/package-lock.json* ./
 RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; else npm install --legacy-peer-deps; fi
 
-# 2. Brondata uit OPA op de plek die scripts/sync-data.mjs verwacht
+# 2. Brondata uit OPA on the plek die scripts/sync-data.mjs verwacht
 #    (../opa-policies-src/data, gerekend vanaf /app).
 COPY opa-policies-src/data /opa-policies-src/data
 

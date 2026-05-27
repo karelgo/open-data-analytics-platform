@@ -1,4 +1,4 @@
-# Source registry — CRM klantcontacten.
+# Source registry — CRM customer interactionen.
 schema_version: 1
 
 name: crm
@@ -22,10 +22,10 @@ silver:
 
 governance:
   legal_basis: AVG_art_6_1e
-  doelbinding: [klantcontact, customer_satisfaction]
+  purpose-limitation: [customer interaction, customer_satisfaction]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 2
-  eigenaar: divisie_klantcontact
+  retention period_jaren: 2
+  eigenaar: divisie_customer interaction
   pii_kolommen: [bsn, contact_inhoud]
   risk_tier: midden
 

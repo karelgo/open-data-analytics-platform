@@ -3,7 +3,7 @@
 # Voorkomt dat één namespace alle cluster-resources opgebruikt en geeft
 # elke pod een sane default-limit als geen requests/limits zijn opgegeven.
 #
-# Quota's zijn **conservatief voor scaled-down k3d**. Productie-overlay
+# Quota's zijn **conservatief voor scaled-down k3d**. Production-overlay
 # verhoogt deze waarden 5-10x.
 
 # ─── odap-platform — Stackable workloads (zwaarst) ────────────────────

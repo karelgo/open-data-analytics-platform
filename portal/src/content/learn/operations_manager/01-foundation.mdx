@@ -1,12 +1,12 @@
 ---
-title: "Het platform voor de Operations Manager"
+title: "Het platform for the Operations Manager"
 role: operations_manager
 level: foundation
 order: 1
 duration: "20 min"
-summary: "Sociaal-medische capaciteitsplanning op geaggregeerde data — geen cliënt-PII zichtbaar, ook niet bij ‘even kijken’."
+summary: "Operationale capacity planning op geaggregeerde data — geen cliënt-PII zichtbaar, ook niet bij ‘even kijken’."
 labs:
-  - title: "Open SMZ Capaciteitsplanning (UC-08)"
+  - title: "Open SMZ Capacity planning (UC-08)"
     hint: "Spreekuur-bezetting per locatie en week"
     href: "/go/superset/"
   - title: "Glossary: spreekuur-typen"
@@ -20,11 +20,11 @@ quiz:
       - "Welke individuele cliënt op spreekuur komt of welke arts hem ziet"
       - "Geboorte- en eindtijd van een spreekuur-blok"
     correct: 2
-  - q: "Een leidinggevende vraagt naar de naam van de cliënt achter een no-show. Wat doe je?"
+  - q: "Een leidinggevende vraagt to the naam van de cliënt achter een no-show. Wat doe je?"
     options:
       - "Je opent silver.smz en geeft de naam"
-      - "Je legt uit dat individueel cliënt-niveau bij capaciteitsplanning niet relevant is en verwijst voor nazorg naar de SMZ-arbeidsdeskundige met cliënt-doel"
-      - "Je vraagt JIT-toegang"
+      - "Je legt uit dat individueel cliënt-niveau bij capacity planning niet relevant is en verwijst voor nazorg to the SMZ-arbeidsdeskundige met cliënt-doel"
+      - "Je vraagt JIT-access"
       - "Je negeert de vraag"
     correct: 1
   - q: "Welke catalog gebruik jij?"
@@ -36,18 +36,18 @@ quiz:
     correct: 1
 ---
 
-Welkom. Capaciteitsplanning is bewust een rol *zonder* cliënt-PII. Niet uit
+Welcome. Capacity planning is bewust een rol *zonder* cliënt-PII. Niet uit
 gemak — uit ontwerp: voor goede planning hoef je niet te weten *wie* er komt.
 
 ## Wat is UC-08?
 
-`gold.uc08_capacity_planning_planning` aggregeert spreekuur-aanvragen, beschikbaarheid van
+`gold.uc08_capacity_planning_planning` aggregeert spreekuur-request, beschikbaarheid van
 artsen en gerealiseerde bezetting tot één plannings-mart. Per locatie × week
 × spreekuur-type zie je:
 
-- aantal openstaande aanvragen;
+- aantal openstaande request;
 - gerealiseerde bezetting (en no-show%);
-- voorspelde behoefte voor de komende 8 weken;
+- voorspelde behoefte for the komende 8 weken;
 - knelpunten (rood = onder de norm).
 
 ## Waarom geen cliënt-data?
@@ -57,8 +57,8 @@ is voor zijn taak. Voor planning is de geaggregeerde stroom genoeg. Bekend
 voorbeeld: een planner die per ongeluk uit dezelfde tabel een lijst van
 "problematische cliënten" gaat maken — dat hoort niet bij planning.
 
-OPA blokkeert dat niet alleen technisch (geen kolom-toegang), het is ook
-expliciet zo afgesproken in de [doelbinding](/docs/compliance-mapping.md):
+OPA blokkeert dat niet alleen technisch (geen kolom-access), het is ook
+expliciet zo afgesproken in de [purpose-limitation](/docs/compliance-mapping.md):
 planning ≠ behandeling.
 
 ## Glossary: één definitie

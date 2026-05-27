@@ -1,10 +1,10 @@
 ---
-title: "Het platform voor de Claims Analyst"
+title: "Het platform for the Claims Analyst"
 role: claims_analyst
 level: foundation
 order: 1
 duration: "20 min"
-summary: "Korte rondleiding door de drie applicaties die je dagelijks gebruikt: Superset, Trino en OpenMetadata — en wat je in welke catalog wel en niet mag zien."
+summary: "Korte rondleiding through the drie applicaties die je dagelijks gebruikt: Superset, Trino en OpenMetadata — en wat je in welke catalog wel en niet mag zien."
 labs:
   - title: "Open de WIA-funnel in Superset"
     hint: "Voorraad en doorlooptijden in jouw regio"
@@ -20,7 +20,7 @@ quiz:
       - "alle catalogs, mits met TICKET-id"
       - "alleen sensitive"
     correct: 1
-    explain: "Je werkt op silver.wia (geconformeerd) en gold.uc01_claims_funnel (sturing). Bronze is voor data-engineers; sensitive voor de Claims Analyst."
+    explain: "Je werkt op silver.wia (geconformeerd) en gold.uc01_claims_funnel (sturing). Bronze is voor data-engineers; sensitive for the Claims Analyst."
   - q: "Wat doet de OPA-policy in Trino voor jouw rol?"
     options:
       - "Hij encrypt je query voor verzending"
@@ -28,17 +28,17 @@ quiz:
       - "Hij maakt de query sneller"
       - "Hij stuurt logs naar OpenSearch"
     correct: 1
-    explain: "OPA controleert per query of jouw rol + doelbinding de gevraagde kolommen mag zien, en past automatisch een regio-filter toe."
+    explain: "OPA controleert per query of jouw rol + purpose-limitation de gevraagde kolommen mag zien, en past automatisch een regio-filter toe."
   - q: "Waar vind je de definitie van een kolom als je niet zeker weet wat ‘arbeidsongeschiktheidsklasse’ betekent?"
     options:
       - "In de Trino-query zelf"
       - "In Apache Superset onder Datasets"
-      - "In OpenMetadata, op de tabel-pagina onder Schema/Glossary"
+      - "In OpenMetadata, on the tabel-pagina onder Schema/Glossary"
       - "In Airflow"
     correct: 2
 ---
 
-Welkom. Deze module is je startpunt op het Open Data & Analytics Platform.
+Welcome. Deze module is je startpunt on the Open Data & Analytics Platform.
 Doel: aan het einde weet je *waar* je werkt, *wat* je mag en *waarom* het zo
 is georganiseerd.
 
@@ -49,9 +49,9 @@ Een Kubernetes-native data-stack die ruwe brondata in vier zones beheert:
 - **bronze** — ruwe data zoals binnengekomen, met PII;
 - **silver** — geconformeerd en gevalideerd;
 - **gold** — gemodelleerde marts per use case (UC-01 t/m UC-10);
-- **sensitive** — apart afgeschermd voor sociaal-medische dossiers (Wajong).
+- **sensitive** — apart afgeschermd voor operationale dossiers (Wajong).
 
-Jij werkt nooit op bronze. Je werkt op `silver.wia` (de eigen aanvragen)
+Jij werkt nooit op bronze. Je werkt op `silver.wia` (de eigen request)
 en `gold.uc01_claims_funnel` (sturingsmart met voorraad, doorlooptijden,
 voorspelling).
 
@@ -72,7 +72,7 @@ Drie regels die je altijd moet kennen:
 
 1. **Regio-filter.** Trino past automatisch een filter toe op `regio_code`.
    Je ziet alleen je eigen regio, ook als je het filter weglaat. Geen workaround.
-2. **PII zichtbaar binnen doel.** Je doelbinding is *uitkering / behandeling /
+2. **PII zichtbaar binnen doel.** Je purpose-limitation is *claim payout / behandeling /
    reïntegratie*. Daarvoor mag je BSN, naam, adres zien. Voor andere doelen niet.
 3. **Geen bronze, geen sensitive.** Geen JIT-uitzondering: dit zijn rolgrenzen.
 
@@ -80,13 +80,13 @@ Wie wat ook wil zien dat hier niet bij past — bel de data-steward, niet de adm
 
 ## Compliance — waar dit op rust
 
-De toegangsregels komen niet uit een willekeurige config: ze volgen uit de
-[architectuur](https://fresh-minds.github.io/FreshStackableDataPlatform/architectuur/) en de
+De accesssregels komen niet uit een willekeurige config: ze volgen uit de
+[architecture](https://fresh-minds.github.io/FreshStackableDataPlatform/architecture/) en de
 [compliance-mapping](https://fresh-minds.github.io/FreshStackableDataPlatform/compliance-mapping/). Concreet:
 
 - **AVG art. 6 lid 1e** als grondslag (publieke taak — beoordeling WIA);
-- **Doelbinding** in OPA-policies — zie [ADR-0003](https://fresh-minds.github.io/FreshStackableDataPlatform/adr/0003-opa-as-trino-authz/);
-- **Audit** — elke query gelogd in OpenSearch met je gebruikersnaam, tijdstip, doel.
+- **Purpose limitation** in OPA-policies — zie [ADR-0003](https://fresh-minds.github.io/FreshStackableDataPlatform/adr/0003-opa-as-trino-authz/);
+- **Audit** — elke query gelogd in OpenSearch met je usersnaam, tijdstip, doel.
 
 Audit-logs zijn niet bedoeld om je te controleren maar om — wanneer ooit nodig —
 te kunnen bewijzen dat het platform binnen de wet draaide.

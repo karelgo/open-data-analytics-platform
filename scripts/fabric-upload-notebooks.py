@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Upload de actieve uc11 Fabric-notebooks naar de workspace.
+"""Upload de actieve uc11 Fabric-notebooks to the workspace.
 
 Idempotent: detecteert bestaande notebooks by displayName en doet dan een
 updateDefinition (POST .../items/<id>/updateDefinition). Bij eerste run
 maakt hij ze aan via POST .../notebooks.
 
-Verwijdert ook notebooks in DEPRECATED_NOTEBOOKS uit de workspace zodat
+Verwijdert ook notebooks in DEPRECATED_NOTEBOOKS from the workspace zodat
 oude notebooks niet meer per ongeluk getriggered kunnen worden (bv.
-uc11_dbt_gold is vervangen door de fabric_dbt_gold KPO-task die
+uc11_dbt_gold is vervangen through the fabric_dbt_gold KPO-task die
 dbt-fabricspark draait — zie uc11_fabric DAG).
 
 Gebruik:
@@ -43,12 +43,12 @@ NOTEBOOK_FILES = {
 }
 
 # Notebooks die ooit bestonden maar nu vervangen zijn. Worden bij elke
-# upload-run gewist uit de workspace — idempotent, no-op als ze er al niet zijn.
+# upload-run gewist from the workspace — idempotent, no-op als ze er al niet zijn.
 DEPRECATED_NOTEBOOKS = ("uc11_dbt_gold",)
 
 
 def _payload(file: Path) -> dict:
-    """Bouw een definition-payload voor de Fabric REST API."""
+    """Bouw een definition-payload for the Fabric REST API."""
     encoded = base64.b64encode(file.read_bytes()).decode("ascii")
     return {
         "definition": {
@@ -76,7 +76,7 @@ def create_notebook(token: str, name: str, file: Path) -> str:
         if not op:
             raise RuntimeError(f"create_notebook 202 zonder Location: {payload}")
         wait_for_operation(token, op)
-        # We weten het id niet uit de operation-response — herquery items.
+        # We weten het id niet from the operation-response — herquery items.
         for it in list_items(token, "Notebook"):
             if it["displayName"] == name:
                 return it["id"]

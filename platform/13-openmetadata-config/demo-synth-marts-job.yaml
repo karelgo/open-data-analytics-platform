@@ -1,7 +1,7 @@
 # OpenMetadata demo-seed Job — synthetiseert UC-mart tabel-entities + verrijking.
 #
 # Achtergrond:
-#   De productie-pipeline is: dbt build (materialiseert tabellen in Trino)
+#   De production-pipeline is: dbt build (materialiseert tabellen in Trino)
 #   → Trino-catalog ingest (registreert tables in OM) → dbt-ingest (linkt
 #   dbt-models aan OM-tables) → enrich_from_dbt_meta.py (PATCH tags, owner,
 #   domain, dataProduct, custom-properties).
@@ -13,13 +13,13 @@
 #
 #   Deze Job creëert die tabel-entities rechtstreeks via de OM REST-API
 #   met representatieve kolommen + verrijking (owner, domain, dataProduct,
-#   Tier/Doelbinding/LegalBasis/Confidentiality/AI-Risk-tags, CGM glossary,
+#   Tier/Purpose limitation/LegalBasis/Confidentiality/AI-Risk-tags, CGM glossary,
 #   custom-properties, PII-tags). Geen Trino-coupling — de tabellen
 #   bestaan alleen in OM, voor demo-doeleinden.
 #
 #   Idempotent: re-runs slaan bestaande tabellen over (en patchen alleen
 #   ontbrekende kolommen). Na een dbt-build + Trino-catalog ingest wordt
-#   de kolom-lijst overschreven door de echte Trino-discovered kolommen;
+#   de kolom-lijst overschreven through the echte Trino-discovered kolommen;
 #   alle PATCH-based enrichment (owner/domain/dataProduct/tags/extension)
 #   blijft behouden.
 #
@@ -30,7 +30,7 @@
 # Pre-conditions die de Job verwacht (allemaal door init-Job aangelegd):
 #   - databaseSchemas onder trino (bronze + gold per UC)
 #   - Teams (divisie_*, knowledge_center, data_steward_*)
-#   - Domains (AG, WW, CRM, FEZ, Polisadm, Klantcontact, Governance)
+#   - Domains (AG, WW, CRM, FEZ, Polisadm, Customer interaction, Governance)
 #   - DataProducts (uc01_claims_funnel, uc04_..., ...)
 #   - Classifications + Glossary CGM
 #   - Custom-property types geregistreerd op Table-entity
@@ -71,24 +71,24 @@ data:
     BOOL = {"dataType": "BOOLEAN"}
 
     # Per-mart definitie. Kolommen zijn afgeleid uit dbt _xxx.yml-tests +
-    # de bijbehorende mart_*.sql; voor de demo voldoende. Productie haalt
+    # de bijbehorende mart_*.sql; for the demo voldoende. Production haalt
     # ze uit Trino-catalog-ingest. Owner/domain/dataProduct/tags/extension
     # spiegelen dbt meta + dbt-meta-mapping.yaml.
     MARTS = [
       {
         "schema": "uc01_claims_funnel", "name": "mart_uc01_claims_funnel_daily",
-        "description": "UC-01 — Dagelijks aggregaat WIA-aanvragen × regio × onderdeel × status. Sturingsinformatie, geen PII.",
+        "description": "UC-01 — Dagelijks aggregaat WIA-request × regio × onderdeel × status. Sturingsinformatie, geen PII.",
         "columns": [
           col("aanvraag_datum", DT, "Datum waarop aanvraag is ingediend."),
           col("regio_code", V(8), "region (NO/NW/ZO/ZW/MN)."),
           col("onderdeel", V(32), "WIA-onderdeel (IVA/WGA/looncomp)."),
           col("status", V(32), "Aanvraag-status (INGEDIEND/IN_BEHANDELING/TOEGEKEND/AFGEWEZEN)."),
-          col("n_aanvragen", INT, "Aantal aanvragen voor deze rij."),
+          col("n_request", INT, "Aantal request voor deze rij."),
         ],
         "domain": "AG", "owner": "divisie_ag", "dataProduct": "uc01_claims_funnel",
-        "tags": ["Tier.Tier1","Doelbinding.Sturingsinfo","LegalBasis.Art6_1c","Confidentiality.Internal","AI.Risk-Laag"],
-        "glossary": ["Aanvraag","Beoordeling"],
-        "ext": {"bewaartermijn_jaren": 7, "legal_basis_text": "WIA_art_64", "dbt_domain": "ag"},
+        "tags": ["Tier.Tier1","Purpose limitation.Sturingsinfo","LegalBasis.Art6_1c","Confidentiality.Internal","AI.Risk-Laag"],
+        "glossary": ["Aanvraag","Assessment"],
+        "ext": {"retention period_jaren": 7, "legal_basis_text": "WIA_art_64", "dbt_domain": "ag"},
         "pii_cols": {},
       },
       {
@@ -102,14 +102,14 @@ data:
           col("aanvraag_geadviseerd", BOOL, "True als TW-aanvulling wordt geadviseerd."),
         ],
         "domain": "WW", "owner": "divisie_ww", "dataProduct": "uc04_eligibility_outreach",
-        "tags": ["Tier.Tier1","Doelbinding.Proactieve_Dienstverlening","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Laag"],
-        "glossary": ["Uitkering"],
-        "ext": {"bewaartermijn_jaren": 7, "legal_basis_text": "Wet_proactieve_dienstverlening_SZW_2025", "dbt_domain": "service_requests", "opt_out_supported": ["true"]},
+        "tags": ["Tier.Tier1","Purpose limitation.Proactieve_Dienstverlening","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Laag"],
+        "glossary": ["Claim payout"],
+        "ext": {"retention period_jaren": 7, "legal_basis_text": "Wet_proactieve_dienstverlening_SZW_2025", "dbt_domain": "service_requests", "opt_out_supported": ["true"]},
         "pii_cols": {"bsn": "PII.BSN"},
       },
       {
         "schema": "uc05_customer_360", "name": "mart_uc05_customer_360",
-        "description": "UC-05 — 360°-cliëntbeeld voor klantcontact. Volledig schema; OPA-policies maskeren BSN/PII per rol.",
+        "description": "UC-05 — 360°-cliëntbeeld voor customer interaction. Volledig schema; OPA-policies maskeren BSN/PII per rol.",
         "columns": [
           col("bsn", V(9), "BSN — OPA-masking."),
           col("voornaam", V(64)),
@@ -119,13 +119,13 @@ data:
           col("straat", V(128)),
           col("huisnummer", V(16)),
           col("postcode", V(8)),
-          col("n_lopende_ww", INT, "Aantal lopende WW-uitkeringen."),
-          col("n_lopende_wia", INT, "Aantal lopende WIA-uitkeringen."),
+          col("n_lopende_ww", INT, "Aantal lopende WW-claim payouten."),
+          col("n_lopende_wia", INT, "Aantal lopende WIA-claim payouten."),
         ],
         "domain": "CRM", "owner": "divisie_crm", "dataProduct": "uc05_customer_360",
-        "tags": ["Tier.Tier1","Doelbinding.Klantcontact","Doelbinding.Behandeling","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Midden"],
-        "glossary": ["Client","Uitkering","Contact","Kanaal"],
-        "ext": {"bewaartermijn_jaren": 7, "legal_basis_text": "WIA+WW+Wajong+TW", "dbt_domain": "customers", "toegang_via_OPA_policies": ["true"]},
+        "tags": ["Tier.Tier1","Purpose limitation.Customer interaction","Purpose limitation.Behandeling","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Midden"],
+        "glossary": ["Client","Claim payout","Contact","Kanaal"],
+        "ext": {"retention period_jaren": 7, "legal_basis_text": "WIA+WW+Wajong+TW", "dbt_domain": "customers", "access_via_OPA_policies": ["true"]},
         "pii_cols": {"bsn":"PII.BSN","voornaam":"PII.Naam","achternaam":"PII.Naam","birth_date":"PII.Geboortedatum","straat":"PII.Adres","huisnummer":"PII.Adres","postcode":"PII.Adres"},
       },
       {
@@ -139,9 +139,9 @@ data:
           col("verwachte_last_eur", DBL),
         ],
         "domain": "FEZ", "owner": "divisie_fez", "dataProduct": "uc06_cost_forecast",
-        "tags": ["Tier.Tier2","Doelbinding.Actuarie","Doelbinding.Beleid","Confidentiality.Internal","AI.Risk-Laag"],
-        "glossary": ["Uitkering"],
-        "ext": {"bewaartermijn_jaren": 10, "dbt_domain": "finance"},
+        "tags": ["Tier.Tier2","Purpose limitation.Actuarie","Purpose limitation.Beleid","Confidentiality.Internal","AI.Risk-Laag"],
+        "glossary": ["Claim payout"],
+        "ext": {"retention period_jaren": 10, "dbt_domain": "finance"},
         "pii_cols": {},
       },
       {
@@ -155,9 +155,9 @@ data:
           col("delta_t_o_v_baseline_eur", DBL),
         ],
         "domain": "FEZ", "owner": "divisie_fez", "dataProduct": "uc06_cost_forecast",
-        "tags": ["Tier.Tier2","Doelbinding.Actuarie","Doelbinding.Beleid","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier2","Purpose limitation.Actuarie","Purpose limitation.Beleid","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 10, "dbt_domain": "finance"},
+        "ext": {"retention period_jaren": 10, "dbt_domain": "finance"},
         "pii_cols": {},
       },
       {
@@ -172,14 +172,14 @@ data:
           col("pct_complete_naam", DBL),
         ],
         "domain": "Polisadm", "owner": "data_steward_polisadm", "dataProduct": "uc07_dq_policies",
-        "tags": ["Tier.Tier1","Doelbinding.Kwaliteitscontrole","Doelbinding.Uitkering","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Laag"],
+        "tags": ["Tier.Tier1","Purpose limitation.Kwaliteitscontrole","Purpose limitation.Claim payout","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Laag"],
         "glossary": ["IKV"],
-        "ext": {"bewaartermijn_jaren": 30, "legal_basis_text": "Wet_SUWI+Wfsv", "dbt_domain": "policies", "juistheid_AVG_art_5_1d": ["true"]},
+        "ext": {"retention period_jaren": 30, "legal_basis_text": "Wet_SUWI+Wfsv", "dbt_domain": "policies", "juistheid_AVG_art_5_1d": ["true"]},
         "pii_cols": {},
       },
       {
         "schema": "uc09_reintegration_effect", "name": "mart_uc09_effect_panel",
-        "description": "UC-09 — Gepseudonimiseerd onderzoekspanel re-integratie. Alleen pseudo-IDs, geen ruwe BSN.",
+        "description": "UC-09 — Gepseudonimiseerd onderzoekspanel reintegration. Alleen pseudo-IDs, geen ruwe BSN.",
         "columns": [
           col("bsn_pseudo", V(64), "SHA-256 hash van BSN — niet herleidbaar."),
           col("leeftijd", INT),
@@ -189,9 +189,9 @@ data:
           col("traject_start_dt", DT),
         ],
         "domain": "AG", "owner": "knowledge_center", "dataProduct": "uc09_reintegration_effect",
-        "tags": ["Tier.Tier3","Doelbinding.Statistisch_Onderzoek","LegalBasis.Art5_1b_VerenigbaarGebruik","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier3","Purpose limitation.Statistisch_Research","LegalBasis.Art5_1b_VerenigbaarGebruik","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": ["Traject"],
-        "ext": {"bewaartermijn_jaren": 10, "legal_basis_text": "art_5_1b_verenigbaar_gebruik", "dbt_domain": "ag", "sandbox_only": ["true"], "pseudonymized": ["true"]},
+        "ext": {"retention period_jaren": 10, "legal_basis_text": "art_5_1b_verenigbaar_gebruik", "dbt_domain": "ag", "sandbox_only": ["true"], "pseudonymized": ["true"]},
         "pii_cols": {},
       },
       {
@@ -203,10 +203,10 @@ data:
           col("n_respondenten", INT),
           col("gemid_score_gewogen", DBL, "Score 1-5, gewogen op aantal contacten."),
         ],
-        "domain": "Klantcontact", "owner": "divisie_klantcontact", "dataProduct": "uc_customer_satisfaction",
-        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1e","Confidentiality.Internal","AI.Risk-Laag"],
+        "domain": "Customer interaction", "owner": "divisie_customer interaction", "dataProduct": "uc_customer_satisfaction",
+        "tags": ["Tier.Tier2","Purpose limitation.Sturingsinfo","LegalBasis.Art6_1e","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": ["Contact","Kanaal"],
-        "ext": {"bewaartermijn_jaren": 5, "dbt_domain": "klantcontact"},
+        "ext": {"retention period_jaren": 5, "dbt_domain": "customer interaction"},
         "pii_cols": {},
       },
       {
@@ -221,9 +221,9 @@ data:
           col("n_records", INT),
         ],
         "domain": "Governance", "owner": "data_steward_platform", "dataProduct": "dq_overview",
-        "tags": ["Tier.Tier2","Doelbinding.Kwaliteitscontrole","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier2","Purpose limitation.Kwaliteitscontrole","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "governance", "juistheid_AVG_art_5_1d": ["true"]},
+        "ext": {"retention period_jaren": 7, "dbt_domain": "governance", "juistheid_AVG_art_5_1d": ["true"]},
         "pii_cols": {},
       },
       {
@@ -238,9 +238,9 @@ data:
           col("dq_status", V(16), "pass/warn/fail."),
         ],
         "domain": "Governance", "owner": "data_steward_platform", "dataProduct": "dq_overview",
-        "tags": ["Tier.Tier2","Doelbinding.Kwaliteitscontrole","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier2","Purpose limitation.Kwaliteitscontrole","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "governance"},
+        "ext": {"retention period_jaren": 7, "dbt_domain": "governance"},
         "pii_cols": {},
       },
       # UC-12 FinOps — FOCUS-spec cloud spend. 5 marts in dezelfde schema/
@@ -256,9 +256,9 @@ data:
           col("effective_cost", DBL),
         ],
         "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
-        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier2","Purpose limitation.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "ext": {"retention period_jaren": 7, "dbt_domain": "finops"},
         "pii_cols": {},
       },
       {
@@ -273,9 +273,9 @@ data:
           col("effective_cost", DBL),
         ],
         "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
-        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier2","Purpose limitation.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "ext": {"retention period_jaren": 7, "dbt_domain": "finops"},
         "pii_cols": {},
       },
       {
@@ -289,9 +289,9 @@ data:
           col("effective_discount_pct", DBL),
         ],
         "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
-        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier2","Purpose limitation.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "ext": {"retention period_jaren": 7, "dbt_domain": "finops"},
         "pii_cols": {},
       },
       {
@@ -305,9 +305,9 @@ data:
           col("rank_in_month", INT),
         ],
         "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
-        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier2","Purpose limitation.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "ext": {"retention period_jaren": 7, "dbt_domain": "finops"},
         "pii_cols": {},
       },
       {
@@ -323,9 +323,9 @@ data:
           col("savings_eur", DBL),
         ],
         "domain": "FinOps", "owner": "divisie_finance", "dataProduct": "uc12_focus_finops",
-        "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
+        "tags": ["Tier.Tier2","Purpose limitation.Sturingsinfo","LegalBasis.Art6_1f","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 7, "dbt_domain": "finops"},
+        "ext": {"retention period_jaren": 7, "dbt_domain": "finops"},
         "pii_cols": {},
       },
     ]
@@ -356,7 +356,7 @@ data:
 
     def ensure_schema(database: str, schema: str) -> bool:
         """Garandeer dat het databaseSchema bestaat. Trino-catalog-ingest
-        creëert deze normaal; voor de demo-synth maken we ze on-the-fly
+        creëert deze normaal; for the demo-synth maken we ze on-the-fly
         zodat UC's zonder Trino-table (bv. UC-12) ook landen."""
         fqn = f"{SERVICE}.{database}.{schema}"
         if fqn in _schema_seen: return True
@@ -430,7 +430,7 @@ data:
             })
         return ops
 
-    # Bookkeeping voor de eindverificatie. OM 1.12 dataProduct.assets is GEEN
+    # Bookkeeping for the eindverificatie. OM 1.12 dataProduct.assets is GEEN
     # persistent veld meer (zoals in 1.5 was) — de UI Data Product-pagina
     # rendert assets via search-query `dataProducts.name.keyword:X` op
     # table_search_index. Bidirectie is dus automatisch zolang:

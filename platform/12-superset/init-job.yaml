@@ -1,10 +1,10 @@
 # Post-deploy init-Job: registreert Trino als Superset-database en maakt
-# datasets aan voor UC-01 (WIA Funnel) en UC-06 (Lastprognose).
+# datasets aan voor UC-01 (WIA Funnel) en UC-06 (Cost forecast).
 #
 # Idempotent: API-calls gebruiken POST → 200/201 of 422 (already exists).
 # De Job wacht via een `until`-loop tot de Superset-webserver healthy is.
 #
-# Productie zou dit via een GitOps-tool (ArgoCD ApplicationSet) of een
+# Production zou dit via een GitOps-tool (ArgoCD ApplicationSet) of een
 # Superset-bundle (zip) doen. Voor dev volstaat een eenvoudige Python-Job.
 ---
 apiVersion: v1
@@ -153,7 +153,7 @@ data:
         aan; charts falen daarna met "Columns missing in dataset".
 
         Implementatie via Trino REST `SELECT * LIMIT 1` — de response
-        bevat een `columns: [{name,type}]` array met de complete kolomlijst.
+        bevat een `columns: [{name,type}]` array with the complete kolomlijst.
         Trino's SHOW COLUMNS / SQL Lab pad geeft op deze cluster maar 1
         kolom terug (oorzaak onduidelijk in Stackable+OPA-combinatie),
         dus dit pad omzeilt dat probleem.
@@ -208,7 +208,7 @@ data:
 
         # 4. Build column list voor Superset PUT.
         # NB: Superset persisteert via API maar 1 kolom (validatie tegen
-        # SHOW COLUMNS dropt de rest). Voor productie-fix: direct in Postgres
+        # SHOW COLUMNS dropt de rest). Voor production-fix: direct in Postgres
         # via /scripts/sync_dataset_columns.sql.
         wanted = []
         for c in cols_meta:
@@ -276,7 +276,7 @@ data:
         gold_id = ensure_trino_database(s, "trino-gold", "gold")
 
         # Datasets — gold.uc0x_*.mart_uc0x_* (UC-mart-tabellen voor BI).
-        # Naam komt uit dbt-modellen in dbt/models/marts/uc0x_*.
+        # Naam komt uit dbt-models in dbt/models/marts/uc0x_*.
         gold_targets = [
             ("uc01_claims_funnel", "mart_uc01_claims_funnel_daily"),
             ("uc04_eligibility_outreach", "mart_uc04_eligibility_outreach"),
@@ -429,7 +429,7 @@ data:
             "mart_uc01_claims_funnel_daily": [
                 ("aanvraag_datum", "DATE", True),
                 ("regio_code", "VARCHAR", False), ("onderdeel", "VARCHAR", False),
-                ("status", "VARCHAR", False), ("n_aanvragen", "BIGINT", False),
+                ("status", "VARCHAR", False), ("n_request", "BIGINT", False),
                 ("gemid_ao_pct", "DOUBLE", False), ("n_in_behandeling", "BIGINT", False),
                 ("n_toegekend", "BIGINT", False), ("n_afgewezen", "BIGINT", False),
             ],
@@ -448,20 +448,20 @@ data:
                 ("n_dienstverbanden_lopend", "BIGINT", False),
                 ("totaal_loon_jaar", "BIGINT", False), ("n_lopende_ww", "BIGINT", False),
                 ("n_lopende_wia", "BIGINT", False), ("max_ao_pct", "INTEGER", False),
-                ("n_klantcontacten_30d", "BIGINT", False),
+                ("n_customer interactionen_30d", "BIGINT", False),
             ],
             "mart_uc06_cost_5y": [
                 ("jaar", "BIGINT", False), ("maand", "BIGINT", False),
                 ("wet", "VARCHAR", False), ("regio_code", "VARCHAR", False),
                 ("uitbetaald_bruto_eur_projection", "INTEGER", False),
-                ("aantal_uitkeringen_projection", "INTEGER", False),
+                ("aantal_claim payouten_projection", "INTEGER", False),
                 ("scenario_id", "VARCHAR", False),
             ],
             "mart_uc06_scenario_results": [
                 ("jaar", "BIGINT", False), ("maand", "BIGINT", False),
                 ("wet", "VARCHAR", False), ("regio_code", "VARCHAR", False),
                 ("uitbetaald_bruto_eur_projection", "INTEGER", False),
-                ("aantal_uitkeringen_projection", "INTEGER", False),
+                ("aantal_claim payouten_projection", "INTEGER", False),
                 ("scenario_id", "VARCHAR", False),
             ],
             "mart_uc07_dq_dagrapport": [
@@ -473,9 +473,9 @@ data:
             ],
             "mart_uc09_effect_panel": [
                 ("bsn_pseudo", "VARCHAR", False), ("leeftijd", "BIGINT", False),
-                ("geslacht", "VARCHAR", False), ("n_ww_aanvragen", "BIGINT", False),
+                ("geslacht", "VARCHAR", False), ("n_ww_request", "BIGINT", False),
                 ("ooit_ww_toegekend", "BOOLEAN", False),
-                ("n_wia_aanvragen", "BIGINT", False), ("max_ao_pct", "INTEGER", False),
+                ("n_wia_request", "BIGINT", False), ("max_ao_pct", "INTEGER", False),
                 ("dienstverbanden_lopend", "BIGINT", False),
                 ("loon_jaar_lopend", "BIGINT", False),
                 ("huidige_status", "VARCHAR", False),
@@ -543,10 +543,10 @@ data:
                 )
                 if cur.rowcount > 0:
                     total_inserted += 1
-            # main_dttm_col op de table-rij zetten zodat line-charts werken:
+            # main_dttm_col on the table-rij zetten zodat line-charts werken:
             # zonder dit krijgt elke time-series chart-API een 500 met
             # "Datetime column not provided as part table configuration".
-            # We pakken de EERSTE is_dttm-kolom uit de DATASET_COLS-spec.
+            # We pakken de EERSTE is_dttm-kolom from the DATASET_COLS-spec.
             dttm_col = next((c[0] for c in cols if c[2]), None)
             if dttm_col:
                 cur.execute(

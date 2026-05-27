@@ -3,7 +3,7 @@
 #
 # Het split-URL-patroon (issuer extern, token-endpoints intern) lost het
 # k3d-probleem op dat 'keycloak.odap.local' alleen via /etc/hosts
-# op de host resolveert; in-cluster pods kennen die hostname niet.
+# on the host resolveert; in-cluster pods kennen die hostname niet.
 # Issuer-claim in tokens blijft de externe URL omdat Keycloak met
 # `proxy: edge` + `hostname: keycloak.odap.local` is gestart.
 apiVersion: v1
@@ -39,7 +39,7 @@ data:
     cookie_refresh          = "10m"
     cookie_domains          = ["platform.odap.local"]
     # NB: whitelist matcht host+port exact. ':8443' is nodig zodat
-    # /oauth2/sign_out?rd=… naar de Keycloak end-session endpoint mag
+    # /oauth2/sign_out?rd=… to the Keycloak end-session endpoint mag
     # redirecten (anders blokkeert validator.go de RP-initiated logout).
     whitelist_domains       = [".odap.local", ".odap.local:8443"]
 
@@ -48,13 +48,13 @@ data:
     upstreams               = ["http://127.0.0.1:8080"]
     redirect_url            = "https://platform.odap.local:8443/oauth2/callback"
 
-    # Identity headers voor de browser (Layout.astro leest /oauth2/userinfo)
+    # Identity headers for the browser (Layout.astro leest /oauth2/userinfo)
     pass_user_headers       = true
     pass_access_token       = true
     set_xauthrequest        = true
     set_authorization_header = false
 
-    # Iedereen met een ODAP realm-account mag in
+    # Iedereen with a ODAP realm-account mag in
     email_domains           = ["*"]
     skip_provider_button    = true
 

@@ -3,17 +3,17 @@
 | Status in deze repo | **Spec + dbt-mart skelet** (geen ML-training in fase 5) |
 |---|---|
 | Domein | WW |
-| Risicoclassificatie | **Hoog (AI Act)** — toegang tot uitkering |
+| Risicoclassificatie | **Hoog (AI Act)** — access tot claim payout |
 | AVG-grondslag | Art. 6 lid 1e |
-| Bewaartermijn | 7 jaar |
+| Retention period | 7 jaar |
 
-Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-03](../../referentiearchitectuur-odap-data-analytics.md).
+Bron: [`referentiearchitecture-odap-data-analytics.md` § 8 UC-03](../../referentiearchitecture-odap-data-analytics.md).
 
 ---
 
 ## Context
 
-UWV gebruikt een risicomodel voor WW-aanvragen. De Algemene Rekenkamer (mei
+UWV gebruikt een risicomodel voor WW-request. De Algemene Rekenkamer (mei
 2025) oordeelde dat het model 3× effectiever is dan willekeurige controle en
 "grotendeels op orde", maar IT-beheer van de risicoscan vraagt aandacht.
 Doel hier: **nieuwe versie** op moderne MLOps-stack met sterkere monitoring
@@ -34,7 +34,7 @@ verwijtbaarheid; behandelaar beslist daadwerkelijk over verwijtbaarheid.
 
 **CGM-entiteiten**: `Aanvraag`, `Dienstverband`, `Ontslag`.
 
-## Architectuur-pad
+## Architecture-pad
 
 ```
 NiFi: PublishKafka service_requests.application
@@ -71,9 +71,9 @@ nodig — geen art. 9-data, wél verzwaarde governance).
 meta:
   domain: ww
   legal_basis: WW_art_24_27
-  doelbinding: [handhaving]
+  purpose-limitation: [handhaving]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: divisie_ww
   pii_kolommen: [bsn]
   risk_tier: hoog
@@ -83,14 +83,14 @@ meta:
 
 ## OPA-policies
 
-- Toegang tot `gold.uc03_fraud_risk.*` alleen voor rol `fraud_analyst` met doelcode `handhaving`.
+- Access tot `gold.uc03_fraud_risk.*` alleen voor rol `fraud_analyst` met doelcode `handhaving`.
 - Singular test (Rego): geen *protected attributes* (etniciteit, wijk-code) in features. Falt af bij detectie.
 - Audit-log van **elke** read (volledig, niet samples): WW-handhaving is
   toezicht-gevoelig.
 
 ## OpenMetadata
 
-- Tags: `Domain.WW`, `AI.Risk.Hoog`, `Doelbinding.handhaving`, `Algoritmeregister.ODAP-CLAIMS-ATTRIBUTION-001`.
+- Tags: `Domain.WW`, `AI.Risk.Hoog`, `Purpose limitation.handhaving`, `Algoritmeregister.ODAP-CLAIMS-ATTRIBUTION-001`.
 - Custom property `champion_challenger`: link naar A/B-experiment-id.
 - Lineage: bronze → silver → mart → (latere: model-feature → score → behandeling → besluit).
 
@@ -100,7 +100,7 @@ meta:
 - `dbt/models/marts/uc03_fraud_risk/{mart_uc03_verwijtbaar_signalen.sql, schema.yml}`
 - `dbt/tests/test_no_protected_attributes_uc03.sql` (singular test)
 
-## TODO voor productie-uitbreiding
+## TODO voor production-uitbreiding
 
 - Drift detection (data + concept) met alerts.
 - Champion-challenger setup met A/B-routing.

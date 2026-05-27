@@ -1,9 +1,9 @@
 # HorizontalPodAutoscaler — Trino-workers schalen op CPU-load (improvements #3).
 #
-# Vereist metrics-server actief. K3d heeft 'm uit (we disabled in cluster-config);
-# productie heeft 'm aan, of gebruik prometheus-adapter.
+# Required metrics-server actief. K3d heeft 'm uit (we disabled in cluster-config);
+# production heeft 'm aan, of gebruik prometheus-adapter.
 #
-# Productie-overlay zou ook scale targetRef vergroten naar 10+ replicas.
+# Production-overlay zou ook scale targetRef vergroten naar 10+ replicas.
 # Dev-instelling: 1-3 replicas, scale-up op > 70% CPU.
 ---
 apiVersion: autoscaling/v2

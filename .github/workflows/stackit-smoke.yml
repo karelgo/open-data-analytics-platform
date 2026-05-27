@@ -8,7 +8,7 @@
 #
 # Smoke-failures zijn fataal voor deze pipeline (rode run = pager-worthy).
 #
-# Vereiste secret: STACKIT_SA_KEY.
+# Requirede secret: STACKIT_SA_KEY.
 name: stackit-smoke
 
 on:

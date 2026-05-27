@@ -9,7 +9,7 @@ Spark on Kubernetes via Stackable's `SparkApplication` CRD.
 | `SparkHistoryServer history` | Permanente Spark-UI op port 18080. Leest event-logs van alle voltooide jobs uit `s3a://odap-checkpoints/spark-events/`. Bereikbaar via `https://spark.<domain>/`. |
 | `Job spark-events-prefix-init` | One-shot bij deploy: maakt `spark-events/.keep` placeholder in MinIO zodat history-server kan starten (S3 heeft geen leeg-directory concept). |
 
-## Architectuur
+## Architecture
 
 ```
 data-generation/load_to_s3.py  →  s3://odap-raw/<domain>/<entity>/dt=YYYY-MM-DD/*.jsonl
@@ -30,7 +30,7 @@ Canonical bron: [`spark-jobs/`](../../spark-jobs/) — daar staan
 `platform/08-spark/scripts/` (gitignored) zodat kustomize ze via
 `configMapGenerator` kan oppikken — zonder load-restrictor=None.
 
-## Voorvereisten
+## Prerequisites
 
 - `platform/01-secrets/` — `minio-s3-credentials` Secret aanwezig.
 - `platform/03-storage/` — `S3Connection s3-minio`; bucket `odap-raw` bestaat in MinIO.
@@ -72,7 +72,7 @@ In Spark UI: lijst van actieve streaming queries en batch-stats.
 Iceberg: wijzig `platform-config.yaml` + de twee env-blokken (driver +
 executor).
 
-## Productie
+## Production
 
 - `replicas: ≥ 3` op executor.
 - Aparte SparkApplication per stream-domein (i.p.v. één foreachBatch dispatcher).
@@ -84,7 +84,7 @@ executor).
 ## WIA bronze→silver→gold demo (parallel-Spark-pad, naast dbt)
 
 Een volledig pure-Spark + Delta Lake pad voor één vertical slice
-(WIA-aanvragen), bedoeld om het Spark-verhaal van bronze tot goud
+(WIA-request), bedoeld om het Spark-verhaal van bronze tot goud
 te demonstreren **naast** het bestaande dbt-+-Trino-pad voor silver/gold.
 Beide paden schrijven naar dezelfde MinIO-buckets maar gebruiken aparte
 HMS-schemas, dus ze raken elkaar niet.
@@ -98,7 +98,7 @@ HMS-schemas, dus ze raken elkaar niet.
 | gold    | `gold.uc01_claims_funnel.mart_uc01_claims_funnel_daily` | `gold.uc01_wia_spark.funnel_daily` |
 | S3-pad  | `s3a://odap-silver/wia/...`                  | `s3a://odap-silver/wia_spark/...`          |
 
-### Componenten
+### Components
 
 | Bestand | Doel |
 |---|---|
@@ -125,7 +125,7 @@ make wia-spark-demo
 # 3. Verifieer eindresultaat via Trino (zie laatste regels van make-output).
 ```
 
-### Waarom geen Airflow DAG voor de orchestratie?
+### Waarom geen Airflow DAG for the orchestratie?
 
 De DAG `transform_wia_spark` BESTAAT in de repo
 ([dags/transform_wia_spark.py](../11-airflow/dags/transform_wia_spark.py))
@@ -145,7 +145,7 @@ de DAG zonder code-wijziging.
 Voor deze demo prefereren we deterministische input boven het oplossen van
 het streaming-resource-probleem — dat is een aparte opdracht. Zodra
 streaming-bronze terug aan staat, kan de seed-stap overgeslagen worden;
-de silver+gold DAG werkt onveranderd op de daadwerkelijke bronze-tabel.
+de silver+gold DAG werkt onveranderd on the daadwerkelijke bronze-tabel.
 
 ### Resource-eisen (lessons learned op k3d, 2026-05-24)
 
@@ -167,7 +167,7 @@ polling, niet `-f` — die mist de laatste seconden bij delete).
   een Delta-superpower (upsert op object-id, niet beschikbaar in raw
   Parquet) en is correct voor incrementele runs.
 - **Gold** is een deterministische aggregatie; volledige overwrite is
-  transparanter en de tabel is klein. In productie zou je
+  transparanter en de tabel is klein. In production zou je
   `dynamicPartitionOverwrite` per `aanvraag_datum` willen.
 
 ### Vergelijking met dbt-pad
@@ -177,6 +177,6 @@ polling, niet `-f` — die mist de laatste seconden bij delete).
 | Taal | SQL (Trino dialect) | PySpark (DataFrame API) |
 | Idempotentie | `materialized=view` (re-query) | Delta MERGE / overwrite |
 | Orchestratie | Cosmos-tasks per model | Airflow KPO + kubectl-apply per SparkApplication |
-| Trigger | Dataset-outlet van bronze-watch | Handmatig (demo) of Dataset (productie) |
+| Trigger | Dataset-outlet van bronze-watch | Handmatig (demo) of Dataset (production) |
 | Compute | Trino-cluster (lange leven) | Spark driver+executor per run (kort leven) |
-| Beste use case | SQL-transformaties, BI | Complex Python, ML-feature-engineering, MERGE |
+| Beste use case | SQL-transformations, BI | Complex Python, ML-feature-engineering, MERGE |

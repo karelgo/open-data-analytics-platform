@@ -1,13 +1,13 @@
 # CGM (Canonical Data Model) glossary voor OpenMetadata.
 #
-# Termen uit referentiearchitectuur Bijlage B + use-case-secties.
+# Termen uit referentiearchitecture Bijlage B + use-case-secties.
 # Wordt via init-Job met POST /api/v1/glossaries en /api/v1/glossaryTerms toegepast.
 #
-# Productie zou de officiële CGM-yaml uit het Data Office repo halen.
+# Production zou de officiële CGM-yaml from the Data Office repo halen.
 #
-# Reviewers/Owners per term — gebruikt door de Request Access-flow (ADR-0008).
+# Reviewers/Owners per term — gebruikt through the Request Access-flow (ADR-0008).
 # Default valt terug op `glossary.reviewers` + `glossary.owner` als de term
-# zelf niets specifieks zet. dataOwner per term scopet aanvragen op het
+# zelf niets specifieks zet. dataOwner per term scopet request op het
 # verantwoordelijke domein.
 
 glossary:
@@ -28,7 +28,7 @@ terms:
   - name: Client
     displayName: "Cliënt"
     description: "Natuurlijke persoon waarvoor the platform performs a service."
-    relatedTerms: [Aanvraag, Uitkering, Contact]
+    relatedTerms: [Aanvraag, Claim payout, Contact]
   - name: Persona
     displayName: "Persoon"
     description: "Persoonsgegeven-deel van een Cliënt (NAW + birth_date)."
@@ -36,9 +36,9 @@ terms:
   # Aanvraag- en beoordelings-domein
   - name: Aanvraag
     displayName: "Aanvraag"
-    description: "Verzoek tot uitkering of voorziening (WW, WIA, Wajong, ZW, TW)."
-  - name: Beoordeling
-    displayName: "Beoordeling"
+    description: "Verzoek tot claim payout of voorziening (WW, WIA, Wajong, ZW, TW)."
+  - name: Assessment
+    displayName: "Assessment"
     description: "Inhoudelijke toetsing van een Aanvraag door beoordelaar."
   - name: Beoordelaar
     displayName: "Beoordelaar"
@@ -47,7 +47,7 @@ terms:
     displayName: "Capaciteit"
     description: "Beschikbare uren per Beoordelaar (UC-08)."
 
-  # Diagnose / sociaal-medisch
+  # Diagnose / operational
   - name: Diagnose
     displayName: "Diagnose"
     description: "Medische diagnose — bijzonder PG (art. 9 AVG). Sensitive Vault."
@@ -57,10 +57,10 @@ terms:
       - case.manager
       - data.steward
 
-  # Re-integratie
+  # Reintegration
   - name: Traject
-    displayName: "Re-integratietraject"
-    description: "Re-integratie-instrument (IPS, proefplaatsing, scholing, jobcoaching)."
+    displayName: "Reintegrationtraject"
+    description: "Reintegration-instrument (IPS, proefplaatsing, scholing, jobcoaching)."
   - name: Werkhervatting
     displayName: "Werkhervatting"
     description: "Daadwerkelijke werkhervatting na een traject."
@@ -85,9 +85,9 @@ terms:
     displayName: "Ontslag"
     description: "Beëindiging van een Dienstverband."
 
-  # Uitkering / financieel — FEZ-domein
-  - name: Uitkering
-    displayName: "Uitkering"
+  # Claim payout / financieel — FEZ-domein
+  - name: Claim payout
+    displayName: "Claim payout"
     description: "Periodieke betaling aan Cliënt op grond van een wet (WW/WIA/Wajong/ZW/TW)."
     dataOwner: finance.analyst
   - name: Inkomen
@@ -104,12 +104,12 @@ terms:
 
   # CRM
   - name: Contact
-    displayName: "Klantcontact"
+    displayName: "Customer interaction"
     description: "Contactgebeurtenis between Client and the platform (telefoon, balie, beeldbellen, mail)."
     dataOwner: marketing.analyst
   - name: Kanaal
     displayName: "Kanaal"
-    description: "Communicatiekanaal — telefoon, balie, beeldbellen, werkmap_bericht, mail."
+    description: "Communicatiekanaal — telefoon, balie, beeldbellen, workspace_bericht, mail."
     dataOwner: marketing.analyst
 
   # Doelgroep
@@ -117,29 +117,29 @@ terms:
     displayName: "Doelgroepregister Banenafspraak"
     description: "Indicaties art. 38d Wfsv."
 
-  # Cross-domein klantreis (UC-11)
-  - name: Klantreis
-    displayName: "Integrale Klantreis"
+  # Cross-domein customer journey (UC-11)
+  - name: Customer journey
+    displayName: "Integrale Customer journey"
     description: |
       Cross-domein aggregaat: chronologische reeks van fase-overgangen van een
-      cliënt across applicable laws (werknemer → ziek → WIA → re-integratie → ...).
+      cliënt across applicable laws (werknemer → ziek → WIA → reintegration → ...).
       Afgeleid uit events in IKV, WW, ZW, WIA, Wajong en Contact. Eigenaar is
-      divisie_klantcontact; OPA filtert per rol op kolom + rij.
-    relatedTerms: [Client, IKV, Aanvraag, Beoordeling, Uitkering, Contact, Traject, Werkhervatting]
+      divisie_customer interaction; OPA filtert per rol op kolom + rij.
+    relatedTerms: [Client, IKV, Aanvraag, Assessment, Claim payout, Contact, Traject, Werkhervatting]
     dataOwner: marketing.analyst
     reviewers:
       - marketing.analyst
       - data.steward
   - name: Fase
-    displayName: "Klantreis-fase"
+    displayName: "Customer journey-fase"
     description: |
-      Periode in de klantreis waarin de cliënt in een bepaalde status
-      verkeert (werknemer, ziek, service_request_application, ww_uitkering, wia_in_behandeling,
+      Periode in de customer journey waarin de cliënt in een bepaalde status
+      verkeert (werknemer, ziek, service_request_application, ww_claim payout, wia_in_behandeling,
       wga, iva, wajong_actief, tussen_dienstverband).
-    relatedTerms: [Klantreis]
+    relatedTerms: [Customer journey]
   - name: EventStream
     displayName: "Event-stream"
     description: |
       Tijdgeordende reeks van cliënt-gebeurtenissen, geünificeerd over
-      domeinen. Basis voor klantreis-tijdlijn-visualisaties.
-    relatedTerms: [Klantreis, Contact]
+      domeinen. Basis voor customer journey-tijdlijn-visualisaties.
+    relatedTerms: [Customer journey, Contact]

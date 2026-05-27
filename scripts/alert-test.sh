@@ -12,8 +12,8 @@
 #   bash scripts/alert-test.sh resolve      # verstuur dezelfde alert
 #                                           # als 'resolved'
 #
-# Vereisten:
-#   - kubectl context wijst naar de cluster waar Alertmanager draait
+# Requireden:
+#   - kubectl context wijst to the cluster waar Alertmanager draait
 #   - Alertmanager runt in namespace odap-monitoring
 #
 # Exit-codes: 0 = success, !=0 = failure.

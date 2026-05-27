@@ -1,12 +1,12 @@
 # Open Data & Analytics Platform — k3d cluster config
 #
-# Scaled-down profiel, geschikt voor ontwikkel-laptop. Niet voor productie.
+# Scaled-down profiel, geschikt voor ontwikkel-laptop. Niet voor production.
 # Dit cluster moet op Docker Desktop draaien met minimaal 8 GB RAM en 4 CPU's
 # beschikbaar voor containers.
 #
 # Belangrijke keuzes:
 # - Traefik uit: we gebruiken Stackable's listener-operator + ingress-nginx
-#   (in fase 1) zodat exposure-pad consistent is met productie.
+#   (in fase 1) zodat exposure-pad consistent is met production.
 # - servicelb uit: niet nodig in deze topologie.
 # - 1 server + 2 agents: lichte setup; pods schalen via scaled-down replica counts.
 # - LoadBalancer ports 8080/8443 op host → ingress-nginx in cluster.

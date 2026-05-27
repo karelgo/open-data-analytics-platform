@@ -1,6 +1,6 @@
 # dbt — Open Data & Analytics Platform
 
-Transformatielaag van **bronze.demo.\*** (raw event-envelopes) naar
+Transformationlaag van **bronze.demo.\*** (raw event-envelopes) naar
 **silver.\<domein\>.\***  (CGM-conform getypt) en **gold.\<uc\>.\***
 (business products).
 
@@ -56,9 +56,9 @@ Elk model **moet** in zijn schema.yml een `meta:` block hebben met:
 meta:
   domain: ag                                    # divisie
   legal_basis: WIA_art_64                       # AVG art. 6 (en eventueel 9)
-  doelbinding: [uitkering, reintegratie]
+  purpose-limitation: [claim payout, reintegration]
   bio_classificatie: vertrouwelijk              # publiek|intern|vertrouwelijk|geheim
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: divisie_ag
   pii_kolommen: [bsn, birth_date]
   risk_tier: laag                               # laag|midden|hoog|verboden

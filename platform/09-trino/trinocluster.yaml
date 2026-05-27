@@ -10,7 +10,7 @@
 # Catalogs: alle TrinoCatalog-resources met label `trino: trino` worden
 # automatisch opgepikt. Zie `catalogs/`.
 #
-# Schaal: 1 coordinator + 1 worker (k3d scaled-down). Productie: meerdere
+# Schaal: 1 coordinator + 1 worker (k3d scaled-down). Production: meerdere
 # workers + fault-tolerant execution.
 ---
 apiVersion: trino.stackable.tech/v1alpha1
@@ -29,7 +29,7 @@ spec:
     # - trino-static: password-file-updater sidecar crashloop
     # - keycloak OIDC: issuer-mismatch tussen interne discovery-URL
     #   en externe issuer-claim die Keycloak adverteert (KC_HOSTNAME=:8443).
-    # Productie: of Keycloak issuer in-cluster resolvable maken (CoreDNS
+    # Production: of Keycloak issuer in-cluster resolvable maken (CoreDNS
     # rewrite + 443:443 port-mapping in k3d), of mTLS via SecretClass tls.
     authentication: []
     authorization:

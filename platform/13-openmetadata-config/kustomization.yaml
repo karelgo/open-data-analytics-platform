@@ -17,7 +17,7 @@ resources:
 # één ConfigMap die de init-Job, governance-DAG en CronJobs mounten op
 # /config. De Python-scripts (.py) en de YAML-configs delen één Mount-punt
 # (init-job laadt /scripts uit een aparte ConfigMap entry voor backwards-
-# compat met de originele setup).
+# compat with the originele setup).
 configMapGenerator:
   - name: openmetadata-platform-config
     namespace: odap-meta

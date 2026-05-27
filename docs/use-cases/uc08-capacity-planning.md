@@ -1,13 +1,13 @@
-# UC-08 — Capaciteitsplanning sociaal-medische beoordelingen
+# UC-08 — Capacity planning operationale beoordelingen
 
 | Status in deze repo | **Spec + dbt-mart skelet** (geen OR-Tools optimizer) |
 |---|---|
 | Domein | AG (SMZ) |
 | Risicoclassificatie | Laag (interne planning, geen besluit over individu) |
 | AVG-grondslag | Art. 6 lid 1b (arbeidsovereenkomst medewerker) + 1f (gerechtvaardigd belang) |
-| Bewaartermijn | 5 jaar (planning-historie) |
+| Retention period | 5 jaar (planning-historie) |
 
-Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-08](../../referentiearchitectuur-odap-data-analytics.md).
+Bron: [`referentiearchitecture-odap-data-analytics.md` § 8 UC-08](../../referentiearchitecture-odap-data-analytics.md).
 
 ---
 
@@ -33,7 +33,7 @@ naar planners; menselijk akkoord verplicht.
 
 **CGM-entiteiten**: `Beoordelaar`, `Capaciteit`, `Aanvraag`.
 
-## Architectuur-pad (in deze repo: voorbereiding-mart, geen optimizer)
+## Architecture-pad (in deze repo: voorbereiding-mart, geen optimizer)
 
 ```
 silver.smz.beoordelaar_rooster
@@ -70,9 +70,9 @@ schrijft een werklijst die niet onder dbt valt — dat blijft Spark.
 meta:
   domain: ag_smz
   legal_basis: arbeidsovereenkomst+gerechtvaardigd_belang
-  doelbinding: [planning]
+  purpose-limitation: [planning]
   bio_classificatie: intern
-  bewaartermijn_jaren: 5
+  retention period_jaren: 5
   eigenaar: divisie_ag_smz
   pii_kolommen: []   # cliënt-data is gepseudonimiseerd of niet aanwezig in mart
   risk_tier: laag
@@ -81,14 +81,14 @@ meta:
 
 ## OPA-policies
 
-- Toegang tot `gold.uc08_capacity_planning.*` voor rol `operations_manager` +
+- Access tot `gold.uc08_capacity_planning.*` voor rol `operations_manager` +
   `data_steward`.
 - Geen PII in mart → geen kolom-masks nodig.
 - Cliëntdata in onderliggende silver-tabellen blijft onder strikte access.
 
 ## OpenMetadata
 
-- Tags: `Domain.AG_SMZ`, `Doelbinding.planning`, `InternalOnly.true`.
+- Tags: `Domain.AG_SMZ`, `Purpose limitation.planning`, `InternalOnly.true`.
 
 ## Outputs
 

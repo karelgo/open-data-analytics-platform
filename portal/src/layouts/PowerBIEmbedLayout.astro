@@ -4,7 +4,7 @@
 
   Verschilt van EmbedLayout.astro doordat het ipv een iframe naar een
   service-subdomein een React Island rendert die powerbi-client-react
-  gebruikt met een server-mint embed-token. Dat omzeilt Microsoft's
+  gebruikt with a server-mint embed-token. Dat omzeilt Microsoft's
   restrictieve `frame-ancestors`-CSP op app.fabric.microsoft.com (zie
   ADR-0008 / docs/use-cases/powerbi-embed-aks-entra.md).
 
@@ -25,7 +25,7 @@ interface Props {
 }
 
 const { component, reportId, pageName } = Astro.props;
-// Fallback-URL voor de "Open in nieuw tabblad"-knop.
+// Fallback-URL for the "Open in nieuw tabblad"-knop.
 const externalUrl =
   reportId
     ? `https://app.fabric.microsoft.com/groups/me/reports/${reportId}`

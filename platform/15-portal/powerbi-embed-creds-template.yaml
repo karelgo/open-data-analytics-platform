@@ -1,6 +1,6 @@
 # Template — NIET committen met echte waarden, alleen placeholders.
 #
-# Creëer in AKS met (van repo-root, met de SP-creds in je env):
+# Creëer in AKS met (van repo-root, with the SP-creds in je env):
 #
 #   set -a; source secrets/local/uc11-multiplatform.env; set +a
 #   kubectl -n odap-platform create secret generic powerbi-embed-creds \
@@ -15,7 +15,7 @@
 # /api/portal/powerbi/embed route met 503 "FABRIC_TENANT_ID/CLIENT_ID
 # /CLIENT_SECRET niet gezet".
 #
-# Productie: vervang door SealedSecret / External Secrets + Key Vault +
+# Production: vervang door SealedSecret / External Secrets + Key Vault +
 # Workload Identity (zie infrastructure/azure/README.md).
 apiVersion: v1
 kind: Secret

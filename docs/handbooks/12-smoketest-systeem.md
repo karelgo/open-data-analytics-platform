@@ -1,10 +1,10 @@
-# Handleiding — Smoketest (systeemrol)
+# Handbook — Smoketest (systeemrol)
 
-> Rol-key: `smoketest` · Type: **service-account, geen mens** · Risiconiveau toegang: middel
+> Rol-key: `smoketest` · Type: **service-account, geen mens** · Risiconiveau access: middel
 
 Dit is **geen rol voor mensen**. Het is een service-account voor
 geautomatiseerde tests, dbt-runs in CI en smoke tests bij deploy.
-Deze handleiding is voor de **platform-admins en data-engineers** die
+Deze handbook is for the **platform-admins en data-engineers** die
 deze rol configureren en bewaken.
 
 ---
@@ -16,7 +16,7 @@ deze rol configureren en bewaken.
 - **CI-pipeline** (`ci/github-actions/`) — bij elke PR run je `dbt parse`, `opa test`, smoke tests.
 - **Smoke tests** (`scripts/run-smoke-tests.sh`, `tests/smoke/*.sh`) — verifiëren dat het cluster werkt.
 - **dbt-runs** in Airflow voor `staging`/`marts` — non-interactief.
-- **Geen interactieve gebruikers** — login geweigerd, alleen service-account-flow.
+- **Geen interactieve users** — login geweigerd, alleen service-account-flow.
 
 ---
 
@@ -39,8 +39,8 @@ deze rol configureren en bewaken.
 ```
 
 > **Waarom alle purposes (`*`)?** Smoke tests valideren dat queries
-> *technisch* werken. De purposes zijn niet bedoeld als doelbinding maar
-> als test-coverage. In productie wordt deze rol **alleen vanuit de CI**
+> *technisch* werken. De purposes zijn niet bedoeld als purpose-limitation maar
+> als test-coverage. In production wordt deze rol **alleen vanuit de CI**
 > aangesproken, niet vanaf werkstations.
 
 ### 2.2 Authenticatie
@@ -48,11 +48,11 @@ deze rol configureren en bewaken.
 Geen password-flow. Het service-account gebruikt:
 
 - **Static OIDC client credentials** (Keycloak `client_credentials`-grant)
-- Secret in `Stackable secret-operator` (productie: External Secrets + Vault)
+- Secret in `Stackable secret-operator` (production: External Secrets + Vault)
 
 ### 2.3 Geen sensitive
 
-`smoketest` heeft **geen** toegang tot `sensitive.*` of `sandbox.*`.
+`smoketest` heeft **geen** access tot `sensitive.*` of `sandbox.*`.
 
 ---
 
@@ -107,7 +107,7 @@ Alerts gaan via Prometheus → AlertManager → Slack `#platform-alerts`.
 
 Maandelijks (data-steward + platform-admin):
 
-1. Bekijk OPA decision-log voor `smoketest` op productie-zones.
+1. Bekijk OPA decision-log voor `smoketest` op production-zones.
 2. Controleer of er **geen** queries zijn met cliënt-specifieke filters
    (`WHERE bsn = '...'`) — dat zou betekenen dat een mens deze rol misbruikt.
 3. Verifieer dat secret-rotatie afgelopen periode is uitgevoerd.
@@ -120,7 +120,7 @@ Maandelijks (data-steward + platform-admin):
 
 1. Check Airflow voor lopende DAGs — vermoedelijk een retry-loop.
 2. Pauzeer de DAG.
-3. Onderzoek de fout.
+3. Research de fout.
 4. Hervat na fix.
 
 ### 5.2 `smoketest` doet plotseling sensitive-queries
@@ -128,7 +128,7 @@ Maandelijks (data-steward + platform-admin):
 Dit is **niet** mogelijk volgens OPA-policy: deny default. Als toch:
 
 1. **Direct** smoke-test deactiveren in Keycloak.
-2. Onderzoek hoe een sensitive-query überhaupt door OPA kwam.
+2. Research hoe een sensitive-query überhaupt door OPA kwam.
 3. Audit-log van laatste 24u exporteren.
 4. Incident melden volgens NIS2-procedure (zie [11-platform-admin.md](11-platform-admin.md) § 4.8).
 
@@ -152,7 +152,7 @@ Als CI-runs failen met `401 Unauthorized` voor `smoketest`:
   is technisch geblokkeerd (geen direct grant).
 - **Geen gedeeld secret.** Het OIDC-client-secret komt alleen uit de
   secret-operator; staat **niet** in code, niet in env-files, niet in chats.
-- **Roteer per kwartaal** (productie). In dev: bij elke fresh `make bootstrap`.
+- **Roteer per kwartaal** (production). In dev: bij elke fresh `make bootstrap`.
 - **Audit-log = bewijs.** Bij twijfel over wat de rol gedaan heeft, lees
   de log; vraag het niet aan de developers.
 
@@ -162,7 +162,7 @@ Als CI-runs failen met `401 Unauthorized` voor `smoketest`:
 
 - `smoketest`-credentials gebruiken voor "snel een query" — gebruik je eigen account.
 - `smoketest` extra rechten geven om een test te laten slagen — fix de test.
-- Een productie-DAG schrijven die `smoketest` als impersonatie van een mens-rol gebruikt.
+- Een production-DAG schrijven die `smoketest` als impersonatie van een mens-rol gebruikt.
 
 ---
 

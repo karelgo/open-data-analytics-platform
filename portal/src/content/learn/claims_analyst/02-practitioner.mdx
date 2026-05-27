@@ -4,13 +4,13 @@ role: claims_analyst
 level: practitioner
 order: 2
 duration: "45 min"
-summary: "Eén complete WIA-aanvraag van werklijst tot een onderbouwde beslissing — met de juiste dashboards, een ad-hoc Trino-query voor de details en een lookup in de glossary."
+summary: "Eén complete WIA-aanvraag van werklijst tot een onderbouwde beslissing — with the juiste dashboards, een ad-hoc Trino-query for the details en een lookup in de glossary."
 prereqs:
   - "claims_analyst/foundation/1"
 labs:
   - title: "Open de WIA-funnel — werklijst voor jouw regio"
     href: "/go/superset/"
-  - title: "Open SQL Lab — voor de dossier-detail-query"
+  - title: "Open SQL Lab — for the dossier-detail-query"
     href: "/go/superset/"
   - title: "Glossary — wat is ‘arbeidsongeschiktheidsklasse’?"
     href: "/go/openmetadata/"
@@ -19,10 +19,10 @@ checks:
     title: "Detail-query op silver.claims.application uitgevoerd"
     hint: "Met regio-filter, met geldige PII-doel-comment"
 quiz:
-  - q: "Wat is een correcte SQL-comment voor een ad-hoc detail-query?"
+  - q: "Wat is een correcte SQL-comment for a ad-hoc detail-query?"
     options:
       - "Geen comment — niet nodig"
-      - "-- WIA-1234 (dossier) — doel: beoordeling/uitkering"
+      - "-- WIA-1234 (dossier) — doel: beoordeling/claim payout"
       - "-- nieuwsgierig"
       - "-- TODO"
     correct: 1
@@ -60,7 +60,7 @@ Open het [WIA-funnel dashboard](/go/superset/) en filter op:
 - status = `open`
 - doorlooptijd_dagen > 56
 
-Dossier 7782 staat in de top-3. Open het kaartje voor de overzichtsvelden.
+Dossier 7782 staat in de top-3. Open het kaartje for the overzichtsvelden.
 
 ## Stap 2 — detail in SQL Lab
 
@@ -68,7 +68,7 @@ Niet alle velden staan in de funnel. Voor het dossier-detail open je
 [SQL Lab](/go/superset/) en draait:
 
 ```sql
--- WIA-2024-7782 (dossier) — doel: beoordeling/uitkering
+-- WIA-2024-7782 (dossier) — doel: beoordeling/claim payout
 SELECT
     application_id,
     bsn,

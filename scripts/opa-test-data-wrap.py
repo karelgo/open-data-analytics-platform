@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Wrap opa-policies-src/data/role_mappings.json zodat `opa test` dezelfde
-data-paden ziet als de Stackable OpaCluster in productie.
+data-paden ziet als de Stackable OpaCluster in production.
 
 Stackable's opa-bundle-loader mount de ConfigMap onder
 `data.configmap["<configmap-name>"]["<namespace>"]`. Onze rego-regels lezen
 data via `data.configmap["opa-trino-bundle"]["odap-platform"].role_mappings.*`.
 
 `opa test` weet niets van die conventie en laadt JSON op `data.<root>`. Dit
-script wrapt de bron-JSON in dezelfde structuur als de productie-bundle,
-zodat dezelfde regels in test én in productie werken — geen rego-conditionals
+script wrapt de bron-JSON in dezelfde structuur als de production-bundle,
+zodat dezelfde regels in test én in production werken — geen rego-conditionals
 nodig.
 
 Tevens strippen we `_`-prefixed velden (commentaar in de bron-JSON), conform
@@ -46,7 +46,7 @@ def main() -> int:
         "--dst",
         type=Path,
         required=True,
-        help="Doel-pad voor de wrapped JSON.",
+        help="Doel-pad for the wrapped JSON.",
     )
     parser.add_argument(
         "--configmap-name",
@@ -69,7 +69,7 @@ def main() -> int:
 
     clean = strip_underscored(raw)
     # We dubbel-publishen onder twee paden:
-    #   - data.configmap[name][namespace].*  (productie-pad; Stackable convention)
+    #   - data.configmap[name][namespace].*  (production-pad; Stackable convention)
     #   - data.<root keys>                   (root-pad; voor legacy tests die
     #                                         `with data.role_mappings as ...` gebruiken)
     # Beide blijven consistent omdat ze van dezelfde bron komen.

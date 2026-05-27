@@ -1,6 +1,6 @@
 # AlertmanagerConfig — receivers + routing (improvements #5.9).
 #
-# Vereist Alertmanager actief (zie infrastructure/helm/prometheus-stack/
+# Required Alertmanager actief (zie infrastructure/helm/prometheus-stack/
 # values-{k3d,aks}.yaml — `alertmanager.enabled: true`).
 #
 # Webhook-URLs en SMTP-credentials zitten in Secret `alertmanager-receivers`
@@ -18,7 +18,7 @@ metadata:
     odap.io/dev-only: "true"
 type: Opaque
 stringData:
-  # Slack — vervang door echte webhook-URL (productie via External Secrets).
+  # Slack — vervang door echte webhook-URL (production via External Secrets).
   slack_webhook: "https://hooks.slack.com/services/REPLACE/WITH/REAL"
   # PagerDuty — uitgeschakeld in dev (zie comment onderaan).
   pagerduty_routing_key: "REPLACE_WITH_PD_INTEGRATION_KEY"
@@ -124,7 +124,7 @@ spec:
 
     # PagerDuty receiver uitgeschakeld voor lokale dev:
     # newer prometheus-operator AlertmanagerConfig schema vereist 'details'
-    # als array van {key,value} paren ipv free-form object. Voor productie
+    # als array van {key,value} paren ipv free-form object. Voor production
     # opnieuw inschakelen na schema-conform maken.
     # - name: pagerduty-critical
     #   pagerdutyConfigs:

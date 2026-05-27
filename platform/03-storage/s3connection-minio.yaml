@@ -1,10 +1,10 @@
-# S3Connection naar de in-cluster MinIO instance.
+# S3Connection to the in-cluster MinIO instance.
 #
 # Stackable-operators (Hive, Trino, Spark, NiFi) refereren deze connection
 # via `spec.clusterConfig.s3.reference: s3-minio` (of vergelijkbaar).
 #
 # Host: in-cluster service-DNS van MinIO (uit Helm-chart).
-# Voor productie zou TLS aanstaan en de bucket-policy strakker zijn.
+# Voor production zou TLS aanstaan en de bucket-policy strakker zijn.
 ---
 apiVersion: s3.stackable.tech/v1alpha1
 kind: S3Connection

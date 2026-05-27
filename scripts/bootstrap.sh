@@ -46,14 +46,14 @@ OPENSEARCH_DASHBOARDS_VERSION="${OPENSEARCH_DASHBOARDS_VERSION:-2.26.0}"
 OPENMETADATA_VERSION="${OPENMETADATA_VERSION:-1.12.8}"
 VECTOR_VERSION="${VECTOR_VERSION:-0.36.1}"
 
-# Voorvereisten check
+# Prerequisites check
 command -v helm >/dev/null     || error "helm niet gevonden"
 command -v kubectl >/dev/null  || error "kubectl niet gevonden"
 command -v stackablectl >/dev/null || error "stackablectl niet gevonden — zie scripts/doctor.sh"
 
-warn "Dev-only credentials in dit bootstrap. NIET gebruiken in productie. Zie infrastructure/helm/*/values.yaml."
+warn "Dev-only credentials in dit bootstrap. NIET gebruiken in production. Zie infrastructure/helm/*/values.yaml."
 
-# 0a. Persistente CA op de host (één keer gegenereerd, hergebruikt op elke
+# 0a. Persistente CA on the host (één keer gegenereerd, hergebruikt op elke
 # bootstrap). Geseed't in stap 1b naar Secret odap-platform-ca; cert-manager's
 # platform-issuer tekent alle leaf-certs ermee. Doordat de CA *niet*
 # regenereert op `make clean && make cluster && make bootstrap`, blijft de
@@ -138,7 +138,7 @@ kubectl wait --for=condition=Established crd/clusterissuers.cert-manager.io --ti
 kubectl apply -f "${ROOT}/infrastructure/helm/cert-manager/cluster-issuer.yaml"
 
 # 2a. Re-issue leaf-certs als de CA is veranderd. cert-manager regenereert
-# elk Secret automatisch zodra het verdwijnt, getekend door de huidige CA.
+# elk Secret automatisch zodra het verdwijnt, getekend through the huidige CA.
 if [[ "$CA_CHANGED" == "yes" ]]; then
   log "Re-issue leaf-certs door platform-issuer"
   kubectl get certificates -A \
@@ -157,7 +157,7 @@ helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
   $(chart_value_args ingress-nginx) \
   --wait --timeout 5m
 
-# 3a. Extra port 8443 op de ingress-nginx-controller Service.
+# 3a. Extra port 8443 on the ingress-nginx-controller Service.
 # Browsers gebruiken `*.odap.local:8443` (k3d port-mapt host:8443
 # → node:443). Maar server-to-server-calls *binnen* de cluster zien geen
 # host-mapping — die hebben dezelfde URL nodig om dezelfde plek te bereiken.
@@ -177,7 +177,7 @@ fi
 # upstream DNS van de host (de Mac's /etc/hosts), die alles naar 127.0.0.1
 # mapped. Server-side OIDC-calls vanuit pods knallen dan op localhost en
 # falen met "Connection refused".
-# Fix: een CoreDNS server-block dat wildcard-matched naar de ingress-nginx
+# Fix: een CoreDNS server-block dat wildcard-matched to the ingress-nginx
 # Service-ClusterIP. k3s mounts coredns-custom automatisch onder
 # /etc/coredns/custom/ en het Corefile importeert *.server-files als
 # extra server-blocks. ClusterIP wordt dynamisch ingelezen (kan per
@@ -265,7 +265,7 @@ for i in {1..30}; do
   kubectl -n odap-platform get secret minio-tls-internal >/dev/null 2>&1 && break
   sleep 2
 done
-# Re-key naar de naam + sleutels die MinIO chart verwacht
+# Re-key to the naam + sleutels die MinIO chart verwacht
 TMPCRT=$(mktemp); TMPKEY=$(mktemp); TMPCA=$(mktemp)
 kubectl -n odap-platform get secret minio-tls-internal -o jsonpath='{.data.tls\.crt}' | base64 -d > "$TMPCRT"
 kubectl -n odap-platform get secret minio-tls-internal -o jsonpath='{.data.tls\.key}' | base64 -d > "$TMPKEY"
@@ -401,7 +401,7 @@ for op in druid-operator hbase-operator hdfs-operator opensearch-operator; do
   fi
 done
 
-# platform-ca-bundle uitbreiden met de Stackable secret-operator self-signed CA.
+# platform-ca-bundle uitbreiden with the Stackable secret-operator self-signed CA.
 # Stackable Trino/Hive/Kafka/etc. krijgen pod-certs uit deze CA voor in-cluster
 # TLS (tls-internal SecretClass). Zonder deze CA in de bundle weigeren clients
 # als Superset (REQUESTS_CA_BUNDLE → /etc/platform-ca/ca.crt) een SQLAlchemy-
@@ -594,7 +594,7 @@ kubectl -n odap-meta rollout status deploy/openmetadata --timeout=10m >/dev/null
 # Genereer een admin-JWT op basis van de ingestion-bot in OM's Postgres-DB.
 # OM 1.5 met `provider=custom-oidc` heeft geen basic-auth, dus `users/login`
 # werkt niet. De `ingestion-bot` user heeft een fernet-encrypted JWT in
-# user_entity; we decrypten met de fernet-key uit de OM Secret en patchen
+# user_entity; we decrypten with the fernet-key from the OM Secret en patchen
 # zowel de odap-meta `openmetadata-admin` Secret (init-Job) als een kopie
 # in odap-platform (governance_om_ingest DAG draait daar).
 log "Genereer admin-JWT (decrypt ingestion-bot fernet-token) + sync naar odap-platform"

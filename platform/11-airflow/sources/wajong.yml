@@ -22,9 +22,9 @@ silver:
 
 governance:
   legal_basis: Wajong_art_2
-  doelbinding: [uitkering, arbeidsondersteuning]
+  purpose-limitation: [claim payout, arbeidsondersteuning]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 10
+  retention period_jaren: 10
   eigenaar: divisie_ag
   pii_kolommen: [bsn, birth_date, woonadres]
   risk_tier: hoog

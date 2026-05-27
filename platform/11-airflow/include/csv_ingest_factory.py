@@ -9,7 +9,7 @@ Trigger: handmatig via Airflow UI met `dag_run.conf = {"object_key": "..."}`.
 Optioneel kan later een sensor toegevoegd worden die `incoming/<bron>/` polt.
 
 Pattern volgt governance_factory._om_ingest_task — pip install at runtime
-i.p.v. een dedicated image, om bouw-overhead te besparen voor de referentie.
+i.p.v. een dedicated image, om bouw-overhead te besparen for the referentie.
 """
 from __future__ import annotations
 

@@ -7,14 +7,14 @@ init-job, CronJobs) 401's krijgen. Werkbaar pad voor "rotation" is daarom:
   1. Admin draait OM UI → users → ingestion-bot → "Regenerate Token"
      (genereert nieuwe encrypted JWT in user_entity.json).
   2. Deze CronJob leest de huidige encrypted JWT uit Postgres,
-     decrypt'm met de OM-fernet-key, en patcht het K8s-secret
+     decrypt'm with the OM-fernet-key, en patcht het K8s-secret
      `openmetadata-admin.jwtToken` in zowel odap-meta als odap-platform.
 
-Dit garandeert dat de K8s-secret altijd in sync is met de actieve token
+Dit garandeert dat de K8s-secret altijd in sync is with the actieve token
 in OM. Het is geen "echte" rotatie (OM moet 'm zelf re-issuen), maar het
 sluit de gap dat een nieuwe token in OM niet vanzelf bij Airflow landt.
 
-Voor productie: External Secrets Operator + Vault dynamic-secret backend.
+Voor production: External Secrets Operator + Vault dynamic-secret backend.
 
 Env-vars:
   POSTGRES_HOST       postgres-postgresql.odap-data.svc.cluster.local (default)

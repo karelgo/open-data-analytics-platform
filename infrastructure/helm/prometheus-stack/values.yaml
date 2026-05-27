@@ -68,7 +68,7 @@ grafana:
   # Keycloak SSO via OIDC. De `grafana`-client zit in realm.json met
   # redirect-URIs voor alle drie de modes (k3d/aks/stackit). De k3d-defaults
   # staan hier; values-aks.yaml en values-stackit.yaml overrulen root_url +
-  # de Keycloak-endpoints met de publieke domeinen.
+  # de Keycloak-endpoints with the publieke domeinen.
   #
   # role_attribute_path: realm-roles uit `roles`-claim mappen op Grafana-rollen.
   # platform_admin → Admin, data_engineer → Editor, rest → Viewer.
@@ -79,19 +79,19 @@ grafana:
   # tls_skip_verify_insecure=true is dev-only nodig omdat de pod het self-signed
   # platform-issuer-cert van keycloak.odap.local niet kan verifiëren
   # (platform-ca-bundle ConfigMap zit in odap-platform, niet odap-monitoring; mounten
-  # zou kunnen maar voegt complexiteit toe voor een dev-only opstelling).
+  # zou kunnen maar voegt complexiteit toe for a dev-only opstelling).
   # values-aks/values-stackit zetten 'm uit (publieke Let's Encrypt-certs).
   #
   # assertNoLeakedSecrets=false: chart-default lint-check verbiedt secrets
   # inline in values. Onze hele repo gebruikt `odap-dev-only-CHANGE-ME-*`
   # placeholders openlijk (zie realm.json en dev-secrets.yaml), dus deze
-  # check is hier inconsistent — productie zou via SealedSecrets/SOPS lopen.
+  # check is hier inconsistent — production zou via SealedSecrets/SOPS lopen.
   assertNoLeakedSecrets: false
   grafana.ini:
     server:
       # Path-routing onder de portal-host (zie platform/14-monitoring/
       # ingress-grafana.yaml). De chart-managed ingress is uit; alle
-      # toegang gaat via /grafana-prefix. serve_from_sub_path zorgt dat
+      # access gaat via /grafana-prefix. serve_from_sub_path zorgt dat
       # alle static-asset paths het /grafana-prefix krijgen.
       root_url: "https://platform.odap.local:8443/grafana/"
       serve_from_sub_path: true

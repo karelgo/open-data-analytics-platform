@@ -1,8 +1,8 @@
 version: 2
 
 seeds:
-  - name: cgm_uitkering_typen
-    description: "CGM-referentie: typen uitkeringen per wet."
+  - name: cgm_claim payout_typen
+    description: "CGM-referentie: typen claim payouten per wet."
     columns:
       - name: code
         tests: [not_null, unique]
@@ -10,7 +10,7 @@ seeds:
         tests: [not_null]
 
   - name: cgm_wet_codes
-    description: "CGM-referentie: codetabel sociale-zekerheidswetten."
+    description: "CGM-referentie: codetabel sociale-zekerheidslaws."
     columns:
       - name: code
         tests: [not_null, unique]
@@ -36,7 +36,7 @@ seeds:
               max_value: 5000
 
   - name: scenario_inputs
-    description: "Scenario-parameters voor UC-06 lastprognose-engine."
+    description: "Scenario-parameters voor UC-06 cost forecast-engine."
     columns:
       - name: scenario_id
         tests: [not_null, unique]

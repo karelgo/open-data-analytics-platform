@@ -1,10 +1,10 @@
 ---
-title: "Voorstel voor een nieuwe sturings-mart"
+title: "Voorstel for a nieuwe sturings-mart"
 role: finance_analyst
 level: expert
 order: 3
 duration: "90 min"
-summary: "Schrijf een use-case-spec voor een nieuwe gold-mart die jij vaak vermist — incl. bron-tabellen, kolommen, aggregatieniveau, doelbinding en DQ-tests. Dit is wat de data-engineer nodig heeft om te bouwen."
+summary: "Schrijf een use-case-spec for a nieuwe gold-mart die jij vaak vermist — incl. bron-tabellen, kolommen, aggregatieniveau, purpose-limitation en DQ-tests. Dit is wat de data-engineer nodig heeft om te bouwen."
 prereqs:
   - "finance_analyst/practitioner/2"
 labs:
@@ -20,21 +20,21 @@ quiz:
   - q: "Wat hoort als allereerste in een use-case spec?"
     options:
       - "SQL"
-      - "Doelbinding (welke wettelijke grondslag, welk besluit / welke sturingsvraag) — alles wat erna komt is afgeleid"
+      - "Purpose limitation (welke wettelijke grondslag, welk besluit / welke sturingsvraag) — alles wat erna komt is afgeleid"
       - "Kolomnamen"
       - "Naam van de auteur"
     correct: 1
   - q: "Welk aggregatieniveau is gepast voor jouw rol?"
     options:
       - "Cliënt-niveau met BSN"
-      - "Geaggregeerd op organisatie-as (regio × maand × uitkeringsoort) — geen PII, in lijn met FEZ-doelbinding"
+      - "Geaggregeerd op organisatie-as (regio × maand × claim payoutsoort) — geen PII, in lijn met FEZ-purpose-limitation"
       - "Per straat"
       - "Per dossier"
     correct: 1
   - q: "Welke DQ-tests stel je minimaal voor?"
     options:
       - "Niets"
-      - "`not_null` op groupby-keys, `unique` op de combinatie van groupby-keys, `accepted_values` op enum-kolommen, `relationships` naar masters — minimaal"
+      - "`not_null` op groupby-keys, `unique` on the combinatie van groupby-keys, `accepted_values` op enum-kolommen, `relationships` naar masters — minimaal"
       - "Alleen `not_null`"
       - "Alleen `unique`"
     correct: 1
@@ -47,36 +47,36 @@ spec goed maakt, hoef je niet 5 keer terug te komen op vragen.
 
 ## De vraag
 
-Je merkt al maanden dat de huidige UC-06 (lastprognose) geen onderscheid
-maakt tussen "uitgaven uitkering" en "uitgaven re-integratie-trajecten".
-Voor sturing op de re-integratie-investering zou een aparte mart helpen.
+Je merkt al maanden dat de huidige UC-06 (cost forecast) geen onderscheid
+maakt tussen "uitgaven claim payout" en "uitgaven reintegration-trajecten".
+Voor sturing on the reintegration-investering zou een aparte mart helpen.
 
 ## Spec-template
 
-In `docs/use-cases/uc-XX-reintegratie-budget.md`:
+In `docs/use-cases/uc-XX-reintegration-budget.md`:
 
 ```markdown
-# UC-XX — Re-integratie budget mart
+# UC-XX — Reintegration budget mart
 
 ## 1. Doel
-Sturingsmart op re-integratie-uitgaven per regio × maand × traject-type.
+Sturingsmart op reintegration-uitgaven per regio × maand × traject-type.
 Ondersteunt FEZ in besluitvorming over budget-allocatie en evaluatie van
 trajecteffectiviteit.
 
-## 2. Doelbinding
+## 2. Purpose limitation
 - Wettelijke grondslag: art. 6 lid 1e AVG (publieke taak — UWV-besluit-
   vorming).
 - Doel: financieel-economische sturing.
 - Geen cliënt-PII; aggregatie op regio-niveau.
 
 ## 3. Bronnen
-- silver.fin.uitgave (re-integratie subset)
+- silver.fin.uitgave (reintegration subset)
 - silver.smz.traject (trajecten met type-classificatie)
 - silver.finance.budget (referentie-budget per regio)
 
 ## 4. Mart-definitie
 
-Tabel: `gold.uc_xx_reintegratie_budget`
+Tabel: `gold.uc_xx_reintegration_budget`
 
 | Kolom | Type | Toelichting |
 |---|---|---|
@@ -108,7 +108,7 @@ Granulariteit: één rij per (maand, regio, type).
 
 ## Wat dit voorkomt
 
-Een vage vraag ("we willen iets met re-integratie") leidt tot 4 weken
+Een vage vraag ("we willen iets met reintegration") leidt tot 4 weken
 heen-en-weer praten. Een concrete spec leidt tot een werkende mart in
 een sprint.
 

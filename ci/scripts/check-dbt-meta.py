@@ -16,9 +16,9 @@ import yaml
 REQUIRED_MARTS = [
     "domain",
     "legal_basis",
-    "doelbinding",
+    "purpose-limitation",
     "bio_classificatie",
-    "bewaartermijn_jaren",
+    "retention period_jaren",
     "eigenaar",
     "pii_kolommen",
     "risk_tier",
@@ -26,7 +26,7 @@ REQUIRED_MARTS = [
 
 REQUIRED_STAGING = [
     "domain",
-    "doelbinding",
+    "purpose-limitation",
     "bio_classificatie",
     "eigenaar",
 ]

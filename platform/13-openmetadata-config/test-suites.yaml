@@ -1,6 +1,6 @@
-# Declaratieve DataQuality TestSuites + TestCases voor de gold marts.
+# Declaratieve DataQuality TestSuites + TestCases for the gold marts.
 #
-# Wordt door de init-Job (apply_test_suites) toegepast via OM REST API:
+# Wordt through the init-Job (apply_test_suites) toegepast via OM REST API:
 #   PUT  /api/v1/dataQuality/testSuites/basic         — per (entity)
 #   POST /api/v1/dataQuality/testCases                 — per test in suite
 #
@@ -16,7 +16,7 @@ test_suites:
   # UC-01 WIA Funnel — DoD-anchor, business-critical.
   - name: uc01_claims_funnel_dq
     displayName: "UC-01 WIA Funnel — Data Quality"
-    description: "Dagelijkse DQ-checks op de WIA Funnel-mart (Tier1, DoD-anchor)."
+    description: "Dagelijkse DQ-checks on the WIA Funnel-mart (Tier1, DoD-anchor)."
     entityFQN: trino.gold.uc01_claims_funnel.mart_uc01_claims_funnel_daily
     test_cases:
       - name: row_count_not_empty
@@ -40,9 +40,9 @@ test_suites:
         parameters:
           - name: allowedValues
             value: '["INGEDIEND","IN_BEHANDELING","TOEGEKEND","AFGEWEZEN"]'
-      - name: n_aanvragen_non_negative
-        displayName: "n_aanvragen >= 0"
-        column: n_aanvragen
+      - name: n_request_non_negative
+        displayName: "n_request >= 0"
+        column: n_request
         testDefinition: columnValueMinToBeBetween
         parameters:
           - name: minValueForMinInCol
@@ -109,9 +109,9 @@ test_suites:
           - name: allowedValues
             value: '["M","V","X","O"]'
 
-  # UC-06 Lastprognose — actuariële projectie.
+  # UC-06 Cost forecast — actuariële projectie.
   - name: uc06_cost_dq
-    displayName: "UC-06 Lastprognose 5y — Data Quality"
+    displayName: "UC-06 Cost forecast 5y — Data Quality"
     description: "5-jaars baseline-projectie claim_cost."
     entityFQN: trino.gold.uc06_cost_forecast.mart_uc06_cost_5y
     test_cases:
@@ -182,9 +182,9 @@ test_suites:
           - name: minValueForMinInCol
             value: "1"
 
-  # UC-09 Re-integratie effect — sandbox, pseudonimisatie.
+  # UC-09 Reintegration effect — sandbox, pseudonimisatie.
   - name: uc09_reintegration_effect_dq
-    displayName: "UC-09 Re-integratie Effect — Data Quality"
+    displayName: "UC-09 Reintegration Effect — Data Quality"
     description: "Gepseudonimiseerd onderzoekspanel. Sandbox-zone."
     entityFQN: trino.gold.uc09_reintegration_effect.mart_uc09_effect_panel
     test_cases:
@@ -210,7 +210,7 @@ test_suites:
         testDefinition: columnValuesToBeInSet
         parameters:
           - name: allowedValues
-            value: '["werkzoekend","ww_uitkering","wia_in_behandeling","reintegratie_actief","werkhervat","uit_zicht"]'
+            value: '["werkzoekend","ww_claim payout","wia_in_behandeling","reintegration_actief","werkhervat","uit_zicht"]'
 
   # UC — Klanttevredenheid
   - name: uc_customer_satisfaction_dq
@@ -275,10 +275,10 @@ test_suites:
         column: uc_code
         testDefinition: columnValuesToBeNotNull
 
-  # UC-11 Klantreis events — cross-domein, Tier1, DoD-anchor.
+  # UC-11 Customer journey events — cross-domein, Tier1, DoD-anchor.
   - name: uc11_journey_events_dq
-    displayName: "UC-11 Klantreis Events — Data Quality"
-    description: "Integriteitschecks op de cross-domein event-stream."
+    displayName: "UC-11 Customer journey Events — Data Quality"
+    description: "Integriteitschecks on the cross-domein event-stream."
     entityFQN: trino.gold.uc11_customer_journey.mart_uc11_journey_events
     test_cases:
       - name: row_count_not_empty
@@ -322,10 +322,10 @@ test_suites:
           - name: minValueForMinInCol
             value: "1"
 
-  # UC-11 Klantreis phases — fase-reconstructie (gaps-and-islands).
+  # UC-11 Customer journey phases — fase-reconstructie (gaps-and-islands).
   - name: uc11_journey_phases_dq
-    displayName: "UC-11 Klantreis Phases — Data Quality"
-    description: "Checks op de fase-reconstructie (BSN × fase × periode)."
+    displayName: "UC-11 Customer journey Phases — Data Quality"
+    description: "Checks on the fase-reconstructie (BSN × fase × periode)."
     entityFQN: trino.gold.uc11_customer_journey.mart_uc11_journey_phases
     test_cases:
       - name: row_count_not_empty
@@ -347,7 +347,7 @@ test_suites:
         testDefinition: columnValuesToBeInSet
         parameters:
           - name: allowedValues
-            value: '["werknemer","tussen_dienstverband","ziek","service_request_application","ww_uitkering","wia_in_behandeling","wga","iva","wajong_actief"]'
+            value: '["werknemer","tussen_dienstverband","ziek","service_request_application","ww_claim payout","wia_in_behandeling","wga","iva","wajong_actief"]'
       - name: fase_start_ts_not_null
         column: fase_start_ts
         testDefinition: columnValuesToBeNotNull
@@ -389,18 +389,18 @@ test_suites:
 
 # Alert / Subscription — notificeert op events. OM 1.5 valideert resource-
 # strings strict; "all" werkt overal. Granulair filteren op testCase doe je
-# in productie via Observability-alert + filtering-rule.
+# in production via Observability-alert + filtering-rule.
 alerts:
   - name: dq_failure_alert
     displayName: "DQ-failure → ops-channel (stub)"
     description: |
-      Triggert op events platform-breed. Productie: vervang destination door
+      Triggert op events platform-breed. Production: vervang destination door
       Slack-webhook (SLACK_WEBHOOK_URL secret) of email (SMTP-config in
       OM-server) en filter op testStatus=Failed.
     alertType: Notification
     resource: all
     destination:
       type: Webhook
-      # k3d-locale endpoint die requests slikt en logt — productie vervangt
-      # dit met de daadwerkelijke Slack/Teams webhook.
+      # k3d-locale endpoint die requests slikt en logt — production vervangt
+      # dit with the daadwerkelijke Slack/Teams webhook.
       endpoint: http://openmetadata.odap-meta.svc.cluster.local:8585/api/v1/system/healthz

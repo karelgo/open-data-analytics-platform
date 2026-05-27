@@ -1,6 +1,6 @@
 """convert_to_delta — generieke any-file → Delta conversie DAG.
 
-Wordt getriggerd door de portal /csv-upload pagina via de airflow-bridge
+Wordt getriggerd through the portal /csv-upload pagina via de airflow-bridge
 sidecar (zie portal/scripts/airflow-bridge.py). Eén task: leest het
 bestand uit `odap-staging/uploads/...`, parseert op basis van
 `source_format` (csv/tsv/json/ndjson/parquet), schrijft Delta naar

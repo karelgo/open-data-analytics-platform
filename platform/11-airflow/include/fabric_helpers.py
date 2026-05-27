@@ -1,7 +1,7 @@
-"""Microsoft Fabric REST helpers — gedeeld door de uc11_fabric DAG.
+"""Microsoft Fabric REST helpers — gedeeld through the uc11_fabric DAG.
 
 Auth via Service Principal (client-credentials flow tegen Azure AD).
-Geen externe Airflow-provider nodig: we praten direct met de REST API
+Geen externe Airflow-provider nodig: we praten direct with the REST API
 zodat de Stackable Airflow image (Python 3.9, geen apache-airflow-providers-
 microsoft-fabric) ongewijzigd blijft.
 

@@ -13,7 +13,7 @@
 # in realm.json (clientId/secret + redirectUris); het secret wordt hier
 # uit Kubernetes-secret openmetadata-oidc-client gelezen.
 #
-# Browser-redirects gaan naar de externe URL (https://keycloak.odap.local:8443),
+# Browser-redirects gaan to the externe URL (https://keycloak.odap.local:8443),
 # server-side token-exchange ook — daarom mountt de pod het platform-ca-bundle
 # (zelf-signed CA van ingress-nginx) in zijn Java truststore via een
 # initContainer (zie `extraInitContainers` onderaan).
@@ -21,7 +21,7 @@
 # Chart 1.5: alle config zit onder `openmetadata.config.*`, niet `global.*`.
 openmetadata:
   config:
-    # Chart-default `host: openmetadata` DNS-resolveert naar de Service
+    # Chart-default `host: openmetadata` DNS-resolveert to the Service
     # ClusterIP — een pod kan daar niet aan binden (alleen aan z'n eigen
     # IP of 0.0.0.0). Zonder deze override crasht de container met
     # `BindException: Address not available`.
@@ -62,7 +62,7 @@ openmetadata:
       # Authority / callbackUrl / publicKeys / discoveryUri zijn mode-specifiek
       # — zie values-{k3d,aks}.yaml. Op k3d wijzen ze naar
       # keycloak.odap.local:8443 (via CoreDNS hosts-override); op AKS
-      # wijzen ze naar de publieke keycloak.${PLATFORM_DOMAIN} (Let's Encrypt).
+      # wijzen ze to the publieke keycloak.${PLATFORM_DOMAIN} (Let's Encrypt).
       clientId: openmetadata
       responseType: code
       jwtPrincipalClaims:
@@ -118,7 +118,7 @@ openmetadata:
 # Java truststore-uitbreiding: voeg odap-platform CA toe zodat OM-pod TLS
 # van ingress-nginx (waarachter Keycloak draait) kan verifieren bij de
 # server-side token-exchange. Truststore wordt in een emptyDir geschreven
-# door een initContainer en daarna door de OM-container ingelezen via
+# door een initContainer en daarna through the OM-container ingelezen via
 # JAVA_OPTS_APPEND (key/store-pass = changeit; alleen dev).
 extraInitContainers:
   - name: import-platform-ca
@@ -133,7 +133,7 @@ extraInitContainers:
         # platform-ca-bundle is een GECONCATENEERDE PEM (Mozilla public roots +
         # odap-platform-CA). `keytool -importcert -alias X -file <multi-pem>`
         # importeert ALLEEN de eerste cert — alle andere worden genegeerd
-        # zonder warning. Daarom split én loop, met een unieke alias per cert.
+        # zonder warning. Daarom split én loop, with a unieke alias per cert.
         cd /tmp
         csplit -z -f om-cert- -b "%03d.pem" /platform-ca/ca.crt '/-----BEGIN CERTIFICATE-----/' '{*}' >/dev/null
         i=0

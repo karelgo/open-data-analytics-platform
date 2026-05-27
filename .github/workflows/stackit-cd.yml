@@ -1,5 +1,5 @@
 # Continuous deploy: bij elke push naar main re-apply alle platform-manifests
-# op het StackIT SKE cluster en publish een verse portal-bundle.
+# on the StackIT SKE cluster en publish een verse portal-bundle.
 #
 # Smoke draait NIET hier — die zit in .github/workflows/stackit-smoke.yml en
 # wordt automatisch getriggerd via `workflow_run` zodra deze CD groen is.
@@ -7,8 +7,8 @@
 # Path-filter: alleen runnen als iets verandert dat het cluster-state
 # beïnvloedt. Doc-only of data-generation changes triggeren géén deploy.
 #
-# Vereiste secret: STACKIT_SA_KEY — het volledige service-account key JSON
-# (zoals gedownload uit de StackIT portal of via `stackit service-account key
+# Requirede secret: STACKIT_SA_KEY — het volledige service-account key JSON
+# (zoals gedownload from the StackIT portal of via `stackit service-account key
 # create -o json`). Dedicated SA met `owner` op project udp_resource —
 # zie `feedback_stackit_ske_managed_sa.md`: gebruik NIET een `*.ske.sa.stackit.cloud`
 # SA, die wordt door SKE zelf gewipet.
@@ -84,7 +84,7 @@ jobs:
           umask 077
           mkdir -p "$HOME/.config/stackit"
           printf '%s' '${{ secrets.STACKIT_SA_KEY }}' > "$HOME/.config/stackit/sa-key.json"
-          # Sanity: valid JSON met de juiste velden? (faalt fail-fast als
+          # Sanity: valid JSON with the juiste velden? (faalt fail-fast als
           # het secret leeg / verkeerd is)
           jq -e '.credentials.iss and .credentials.kid' \
             "$HOME/.config/stackit/sa-key.json" >/dev/null

@@ -1,32 +1,32 @@
 ---
-title: "Handleiding — Researcher"
+title: "Handbook — Researcher"
 role: researcher
 ---
 
-> Rol-key: `researcher` · Domein: Statistisch onderzoek (sandbox) · Risiconiveau toegang: laag (alleen sandbox, gepseudonimiseerd)
+> Rol-key: `researcher` · Domein: Statistisch onderzoek (sandbox) · Risiconiveau access: laag (alleen sandbox, gepseudonimiseerd)
 
-Deze handleiding is voor **onderzoekers** die statistisch onderzoek doen
+Deze handbook is voor **onderzoekers** die statistisch onderzoek doen
 op ODAP data. Je werkt **uitsluitend in de sandbox-zone** met
-gepseudonimiseerde panels — geen productie-PII, geen rauwe BSN's.
+gepseudonimiseerde panels — geen production-PII, geen rauwe BSN's.
 
 ---
 
 ## 1. Wat doet jouw rol?
 
-Je doet wetenschappelijk-statistisch onderzoek (UC-09 — re-integratie-effectiviteit
+Je doet wetenschappelijk-statistisch onderzoek (UC-09 — reintegration-effectiviteit
 en vergelijkbare studies). Je gebruikt het platform om:
 
 - Gepseudonimiseerde panels uit `sandbox.*` te raadplegen
 - Cohort-analyses, regressies en controlled comparisons te draaien
 - Resultaten alleen geaggregeerd te exporteren
 
-> Als je rauwe productie-data nodig hebt, ben je in de **verkeerde rol**.
+> Als je rauwe production-data nodig hebt, ben je in de **verkeerde rol**.
 > Vraag dan een formele DPIA-aanvraag bij Data Office; deze wordt buiten
 > dit platform afgehandeld.
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
@@ -43,10 +43,10 @@ Voor ad-hoc gebruik van Trino: `kubectl -n odap-platform port-forward svc/trino-
 
 ### 3.1 Catalog en schema
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
 | `sandbox` | * | Gepseudonimiseerde panels, synthetische cohorts | **Ja** |
-| `silver`, `gold`, `bronze`, `sensitive` | * | Productie-zones | **Nee** |
+| `silver`, `gold`, `bronze`, `sensitive` | * | Production-zones | **Nee** |
 
 ### 3.2 Welke kolommen?
 
@@ -60,10 +60,10 @@ In `sandbox.*`:
 | `traject_soort`, `uitkomst` | Volledig — kern van je analyse |
 | `bsn`, naam, etc. | NIET aanwezig — bij ingestion al verwijderd |
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
 Purpose: **"statistisch_onderzoek"**. Het platform staat geen joins toe
-tussen `sandbox.*` en productiezones — die paden zijn fysiek dichtgezet.
+tussen `sandbox.*` en productionzones — die paden zijn fysiek dichtgezet.
 
 ---
 
@@ -152,15 +152,15 @@ SELECT COUNT(*) FROM gematched;
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `Access Denied: silver.*` | Productie-data niet voor researcher | Werk in sandbox |
+| `Access Denied: silver.*` | Production-data niet voor researcher | Werk in sandbox |
 | `JOIN across catalogs not allowed` | Bewust geblokkeerd | Vraag Data Office voor combinatie-traject |
 | `Result has < 30 rows` | Mogelijk privacy-onderdrukking | Aggregeer ruwer |
 
 | Probleem | Contact |
 |---|---|
-| Inloggen | Platform-admin |
+| Sign in | Platform-admin |
 | Cohort-vraag, panel-versies | Data Office (out-of-platform) |
-| "Ik heb productie-data nodig" | DPIA-aanvraag via Data Office |
+| "Ik heb production-data nodig" | DPIA-aanvraag via Data Office |
 
 ---
 
@@ -169,7 +169,7 @@ SELECT COUNT(*) FROM gematched;
 - Pseudoniemen koppelen aan externe data om te de-anonimiseren — strafbaar.
 - Cohort-data extern delen zonder Data Office-akkoord.
 - Aggregaten met < 10 records publiceren.
-- Toegang tot productie-zones forceren via een ander account.
+- Access tot production-zones forceren via een ander account.
 
 ---
 

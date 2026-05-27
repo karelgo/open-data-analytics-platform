@@ -4,7 +4,7 @@
 ) }}
 
 -- UC-07 — Datakwaliteit polisadministratie, dagrapport.
--- Aggregeert tellertjes per ingestiedag voor de DQ-steward.
+-- Aggregeert tellertjes per ingestiondag for the DQ-steward.
 
 with ikv as (
     select

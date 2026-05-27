@@ -1,6 +1,6 @@
 # OpenMetadata — k3d-specific overrides.
 #
-# Browser-redirects gaan naar de externe URL (https://keycloak.odap.local:8443),
+# Browser-redirects gaan to the externe URL (https://keycloak.odap.local:8443),
 # server-side token-exchange ook — daarom mountt de pod het platform-ca-bundle
 # (zelf-signed CA van ingress-nginx) in zijn Java truststore via een
 # initContainer (gedefinieerd in de base values.yaml).

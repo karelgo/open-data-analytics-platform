@@ -6,7 +6,7 @@
 # doorgegeven.
 #
 # Service prometheus-kube-prometheus-prometheus wordt door kube-prometheus-stack
-# gemaakt. Geen auth — voor demo/dev OK; productie zou oauth2-proxy ervoor zetten.
+# gemaakt. Geen auth — voor demo/dev OK; production zou oauth2-proxy ervoor zetten.
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# wia-spark-demo.sh — Spark bronze→silver→gold pipeline voor WIA-aanvragen.
+# wia-spark-demo.sh — Spark bronze→silver→gold pipeline voor WIA-request.
 #
 # Doet wat de Airflow DAG transform_wia_spark.py zou doen, MAAR zonder Airflow.
 # Reden: Stackable Airflow 3.0.6 mist het /execution/ API-endpoint (zie
@@ -20,7 +20,7 @@
 #   scripts/wia-spark-demo.sh         # direct
 #   SKIP_SEED=1 scripts/wia-spark-demo.sh   # gebruik bestaande bronze-data
 #
-# Vereist: kubectl-context op odap-platform cluster; cluster heeft de
+# Required: kubectl-context op odap-platform cluster; cluster heeft de
 # 08-spark + 11-airflow kustomizations al gedeployed.
 
 set -euo pipefail

@@ -7,7 +7,7 @@
 | AVG-grondslag | Art. 6 lid 1c (wettelijke verplichting) + 1e |
 | Juistheidsprincipe | Art. 5 lid 1d AVG — actief invulling |
 
-Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-07](../../referentiearchitectuur-odap-data-analytics.md).
+Bron: [`referentiearchitecture-odap-data-analytics.md` § 8 UC-07](../../referentiearchitecture-odap-data-analytics.md).
 
 ---
 
@@ -15,7 +15,7 @@ Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-07](../../referen
 
 Polisadministratie (~21,2 mln IKV's, ~13,8 mln personen) is fundament voor
 dagloon, WW, WIA en gegevensleveringen. Fouten in IKV's leiden tot fouten in
-uitkeringen.
+claim payouten.
 
 ## Doel
 
@@ -34,7 +34,7 @@ en correctievoorstellen voor data-stewards.
 
 **CGM-entiteiten**: `IKV`, `Werknemer`, `Werkgever`.
 
-## Architectuur-pad
+## Architecture-pad
 
 ```
 NiFi: ingest aangiftes  → ValidateRecord (schema-validatie) →
@@ -86,9 +86,9 @@ Op `silver.policies.ikv`:
 meta:
   domain: polisadm
   legal_basis: Wet_SUWI+Wfsv
-  doelbinding: [primair_proces, kwaliteitscontrole]
+  purpose-limitation: [primair_proces, kwaliteitscontrole]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 30   # polisadministratie wettelijk lang
+  retention period_jaren: 30   # polisadministratie wettelijk lang
   eigenaar: data_steward_polisadm
   pii_kolommen: [bsn, lh_nummer]
   risk_tier: laag
@@ -97,7 +97,7 @@ meta:
 
 ## OPA-policies
 
-- Toegang tot `gold.uc07_dq_policies.*` alleen voor `data_steward` met doelcode
+- Access tot `gold.uc07_dq_policies.*` alleen voor `data_steward` met doelcode
   `kwaliteitscontrole`.
 - Inzage in details (bsn-niveau): `data_steward_polisadm` + JIT-token.
 - Aggregaten: alle data_stewards.
@@ -115,4 +115,4 @@ meta:
 ## DoD-koppeling
 
 UC-07 is onderdeel van de DoD: "dbt-test `bsn_valid` faalt op een ingespoten
-ongeldige BSN-record" (zie [Originele referentie § Definition of Done](../architectuur/referentie.md#definition-of-done)).
+ongeldige BSN-record" (zie [Originele referentie § Definition of Done](../architecture/reference.md#definition-of-done)).

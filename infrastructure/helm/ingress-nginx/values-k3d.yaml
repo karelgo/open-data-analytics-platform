@@ -3,7 +3,7 @@
 # k3d's serverlb routes host port 80/443 to node IPs. With servicelb
 # uitgeschakeld in infrastructure/k3d/k3d-cluster.yaml heeft een
 # LoadBalancer-service geen externe IP — daarom hostNetwork + DaemonSet
-# zodat de controller direct op de node bindt.
+# zodat de controller direct on the node bindt.
 controller:
   hostNetwork: true
   hostPort:

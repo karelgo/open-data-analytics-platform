@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Smoke test 08 — OPA-decisions kloppen met de platform policies.
+# Smoke test 08 — OPA-decisions kloppen with the platform policies.
 #
 # Runt OPA-decision-calls (in-cluster via curl-pod) tegen een paar key-scenarios:
 #
 #   1. anonymous user             → allow=false (default-deny)
-#   2. marketing_analyst + purpose `klantcontact` op uc05    → allow=true
+#   2. marketing_analyst + purpose `customer interaction` op uc05    → allow=true
 #   3. data_steward zonder purpose op uc05                → allow=false (DoD)
 #   4. marketing_analyst + bsn-column                        → columnMask retourneert masking-expr (DoD)
 #   5. claims_analyst + regio AMS op silver.wia          → rowFilter `regio_code = 'AMS'`
 #   6. data.steward + diagnose-column (sensitive)         → columnMask = NULL
 #
-# Vereist: fase 0+1+2+3+9 (OpaCluster + bundle uit fase 9 deployed).
+# Required: fase 0+1+2+3+9 (OpaCluster + bundle uit fase 9 deployed).
 set -euo pipefail
 
 NS="${NS:-odap-platform}"
@@ -40,20 +40,20 @@ echo "$r" | grep -q '"result": *false' \
   && pass "anonymous → allow=false" \
   || fail "anonymous: $r"
 
-# --- 2. marketing_analyst + klantcontact op uc05 → allow ----------------
-log "marketing_analyst + klantcontact op gold.uc05_customer_360.* → allow=true"
+# --- 2. marketing_analyst + customer interaction op uc05 → allow ----------------
+log "marketing_analyst + customer interaction op gold.uc05_customer_360.* → allow=true"
 r=$(curl_decide trino/allow \
-    '{"input":{"context":{"identity":{"user":"marketing.analyst","groups":["marketing_analyst"],"extraCredentials":{"purpose":"klantcontact"}}},"action":{"operation":"SelectFromColumns","resource":{"table":{"catalogName":"gold","schemaName":"uc05_customer_360","tableName":"mart_uc05_customer_360"}}}}}')
+    '{"input":{"context":{"identity":{"user":"marketing.analyst","groups":["marketing_analyst"],"extraCredentials":{"purpose":"customer interaction"}}},"action":{"operation":"SelectFromColumns","resource":{"table":{"catalogName":"gold","schemaName":"uc05_customer_360","tableName":"mart_uc05_customer_360"}}}}}')
 echo "$r" | grep -q '"result": *true' \
-  && pass "marketing_analyst+klantcontact → allow=true" \
-  || fail "marketing_analyst+klantcontact: $r"
+  && pass "marketing_analyst+customer interaction → allow=true" \
+  || fail "marketing_analyst+customer interaction: $r"
 
 # --- 3. data_steward zonder purpose op uc05 → deny (DoD!) ------------
 log "data_steward ZONDER purpose op gold.uc05 → allow=false (DoD R-AVG-06)"
 r=$(curl_decide trino/allow \
     '{"input":{"context":{"identity":{"user":"data.steward","groups":["data_steward"]}},"action":{"operation":"SelectFromColumns","resource":{"table":{"catalogName":"gold","schemaName":"uc05_customer_360","tableName":"mart_uc05_customer_360"}}}}}')
 echo "$r" | grep -q '"result": *false' \
-  && pass "data_steward zonder purpose → allow=false (doelbinding-deny)" \
+  && pass "data_steward zonder purpose → allow=false (purpose-limitation-deny)" \
   || fail "data_steward zonder purpose: $r"
 
 # --- 4. marketing_analyst + bsn-kolom → columnMask (DoD!) ---------------

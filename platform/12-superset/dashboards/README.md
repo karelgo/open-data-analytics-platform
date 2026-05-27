@@ -10,7 +10,7 @@ Dashboards bouwen we vervolgens **interactief** in Superset's UI; export via
 ## Dashboards die de DoD vereist
 
 - `uc01-claims-funnel.zip` — DoD: "Superset toont dashboard 'WIA Funnel' voor rol `data_steward` met 7 dagen synthetische data."
-- `uc06-cost-forecast.zip` — Schadelast scenario-vergelijking.
+- `uc06-cost-forecast.zip` — Cost forecast scenario-vergelijking.
 
 ## Workflow voor commits
 
@@ -39,7 +39,7 @@ BODY_UC01_FUNNEL_LINE = {
     "datasource_type": "table",
     "viz_type": "line",
     "params": json.dumps({...}),
-    "slice_name": "WIA Funnel — aanvragen per dag",
+    "slice_name": "WIA Funnel — request per dag",
 }
 ```
 

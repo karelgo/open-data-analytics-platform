@@ -14,7 +14,7 @@ Direct Lake-mode tegen het bestaande `uc11_lakehouse` (zelfde Fabric workspace
 + SQL endpoint host als UC-11; zie secrets/local/uc11-multiplatform.env).
 
 Voorvereiste: de 5 marts MOETEN al in het lakehouse staan. Zie
-docs/use-cases/uc12-focus-finops-powerbi.md voor de seed-stappen (dbt-
+docs/use-cases/uc12-focus-finops-powerbi.md for the seed-stappen (dbt-
 fabricspark target of een one-shot Fabric notebook).
 
 Output:
@@ -38,7 +38,7 @@ OUT_DIR = REPO_ROOT / "platform" / "12-powerbi" / "uc12_focus_finops"
 SM_DIR = OUT_DIR / "SemanticModel"
 RP_DIR = OUT_DIR / "Report"
 
-# Env-driven — SQL endpoint host komt uit het UC-11 lakehouse (gedeeld).
+# Env-driven — SQL endpoint host komt from the UC-11 lakehouse (gedeeld).
 SQL_HOST = os.environ.get(
     "FABRIC_SQL_ENDPOINT_HOST",
     "f7x5z7ufbtoubd2v4iyuhxftm4-vadyhb425gouxeoepoh4ivyyhm.datawarehouse.fabric.microsoft.com",
@@ -686,7 +686,7 @@ def main() -> None:
         print(
             "  → placeholder SemanticModel-ID gebruikt; upload-script vervangt "
             "deze automatisch na de eerste upload (run hierna opnieuw zodat "
-            "byConnection.connectionString naar het echte ID wijst)."
+            "byConnection.connectionString to the echte ID wijst)."
         )
     else:
         print(f"  → SemanticModel-ID: {sid}")

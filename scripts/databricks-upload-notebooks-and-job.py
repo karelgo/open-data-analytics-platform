@@ -31,9 +31,9 @@ NOTEBOOKS = {
     "uc11_silver": NOTEBOOKS_DIR / "uc11_silver.ipynb",
 }
 
-# Notebooks die ooit bestonden maar nu vervangen zijn. Worden uit de workspace
+# Notebooks die ooit bestonden maar nu vervangen zijn. Worden from the workspace
 # verwijderd zodat de Job ze niet meer per ongeluk kan triggeren.
-# uc11_dbt_gold (Spark-SQL inline) is vervangen door de databricks_dbt_gold
+# uc11_dbt_gold (Spark-SQL inline) is vervangen through the databricks_dbt_gold
 # KubernetesPodOperator in uc11_databricks DAG — die draait dbt-databricks
 # tegen de SQL warehouse, symmetrisch met fabric_dbt_gold.
 DEPRECATED_NOTEBOOKS = ("uc11_dbt_gold",)
@@ -111,7 +111,7 @@ def build_job_settings() -> dict:
     """Multi-task job met 2 sequentiële notebook-tasks op één shared job-cluster.
 
     De gold-laag draait NIET meer als notebook-task in deze Job — die is
-    verplaatst naar de databricks_dbt_gold KubernetesPodOperator in de
+    verplaatst to the databricks_dbt_gold KubernetesPodOperator in de
     uc11_databricks Airflow DAG (die roept dbt-databricks aan tegen de SQL
     warehouse). Symmetrisch met fabric_dbt_gold in uc11_fabric.
     """
@@ -171,7 +171,7 @@ def list_workspace_notebooks(parent_path: str) -> list[dict]:
 
 
 def delete_workspace_object(path: str) -> None:
-    """DELETE een notebook of map uit de workspace."""
+    """DELETE een notebook of map from the workspace."""
     status, payload = request("POST", "/api/2.0/workspace/delete",
                               {"path": path, "recursive": False})
     if status not in (200, 204):

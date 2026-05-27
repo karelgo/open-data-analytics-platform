@@ -1,7 +1,7 @@
 # cert-manager — scaled-down profiel voor k3d
 #
 # Levert TLS certificates voor alle ODAP platform services. Self-signed CA
-# voor dev. Productie zou Let's Encrypt of een interne PKI gebruiken.
+# voor dev. Production zou Let's Encrypt of een interne PKI gebruiken.
 #
 # Chart: jetstack/cert-manager
 # Version pin: zie scripts/bootstrap.sh

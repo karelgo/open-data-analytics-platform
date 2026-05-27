@@ -8,7 +8,7 @@
 -- Eén rij per (billing_month × service_name × region × environment). Voedt
 -- de "spend per service / per regio" pie-charts en de dist_bar drill-downs in
 -- het UC-12 dashboard. `tag_environment` valt terug op 'unknown' zodat rijen
--- zonder tag niet uit het dashboard verdwijnen.
+-- zonder tag niet from the dashboard verdwijnen.
 
 with src as (
     select * from {{ ref('stg_focus_billing') }}

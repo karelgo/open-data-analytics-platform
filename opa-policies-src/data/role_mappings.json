@@ -39,7 +39,7 @@
         "break_glass": false
       },
       "data_engineer": {
-        "_role_purpose": "Pipeline-eigenaar; JIT-toegang tot bronze.",
+        "_role_purpose": "Pipeline-eigenaar; JIT-access tot bronze.",
         "catalogs": [
           "bronze"
         ],
@@ -198,7 +198,7 @@
         "proactieve_dienstverlening"
       ],
       "gold.uc05_customer_360.*": [
-        "klantcontact",
+        "customer interaction",
         "behandeling"
       ],
       "gold.uc06_cost_forecast.*": [
@@ -213,20 +213,20 @@
         "planning"
       ],
       "silver.claims.*": [
-        "uitkering",
+        "claim payout",
         "behandeling",
-        "reintegratie"
+        "reintegration"
       ],
       "silver.service_requests.*": [
-        "uitkering",
+        "claim payout",
         "handhaving"
       ],
       "silver.eligibility_cases.*": [
-        "reintegratie",
+        "reintegration",
         "behandeling"
       ],
       "silver.customers.*": [
-        "klantcontact",
+        "customer interaction",
         "behandeling"
       ],
       "silver.finance.*": [
@@ -242,13 +242,13 @@
         "kwaliteitscontrole"
       ],
       "silver.incidents.*": [
-        "uitkering"
+        "claim payout"
       ],
       "bronze.*": [
         "primair_proces"
       ],
       "sensitive.eligibility_cases.*": [
-        "reintegratie",
+        "reintegration",
         "behandeling"
       ]
     },

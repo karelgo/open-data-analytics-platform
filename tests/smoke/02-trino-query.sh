@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Smoke test 02 — Trino + OPA staan op en accepteren een eenvoudige query.
 #
-# Vereist: fase 0 + 1 + 2 + 3 zijn applied.
+# Required: fase 0 + 1 + 2 + 3 zijn applied.
 #
 # Stappen:
 #   1. TrinoCluster + OpaCluster pods Ready

@@ -21,12 +21,12 @@ test_uc05_denied_without_purpose if {
 	}
 }
 
-test_uc05_allowed_with_klantcontact_purpose if {
+test_uc05_allowed_with_customer interaction_purpose if {
 	allow with input as {
 		"context": {"identity": {
 			"user": "marketing.analyst",
 			"groups": ["marketing_analyst"],
-			"extraCredentials": {"purpose": "klantcontact"},
+			"extraCredentials": {"purpose": "customer interaction"},
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
@@ -40,7 +40,7 @@ test_uc05_allowed_with_klantcontact_purpose if {
 }
 
 test_uc05_denied_with_wrong_purpose if {
-	# marketing_analyst heeft `klantcontact` maar declareert `actuarie` → mismatch
+	# marketing_analyst heeft `customer interaction` maar declareert `actuarie` → mismatch
 	not allow with input as {
 		"context": {"identity": {
 			"user": "marketing.analyst",

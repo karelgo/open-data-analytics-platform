@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Build-time loader: kopieert docs/handbooks/<NN-rol>.md (source-of-truth
-// per rol) naar portal/src/content/handbooks/<role-id>.md met de juiste
+// per rol) naar portal/src/content/handbooks/<role-id>.md with the juiste
 // frontmatter (`title`, `role`) zodat Astro's content-collection het kan
 // renderen via /handbooks/<role-id>/.
 //

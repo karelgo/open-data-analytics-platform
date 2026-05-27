@@ -73,7 +73,7 @@ PAYLOAD=$(cat <<'JSON'
 {
   "clientId": "multica",
   "name": "ODAP Platform — Multica",
-  "description": "OIDC-client voor de oauth2-proxy voor https://multica.odap.local",
+  "description": "OIDC-client for the oauth2-proxy voor https://multica.odap.local",
   "enabled": true,
   "protocol": "openid-connect",
   "publicClient": false,

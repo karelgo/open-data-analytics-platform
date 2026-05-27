@@ -1,28 +1,28 @@
 """UC-11 — multi-platform demo: Databricks variant.
 
-Draait een batch-only uc11 pijplijn tegen Databricks Unity Catalog. Geen
+Draait een batch-only uc11 pipeline tegen Databricks Unity Catalog. Geen
 streaming bronze. Equivalent van uc11_fabric, maar dan tegen Databricks
 compute en UC-managed Delta tabellen (catalog: `databricks`).
 
 Tasks:
-  1. databricks_seed_silver — POST /api/2.1/jobs/run-now op de uc11-pipeline
+  1. databricks_seed_silver — POST /api/2.1/jobs/run-now on the uc11-pipeline
                               Job; wacht tot beide notebook-tasks (seed_bronze +
                               silver) klaar zijn. Schrijft naar
                               databricks.bronze.* en databricks.silver.*.
   2. databricks_dbt_gold    — KubernetesPodOperator: `dbt run --target
                               databricks_dev` met dbt-databricks. Bouwt
-                              int_customer_journey_events + 2 marts uit het échte
+                              int_customer_journey_events + 2 marts from the échte
                               dbt-project — zelfde SQL als Trino én Fabric
                               executeren (drie engines, één dbt-project).
   3. databricks_verify      — SQL-warehouse query: row-count > 0 op
                               databricks.gold.mart_uc11_journey_events.
 
-Voorvereisten (in-cluster):
+Prerequisites (in-cluster):
   - Kubernetes Secret 'uc11-multiplatform-creds' gemount als envFrom (heeft
     DATABRICKS_HOST, DATABRICKS_TOKEN, DATABRICKS_HTTP_PATH, DATABRICKS_CATALOG,
     DATABRICKS_WAREHOUSE_ID).
-  - Airflow Variable 'databricks_uc11_job_id' met de Job-ID (alleen
-    seed_bronze + silver tasks; dbt_gold task is verwijderd uit de Job —
+  - Airflow Variable 'databricks_uc11_job_id' with the Job-ID (alleen
+    seed_bronze + silver tasks; dbt_gold task is verwijderd from the Job —
     die draait nu via deze DAG's KPO).
   - dbt-databricks zit in de odap/dbt-trino:1.9.0 image (zelfde image
     als fabric_dbt_gold gebruikt).
@@ -63,14 +63,14 @@ GOLD_TABLE_FQN = f"{DATABRICKS_CATALOG}.gold.mart_uc11_journey_events"
 DBT_IMAGE = "odap/dbt-trino:1.9.0"
 DBT_SECRET = "uc11-multiplatform-creds"
 
-# dbt-databricks run-script voor de KPO.
+# dbt-databricks run-script for the KPO.
 #
 # Twee dingen die we adhoc fixen omdat de odap/dbt-trino:1.9.0 image
 # (gedeeld met fabric_dbt_gold) initiëel alleen dbt-trino + dbt-fabricspark
 # heeft:
 #   1. `pip install dbt-databricks~=1.11.0` — komt mee in pip-cache; <15s
 #   2. Een tijdelijke profiles.yml met databricks_dev target naar /tmp/profiles
-#      die de DATABRICKS_* env-vars uit het Secret leest.
+#      die de DATABRICKS_* env-vars from the Secret leest.
 # Volgende image-build kan dit incorporeren — dan vervalt de pip-install
 # stap en kan profiles.yml gewoon de embedded versie gebruiken.
 DBT_RUN_SCRIPT = r"""
@@ -116,7 +116,7 @@ def _trigger_seed_silver(**_) -> None:
 
 
 def _verify_gold_mart(**_) -> None:
-    """SQL-warehouse query op de gold-mart: row-count > 0."""
+    """SQL-warehouse query on the gold-mart: row-count > 0."""
     result = execute_sql(f"SELECT COUNT(*) AS n FROM {GOLD_TABLE_FQN}")
     data = result.get("result", {}).get("data_array") or []
     if not data:

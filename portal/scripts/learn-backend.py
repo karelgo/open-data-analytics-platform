@@ -1,4 +1,4 @@
-"""Reference backend voor de Academy auto-checks en voortgang-sync.
+"""Reference backend for the Academy auto-checks en voortgang-sync.
 
 Loopt naast de portal-nginx (zelfde pod of een sidecar). De portal nginx
 proxyt /api/learn/* naar deze service op poort 8088. Geen state op disk —
@@ -10,7 +10,7 @@ GET  /api/learn/progress
 PUT  /api/learn/progress              {"progress": {...}}
 GET  /api/learn/check/{check_id}      → {"ok": bool, "msg": str}
 
-Vereiste env
+Requirede env
 ------------
 KEYCLOAK_URL                http(s)://keycloak.odap.local:8443
 KEYCLOAK_REALM              uwv
@@ -137,7 +137,7 @@ async def put_progress(req: Request) -> JSONResponse:
 # Elke check is een functie die {ok, msg} teruggeeft. Voeg toe naar smaak.
 
 def _check_wia_practitioner_query(user: str) -> dict[str, Any]:
-    # Probeer Trino audit-log: is er query met "doel: beoordeling/uitkering"
+    # Probeer Trino audit-log: is er query met "doel: beoordeling/claim payout"
     # in de laatste 24u door deze user, op silver.claims.application, met regio_code-filter?
     # Zie tests/smoke/test_audit_query.py voor patroon.
     return {"ok": False, "msg": "audit-log koppeling niet geconfigureerd"}

@@ -16,7 +16,7 @@
 # upstream `ghcr.io/dbt-labs/dbt-trino:1.9.0` vereist auth bij anonymous pull).
 FROM odap/dbt-trino:1.9.0
 
-# dbt-fabricspark voor de UC-11 multi-platform demo (gold-marts op Fabric
+# dbt-fabricspark for the UC-11 multi-platform demo (gold-marts op Fabric
 # Lakehouse via Livy). 1.12 hangt op dbt-core>=1.8 wat compatibel is met de
 # 1.9-base. Layer vóór de project-COPY zodat hercopiëren niet hoeft te
 # reïnstalleren.

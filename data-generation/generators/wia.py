@@ -1,4 +1,4 @@
-"""WIA-aanvragen stub. SYNTHETIC DATA — NOT FOR REAL USE."""
+"""WIA-request stub. SYNTHETIC DATA — NOT FOR REAL USE."""
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ def generate_claim_application(rng: random.Random, bsn: str) -> WIAAanvraag:
     )
 
 
-def generate_wia_aanvragen(
+def generate_wia_request(
     persona_bsns: list[str], rate: float = 0.15, seed: int | None = None
 ) -> Iterator[WIAAanvraag]:
     rng = make_rng(seed)

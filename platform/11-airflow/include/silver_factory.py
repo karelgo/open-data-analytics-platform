@@ -20,7 +20,7 @@ from sources_loader import SourceSpec, load_all_sources
 
 # Cosmos imports — pad A (initContainer) zorgt dat dit op PYTHONPATH staat.
 # Als cosmos ontbreekt, valt de DAG terug op een EmptyOperator zodat parsing
-# niet crasht. In productie nooit gewenst — DAG integrity test faalt dan.
+# niet crasht. In production nooit gewenst — DAG integrity test faalt dan.
 try:
     from cosmos import (
         DbtDag,
@@ -127,7 +127,7 @@ def build_silver_dag(source: SourceSpec) -> DAG:
         is_paused_upon_creation=False,
         tags=source.airflow_tags + ["silver", "cosmos"],
         # Publiceer silver-Dataset zodat gold-DAGs triggeren.
-        # Cosmos plaatst outlets op de eindknoop via een end-task.
+        # Cosmos plaatst outlets on the eindknoop via een end-task.
         # Voor manifest-based mode zetten we deze via render_config.
     )
 

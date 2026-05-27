@@ -197,7 +197,7 @@ data:
             # approval-Task. Bots mogen geen Tasks aanmaken
             # ("Task cannot be created by bot only by user or teams").
             # Bootstrap seedt daarom minimal term-records (name + description);
-            # reviewers/dataOwner zijn documentatie-metadata, kan later via UI
+            # reviewers/dataOwner zijn documentation-metadata, kan later via UI
             # gezet worden door een echte user.
             term_body = {
                 "glossary": g["name"],
@@ -250,7 +250,7 @@ data:
 
 
     def apply_custom_properties() -> None:
-        """Registreer custom-properties op de Table-entiteit. OM 1.5 heeft
+        """Registreer custom-properties on the Table-entiteit. OM 1.5 heeft
         geen `boolean` primitive — booleans worden gemodelleerd als enum met
         EnumConfig.values=['true','false']. Bestaande properties worden
         overgeslagen (idempotent op naam)."""
@@ -503,7 +503,7 @@ data:
         """De `ingestion-bot` heeft default IngestionBotRole, wat user-token-
         rotatie verbiedt (403 op /users/generateToken). Bots mogen zichzelf
         ook niet via de OM-API tot admin promoveren ("Principal is not admin").
-        Workaround: direct in de Postgres-DB `isAdmin=true` zetten. Vereist
+        Workaround: direct in de Postgres-DB `isAdmin=true` zetten. Required
         psycopg2 + POSTGRES_PASSWORD env (uit mysql-secrets, chart-quirk-naam).
         """
         log("Promote ingestion-bot tot admin (via Postgres-direct)")
@@ -599,7 +599,7 @@ spec:
                 secretKeyRef:
                   name: openmetadata-admin
                   key: jwtToken
-            # Postgres-direct toegang voor bot-promote (chart-quirk: het
+            # Postgres-direct access voor bot-promote (chart-quirk: het
             # OM-DB-secret heet `mysql-secrets` zelfs bij Postgres, met
             # key `openmetadata-mysql-password`).
             - name: POSTGRES_PASSWORD

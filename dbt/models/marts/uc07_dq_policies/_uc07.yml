@@ -8,9 +8,9 @@ models:
     meta:
       domain: polisadm
       legal_basis: Wet_SUWI+Wfsv
-      doelbinding: ["primair_proces", "kwaliteitscontrole"]
+      purpose-limitation: ["primair_proces", "kwaliteitscontrole"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 30
+      retention period_jaren: 30
       eigenaar: data_steward_polisadm
       pii_kolommen: []
       risk_tier: laag

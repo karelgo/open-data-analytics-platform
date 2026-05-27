@@ -1,20 +1,20 @@
 ---
-title: Datazones
-description: Medallion-architectuur (bronze/silver/gold) + sensitive vault — zone-scheiding en toegang.
+title: Data zones
+description: Medallion-architecture (bronze/silver/gold) + sensitive vault — zone-scheiding en access.
 ---
 
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
-# Datazones
+# Data zones
 
 Vier MinIO-buckets, elk met eigen Trino-catalog, plus een aparte vault voor
 bijzondere persoonsgegevens (art. 9 AVG). De zone-naam in de portal en in
 de OPA-policies zijn 1-op-1.
 
-## Overzicht
+## Overview
 
-| Catalog | Bucket | Inhoud | Toegang (default) |
+| Catalog | Bucket | Inhoud | Access (default) |
 |---|---|---|---|
 | `bronze` | `odap-bronze` | Onveranderbare brondata (incl. raw PII) | data-engineers (JIT) |
 | `silver` | `odap-silver` | Geconformeerd, gepseudonimiseerd waar mogelijk | analisten + engineers |
@@ -22,12 +22,12 @@ de OPA-policies zijn 1-op-1.
 | `sensitive` | `sensitive` | Bijzondere persoonsgegevens (art. 9 AVG, medisch) | strikt; 4-eyes principe |
 | `sandbox` | `sandbox` | Gepseudonimiseerd — voor researchers | researcher (read-only) |
 
-## Toegangsstrategie
+## Accesssstrategie
 
 ```mermaid
 flowchart LR
     bronze[bronze<br/>raw + PII] -- "ETL: pseudonimiseer" --> silver[silver<br/>geconformeerd]
-    silver -- "dbt-modellen" --> gold[gold<br/>marts voor BI]
+    silver -- "dbt-models" --> gold[gold<br/>marts voor BI]
     bronze -- "alleen via vault-flow" --> sensitive[sensitive<br/>art. 9 AVG]
     silver -- "pseudo-export" --> sandbox[sandbox<br/>research]
 
@@ -36,13 +36,13 @@ flowchart LR
 ```
 
 OPA-policies zijn **format-agnostisch**: ze kijken naar
-`catalog.schema.table`- en kolomnamen, niet naar het onderliggende
+`catalog.schema.table`- en kolomnamen, niet to the onderliggende
 bestandsformaat. Switching tussen Delta en Iceberg laat de policies
 onveranderd (zie [ADR-0002](../adr/0002-iceberg-vs-delta.md)).
 
 ## Wat zie je per rol?
 
-Dit volgt 1-op-1 de rol-handleidingen:
+Dit volgt 1-op-1 de rol-handbooken:
 
 - **Claims Analyst / Claims Analyst / etc.** → primair `gold`,
   beperkt `silver` (eigen domein). Geen `bronze`.
@@ -55,4 +55,4 @@ Dit volgt 1-op-1 de rol-handleidingen:
 
 Welke kolommen je in een gold-mart precies ziet hangt af van de OPA-policies
 in [`opa-policies-src/`](https://github.com/fresh-minds/FreshStackableDataPlatform/tree/main/opa-policies-src).
-Zie [Identiteit & autorisatie](auth.md) voor de policy-flow.
+Zie [Identity & autorisatie](auth.md) for the policy-flow.

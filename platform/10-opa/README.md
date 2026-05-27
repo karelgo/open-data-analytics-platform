@@ -14,10 +14,10 @@ In fase 3 staat **één** policy in de bundle:
 - [`policies/trino-base.rego`](policies/trino-base.rego) — allow-all voor authenticated users (dev bootstrap, ticket `ODAP-PLATFORM-OPA-001`).
 - [`policies/trino-base_test.rego`](policies/trino-base_test.rego) — `opa test` coverage.
 
-In fase 9 wordt deze vervangen door de canonical bundle uit `opa-policies-src/trino/`:
+In fase 9 wordt deze vervangen through the canonical bundle uit `opa-policies-src/trino/`:
 - `trino-base.rego` (default-deny)
 - `trino-platform-roles.rego` (rol-mapping)
-- `trino-doelbinding.rego` (R-AVG-06)
+- `trino-purpose-limitation.rego` (R-AVG-06)
 - `trino-row-filters.rego` (R-BIO-11)
 - `trino-column-masks.rego` (R-BIO-11)
 - + `*_test.rego` per file
@@ -50,7 +50,7 @@ kubectl -n odap-platform run opa-test --rm -it --image=curlimages/curl:8.10.1 --
 # Verwacht: {"result": true}
 ```
 
-## Productie-pad
+## Production-pad
 
 - Default-deny in alle base policies; expliciete allow per rol.
 - Audit-log per decisie naar OpenSearch.

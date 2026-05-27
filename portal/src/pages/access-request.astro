@@ -4,21 +4,21 @@ import Button from '../components/primitives/Button.astro';
 import Eyebrow from '../components/primitives/Eyebrow.astro';
 
 // Self-service formulier dat een access-request Task aanmaakt in
-// OpenMetadata. POST gaat naar de bridge via /access-request-api/api/request
+// OpenMetadata. POST gaat to the bridge via /access-request-api/api/request
 // (same-origin via ingress-rewrite — zie platform/18-om-access-bridge/
 // ingress.yaml). Conventie zit in de bridge: hij plaatst "Request Access"
 // in de Task-message zodat de bestaande webhook-flow na approval een
 // grant uitvoert. Volledige doc: docs/access-request-guide.md.
 
-// Bekende doelbindingen — moet sporen met de purposes in
+// Bekende purpose-limitationen — moet sporen with the purposes in
 // resource_purposes (opa-policies-src/data/role_mappings.json).
 const purposes = [
-  { id: 'klantcontact',        label: 'Klantcontact (UC-05)' },
+  { id: 'customer interaction',        label: 'Customer interaction (UC-05)' },
   { id: 'behandeling',         label: 'Behandeling van aanvraag (UC-04, UC-07)' },
   { id: 'kwaliteitscontrole',  label: 'Kwaliteitscontrole / reconciliatie (FEZ)' },
   { id: 'handhaving',          label: 'Handhaving (UC-06)' },
-  { id: 'planning',            label: 'Capaciteitsplanning (UC-08)' },
-  { id: 'onderzoek',           label: 'Onderzoek (UC-09, sandbox-zone)' },
+  { id: 'planning',            label: 'Capacity planning (UC-08)' },
+  { id: 'onderzoek',           label: 'Research (UC-09, sandbox-zone)' },
   { id: 'pipeline-development', label: 'Pipeline-development (data engineer, JIT)' },
 ];
 
@@ -40,7 +40,7 @@ const sampleAssets = [
     </h1>
     <p class="ar-hero-body">
       Vul dit formulier in. Wij maken een Task aan in OpenMetadata en
-      sturen 'm naar de owner. Bij approval krijg je automatisch de rol
+      sturen 'm to the owner. Bij approval krijg je automatisch de rol
       <code>data_access:&lt;catalog&gt;.&lt;schema&gt;</code> en kun je de
       data in Trino/Superset bevragen.
     </p>
@@ -82,7 +82,7 @@ const sampleAssets = [
           placeholder="bv. claims.analyst"
         />
         <small class="ar-hint">
-          Je Keycloak-gebruikersnaam (eerste deel van je e-mail). In productie
+          Je Keycloak-usersnaam (eerste deel van je e-mail). In production
           komt dit uit je SSO-sessie; in dev type je 'm zelf.
         </small>
       </div>
@@ -90,25 +90,25 @@ const sampleAssets = [
       <div class="ar-row">
         <label for="ar-purpose">Voor welk doel?</label>
         <select id="ar-purpose" name="purpose" required>
-          <option value="" disabled selected>— Kies een doelbinding —</option>
+          <option value="" disabled selected>— Kies een purpose-limitation —</option>
           {purposes.map((p) => <option value={p.id}>{p.label}</option>)}
         </select>
         <small class="ar-hint">
-          Doelbinding is wettelijk verplicht (AVG art. 5 lid 1b). OPA-Rego
-          handhaaft dit op query-tijd; de owner kijkt of de doelbinding
+          Purpose limitation is wettelijk verplicht (GDPR Art. 5(1)(b)). OPA-Rego
+          handhaaft dit op query-tijd; de owner kijkt of de purpose-limitation
           passend is bij jouw rol.
         </small>
       </div>
 
       <div class="ar-row">
-        <label for="ar-duration">Hoe lang heb je toegang nodig?</label>
+        <label for="ar-duration">Hoe lang heb je access nodig?</label>
         <input
           id="ar-duration"
           name="duration"
           type="text"
           placeholder="bv. 2 maanden, t/m 2026-08-01"
         />
-        <small class="ar-hint">Optioneel, maar wel netjes voor de owner.</small>
+        <small class="ar-hint">Optioneel, maar wel netjes for the owner.</small>
       </div>
 
       <div class="ar-row">
@@ -117,7 +117,7 @@ const sampleAssets = [
           id="ar-motivation"
           name="motivation"
           rows="5"
-          placeholder="Wat ga je met de data doen? Welk project? Waarom kun je niet uit met de aggregaten die je nu al mag zien?"
+          placeholder="Wat ga je with the data doen? Welk project? Waarom kun je niet uit with the aggregaten die je nu al mag zien?"
         ></textarea>
         <small class="ar-hint">Helpt de owner een snellere beslissing nemen.</small>
       </div>

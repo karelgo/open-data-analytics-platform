@@ -124,7 +124,7 @@ def main() -> int:
         .withColumn("silver_ingestion_ts", F.current_timestamp())
     )
     out_cnt = deduped.count()
-    print(f"  After parse + dedupe: {out_cnt} unique aanvragen", flush=True)
+    print(f"  After parse + dedupe: {out_cnt} unique request", flush=True)
 
     # Delta MERGE — toont Delta-superpower vs Parquet. Op eerste run schrijven
     # we de tabel + registreren; daarna upsert per application_id.

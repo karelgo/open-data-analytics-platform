@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-"""Genereer architectuur-pagina's voor de MkDocs-site uit portal/src/data/components.ts.
+"""Genereer architecture-pagina's for the MkDocs-site uit portal/src/data/components.ts.
 
-De portal-registry blijft de single source of truth voor componenten, lagen
+De portal-registry blijft de single source of truth voor components, lagen
 en rol-mappings. Dit script parseert die TypeScript-bron en schrijft markdown
-naar docs/architectuur/. CI draait dit voor `mkdocs build`.
+naar docs/architecture/. CI draait dit voor `mkdocs build`.
 
 Outputs:
-  docs/architectuur/index.md         — overzicht + swim-lane diagram (mermaid)
-  docs/architectuur/componenten.md   — per-component pagina (tabel + detail)
-  docs/architectuur/datazones.md     — medallion + sensitive uitleg
-  docs/architectuur/auth.md          — Keycloak + OPA + AuthenticationClass
-  docs/architectuur/tabel-formaat.md — Delta vs Iceberg abstractie
-  docs/architectuur/naming.md        — naming conventions
-  docs/architectuur/referentie.md    — link naar originele referentiearch
+  docs/architecture/index.md         — overzicht + swim-lane diagram (mermaid)
+  docs/architecture/components.md   — per-component pagina (tabel + detail)
+  docs/architecture/data zones.md     — medallion + sensitive uitleg
+  docs/architecture/auth.md          — Keycloak + OPA + AuthenticationClass
+  docs/architecture/table-format.md — Delta vs Iceberg abstractie
+  docs/architecture/naming.md        — naming conventions
+  docs/architecture/reference.md    — link naar originele referentiearch
   docs/index.md                       — site-landing
-  docs/rollen/index.md                — overzicht 12 rollen + matrix
+  docs/roles/index.md                — overzicht 12 rollen + matrix
   docs/use-cases/index.md             — UC overzicht
   docs/adr/index.md                   — ADR overzicht
   docs/security.md                    — security policy (kopie van SECURITY.md)
@@ -210,7 +210,7 @@ def load_registry() -> tuple[list[Component], list[Stage]]:
 
 GENERATED_BANNER = (
     "<!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.\n"
-    "     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->\n"
+    "     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->\n"
 )
 
 
@@ -246,12 +246,12 @@ hide:
 
 # Open Data & Analytics Platform
 
-Een **fictieve, illustratieve** referentie-implementatie van een modern data-
+Een **fictieve, illustratieve** reference implementation van een modern data-
 en analyticsplatform voor UWV, gebouwd op open source en gericht op compliance
-met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
+met GDPR, ISO 27001/27002, NIS2, and the EU AI Act.
 
 !!! warning "Geen echte ODAP data"
-    Geen echte BSN's, geen echte productiecode. Alle datasets zijn synthetisch
+    Geen echte BSN's, geen echte productioncode. Alle datasets zijn synthetisch
     en gemarkeerd met `# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`.
     Deze repo is geen ODAP product en geen aanbestedingsstuk.
 
@@ -259,22 +259,22 @@ met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
 
 <div class="grid cards" markdown>
 
--   :material-sitemap:{{ .lg .middle }} **Architectuur**
+-   :material-sitemap:{{ .lg .middle }} **Architecture**
 
     ---
 
-    {len(comps)} componenten over {len(pipeline_stages)} lagen — van ingestie
+    {len(comps)} components over {len(pipeline_stages)} lagen — van ingestion
     tot consumptie, met identity, observability en governance als
     cross-cutting lanen.
 
-    [:octicons-arrow-right-24: Open architectuur](architectuur/index.md)
+    [:octicons-arrow-right-24: Open architecture](architecture/index.md)
 
 -   :material-account-group:{{ .lg .middle }} **Voor wie?**
 
     ---
 
-    {role_count} rollen met elk eigen handleiding: Claims Analyst,
-    Fraud Analyst, data-engineer, platform-admin, … Toegang en data-zichtbaarheid
+    {role_count} rollen met elk eigen handbook: Claims Analyst,
+    Fraud Analyst, data-engineer, platform-admin, … Access en data-zichtbaarheid
     komen uit OPA-policies en Keycloak-rollen.
 
     [:octicons-arrow-right-24: Bekijk rollen](rollen/index.md)
@@ -284,18 +284,18 @@ met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
     ---
 
     11 concrete business-flows — van WIA-funnel (UC-01) tot
-    integrale klantreis (UC-11) — met scope, CGM-entiteiten, doelbinding
+    integrale customer journey (UC-11) — met scope, CGM-entiteiten, purpose-limitation
     en AI-Act-classificatie.
 
     [:octicons-arrow-right-24: Bekijk use cases](use-cases/index.md)
 
--   :material-clipboard-text:{{ .lg .middle }} **Beslissingen**
+-   :material-clipboard-text:{{ .lg .middle }} **Decisions**
 
     ---
 
     8 ADRs leggen de fundamentele keuzes vast: Stackable, Delta vs Iceberg,
     OPA als Trino-authz, OpenMetadata als catalog, dbt-trino als
-    transformatielaag.
+    transformationlaag.
 
     [:octicons-arrow-right-24: Bekijk ADRs](adr/index.md)
 
@@ -303,7 +303,7 @@ met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
 
     ---
 
-    Iedere R-NORA/AVG/BIO/NIS2/AI-Act-requirement is gemapt op een concreet
+    Iedere R-GDPR/ISO27001/NIS2/NIS2/AI-Act-requirement is gemapt op een concreet
     bestand of setting — herleidbaar in code en config.
 
     [:octicons-arrow-right-24: Compliance-mapping](compliance-mapping.md)
@@ -312,27 +312,27 @@ met NORA, AVG, BIO/BIO2, NIS2 en de AI Act.
 
     ---
 
-    Runbook, security-policy, documentatie-gaps, roadmap. De operationele
+    Runbook, security-policy, documentation-gaps, roadmap. De operationele
     realiteit van het platform.
 
     [:octicons-arrow-right-24: Operations](runbook.md)
 
 </div>
 
-## Snelstart
+## Quick start
 
 ```bash
-# Voorvereisten: Docker Desktop (≥ 8 GB / ≥ 4 CPU), k3d ≥ 5.6, kubectl, helm, stackablectl
+# Prerequisites: Docker Desktop (≥ 8 GB / ≥ 4 CPU), k3d ≥ 5.6, kubectl, helm, stackablectl
 
 git clone https://github.com/fresh-minds/FreshStackableDataPlatform.git
 cd FreshStackableDataPlatform
 
-# DNS-injectie voor lokale toegang
+# DNS-injectie voor lokale access
 echo "127.0.0.1 keycloak.odap.local \\
   superset.odap.local airflow.odap.local \\
   minio.odap.local openmetadata.odap.local" | sudo tee -a /etc/hosts
 
-# Cluster + platform deployen (~15-30 min op de eerste run)
+# Cluster + platform deployen (~15-30 min on the eerste run)
 make cluster        # k3d cluster create
 make bootstrap      # cert-manager, MinIO, Postgres, Keycloak, Stackable operators
 make deploy-platform # Trino, Spark, Kafka, NiFi, Airflow, Superset, OpenMetadata
@@ -344,28 +344,28 @@ make test           # smoke tests
 
 | Laag | Component | Kort |
 |---|---|---|
-| Identiteit | **Keycloak** | OIDC, MFA, rol-claims |
-| Ingestie | **NiFi → Kafka** | Visuele flows, schaalbare event-bus |
-| Opslag | **MinIO + Hive Metastore** | S3-compatible, Delta-tabellen, catalog |
-| Verwerking | **Spark (Stackable)** | Structured Streaming + batch |
+| Identity | **Keycloak** | OIDC, MFA, rol-claims |
+| Ingestion | **NiFi → Kafka** | Visuele flows, schaalbare event-bus |
+| Storage | **MinIO + Hive Metastore** | S3-compatible, Delta-tabellen, catalog |
+| Processing | **Spark (Stackable)** | Structured Streaming + batch |
 | Query | **Trino + OPA** | SQL over lakehouse met policy-checks |
-| Transformatie | **dbt-trino** | Staging → intermediate → marts, format-agnostisch |
+| Transformation | **dbt-trino** | Staging → intermediate → marts, format-agnostisch |
 | Orkestratie | **Airflow** | DAGs voor batch + dbt-runs |
 | BI | **Superset** | Dashboards + SQL Lab |
 | Governance | **OpenMetadata** | Catalog, glossary, lineage, DQ |
 | Observability | **Vector → OpenSearch + Prometheus + OTEL** | Logs, metrics, traces |
 
-Alle componenten via **Stackable Data Platform 26.3** operators.
+Alle components via **Stackable Data Platform 26.3** operators.
 
 ## Bijdragen
 
-Issues, PR's en feedback welkom via [GitHub](https://github.com/fresh-minds/FreshStackableDataPlatform).
-Een nieuwe doc volgt de bestaande structuur (ADR ↔ use-case ↔ handleiding);
+Issues, PR's en feedback welcome via [GitHub](https://github.com/fresh-minds/FreshStackableDataPlatform).
+Een nieuwe doc volgt de bestaande structuur (ADR ↔ use-case ↔ handbook);
 kruisverwijzingen worden bijgewerkt in dit document én in de index.
 """
 
 
-def render_architectuur_index(stages: list[Stage], comps: list[Component]) -> str:
+def render_architecture_index(stages: list[Stage], comps: list[Component]) -> str:
     pipeline_stages = [s for s in stages if s.kind in ("pipeline-step", "output") and s.id != "sources"]
     overlay_stages = [s for s in stages if s.kind == "overlay"]
     side_stages = [s for s in stages if s.kind == "side"]
@@ -407,20 +407,20 @@ def render_architectuur_index(stages: list[Stage], comps: list[Component]) -> st
         lane_md.append("| Component | Verantwoordelijkheid | Doel |")
         lane_md.append("|---|---|---|")
         for c in s_comps:
-            comp_link = f"[{c.name}](componenten.md#{c.id})"
+            comp_link = f"[{c.name}](components.md#{c.id})"
             lane_md.append(f"| {comp_link} | {c.short} | {c.purpose} |")
         lane_md.append("")
 
     return f"""---
-title: Architectuur
-description: Overzicht van de ODAP platformarchitectuur — lagen, dataflow, cross-cutting zorgen.
+title: Architecture
+description: Overview van de ODAP platformarchitecture — lagen, dataflow, cross-cutting zorgen.
 ---
 
-# Architectuur
+# Architecture
 
 Het platform is opgebouwd als een **keten van lagen** — data komt binnen
-(ingestie), wordt opgeslagen (lakehouse), bewerkt en gemodelleerd
-(transformatie) en uiteindelijk geconsumeerd in dashboards en data-producten.
+(ingestion), wordt opgeslagen (lakehouse), bewerkt en gemodelleerd
+(transformation) en uiteindelijk geconsumeerd in dashboards en data-producten.
 Daaroverheen liggen vijf cross-cutting lanen — **identity**, **discovery**,
 **pipeline-orkestratie**, **observability** en **agents** — die overal raken.
 
@@ -431,16 +431,16 @@ flowchart LR
 {mermaid_block}
 ```
 
-Auth/authz en observability raken alle componenten — zie
-[Identiteit & autorisatie](auth.md) en [Operations / Runbook](../runbook.md).
+Auth/authz en observability raken alle components — zie
+[Identity & autorisatie](auth.md) en [Operations / Runbook](../runbook.md).
 
-## Mapping op de UWV-referentiearchitectuur
+## Mapping on the UWV-referentiearchitecture
 
 | Laag in referentie-arch. | Component in deze repo |
 |---|---|
 | Bronnen | `data-generation/` — synthetische generators voor Polisadm/WW/WIA/Wajong/CRM/FEZ |
-| Ingestie & integratie | `platform/07-nifi/` (NiFi) + `platform/06-kafka/` (Kafka) + `nifi-flows/templates/` |
-| Opslag (lakehouse, medallion) | MinIO (`platform/03-storage/`) + Delta-tabellen + `platform/05-hive-metastore/` |
+| Ingestion & integratie | `platform/07-nifi/` (NiFi) + `platform/06-kafka/` (Kafka) + `nifi-flows/templates/` |
+| Storage (lakehouse, medallion) | MinIO (`platform/03-storage/`) + Delta-tabellen + `platform/05-hive-metastore/` |
 | Processing & ML | `platform/08-spark/apps/` (PySpark via SparkApplication) + `dbt/` (Trino-side transforms) |
 | Semantische laag | dbt-marts (`dbt/models/marts/uc0x_*/`) + Trino views (`gold` catalog) |
 | Consumptie | `platform/12-superset/` (BI) + Trino REST/JDBC voor toekomstige API-laag |
@@ -450,22 +450,22 @@ Auth/authz en observability raken alle componenten — zie
 | Observability | Vector (Stackable) + Prometheus (`infrastructure/helm/prometheus-stack/`) + OpenSearch (gedeeld) |
 | Secrets / TLS | cert-manager + Stackable secret-operator |
 
-## Componenten per laag
+## Components per laag
 
 {chr(10).join(lane_md)}
 
 ## Verder lezen
 
-- [Componenten in detail](componenten.md) — per component een eigen sectie
-- [Datazones](datazones.md) — medallion + sensitive uitleg
-- [Identiteit & autorisatie](auth.md) — Keycloak + OPA
+- [Components in detail](components.md) — per component een eigen sectie
+- [Data zones](data zones.md) — medallion + sensitive uitleg
+- [Identity & autorisatie](auth.md) — Keycloak + OPA
 - [Tabel-formaat abstractie](tabel-formaat.md) — Delta vs Iceberg
 - [Naming conventions](naming.md)
-- [Originele referentie-architectuur](referentie.md) — bron-document
+- [Originele referentie-architecture](referentie.md) — bron-document
 """
 
 
-def render_componenten(comps: list[Component], stages: list[Stage]) -> str:
+def render_components(comps: list[Component], stages: list[Stage]) -> str:
     by_stage = {s.id: s for s in stages}
 
     sections: list[str] = []
@@ -502,24 +502,24 @@ def render_componenten(comps: list[Component], stages: list[Stage]) -> str:
     role_matrix = _render_role_matrix(comps)
 
     return f"""---
-title: Componenten
+title: Components
 description: Per-component overzicht — verantwoordelijkheid, doel, URL, gebruikende rollen.
 ---
 
-# Componenten
+# Components
 
 Per-component overzicht. Voor het diagram op laag-niveau zie
-[Architectuur · Overzicht](index.md); voor de relatie tussen rollen en
-componenten zie de [rol-matrix](#rol-matrix) onderaan.
+[Architecture · Overview](index.md); for the relatie tussen rollen en
+components zie de [rol-matrix](#rol-matrix) onderaan.
 
 {chr(10).join(sections)}
 
 ## Rol-matrix {{ #rol-matrix }}
 
 Welke rol gebruikt welk component? Een ✓ betekent dat de rol in deze
-referentie-implementatie via de portal-shortcuts naar de UI van het
+reference implementation via de portal-shortcuts to the UI van het
 component wordt gestuurd. Een lege cel betekent dat de rol normaliter geen
-directe toegang nodig heeft (toegang kan alsnog via JIT/break-glass).
+directe access nodig heeft (access kan alsnog via JIT/break-glass).
 
 {role_matrix}
 """
@@ -556,21 +556,21 @@ def _render_role_matrix(comps: list[Component]) -> str:
     return "\n".join(rows)
 
 
-def render_datazones() -> str:
+def render_data zones() -> str:
     return f"""---
-title: Datazones
-description: Medallion-architectuur (bronze/silver/gold) + sensitive vault — zone-scheiding en toegang.
+title: Data zones
+description: Medallion-architecture (bronze/silver/gold) + sensitive vault — zone-scheiding en access.
 ---
 
-# Datazones
+# Data zones
 
 Vier MinIO-buckets, elk met eigen Trino-catalog, plus een aparte vault voor
 bijzondere persoonsgegevens (art. 9 AVG). De zone-naam in de portal en in
 de OPA-policies zijn 1-op-1.
 
-## Overzicht
+## Overview
 
-| Catalog | Bucket | Inhoud | Toegang (default) |
+| Catalog | Bucket | Inhoud | Access (default) |
 |---|---|---|---|
 | `bronze` | `odap-bronze` | Onveranderbare brondata (incl. raw PII) | data-engineers (JIT) |
 | `silver` | `odap-silver` | Geconformeerd, gepseudonimiseerd waar mogelijk | analisten + engineers |
@@ -578,12 +578,12 @@ de OPA-policies zijn 1-op-1.
 | `sensitive` | `sensitive` | Bijzondere persoonsgegevens (art. 9 AVG, medisch) | strikt; 4-eyes principe |
 | `sandbox` | `sandbox` | Gepseudonimiseerd — voor researchers | researcher (read-only) |
 
-## Toegangsstrategie
+## Accesssstrategie
 
 ```mermaid
 flowchart LR
     bronze[bronze<br/>raw + PII] -- "ETL: pseudonimiseer" --> silver[silver<br/>geconformeerd]
-    silver -- "dbt-modellen" --> gold[gold<br/>marts voor BI]
+    silver -- "dbt-models" --> gold[gold<br/>marts voor BI]
     bronze -- "alleen via vault-flow" --> sensitive[sensitive<br/>art. 9 AVG]
     silver -- "pseudo-export" --> sandbox[sandbox<br/>research]
 
@@ -592,13 +592,13 @@ flowchart LR
 ```
 
 OPA-policies zijn **format-agnostisch**: ze kijken naar
-`catalog.schema.table`- en kolomnamen, niet naar het onderliggende
+`catalog.schema.table`- en kolomnamen, niet to the onderliggende
 bestandsformaat. Switching tussen Delta en Iceberg laat de policies
 onveranderd (zie [ADR-0002](../adr/0002-iceberg-vs-delta.md)).
 
 ## Wat zie je per rol?
 
-Dit volgt 1-op-1 de rol-handleidingen:
+Dit volgt 1-op-1 de rol-handbooken:
 
 - **Claims Analyst / Claims Analyst / etc.** → primair `gold`,
   beperkt `silver` (eigen domein). Geen `bronze`.
@@ -611,19 +611,19 @@ Dit volgt 1-op-1 de rol-handleidingen:
 
 Welke kolommen je in een gold-mart precies ziet hangt af van de OPA-policies
 in [`opa-policies-src/`](https://github.com/fresh-minds/FreshStackableDataPlatform/tree/main/opa-policies-src).
-Zie [Identiteit & autorisatie](auth.md) voor de policy-flow.
+Zie [Identity & autorisatie](auth.md) for the policy-flow.
 """
 
 
 def render_auth() -> str:
     return f"""---
-title: Identiteit & autorisatie
+title: Identity & autorisatie
 description: Hoe Keycloak en OPA samen bepalen wie wat mag zien.
 ---
 
-# Identiteit & autorisatie
+# Identity & autorisatie
 
-Toegang is geen kwestie van losse user-accounts per service — alle componenten
+Access is geen kwestie van losse user-accounts per service — alle components
 delegeren authenticatie naar **Keycloak** (OIDC) en autorisatie op queries
 naar **Open Policy Agent (OPA)**.
 
@@ -679,8 +679,8 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 | Policy | Doel |
 |---|---|
 | `trino-base.rego` | OIDC token-validatie, role-mapping |
-| `trino-data-access.rego` | Catalog/schema/table-toegang per rol |
-| `trino-doelbinding.rego` | Doelbinding (purpose) afdwingen op gold-tabellen |
+| `trino-data-access.rego` | Catalog/schema/table-access per rol |
+| `trino-purpose-limitation.rego` | Purpose limitation (purpose) afdwingen op gold-tabellen |
 | `trino-row-filters.rego` | Rij-filters per rol (bijv. Fraud Analyst ziet alleen WW-claims) |
 | `trino-column-masks.rego` | Kolom-maskering (PII, gezondheid → hash of `***`) |
 | `trino-platform-roles.rego` | Role-definities (single source) |
@@ -688,17 +688,17 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 Build van de bundle: `scripts/build-opa-bundle.sh`, geïntegreerd in
 `make deploy-platform`.
 
-!!! tip "Doelbinding eerst"
+!!! tip "Purpose limitation eerst"
     Bij elke query controleert OPA of er een **geldig doel** is meegegeven
-    (bijv. `uitkering`, `handhaving`, `onderzoek`). Zonder doel: deny.
-    Doelbinding is harder dan rol — een Claims Analyst zonder doel
-    `uitkering` krijgt ook in zijn eigen mart geen data.
+    (bijv. `claim payout`, `handhaving`, `onderzoek`). Zonder doel: deny.
+    Purpose limitation is harder dan rol — een Claims Analyst zonder doel
+    `claim payout` krijgt ook in zijn eigen mart geen data.
 
 ## Zie ook
 
 - [ADR-0003 · OPA als Trino-authz](../adr/0003-opa-as-trino-authz.md)
 - [ADR-0008 · Self-service data-access](../adr/0008-self-service-data-access.md)
-- [Toegang aanvragen (handleiding)](../access-request-guide.md)
+- [Access request (handbook)](../access-request-guide.md)
 - [Compliance-mapping § AVG](../compliance-mapping.md)
 """
 
@@ -737,13 +737,13 @@ platform:
 
 Zie [ADR-0002 · Iceberg vs Delta](../adr/0002-iceberg-vs-delta.md) voor de
 afweging en [ADR-0006 · Delta gekozen voor deze implementatie](../adr/0006-delta-chosen-for-this-implementation.md)
-voor waarom deze referentie-implementatie Delta default.
+voor waarom deze reference implementation Delta default.
 
 ## Ingestion-pad bij Delta (afwijking van Iceberg-demo)
 
 Stackable's referentie-demo `data-lakehouse-iceberg-trino-spark` gebruikt
 NiFi's native `PutIceberg`-processor. Voor **Delta is er geen native NiFi-
-processor**. Daarom wordt voor de Delta-route alle bron-data via NiFi naar
+processor**. Daarom wordt for the Delta-route alle bron-data via NiFi naar
 **Kafka** geschreven; Spark Structured Streaming consumeert Kafka en schrijft
 naar Delta op MinIO.
 
@@ -757,20 +757,20 @@ flowchart LR
 ```
 
 Iceberg-pad (toekomstig of switch-back): NiFi's `PutIceberg` schrijft direct
-naar bronze; Spark blijft beschikbaar voor silver/gold-transformaties.
+naar bronze; Spark blijft beschikbaar voor silver/gold-transformations.
 """
 
 
 def render_naming() -> str:
     return f"""---
 title: Naming conventions
-description: Namen voor namespaces, schemas, topics, DNS — consistent over alle componenten.
+description: Namen voor namespaces, schemas, topics, DNS — consistent over alle components.
 ---
 
 # Naming conventions
 
 Eén consistente naamgevingsstrategie maakt zoeken in OpenMetadata, lineage
-en logs een stuk eenvoudiger. Alle componenten houden zich hieraan.
+en logs een stuk eenvoudiger. Alle components houden zich hieraan.
 
 ## Kubernetes namespaces
 
@@ -786,14 +786,14 @@ en logs een stuk eenvoudiger. Alle componenten houden zich hieraan.
 
 | Pattern | Voorbeelden |
 |---|---|
-| `bronze.demo.<entity>` | `bronze.claims.application`, `bronze.demo.ww_uitkering` |
+| `bronze.demo.<entity>` | `bronze.claims.application`, `bronze.demo.ww_claim payout` |
 | `silver.<domain>.<entity>` | `silver.claims.application_pseudo`, `silver.customers.interaction` |
 | `gold.<uc_id>.<artifact>` | `gold.uc01_claims_funnel.daily_kpi`, `gold.uc05_customer_360.profile` |
 | `sensitive.<domain>.<entity>` | `sensitive.medisch.diagnose` |
 
 Domein-codes: `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`, `smz`.
 
-## dbt-modellen
+## dbt-models
 
 ```
 <layer>_<domain>_<entity>.sql
@@ -815,7 +815,7 @@ Voorbeelden:
 
 - `claims.application`
 - `uwv.wia.beoordeling`
-- `uwv.ww.uitkering`
+- `uwv.ww.claim payout`
 
 ## DNS
 
@@ -841,26 +841,26 @@ rewrite de portal client-side; zie
 
 def render_referentie() -> str:
     return f"""---
-title: Originele referentie-architectuur
+title: Originele referentie-architecture
 description: Het bronvoorstel waarvan deze repo de implementatie is.
 ---
 
-# Originele referentie-architectuur
+# Originele referentie-architecture
 
 De huidige implementatie volgt:
 
-- [`referentiearchitectuur-odap-data-analytics.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/referentiearchitectuur-odap-data-analytics.md)
-  — 12 architectuurprincipes, 10 use-cases, CGM-entiteiten, Sensitive Vault,
+- [`referentiearchitecture-odap-data-analytics.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/referentiearchitecture-odap-data-analytics.md)
+  — 12 architectureprincipes, 10 use-cases, CGM-entiteiten, Sensitive Vault,
   data-mesh, wettelijke mappen.
 - [`requirements.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/requirements.md)
-  — Volledige requirements-matrix: NORA, AVG, BIO/BIO2, NIS2, AI Act met
+  — Volledige requirements-matrix: SOC 2, AVG, ISO 27001 / ISO 27002, NIS2, AI Act met
   R-* codes (70+ rules).
 - [`odap-platform-mapping-research.md`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/odap-platform-mapping-research.md)
   — Technische blauwdruk: component-mapping Stackable → Kubernetes.
 
 Deze pagina is een **navigatie-stub** — de bron-documenten staan in de
 repo-root als ware ze A4-rapporten. Voor implementatie-details zie de
-[Architectuur · Overzicht](index.md).
+[Architecture · Overview](index.md).
 
 ## Definition of Done
 
@@ -872,17 +872,17 @@ Het platform is "klaar" wanneer:
    rol `data_steward`.
 3. OpenMetadata toont end-to-end lineage van synthetische bron → dbt-model →
    Superset chart.
-4. OPA weigert query op `client_360.bsn` voor rol zonder doel "uitkering";
+4. OPA weigert query op `client_360.bsn` voor rol zonder doel "claim payout";
    maskeert BSN voor `marketing_analyst`.
 5. dbt-test `bsn_valid` faalt op een ingespoten ongeldige BSN-record.
-6. OpenMetadata toont voor elke gold-tabel: eigenaar, doelbinding-tag,
-   classificatie, bewaartermijn.
+6. OpenMetadata toont voor elke gold-tabel: eigenaar, purpose-limitation-tag,
+   classificatie, retention period.
 7. [`compliance-mapping`](../compliance-mapping.md) mapt elk
-   R-NORA/AVG/BIO/NIS2 op een concreet bestand of setting.
+   R-GDPR/ISO27001/NIS2/NIS2 op een concreet bestand of setting.
 8. CI-pipeline (GitHub Actions) groen op fresh clone.
 9. Switching naar Iceberg vereist alleen wijziging in `platform-config.yaml`
    + Trino-catalog redeploy + dbt re-run — code blijft anders ongewijzigd.
-10. Geen `latest`-tag, geen plaintext secret, geen TODO in productie-policy
+10. Geen `latest`-tag, geen plaintext secret, geen TODO in production-policy
     zonder ticket-id.
 """
 
@@ -894,43 +894,43 @@ title: Rollen — overzicht
 description: Welke rollen het platform onderscheidt en wie wat ziet.
 ---
 
-# Rollen op het platform
+# Rollen on the platform
 
 Het platform onderscheidt **11 menselijke rollen** + **1 systeemrol**,
 gemodelleerd in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
 en [`opa-policies-src/data/role_mappings.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/opa-policies-src/data/role_mappings.json).
 
-## Business-rollen (eindgebruikers)
+## Business-rollen (eindusers)
 
-| # | Rol | Domein | Handleiding |
+| # | Rol | Domein | Handbook |
 |---|---|---|---|
 | 1 | Claims Analyst | AG / WIA | [01-claims-analyst](../handbooks/01-claims-analyst.md) |
 | 2 | Fraud Analyst | WW | [02-fraud-analyst](../handbooks/02-fraud-analyst.md) |
 | 3 | Claims Analyst | AG / Wajong | [03-claims-analyst](../handbooks/03-claims-analyst.md) |
-| 4 | Marketing Analyst | CRM / Klantcontact | [04-marketing-analyst](../handbooks/04-marketing-analyst.md) |
+| 4 | Marketing Analyst | CRM / Customer interaction | [04-marketing-analyst](../handbooks/04-marketing-analyst.md) |
 | 5 | Finance Analyst | Financiën | [05-finance-analyst](../handbooks/05-finance-analyst.md) |
-| 6 | Operations Manager | Sociaal-medische zaken | [06-operations-manager](../handbooks/06-operations-manager.md) |
+| 6 | Operations Manager | Operationale zaken | [06-operations-manager](../handbooks/06-operations-manager.md) |
 | 7 | Marketing Analyst | Toeslagenwet (proactief) | [07-marketing-analyst](../handbooks/07-marketing-analyst.md) |
-| 8 | Researcher | Onderzoek (sandbox) | [08-researcher](../handbooks/08-researcher.md) |
+| 8 | Researcher | Research (sandbox) | [08-researcher](../handbooks/08-researcher.md) |
 
-## Technische rollen (platform-team)
+## Technische rollen (platform team)
 
-| # | Rol | Verantwoordelijkheid | Handleiding |
+| # | Rol | Verantwoordelijkheid | Handbook |
 |---|---|---|---|
 | 9 | Data-steward | Datakwaliteit, governance, lineage | [09-data-steward](../handbooks/09-data-steward.md) |
-| 10 | Data-engineer | Pipelines, ingestion, transformaties | [10-data-engineer](../handbooks/10-data-engineer.md) |
+| 10 | Data-engineer | Pipelines, ingestion, transformations | [10-data-engineer](../handbooks/10-data-engineer.md) |
 | 11 | Platform-admin | Cluster, security, break-glass | [11-platform-admin](../handbooks/11-platform-admin.md) |
 
 ## Systeemrol
 
-| # | Rol | Functie | Handleiding |
+| # | Rol | Functie | Handbook |
 |---|---|---|---|
 | 12 | Smoketest | Service-account voor automated tests + dbt-runs | [12-smoketest-systeem](../handbooks/12-smoketest-systeem.md) |
 
 ## Zes regels die voor iedereen gelden
 
-1. **Doelbinding eerst** — gebruik data alleen voor de taak waarvoor je rol toegang heeft.
-2. **Niets is "zomaar"** — elke query wordt gelogd, elke toegang is herleidbaar.
+1. **Purpose limitation eerst** — gebruik data alleen for the taak waarvoor je rol access heeft.
+2. **Niets is "zomaar"** — elke query wordt gelogd, elke access is herleidbaar.
 3. **Mens beslist** — algoritmes geven advies, jij neemt het besluit.
 4. **Bij twijfel niet doen** — vraag eerst de data-steward of platform-admin.
 5. **Geen schermafbeeldingen van persoonsgegevens** — ook niet voor bug-rapporten.
@@ -941,7 +941,7 @@ en [`opa-policies-src/data/role_mappings.json`](https://github.com/fresh-minds/F
 {matrix}
 
 Een ✓ in `keycloak` betekent dat alle rollen erover SSO'en. Voor `multica`,
-`prometheus`, en sommige observability-componenten beperken we toegang
+`prometheus`, en sommige observability-components beperken we access
 expliciet tot platform-rollen.
 """
 
@@ -949,13 +949,13 @@ expliciet tot platform-rollen.
 def render_use_cases_index() -> str:
     return f"""---
 title: Use cases — overzicht
-description: 11 concrete business-flows met scope, doelbinding, CGM-entiteiten en datapad.
+description: 11 concrete business-flows met scope, purpose-limitation, CGM-entiteiten en datapad.
 ---
 
 # Use cases
 
 Elf use-case-specs onder [`use-cases/`](https://github.com/fresh-minds/FreshStackableDataPlatform/tree/main/docs/use-cases),
-elk met scope, CGM-entiteiten, doelbinding, AI-Act-classificatie en
+elk met scope, CGM-entiteiten, purpose-limitation, AI-Act-classificatie en
 Definition-of-Done-anchors.
 
 | ID | Titel | Status | Domein | AI-Act |
@@ -964,20 +964,20 @@ Definition-of-Done-anchors.
 | [UC-02](uc02-complex-cases-ai.md) | Wajong AI-ondersteuning (hoog-risico) | Placeholder | AG/Wajong | **Hoog** |
 | [UC-03](uc03-fraud-risk.md) | WW-risico-screening (verboden-grens) | Placeholder + guard-test | WW | Verboden-grens |
 | [UC-04](uc04-proactieve-tw.md) | Proactieve TW-eligibility | Mart aanwezig | TW | Beperkt |
-| [UC-05](uc05-customer-360.md) | Klant-360 (gepseudonimiseerd) | Mart aanwezig | CRM | Laag |
-| [UC-06](uc06-schadelast.md) | Schadelast-prognose 5 jaar | Mart aanwezig | FEZ | Laag |
+| [UC-05](uc05-customer-360.md) | Customer 360 (gepseudonimiseerd) | Mart aanwezig | CRM | Laag |
+| [UC-06](uc06-cost forecast.md) | Cost forecast-prognose 5 jaar | Mart aanwezig | FEZ | Laag |
 | [UC-07](uc07-dq-policies.md) | DQ-dagrapport polisadministratie | Mart aanwezig | Polisadm | n.v.t. |
-| [UC-08](uc08-capacity-planning-planning.md) | SMZ-capaciteitsplanning | Placeholder | SMZ | Beperkt |
-| [UC-09](uc09-reintegration-effect.md) | Re-integratie-effectmeting | Mart aanwezig | Re-integratie | Beperkt |
+| [UC-08](uc08-capacity-planning-planning.md) | SMZ-capacity planning | Placeholder | SMZ | Beperkt |
+| [UC-09](uc09-reintegration-effect.md) | Reintegration-effectmeting | Mart aanwezig | Reintegration | Beperkt |
 | [UC-10](uc10-gegevensdiensten.md) | Gegevensdiensten-API | Placeholder | Cross-domein | n.v.t. |
-| [UC-11](uc11-customer-journey.md) | Integrale Klantreis (event-stream + fasen) | Mart aanwezig · [walkthrough](uc11-customer-journey-walkthrough.md) | Cross-domein | Beperkt |
+| [UC-11](uc11-customer-journey.md) | Integrale Customer journey (event-stream + fasen) | Mart aanwezig · [walkthrough](uc11-customer-journey-walkthrough.md) | Cross-domein | Beperkt |
 
 ## UC-11 — speciale walkthrough
 
 UC-11 heeft een aparte **demo-walkthrough** in
 [uc11-customer-journey-walkthrough](uc11-customer-journey-walkthrough.md) —
 stap-voor-stap rondleiding door alle platform-onderdelen, met directe
-links naar de live UI's (portal, dbt-docs, OpenMetadata, Trino, Airflow,
+links to the live UI's (portal, dbt-docs, OpenMetadata, Trino, Airflow,
 Superset). Handig als presentatie-script of als onboarding-tour.
 
 ## Use-case format
@@ -988,18 +988,18 @@ Elke spec volgt dezelfde indeling:
 - **Domein** — bv. AG/WIA, WW, CRM, FEZ
 - **Risicoclassificatie** — laag / beperkt / hoog / verboden-grens (per AI Act)
 - **AVG-grondslag** — art. 6 lid 1{{a,b,c,d,e,f}}
-- **Bewaartermijn (gold)** — typisch 7 jaar (besluitvormingsdata)
+- **Retention period (gold)** — typisch 7 jaar (besluitvormingsdata)
 - **Probleem** — waarom deze use-case bestaat
 - **Doel** — wat moet er anders zijn na implementatie
 - **Data** — bronnen, klassificaties, CGM-entiteiten
-- **Architectuur-pad** — concrete repo-bestanden van bron → dashboard
+- **Architecture-pad** — concrete repo-bestanden van bron → dashboard
 - **DoD-anchor** — welk dbt-model + welke OPA-test bewijst dat het werkt
 """
 
 
 def render_adr_index() -> str:
     return f"""---
-title: Beslissingen (ADRs) — overzicht
+title: Decisions (ADRs) — overzicht
 description: Architecture Decision Records die de fundamentele keuzes vastleggen.
 ---
 
@@ -1014,9 +1014,9 @@ wordt niet bewerkt maar als "superseded by" gemarkeerd.
 | [0002](0002-iceberg-vs-delta.md) | Iceberg vs Delta — afweging | Superseded by 0006 |
 | [0003](0003-opa-as-trino-authz.md) | OPA als Trino-autorisatie-engine | Accepted |
 | [0004](0004-openmetadata-as-catalog.md) | OpenMetadata als catalog/lineage/DQ | Accepted |
-| [0005](0005-dbt-trino-as-transform.md) | dbt-trino als transformatielaag | Accepted |
+| [0005](0005-dbt-trino-as-transform.md) | dbt-trino als transformationlaag | Accepted |
 | [0006](0006-delta-chosen-for-this-implementation.md) | Delta gekozen voor deze implementatie | Accepted |
-| [0007](0007-airflow-pipeline-architecture.md) | Airflow pipeline-architectuur | Accepted |
+| [0007](0007-airflow-pipeline-architecture.md) | Airflow pipeline-architecture | Accepted |
 | [0008](0008-self-service-data-access.md) | Self-service data-access flow | Accepted |
 
 ## ADR-format
@@ -1024,7 +1024,7 @@ wordt niet bewerkt maar als "superseded by" gemarkeerd.
 Elke ADR volgt dezelfde indeling:
 
 - **Status** — Proposed / Accepted / Deprecated / Superseded by N
-- **Context** — wat speelt er, welke krachten werken op de keuze
+- **Context** — wat speelt er, welke krachten werken on the keuze
 - **Beslissing** — wat is besloten
 - **Gevolgen** — wat verandert er door deze keuze
 - **Alternatieven** — wat is overwogen en waarom afgewezen
@@ -1034,27 +1034,27 @@ Elke ADR volgt dezelfde indeling:
 def render_architecture_redirect() -> str:
     """Vervang de oude top-level architecture.md door een korte redirect-stub.
 
-    De inhoud is verhuisd naar `architectuur/index.md` + de andere bestanden
-    onder `architectuur/`. We laten dit bestand bestaan om verwijzingen
+    De inhoud is verhuisd naar `architecture/index.md` + de andere bestanden
+    onder `architecture/`. We laten dit bestand bestaan om verwijzingen
     elders niet te breken.
     """
     return """---
-title: Architectuur (verplaatst)
-description: De architectuur-documentatie is verplaatst naar /architectuur/.
+title: Architecture (verplaatst)
+description: De architecture-documentation is verplaatst naar /architecture/.
 ---
 
-# Architectuur is verplaatst
+# Architecture is verplaatst
 
-De architectuur-documentatie staat nu onder
-[Architectuur · Overzicht](architectuur/index.md), opgedeeld in:
+De architecture-documentation staat nu onder
+[Architecture · Overview](architecture/index.md), opgedeeld in:
 
-- [Overzicht](architectuur/index.md) — dataflow + lagen
-- [Componenten](architectuur/componenten.md) — per-component pagina's
-- [Datazones](architectuur/datazones.md)
-- [Identiteit & autorisatie](architectuur/auth.md)
-- [Tabel-formaat abstractie](architectuur/tabel-formaat.md)
-- [Naming conventions](architectuur/naming.md)
-- [Originele referentie](architectuur/referentie.md)
+- [Overview](architecture/index.md) — dataflow + lagen
+- [Components](architecture/components.md) — per-component pagina's
+- [Data zones](architecture/data zones.md)
+- [Identity & autorisatie](architecture/auth.md)
+- [Tabel-formaat abstractie](architecture/table-format.md)
+- [Naming conventions](architecture/naming.md)
+- [Originele referentie](architecture/reference.md)
 """
 
 
@@ -1087,7 +1087,7 @@ def render_extra_css() -> str:
     return """/* Auto-generated door scripts/docs_gen.py.
    Aanpassingen overleven niet — wijzig in de generator. */
 
-/* platform-amber accent override op het Material amber-palet zodat het exact de
+/* platform-amber accent override on the Material amber-palet zodat het exact de
    portal-amber matcht (oklch(0.78 0.18 76) in de portal tokens). */
 :root {
   --md-primary-fg-color:        #d68f00;
@@ -1108,7 +1108,7 @@ def render_extra_css() -> str:
   margin: 1.5rem 0;
 }
 
-/* Grid-cards op de homepage: iets meer ademruimte. */
+/* Grid-cards on the homepage: iets meer ademruimte. */
 .md-typeset .grid.cards > ul > li {
   padding: 1.2rem 1.2rem 1.4rem;
 }
@@ -1187,13 +1187,13 @@ def main() -> None:
     targets: dict[Path, str] = {
         DOCS_DIR / "index.md": render_index(stages, comps),
         DOCS_DIR / "architecture.md": render_architecture_redirect(),
-        DOCS_DIR / "architectuur" / "index.md": render_architectuur_index(stages, comps),
-        DOCS_DIR / "architectuur" / "componenten.md": render_componenten(comps, stages),
-        DOCS_DIR / "architectuur" / "datazones.md": render_datazones(),
-        DOCS_DIR / "architectuur" / "auth.md": render_auth(),
-        DOCS_DIR / "architectuur" / "tabel-formaat.md": render_tabelformaat(),
-        DOCS_DIR / "architectuur" / "naming.md": render_naming(),
-        DOCS_DIR / "architectuur" / "referentie.md": render_referentie(),
+        DOCS_DIR / "architecture" / "index.md": render_architecture_index(stages, comps),
+        DOCS_DIR / "architecture" / "components.md": render_components(comps, stages),
+        DOCS_DIR / "architecture" / "data zones.md": render_data zones(),
+        DOCS_DIR / "architecture" / "auth.md": render_auth(),
+        DOCS_DIR / "architecture" / "tabel-formaat.md": render_tabelformaat(),
+        DOCS_DIR / "architecture" / "naming.md": render_naming(),
+        DOCS_DIR / "architecture" / "referentie.md": render_referentie(),
         DOCS_DIR / "rollen" / "index.md": render_rollen_index(comps),
         DOCS_DIR / "use-cases" / "index.md": render_use_cases_index(),
         DOCS_DIR / "adr" / "index.md": render_adr_index(),

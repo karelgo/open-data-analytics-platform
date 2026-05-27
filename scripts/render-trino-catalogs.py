@@ -82,7 +82,7 @@ def write_rendered_kustomization(rendered_files: list[Path]) -> Path:
 def main() -> int:
     fmt = resolve_format()
     DST.mkdir(parents=True, exist_ok=True)
-    # Schoon rendered-output op voor het regenereren (geen stale files).
+    # Schoon rendered-output op for the regenereren (geen stale files).
     for old in DST.glob("*.yaml"):
         old.unlink()
 

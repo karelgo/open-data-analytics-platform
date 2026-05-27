@@ -20,12 +20,12 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "25m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    # Iframe-allow voor de portal embed-shell (cross-origin). Strip
+    # Iframe-allow for the portal embed-shell (cross-origin). Strip
     # X-Frame-Options EN Multica's eigen Content-Security-Policy — die
     # bevat `frame-ancestors 'none'`; bij meerdere CSP-headers past de
     # browser de intersectie per directive toe en zou 'none' onze
     # permissive header vetoën. We verliezen daarmee Multica's XSS-CSP
-    # (script-src/style-src/etc.); voor dev-demo acceptabel — productie
+    # (script-src/style-src/etc.); voor dev-demo acceptabel — production
     # zou Multica's CSP configurable moeten maken.
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_hide_header X-Frame-Options;

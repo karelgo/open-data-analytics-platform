@@ -6,13 +6,13 @@
 #   enrich_from_dbt_meta.py-script PATCHt elke dbt-mart met de
 #   `cgm_entiteiten[]` uit dbt meta — maar dat dekt alleen mart-niveau.
 #   Bronze stg_*-tabellen krijgen geen glossary-koppeling want hun meta
-#   wordt direct uit de Trino-catalog gehaald (geen dbt-meta).
+#   wordt direct from the Trino-catalog gehaald (geen dbt-meta).
 #
-#   Daarnaast missen sommige termen iedere koppeling (Klantreis,
+#   Daarnaast missen sommige termen iedere koppeling (Customer journey,
 #   EventStream, Fase, Persona, Werknemer, Werkgever, Dienstverband,
 #   Ontslag, Diagnose, Inkomen, Huishouden, Aggregaat, Uitkomst).
 #
-#   Deze Job vult die gaten met een handgemaakte logische mapping
+#   Deze Job vult die gaten with a handgemaakte logische mapping
 #   (term → (schema, table)-paren). Voor elk paar koppelt het de
 #   bronze/silver/gold versies via PATCH /tables met UNION op tags
 #   (idempotent — bestaande tags blijven staan).
@@ -53,8 +53,8 @@ data:
     # zones worden overgeslagen. Termen waarvoor geen dbt-model bestaat
     # (Beoordelaar/Capaciteit/Doelgroepregister) zijn niet in deze map.
     LINKS = {
-        # Klantreis-cluster — UC-11 + intermediate
-        "Klantreis": [
+        # Customer journey-cluster — UC-11 + intermediate
+        "Customer journey": [
             ("uc11_customer_journey", "mart_uc11_journey_events"),
             ("uc11_customer_journey", "mart_uc11_journey_phases"),
             ("intermediate", "int_customer_journey_events"),
@@ -89,13 +89,13 @@ data:
             ("policies", "stg_policy_holders"),
         ],
 
-        # Aanvraag / Beoordeling — over wet-domeinen heen
+        # Aanvraag / Assessment — over wet-domeinen heen
         "Aanvraag": [
             ("service_requests", "stg_service_request_application"),
             ("claims", "stg_claim_application"),
             ("eligibility_cases", "stg_eligibility_case"),
         ],
-        "Beoordeling": [
+        "Assessment": [
             ("claims", "stg_claim_application"),
             ("eligibility_cases", "stg_eligibility_case"),
         ],
@@ -103,7 +103,7 @@ data:
             ("service_requests", "stg_service_request_application"),
         ],
 
-        # Sociaal-medisch (sensitive — alleen op bron, niet op marts)
+        # Operational (sensitive — alleen op bron, niet op marts)
         "Diagnose": [
             ("incidents", "stg_incident_report"),
             ("eligibility_cases", "stg_eligibility_case"),
@@ -117,8 +117,8 @@ data:
             ("customers", "stg_customer_interaction"),
         ],
 
-        # FEZ / Uitkering
-        "Uitkering": [
+        # FEZ / Claim payout
+        "Claim payout": [
             ("finance", "stg_finance_expense"),
         ],
         "Aggregaat": [
@@ -135,7 +135,7 @@ data:
             ("uc04_eligibility_outreach", "mart_uc04_eligibility_outreach"),
         ],
 
-        # Re-integratie — UC-09
+        # Reintegration — UC-09
         "Traject": [
             ("uc09_reintegration_effect", "mart_uc09_effect_panel"),
         ],

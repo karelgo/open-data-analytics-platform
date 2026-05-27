@@ -1,4 +1,4 @@
-"""CRM klantcontact stub. SYNTHETIC — NOT FOR REAL USE."""
+"""CRM customer interaction stub. SYNTHETIC — NOT FOR REAL USE."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from ._common import envelope, make_rng
 class KlantContact:
     contact_id: str
     bsn: str
-    kanaal: str  # 'telefoon' | 'balie' | 'beeldbellen' | 'werkmap_bericht' | 'mail'
+    kanaal: str  # 'telefoon' | 'balie' | 'beeldbellen' | 'workspace_bericht' | 'mail'
     onderwerp: str  # 'WW' | 'WIA' | 'Wajong' | 'algemeen'
     timestamp: str
     duur_seconden: int | None
@@ -22,11 +22,11 @@ class KlantContact:
         return asdict(self)
 
 
-def generate_klantcontacten(
+def generate_customer interactionen(
     persona_bsns: list[str], avg_per_persoon: float = 0.5, seed: int | None = None
 ) -> Iterator[KlantContact]:
     rng = make_rng(seed)
-    kanalen = ["telefoon", "balie", "beeldbellen", "werkmap_bericht", "mail"]
+    kanalen = ["telefoon", "balie", "beeldbellen", "workspace_bericht", "mail"]
     onderwerpen = ["WW", "WIA", "Wajong", "algemeen"]
     for bsn in persona_bsns:
         n = rng.choices([0, 1, 2, 3], weights=[40, 35, 20, 5])[0]

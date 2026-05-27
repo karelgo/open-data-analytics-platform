@@ -2,7 +2,7 @@
 
 Er zijn twee paden naast elkaar: een generieke **any-file → Delta** flow voor
 ad-hoc + sandbox uploads (portal), en het oorspronkelijke **structured
-csv_batch** pad voor bronnen met een vaste schema-spec (customer_satisfaction,
+csv_batch** pad voor bronnen with a vaste schema-spec (customer_satisfaction,
 FOCUS billing). Beide schrijven uiteindelijk Delta in bronze; het verschil zit
 in de schema-validatie en de downstream-keten.
 
@@ -18,7 +18,7 @@ bestanden (CSV, TSV, JSON, NDJSON, Parquet) verschijnt na de upload een
 "Convert to Delta"-knop die de `convert_to_delta` DAG triggert via de
 `airflow-bridge` sidecar in de portal-pod.
 
-**Architectuur**
+**Architecture**
 
 ```
 gebruiker  ─▶ POST /api/auth/token              (oauth2-proxy access-token)
@@ -47,7 +47,7 @@ gebruiker  ─▶ POST /api/auth/token              (oauth2-proxy access-token)
 
 - Sandbox / experimenteer-data — geen schema-validatie nodig.
 - Onbekend of variabel schema; pyarrow's type-inference is goed genoeg.
-- Eenmalige conversie van een Parquet/JSON-bestand.
+- One-offe conversie van een Parquet/JSON-bestand.
 - Je hebt geen tijd om een source-YAML te schrijven.
 
 **Beperkingen**
@@ -70,7 +70,7 @@ bron met `sla.mode: csv_batch` in [`platform/11-airflow/sources/`](../../platfor
 
 - Eénmalige of periodieke CSV uit een bronsysteem zonder Kafka-aansluiting.
 - Klein volume (≤ enkele miljoenen rijen) waarvoor streaming overkill is.
-- Tabel-schema is bekend en stabiel — wordt afgedwongen door de source-YAML.
+- Tabel-schema is bekend en stabiel — wordt afgedwongen through the source-YAML.
 - Je wilt dat silver- en gold-DAGs automatisch triggeren via Dataset-publicatie.
 
 Voor continue events (WIA, WW, polisadministratie, …) gebruik je het
@@ -78,7 +78,7 @@ Kafka-pad — zie [ADR-0007](../adr/0007-airflow-pipeline-architecture.md).
 
 ---
 
-## Architectuur in één blik
+## Architecture in één blik
 
 ```
 gebruiker
@@ -140,7 +140,7 @@ DAGs verschijnen na een DAG-parse-cycle (~30s).
 
 ### Optie B — CLI (`mc`)
 
-Vereist een `odap-platform` alias in `~/.mc/config.json`:
+Required een `odap-platform` alias in `~/.mc/config.json`:
 
 ```bash
 mc cp ./mijn-meting.csv \
@@ -196,7 +196,7 @@ SELECT count(*), max(ingestion_ts)
 FROM bronze.customer_satisfaction.score;
 
 -- Silver (auto getriggerd):
-SELECT * FROM silver.klantcontact.stg_customer_satisfaction LIMIT 10;
+SELECT * FROM silver.customer interaction.stg_customer_satisfaction LIMIT 10;
 
 -- Gold (auto getriggerd):
 SELECT *
@@ -221,7 +221,7 @@ Checklist (zelfde flow als een Kafka-bron, minus Kafka/Spark):
 3. Voeg toe (alleen voor nieuwe domain): `+schema` regel in
    `dbt/dbt_project.yml` onder `staging:`.
 4. Voeg toe: `dbt/models/marts/<uc>/mart_<...>.sql` + `_<uc>.yml`.
-5. Update `gold_factory.ACTIVE_USE_CASES` met de nieuwe UC (alleen voor
+5. Update `gold_factory.ACTIVE_USE_CASES` with the nieuwe UC (alleen voor
    nieuwe UC).
 6. Voeg toe in `platform/11-airflow/kustomization.yaml`:
    `sources/<bron>.yml` onder `airflow-sources`.

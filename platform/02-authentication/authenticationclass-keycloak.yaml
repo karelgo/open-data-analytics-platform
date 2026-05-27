@@ -5,13 +5,13 @@
 # in Stackable's design-docs.
 #
 # Hostname/poort komen overeen met Helm-deployed Keycloak + ingress-nginx
-# (port 8443 op de host loopt naar ingress-nginx → Keycloak).
+# (port 8443 on the host loopt naar ingress-nginx → Keycloak).
 #
 # Voor in-cluster service-discovery zou je `keycloak.odap-auth.svc.cluster.local`
-# kiezen, maar OIDC-redirects worden door de browser uitgevoerd; daarom is
+# kiezen, maar OIDC-redirects worden through the browser uitgevoerd; daarom is
 # het externe DNS-pad nodig (hostname must match issuer URL in tokens).
 #
-# Productie: TLS verplicht, hier voor dev uitgeschakeld op de internal
+# Production: TLS verplicht, hier voor dev uitgeschakeld on the internal
 # AuthenticationClass; ingress-nginx termineert de TLS aan de buitenkant.
 ---
 apiVersion: authentication.stackable.tech/v1alpha1
@@ -24,9 +24,9 @@ spec:
       # In-cluster service-DNS voor server-side OIDC discovery.
       # Keycloak draait met proxy=edge + hostname=keycloak.odap.local
       # (zie helm/keycloak/values.yaml) zodat issuer-claim de externe URL
-      # blijft — browser-redirects gaan dus naar de externe ingress.
+      # blijft — browser-redirects gaan dus to the externe ingress.
       # Pod kan keycloak.odap.local niet resolveren (k3d /etc/hosts
-      # zit alleen op de host) → daarom de svc.cluster.local-naam.
+      # zit alleen on the host) → daarom de svc.cluster.local-naam.
       hostname: keycloak.odap-auth.svc.cluster.local
       port: 80
       rootPath: /realms/odap
@@ -37,5 +37,5 @@ spec:
         - email
         - roles
       providerHint: Keycloak
-      # tls weggehaald: in-cluster naar Keycloak is HTTP. Productie zou via
+      # tls weggehaald: in-cluster naar Keycloak is HTTP. Production zou via
       # service-mesh of een interne TLS-cert wel TLS aan kunnen zetten.

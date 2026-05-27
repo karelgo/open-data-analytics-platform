@@ -1,13 +1,13 @@
-# UC-06 — Schadelast- en claim_costprognose (FEZ)
+# UC-06 — Cost forecast- en claim_costprognose (FEZ)
 
 | Status in deze repo | **Volledig geïmplementeerd** (geaggregeerd) |
 |---|---|
 | Domein | FEZ |
 | Risicoclassificatie | Laag (geaggregeerde data, geen PII in gold) |
 | AVG-grondslag | Voornamelijk geanonimiseerd → buiten AVG-scope |
-| Bewaartermijn | 10 jaar (begroting/realisatie) |
+| Retention period | 10 jaar (begroting/realisatie) |
 
-Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-06](../../referentiearchitectuur-odap-data-analytics.md).
+Bron: [`referentiearchitecture-odap-data-analytics.md` § 8 UC-06](../../referentiearchitecture-odap-data-analytics.md).
 
 ---
 
@@ -19,21 +19,21 @@ beleidsscenario's moeten doorgerekend kunnen worden.
 
 ## Doel
 
-Actuariële modellen voor 5-jaars claim_costprognose per wet, met
+Actuariële models voor 5-jaars claim_costprognose per wet, met
 scenario-analyse.
 
 ## Data
 
 | Bron | Inhoud |
 |---|---|
-| Geaggregeerde uitkeringsdata per wet | Volume, gemiddelde duur per wet (WW/WIA/Wajong/ZW/WAO/TW) |
+| Geaggregeerde claim payoutsdata per wet | Volume, gemiddelde duur per wet (WW/WIA/Wajong/ZW/WAO/TW) |
 | Demografische trends (CBS) | Beroepsbevolking, leeftijdspiramide |
 | Economische indicatoren (CPB) | Werkloosheid, BBP-groei |
-| Historische schadelast | 10 jaar terug |
+| Historische cost forecast | 10 jaar terug |
 
 **Geen herleidbare cliëntdata.** Alleen geaggregeerd of gepseudonimiseerd.
 
-## Architectuur-pad
+## Architecture-pad
 
 ```
 silver.finance.expense_per_wet_per_maand
@@ -43,7 +43,7 @@ silver.referentie.cpb_indicatoren
             ▼
 mart_uc06_cost_5y.sql (basis-projectie)
             │
-            ├── tijdreeks via Spark-job ml_lastprognose.py (Prophet/statsforecast)
+            ├── tijdreeks via Spark-job ml_cost forecast.py (Prophet/statsforecast)
             │   output: gold.uc06_cost_forecast.prognose_per_wet
             │
             └── scenario-engine (Trino-side `MERGE INTO` met scenario-parameters)
@@ -60,7 +60,7 @@ mart_uc06_cost_5y.sql (basis-projectie)
 | iva_afschaf_2027 | IVA afgeschaft per 2027 | iva_volume_factor_2027 | 0.0 |
 | ww_versoberen | WW max 12 mnd ipv 24 | ww_max_duur_mnd | 12 |
 
-Trino-query produceert `scenario_results` met de gewijzigde projectie.
+Trino-query produceert `scenario_results` with the gewijzigde projectie.
 
 ## dbt-model `meta`
 
@@ -68,9 +68,9 @@ Trino-query produceert `scenario_results` met de gewijzigde projectie.
 meta:
   domain: fez
   legal_basis: n/a   # geaggregeerd, geen persoonsgegevens
-  doelbinding: [actuarie, beleid]
+  purpose-limitation: [actuarie, beleid]
   bio_classificatie: intern
-  bewaartermijn_jaren: 10
+  retention period_jaren: 10
   eigenaar: divisie_fez
   pii_kolommen: []
   risk_tier: laag
@@ -79,7 +79,7 @@ meta:
 
 ## OPA-policies
 
-- Toegang tot `gold.uc06_cost_forecast.*` voor rollen `finance_analyst`,
+- Access tot `gold.uc06_cost_forecast.*` voor rollen `finance_analyst`,
   `data_steward`, `platform_admin`.
 - Geen kolom-masks; geen row-filters (data is publiek-publiceerbaar).
 - Wel: audit-log van wijzigingen aan `scenario_inputs` (kritisch voor
@@ -87,9 +87,9 @@ meta:
 
 ## OpenMetadata
 
-- Tags: `Domain.FEZ`, `Aggregaat.geanonimiseerd`, `Doelbinding.actuarie`,
+- Tags: `Domain.FEZ`, `Aggregaat.geanonimiseerd`, `Purpose limitation.actuarie`,
   `Public.true`.
-- Glossary: `Schadelast`, `Uitkeringslast`, `Premie`, `Aof`, `Awf`, `Whk`,
+- Glossary: `Cost forecast`, `Claim payoutslast`, `Premie`, `Aof`, `Awf`, `Whk`,
   `Ufo`.
 
 ## Outputs
@@ -98,7 +98,7 @@ meta:
 - `dbt/seeds/cpb_indicatoren_synthetic.csv`.
 - `dbt/seeds/scenario_inputs.csv` (initiële scenario's).
 - `dbt/models/marts/uc06_cost_forecast/{mart_uc06_cost_5y.sql, mart_uc06_scenario_results.sql, schema.yml}`.
-- `spark-jobs/ml_lastprognose.py` (Prophet-based tijdreeks; placeholder
+- `spark-jobs/ml_cost forecast.py` (Prophet-based tijdreeks; placeholder
   met simpele lineaire trend in deze referentie).
 - `platform/12-superset/dashboards/uc06-cost-forecast.json`.
 

@@ -4,7 +4,7 @@ role: platform_admin
 level: practitioner
 order: 2
 duration: "90 min"
-summary: "Een verzoek voor een nieuwe rol `dq_inspector` (read-only DQ-rapportages) in productie krijgen, zonder dat business-rollen verstoring zien."
+summary: "Een verzoek for a nieuwe rol `dq_inspector` (read-only DQ-rapportages) in production krijgen, zonder dat business-rollen verstoring zien."
 prereqs:
   - "platform_admin/foundation/1"
 labs:
@@ -29,12 +29,12 @@ quiz:
       - "Direct in Keycloak"
       - "Zonder smoke-test"
     correct: 1
-  - q: "Test-user voor de nieuwe rol — waarom is die belangrijk?"
+  - q: "Test-user for the nieuwe rol — waarom is die belangrijk?"
     options:
       - "Niet"
       - "Smoke-test draait als die test-user; je weet of de rol *werkt* op een echte query, niet alleen of de YAML klopt"
       - "Voor cosmetisch effect"
-      - "Wegens BIO/BIO2"
+      - "Wegens ISO 27001 / ISO 27002"
     correct: 1
   - q: "Bundle-reload faalt — wat doe je niet?"
     options:
@@ -46,8 +46,8 @@ quiz:
 ---
 
 Hands-on. Een data-steward vraagt een nieuwe rol `dq_inspector`: read-only
-toegang tot DQ-overzichten, geen cliënt-PII. Klinkt simpel — maar als je
-het verkeerd uitrolt zie je het pas op productie.
+access tot DQ-overzichten, geen cliënt-PII. Klinkt simpel — maar als je
+het verkeerd uitrolt zie je het pas op production.
 
 ## Stap 1 — role-mapping ontwerpen
 
@@ -124,23 +124,23 @@ KEYCLOAK_USER=dq.test make test SUITE=role-smoke ROLE=dq_inspector
 
 Dit draait een set queries:
 
-- toegang tot `gold.dq.*` — moet werken;
-- toegang tot `silver.claims.application.bsn` — moet 0 rijen geven;
-- toegang tot `sensitive.eligibility_cases.*` — moet 0 rijen geven.
+- access tot `gold.dq.*` — moet werken;
+- access tot `silver.claims.application.bsn` — moet 0 rijen geven;
+- access tot `sensitive.eligibility_cases.*` — moet 0 rijen geven.
 
 Alle drie groen? Verder. Een falend signaal? Revert (zie volgende stap).
 
 ## Stap 7 — Communicatie
 
 E-mail data-steward: "Rol uitgerold, smoke-test groen, test-user
-`dq.test` actief tot maandag voor jullie eigen validatie. Productie-users
+`dq.test` actief tot maandag voor jullie eigen validatie. Production-users
 toevoegen als jullie tevreden zijn."
 
 ## Wat als bundle-reload faalt?
 
-Niet panicken. Niet in productie debuggen. Revert via een nieuwe commit
-(geen force-push); audit-spoor moet kloppen. Onderzoek de fout in een
-worktree. Het oude bundle blijft actief, dus je gebruikers merken niets.
+Niet panicken. Niet in production debuggen. Revert via een nieuwe commit
+(geen force-push); audit-spoor moet kloppen. Research de fout in een
+worktree. Het oude bundle blijft actief, dus je users merken niets.
 
 ## Verificatie
 

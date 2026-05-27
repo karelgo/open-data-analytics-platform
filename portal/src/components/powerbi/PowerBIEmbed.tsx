@@ -1,11 +1,11 @@
 /*
-  PowerBIEmbed — React Island voor de portal-shell.
+  PowerBIEmbed — React Island for the portal-shell.
 
   Rendert een Power BI rapport binnen het v2-shell-frame:
     1. GET /api/portal/powerbi/reports — workspace report-lijst voor de
        dropdown bovenaan.
     2. POST /api/portal/powerbi/embed/<reportId> — krijgt een embed-token
-       gegrond op de gefedereerde Entra-identiteit van de portal-user
+       gegrond on the gefedereerde Entra-identity van de portal-user
        (via oauth2-proxy + Keycloak↔Entra broker, ADR-0008).
     3. Render <PowerBIEmbed config={...}> uit powerbi-client-react.
     4. Handle loading + error states; auto-refresh token bij expiry.
@@ -16,7 +16,7 @@
 
   Identity-toggle: ?identity=on triggert {effectiveIdentity:true} in de
   embed-token-mint, zodat RLS-rules op USERNAME() de gefedereerde
-  Entra-email zien. Vereist een fixed-identity-cloud-connection op het
+  Entra-email zien. Required een fixed-identity-cloud-connection op het
   semantic model — zonder die geeft Power BI 403 (zie use-case-doc).
 
   Geen MSAL.js in de browser — de embed-token komt vanuit de portal-backend,
@@ -141,7 +141,7 @@ export default function PowerBIEmbed({ reportId: propReportId, pageName }: Props
         if (cancelled) return;
         setReports(r.reports);
         // Als de geselecteerde report-ID niet in de lijst zit, fallback
-        // naar de eerste; behoudt geen "ghost" selectie na een delete.
+        // to the eerste; behoudt geen "ghost" selectie na een delete.
         if (r.reports.length > 0 && !r.reports.some((x) => x.id === selectedReportId)) {
           setSelectedId(r.reports[0].id);
         }
@@ -306,7 +306,7 @@ function Toolbar(props: {
         )}
       </label>
 
-      <label className="pbi-toolbar-field pbi-toolbar-toggle" title="Stuur de gefedereerde Entra-email mee als effectiveIdentity (vereist fixed-identity cloud connection op het semantic model)">
+      <label className="pbi-toolbar-field pbi-toolbar-toggle" title="Stuur de gefedereerde Entra-email mee als effectiveIdentity (vereist fixed-identity cloud connection on the semantic model)">
         <input
           type="checkbox"
           checked={identityMode}
@@ -345,7 +345,7 @@ function PowerBIErrorPanel({ err, reportId }: { err: string; reportId: string })
 
 // ─── Style ────────────────────────────────────────────────────────────
 // Style-component in plaats van een externe .css zodat het Island self-
-// contained blijft (cssClassName op de embed-component werkt zo ook out
+// contained blijft (cssClassName on the embed-component werkt zo ook out
 // of the box in Astro's React-island context).
 function PowerBIStyles(): JSX.Element {
   return (

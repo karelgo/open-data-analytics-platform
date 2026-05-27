@@ -1,7 +1,7 @@
 # Dagelijkse Keycloak → OM user-sync (improvements 5 — SCIM-stub).
 #
 # OM 1.5 heeft geen SCIM-provisioner; nieuwe Keycloak-users verschijnen pas
-# in OM zodra ze inloggen. Voor owner-toewijzing en reviewer-mailings
+# in OM zodra ze sign in. Voor owner-toewijzing en reviewer-mailings
 # moeten ze ook zonder login zichtbaar zijn. Deze CronJob roept
 # /config/keycloak_user_sync.py aan dat de realm-users idempotent in OM POSTet.
 #

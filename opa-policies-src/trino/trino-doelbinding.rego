@@ -1,6 +1,6 @@
 package trino
 
-# Doelbinding (R-AVG-05 + R-AVG-06).
+# Purpose limitation (R-AVG-05 + R-AVG-06).
 #
 # Per resource: welke purposes zijn toegestaan?
 # Per rol:      welke purposes mag de rol declareren?

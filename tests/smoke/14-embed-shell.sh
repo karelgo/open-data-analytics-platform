@@ -2,7 +2,7 @@
 # Smoke test 14 — Portal embed-shell + path-routed services.
 #
 # Verifieert dat de unified iframe-shell van de portal correct werkt:
-#   - elke /embed/<id>/-pagina is gebouwd (200 op de Astro static HTML)
+#   - elke /embed/<id>/-pagina is gebouwd (200 on the Astro static HTML)
 #   - elk path-routed service-pad (/grafana, /prometheus, /airflow,
 #     /superset, /jupyter) reageert via de portal-host
 #   - elke subdomain-service stuurt de juiste CSP frame-ancestors mee
@@ -29,7 +29,7 @@ esac
 # Cloud-modes hebben hun eigen TLD; values voor PLATFORM_DOMAIN worden
 # door scripts/lib/mode.sh gezet (example.com /
 # example.com). De TLD-rewrite in Layout.astro doet hetzelfde
-# voor de browser; deze test gebruikt PLATFORM_DOMAIN direct.
+# for the browser; deze test gebruikt PLATFORM_DOMAIN direct.
 PORTAL="https://platform.${PLATFORM_DOMAIN}${PORT_SUFFIX}"
 
 FAILED=0

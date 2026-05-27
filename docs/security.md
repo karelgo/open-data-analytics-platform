@@ -4,7 +4,7 @@ description: Hoe kwetsbaarheden te rapporteren — NIS2-compliant disclosure flo
 ---
 
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
 # Security Policy
 
@@ -18,8 +18,8 @@ worden, en wat je van ons mag verwachten in de respons-flow.
 
 ## Supported versions
 
-Dit is een **referentie-implementatie**. Er zijn (nog) geen formele releases.
-Onderhoud loopt op de `main`-branch:
+Dit is een **reference implementation**. Er zijn (nog) geen formele releases.
+Onderhoud loopt on the `main`-branch:
 
 | Branch | Status |
 |---|---|
@@ -27,7 +27,7 @@ Onderhoud loopt op de `main`-branch:
 | feature-branches | best-effort |
 | oudere commits | geen support |
 
-Voor productie-deployments wordt aangeraden een eigen fork te onderhouden
+Voor production-deployments wordt aangeraden een eigen fork te onderhouden
 met versie-labels (semver).
 
 ---
@@ -41,7 +41,7 @@ met versie-labels (semver).
 2. **E-mail** — `security@<jouw-organisatie>.nl` (vervang door echte contact bij fork).
    Voeg toe:
    - Beschrijving + impact
-   - Reproductiestappen
+   - Reproductionstappen
    - Affected component(s) — bv. `platform/10-opa/`, `dbt/macros/`, `data-generation/`
    - Voorgestelde fix (optioneel)
    - Of je gepubliceerd wilt worden in de credits
@@ -80,7 +80,7 @@ PGP-key via dezelfde e-mail.
 - Platform-manifests die over-privileged zijn (te brede SecretClass, RBAC)
 - Container-images met kwetsbaarheden (door ons gepind)
 - CI-workflows die secrets onbedoeld exposen
-- Documentation-leaks (productie-credentials in voorbeelden)
+- Documentation-leaks (production-credentials in voorbeelden)
 
 **Out-of-scope** (niet melden, of meld bij upstream-project):
 
@@ -105,7 +105,7 @@ We crediten de melder in de advisory tenzij anders gevraagd.
 
 ## Bekende beperkingen (intentioneel)
 
-Deze repo is een **dev-referentie**, niet productie-klaar. Items in
+Deze repo is een **dev-referentie**, niet production-klaar. Items in
 [`docs/runbook.md` § 11](docs/runbook.md) en
 [`docs/improvements.md`](docs/improvements.md) zijn bekende gaps en geen
 nieuwe vulnerabilities:
@@ -116,7 +116,7 @@ nieuwe vulnerabilities:
 - Geen NetworkPolicies (alleen namespace-isolation)
 - `smoketest`-static-auth-user in Trino
 
-Productie-gebruikers zouden deze items eerst afdekken vóór deployment.
+Production-users zouden deze items eerst afdekken vóór deployment.
 
 ---
 

@@ -1,9 +1,9 @@
-# Handleiding — Fraud Analyst
+# Handbook — Fraud Analyst
 
-> Rol-key: `fraud_analyst` · Domein: WW / Handhaving · Risiconiveau toegang: hoog (PII + bankrekening)
+> Rol-key: `fraud_analyst` · Domein: WW / Handhaving · Risiconiveau access: hoog (PII + bankrekening)
 
-Deze handleiding is voor **handhavers** die WW-uitkeringen onderzoeken op
-recht- en doelmatigheid. Je hebt toegang tot WW-data en een aantal
+Deze handbook is voor **handhavers** die WW-claim payouten onderzoeken op
+recht- en doelmatigheid. Je hebt access tot WW-data en een aantal
 financiële kolommen die voor andere rollen gemaskeerd zijn — zoals
 bankrekening-/IBAN-velden voor onderzoeksdoeleinden.
 
@@ -13,21 +13,21 @@ bankrekening-/IBAN-velden voor onderzoeksdoeleinden.
 
 ## 1. Wat doet jouw rol?
 
-Je onderzoekt signalen van mogelijk oneigenlijk gebruik van WW-uitkeringen.
+Je onderzoekt signalen van mogelijk oneigenlijk gebruik van WW-claim payouten.
 Je gebruikt het platform om:
 
-- WW-aanvragen, betalingen en vermogensvelden te combineren
-- Risico-indicatoren uit het UC-03-model te raadplegen
-- Onderzoeksdossiers samen te stellen
+- WW-request, betalingen en vermogensvelden te combineren
+- Risico-indicatoren from the UC-03-model te raadplegen
+- Researchsdossiers samen te stellen
 - Caseload-overzichten te bekijken
 
-Je hebt **niet**: medische velden (`diagnose`, `icd10`) en geen toegang tot
+Je hebt **niet**: medische velden (`diagnose`, `icd10`) en geen access tot
 Wajong of WIA. Bankrekening- en IBAN-velden zie je **wel**, maar uitsluitend
 voor het doel "handhaving".
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 ### 2.1 Account
 
@@ -57,7 +57,7 @@ goede gewoonte is een korte notitie in je eigen onderzoeksysteem.
 
 | Catalog | Schema | Wat zit erin? | Zie jij het? |
 |---|---|---|---|
-| `silver` | `ww` | WW-aanvragen, betalingen, status-historie | **Ja** |
+| `silver` | `ww` | WW-request, betalingen, status-historie | **Ja** |
 | `gold` | `uc03_fraud_risk` | Risico-indicatoren per dossier | **Ja** |
 | `silver` | `wia`, `wajong`, `crm` | Andere domeinen | **Nee** |
 | `sensitive` | `wajong.*` | Bijzondere persoonsgegevens | **Nee** |
@@ -96,7 +96,7 @@ Op `silver.persons.persoon` zien:
 3. Bekijk top-20 in de tegel **Hoogste scores**
 4. Klik door op een rij → **Drill-through naar dossierdetails**
 
-### 4.2 Workflow B — Onderzoek op één dossier
+### 4.2 Workflow B — Research op één dossier
 
 **Scenario.** Je hebt een tip ontvangen over BSN 999000456.
 
@@ -131,11 +131,11 @@ GROUP BY team_handhaver
 ORDER BY aantal_open DESC;
 ```
 
-### 4.4 Workflow D — Onderzoeksdossier samenstellen
+### 4.4 Workflow D — Researchsdossier samenstellen
 
 **Scenario.** Je hebt voldoende signaal voor formeel onderzoek; je wilt een gestructureerd dossier.
 
-1. Maak een nieuwe **Saved Query** in Superset met de joins van workflow B
+1. Maak een nieuwe **Saved Query** in Superset with the joins van workflow B
 2. Exporteer het resultaat als CSV
 3. Plaats het CSV in het zaak-dossier in jouw onderzoeksysteem (out-of-platform)
 4. Voeg je query in de zaak-aantekening: zo is reproduceerbaar wat je zag
@@ -161,7 +161,7 @@ ORDER BY 1;
 
 ## 5. Hulp, fouten & escalatie
 
-### 5.1 Veelvoorkomende foutmeldingen
+### 5.1 Veelvoorkomende errors
 
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
@@ -186,7 +186,7 @@ Het model levert een score en een korte uitleg (top-drivers). Volg deze regels:
 
 | Probleem | Contact |
 |---|---|
-| Inloggen, MFA | Platform-admin |
+| Sign in, MFA | Platform-admin |
 | Kolom-betekenis | Data-steward |
 | "De score klopt niet" | Data-steward → MLOps-team |
 | Vermoede inbreuk | Platform-admin (telefonisch) |

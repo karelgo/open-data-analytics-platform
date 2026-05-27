@@ -1,4 +1,4 @@
-{# Target-aware schema-bootstrap voor het ODAP platform.
+{# Target-aware schema-bootstrap for the ODAP platform.
 
    Gebruik (in dbt_project.yml):
      on-run-start: "{{ ensure_schemas() }}"
@@ -12,14 +12,14 @@
                   aangemaakt (eenmalig, via Databricks SQL of Terraform).
                   Tabellen zijn UC-managed; geen schema-locaties nodig.
    - fabric / fabricspark → no-op. Lakehouse + schemas worden via Fabric REST
-                  voorgekookt door de uc11_fabric Airflow-DAG (eerste task).
+                  voorgekookt through the uc11_fabric Airflow-DAG (eerste task).
    - default → no-op + waarschuwing, zodat onbekende targets niet stilletjes
                schema-creatie missen.
 #}
 {% macro ensure_schemas() %}
     {%- set silver_schemas = [
         'persons', 'policies', 'service_requests', 'claims', 'eligibility_cases', 'incidents', 'customers',
-        'finance', 'klantcontact', 'finops', 'intermediate', 'sandbox_uc09', 'seed'
+        'finance', 'customer interaction', 'finops', 'intermediate', 'sandbox_uc09', 'seed'
     ] -%}
     {%- set gold_schemas = [
         'uc01_claims_funnel', 'uc04_eligibility_outreach', 'uc05_customer_360',

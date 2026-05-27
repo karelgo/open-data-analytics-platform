@@ -1,14 +1,14 @@
 ---
-title: Identiteit & autorisatie
+title: Identity & autorisatie
 description: Hoe Keycloak en OPA samen bepalen wie wat mag zien.
 ---
 
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
-# Identiteit & autorisatie
+# Identity & autorisatie
 
-Toegang is geen kwestie van losse user-accounts per service — alle componenten
+Access is geen kwestie van losse user-accounts per service — alle components
 delegeren authenticatie naar **Keycloak** (OIDC) en autorisatie op queries
 naar **Open Policy Agent (OPA)**.
 
@@ -64,8 +64,8 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 | Policy | Doel |
 |---|---|
 | `trino-base.rego` | OIDC token-validatie, role-mapping |
-| `trino-data-access.rego` | Catalog/schema/table-toegang per rol |
-| `trino-doelbinding.rego` | Doelbinding (purpose) afdwingen op gold-tabellen |
+| `trino-data-access.rego` | Catalog/schema/table-access per rol |
+| `trino-purpose-limitation.rego` | Purpose limitation (purpose) afdwingen op gold-tabellen |
 | `trino-row-filters.rego` | Rij-filters per rol (bijv. Fraud Analyst ziet alleen WW-claims) |
 | `trino-column-masks.rego` | Kolom-maskering (PII, gezondheid → hash of `***`) |
 | `trino-platform-roles.rego` | UWV-rol-definities (single source) |
@@ -73,15 +73,15 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 Build van de bundle: `scripts/build-opa-bundle.sh`, geïntegreerd in
 `make deploy-platform`.
 
-!!! tip "Doelbinding eerst"
+!!! tip "Purpose limitation eerst"
     Bij elke query controleert OPA of er een **geldig doel** is meegegeven
-    (bijv. `uitkering`, `handhaving`, `onderzoek`). Zonder doel: deny.
-    Doelbinding is harder dan rol — een Claims Analyst zonder doel
-    `uitkering` krijgt ook in zijn eigen mart geen data.
+    (bijv. `claim payout`, `handhaving`, `onderzoek`). Zonder doel: deny.
+    Purpose limitation is harder dan rol — een Claims Analyst zonder doel
+    `claim payout` krijgt ook in zijn eigen mart geen data.
 
 ## Zie ook
 
 - [ADR-0003 · OPA als Trino-authz](../adr/0003-opa-as-trino-authz.md)
 - [ADR-0008 · Self-service data-access](../adr/0008-self-service-data-access.md)
-- [Toegang aanvragen (handleiding)](../access-request-guide.md)
+- [Access request (handbook)](../access-request-guide.md)
 - [Compliance-mapping § AVG](../compliance-mapping.md)

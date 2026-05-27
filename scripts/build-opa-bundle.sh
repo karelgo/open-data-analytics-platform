@@ -34,7 +34,7 @@ fi
 
 # --- 2. opa test ------------------------------------------------------
 # Data wordt gewrapped onder data.configmap[<name>][<ns>] zodat `opa test`
-# dezelfde paden ziet als de Stackable OpaCluster in productie.
+# dezelfde paden ziet als de Stackable OpaCluster in production.
 if command -v opa >/dev/null 2>&1; then
   log "Render wrapped test-data → /tmp/opa-test-data.json"
   python3 "$ROOT/scripts/opa-test-data-wrap.py" \
@@ -65,7 +65,7 @@ done
 
 # --- 4. Sync data ------------------------------------------------------
 # Source-JSON is reeds onder top-level key `role_mappings` gestructureerd
-# zodat opa-test (raw load → data.role_mappings.*) en productie-bundle
+# zodat opa-test (raw load → data.role_mappings.*) en production-bundle
 # (zelfde structuur) consistent zijn. We strippen alleen _-prefixed comments.
 log "Sync data → $DST_POLICIES/data.json"
 python3 - <<PY

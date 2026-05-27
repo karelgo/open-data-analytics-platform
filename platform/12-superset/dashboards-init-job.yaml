@@ -60,7 +60,7 @@ data:
         duplicaat. Bug-historie: 4× elke UC-11 chart na 4 init-runs.
 
         Client-side filter is robuust: één GET met page_size=100 dekt onze
-        ~50 charts. Voor productie-volumes >100 paginating uitbreiden.
+        ~50 charts. Voor production-volumes >100 paginating uitbreiden.
         """
         r = s.get(urljoin(SUPERSET_URL, "/api/v1/chart/"),
                   params={"q": "(page:0,page_size:100)"})
@@ -73,12 +73,12 @@ data:
 
 
     def build_query_context(dataset_id: int, viz_type: str, params: dict) -> str:
-        """Genereer een query_context voor een chart.
+        """Genereer een query_context for a chart.
 
         Superset 4.x weigert chart-data renderen als `query_context` leeg
         is ("Chart has no query context saved. Please save the chart
         again."). Normaal vult de UI dit bij elk save; bij API-creatie
-        moeten we het zelf zetten. Eén query met de metrics/groupby/time
+        moeten we het zelf zetten. Eén query with the metrics/groupby/time
         uit `params` is genoeg voor line/pie/big_number_total.
         """
         # `metric` (single) en `metrics` (list) moeten allebei in de
@@ -236,7 +236,7 @@ data:
         `heights` werkt analoog (default 50). Geeft een geldige tree met
         ROOT → GRID → ROW(s) → CHART(s). Zonder dit blijft de canvas leeg
         ook al staan de slices in de M2M-tabel, want het frontend leest
-        position_json om de chart-componenten te plaatsen.
+        position_json om de chart-components te plaatsen.
         """
         if widths is None:
             widths = [12] * len(charts)
@@ -361,17 +361,17 @@ data:
                 "title": "UC-01 — WIA Funnel",
                 "dataset": "mart_uc01_claims_funnel_daily",
                 "charts": [
-                    ("Totaal WIA aanvragen", "big_number_total", {
-                        "metric": metric("n_aanvragen", "SUM", "INTEGER", "Totaal"),
+                    ("Totaal WIA request", "big_number_total", {
+                        "metric": metric("n_request", "SUM", "INTEGER", "Totaal"),
                     }),
-                    ("WIA aanvragen per dag", "echarts_timeseries_line", {
+                    ("WIA request per dag", "echarts_timeseries_line", {
                         "x_axis": "aanvraag_datum",
                         "time_grain_sqla": "P1D",
-                        "metrics": [metric("n_aanvragen", "SUM", "INTEGER", "Aanvragen")],
+                        "metrics": [metric("n_request", "SUM", "INTEGER", "Request")],
                         "groupby": [],
                     }),
-                    ("WIA aanvragen per status", "pie", {
-                        "metrics": [metric("n_aanvragen", "SUM", "INTEGER", "Aanvragen")],
+                    ("WIA request per status", "pie", {
+                        "metrics": [metric("n_request", "SUM", "INTEGER", "Request")],
                         "groupby": ["status"],
                     }),
                 ],
@@ -417,23 +417,23 @@ data:
                     }),
                 ],
             },
-            # ─────────────── UC-06 Lastprognose ───────────────
+            # ─────────────── UC-06 Cost forecast ───────────────
             {
-                "slug": "lastprognose",
-                "title": "UC-06 — Uitkeringslast 5-jaar prognose",
+                "slug": "cost forecast",
+                "title": "UC-06 — Claim payoutslast 5-jaar prognose",
                 "dataset": "mart_uc06_cost_5y",
                 "charts": [
                     ("Totaal claim_cost 5-jaar (EUR)", "big_number_total", {
                         "metric": metric("uitbetaald_bruto_eur_projection", "SUM",
                                          "DECIMAL", "Totaal EUR"),
                     }),
-                    ("Uitkeringen per wet", "pie", {
+                    ("Claim payouten per wet", "pie", {
                         "metrics": [metric("uitbetaald_bruto_eur_projection", "SUM",
                                            "DECIMAL", "EUR")],
                         "groupby": ["wet"],
                     }),
-                    ("Aantal uitkeringen per regio", "dist_bar", {
-                        "metrics": [metric("aantal_uitkeringen_projection", "SUM",
+                    ("Aantal claim payouten per regio", "dist_bar", {
+                        "metrics": [metric("aantal_claim payouten_projection", "SUM",
                                            "INTEGER", "Aantal")],
                         "groupby": ["regio_code"],
                     }),
@@ -457,10 +457,10 @@ data:
                     }),
                 ],
             },
-            # ─────────────── UC-09 Re-integratie effect (sandbox) ───────────────
+            # ─────────────── UC-09 Reintegration effect (sandbox) ───────────────
             {
                 "slug": "reint-effect",
-                "title": "UC-09 — Re-integratie effect (sandbox)",
+                "title": "UC-09 — Reintegration effect (sandbox)",
                 "dataset": "mart_uc09_effect_panel",
                 "charts": [
                     ("Panel-deelnemers", "big_number_total", {
@@ -486,10 +486,10 @@ data:
                 ],
             },
             # ─────────────── Cross-UC Datakwaliteit ───────────────
-            # Eén-stop overzicht voor de DQ-steward: per UC totaal-records,
+            # Eén-stop overzicht for the DQ-steward: per UC totaal-records,
             # violations per severity, en een tabel met alle individuele
             # checks. Bron: mart_dq_overview + mart_dq_violations (live
-            # geteld op de gold-marts; geen test-runner-output nodig).
+            # geteld on the gold-marts; geen test-runner-output nodig).
             {
                 "slug": "dq-overview",
                 "title": "Datakwaliteit — overzicht alle UCs",
@@ -534,17 +534,17 @@ data:
                     }),
                 ],
             },
-            # ─────────────── UC-11 Integrale Klantreis ───────────────
+            # ─────────────── UC-11 Integrale Customer journey ───────────────
             # Multi-mart dashboard: events-mart als default, phases-mart als
             # per-chart override. Layout is 5 rijen: KPI-strip, temporal,
             # distribution, drill-down, detail-tabel.
             {
                 "slug": "uc11-customer-journey",
-                "title": "UC-11 — Integrale Klantreis",
+                "title": "UC-11 — Integrale Customer journey",
                 "dataset": "mart_uc11_journey_events",
                 "charts": [
                     # ── Rij 1: KPI strip ── (4 × width 3)
-                    ("Unieke cliënten in klantreis", "big_number_total", {
+                    ("Unieke cliënten in customer journey", "big_number_total", {
                         "metric": {"expressionType": "SIMPLE",
                                    "column": {"column_name": "bsn", "type": "VARCHAR"},
                                    "aggregate": "COUNT_DISTINCT",

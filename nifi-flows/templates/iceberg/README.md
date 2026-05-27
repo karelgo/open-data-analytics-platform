@@ -14,7 +14,7 @@ GetSFTP / GetS3 → ValidateRecord → UpdateAttribute (PII) → PutIceberg → 
 ```
 
 Geen tussenstap via Kafka nodig. Spark Streaming wordt dan alleen ingezet voor
-silver/gold-transformaties (CDC-applies, joins, MERGE INTO).
+silver/gold-transformations (CDC-applies, joins, MERGE INTO).
 
 Bij switch terug naar Iceberg:
 1. `platform-config.yaml`: `table_format: iceberg`.

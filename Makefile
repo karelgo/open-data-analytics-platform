@@ -133,7 +133,7 @@ opa-bundle: opa-test ## Build OPA-bundle: sync rego + data naar platform/10-opa/
 
 .PHONY: dbt-image
 dbt-image: ## Build odap/dbt-trino:1.9.0 (incl. dbt-fabricspark) en importeer in lokale cluster. Voor aks: gebruik een registry.
-	@if [ "$(MODE)" = "aks" ]; then echo "[dbt-image] mode=aks: build + push naar de Azure container registry, daarna 'helm upgrade' op de Cosmos image-tag"; exit 0; fi
+	@if [ "$(MODE)" = "aks" ]; then echo "[dbt-image] mode=aks: build + push to the Azure container registry, daarna 'helm upgrade' on the Cosmos image-tag"; exit 0; fi
 	@cp infrastructure/airflow/dbt/profiles.yml dbt/profiles.yml
 	docker build -t odap/dbt-trino:1.9.0 -f infrastructure/airflow/dbt/Dockerfile dbt
 	k3d image import odap/dbt-trino:1.9.0 -c $(CLUSTER_NAME)
@@ -158,7 +158,7 @@ om-bridge-image: ## Build odap/om-access-bridge:dev en importeer in k3d
 deploy-om-bridge: om-bridge-image ## Deploy de OM→Keycloak access-bridge (ADR-0008) — incl. Keycloak-client + OM-subscription setup
 	@if ! kubectl -n odap-platform get secret om-access-bridge-secret >/dev/null 2>&1; then \
 	  echo "[deploy-om-bridge] om-access-bridge-secret bestaat nog niet — bootstrappen met dev-placeholders."; \
-	  echo "                    Voor productie: zie platform/18-om-access-bridge/secret.yaml"; \
+	  echo "                    Voor production: zie platform/18-om-access-bridge/secret.yaml"; \
 	  OM_JWT="$$(kubectl -n odap-meta get secret openmetadata-admin -o jsonpath='{.data.jwtToken}' 2>/dev/null | base64 -d)"; \
 	  if [ -z "$$OM_JWT" ]; then echo "[deploy-om-bridge] WAARSCHUWING: openmetadata-admin secret nog niet aanwezig — OM_ADMIN_TOKEN wordt placeholder; /api/request zal 500 geven tot bridge re-deployed met token."; OM_JWT="REPLACE-WITH-JWT-FROM-openmetadata-admin-SECRET"; fi; \
 	  kubectl -n odap-platform create secret generic om-access-bridge-secret \
@@ -220,11 +220,11 @@ e2e: ## Run e2e test (UC-01 full flow)
 	bash tests/e2e/full-flow-uc01.sh
 
 .PHONY: e2e-uc11
-e2e-uc11: ## Run e2e test (UC-11 Integrale Klantreis) — vereist bestaand cluster
+e2e-uc11: ## Run e2e test (UC-11 Integrale Customer journey) — vereist bestaand cluster
 	bash tests/e2e/uc11-flow.sh
 
 .PHONY: dbt-build-uc11
-dbt-build-uc11: ## Build alle UC-11 modellen (tag:uc11) — vereist Trino-bereik
+dbt-build-uc11: ## Build alle UC-11 models (tag:uc11) — vereist Trino-bereik
 	cd dbt && $(DBT) deps && $(DBT) run -s tag:uc11
 	cd dbt && $(DBT) test -s tag:uc11
 
@@ -257,7 +257,7 @@ lint-python: ## ruff + mypy over data-generation/ en spark-jobs/
 	mypy data-generation/ spark-jobs/ --ignore-missing-imports || true
 
 .PHONY: dbt-parse
-dbt-parse: ## dbt parse + compile (geen warehouse-toegang vereist)
+dbt-parse: ## dbt parse + compile (geen warehouse-access vereist)
 	cd dbt && dbt deps && dbt parse
 
 # dbt-binary: prefereer dbt-core (Python) — die ondersteunt `docs generate
@@ -268,7 +268,7 @@ DBT ?= $(shell test -x $$HOME/.dbt-core-venv/bin/dbt && echo $$HOME/.dbt-core-ve
 
 # CA-bundle voor TLS-verify naar Trino. dbt-trino's `cert:`-setting wordt op
 # sommige paden genegeerd; via REQUESTS_CA_BUNDLE/SSL_CERT_FILE gebeurt het
-# zeker. Pad komt overeen met de fallback in dbt/profiles.yml.
+# zeker. Pad komt overeen with the fallback in dbt/profiles.yml.
 TRINO_TLS_CERT_PATH ?= $$HOME/.odap-platform-ca.crt
 
 .PHONY: dbt-docs

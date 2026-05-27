@@ -32,8 +32,8 @@ USER 1000
 EXPOSE 8089
 
 # 0.0.0.0 zodat de kubelet (van buiten het pod-network-namespace) de
-# readiness/liveness HTTP-probes op de pod-IP kan doen. Binnen het pod
+# readiness/liveness HTTP-probes on the pod-IP kan doen. Binnen het pod
 # wordt 127.0.0.1:8089 gebruikt door nginx. De Service expose-set géén
-# port 8089 dus alleen pods met de pod-IP kunnen contact maken; voor
+# port 8089 dus alleen pods with the pod-IP kunnen contact maken; voor
 # prod hoort hier een NetworkPolicy bij die odap-platform ingress beperkt.
 CMD ["uvicorn", "portal.scripts.airflow_bridge:app", "--host", "0.0.0.0", "--port", "8089"]

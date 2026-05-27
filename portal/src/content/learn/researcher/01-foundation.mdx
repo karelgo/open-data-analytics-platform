@@ -1,10 +1,10 @@
 ---
-title: "Het platform voor de Researcher"
+title: "Het platform for the Researcher"
 role: researcher
 level: foundation
 order: 1
 duration: "30 min"
-summary: "Onderzoek doen in de sandbox-zone met gepseudonimiseerde data, k-anonimiteit, en een notebook dat reproduceerbaar blijft."
+summary: "Research doen in de sandbox-zone met gepseudonimiseerde data, k-anonimiteit, en een notebook dat reproduceerbaar blijft."
 labs:
   - title: "Open de sandbox in Trino"
     hint: "schema sandbox.research_*"
@@ -16,14 +16,14 @@ quiz:
   - q: "Wat is het verschil tussen ‘gepseudonimiseerd’ en ‘geanonimiseerd’?"
     options:
       - "Niets, gewoon synoniemen"
-      - "Geanonimiseerd is onomkeerbaar herleidbaar; gepseudonimiseerd is dat in principe wel als je over de sleutel beschikt — die de researcher níét heeft"
+      - "Geanonimiseerd is onomkeerbaar herleidbaar; gepseudonimiseerd is dat in principe wel als je about the sleutel beschikt — die de researcher níét heeft"
       - "Geanonimiseerd is gevoeliger"
       - "Pseudonimisering geldt alleen voor naam, niet voor BSN"
     correct: 1
   - q: "Waarom heeft de sandbox een k-anonimiteit-eis (k≥10) op output?"
     options:
       - "Voor formele schoonheid"
-      - "Om herleidbaarheid via combinaties van quasi-identifiers (regio + leeftijdsklasse + uitkeringsoort) te voorkomen — als een groep < 10 cliënten heeft kan een unieke combinatie iemand wel weer aanwijsbaar maken"
+      - "Om herleidbaarheid via combinaties van quasi-identifiers (regio + leeftijdsklasse + claim payoutsoort) te voorkomen — als een groep < 10 cliënten heeft kan een unieke combinatie iemand wel weer aanwijsbaar maken"
       - "Omdat Trino dat verplicht"
       - "Geen idee"
     correct: 1
@@ -31,36 +31,36 @@ quiz:
   - q: "Wat is het minimaal vereiste voor reproduceerbaarheid van een onderzoek?"
     options:
       - "De query in je hoofd"
-      - "De query versie-beheerd in de repo, met de dbt-model-versie en de datum-filter expliciet — zodat dezelfde uitkomst over een jaar nog reproduceerbaar is"
+      - "De query versie-beheerd in de repo, with the dbt-model-versie en de datum-filter expliciet — zodat dezelfde uitkomst over een jaar nog reproduceerbaar is"
       - "Een screenshot"
       - "Een mailtje aan jezelf"
     correct: 1
 ---
 
-Welkom. Researcher is een uitzonderlijke rol op dit platform: bewust *minder*
-toegang dan de business-rollen (geen direct cliënt-niveau PII), bewust *meer*
-breedte (cross-domein, alle uitkeringssoorten samen).
+Welcome. Researcher is een uitzonderlijke rol op dit platform: bewust *minder*
+access dan de business-rollen (geen direct cliënt-niveau PII), bewust *meer*
+breedte (cross-domein, alle claim payoutssoorten samen).
 
 ## De sandbox-zone
 
 `sandbox.research_*` is een aparte zone die nachtelijk wordt gevuld vanuit
-silver, met twee transformaties:
+silver, met twee transformations:
 
 1. **Pseudonimisering.** BSN, naam, adres worden vervangen door een stabiele
    hash. Dezelfde cliënt heeft over runs heen dezelfde sleutel, maar de
    sleutel is voor jou niet omkeerbaar.
 2. **Aggregatie- en k-anonimiteit-checks.** Voordat data de sandbox in mag
-   moet elke groep (regio × leeftijdsklasse × uitkeringsoort) ten minste
+   moet elke groep (regio × leeftijdsklasse × claim payoutsoort) ten minste
    k=10 cliënten bevatten. Singletons worden weggelaten.
 
 ## Welke werkstroom?
 
 ```
-1. Onderzoeksvraag formuleren     → ethics-form invullen (UC-09)
-2. Data verkennen in Trino        → sandbox.research_*
+1. Researchsvraag formuleren     → ethics-form invullen (UC-09)
+2. Data explore in Trino        → sandbox.research_*
 3. Analyse in notebook            → vscode.dev / lokale Python / dbt
 4. Output controleren op k        → ingebouwde check_k() helper
-5. Rapport publiceren met lineage → expliciet welke modellen, datum-filters
+5. Rapport publiceren met lineage → expliciet welke models, datum-filters
 ```
 
 De ethics-stap is geen formaliteit — bij verandering van vraag binnen
@@ -82,7 +82,7 @@ OpenMetadata helpt: lineage-graphs zijn versie-bewust en je kunt een
 
 | Applicatie | Wanneer? |
 |---|---|
-| **Trino** | Sandbox-queries, primaire data-toegang |
+| **Trino** | Sandbox-queries, primaire data-access |
 | **vscode.dev** | Analyse-notebook, Python-script in repo |
 | **OpenMetadata** | Lineage, bias-rapporten, glossary |
 

@@ -1,14 +1,14 @@
 ---
-title: "Handleiding — Data-engineer"
+title: "Handbook — Data-engineer"
 role: data_engineer
 ---
 
-> Rol-key: `data_engineer` · Domein: Data-pipelines & ingestion · Risiconiveau toegang: hoog (PII in bronze, JIT)
+> Rol-key: `data_engineer` · Domein: Data-pipelines & ingestion · Risiconiveau access: hoog (PII in bronze, JIT)
 
-Deze handleiding is voor **data-engineers** die pipelines bouwen en
-beheren. Je hebt **JIT-toegang** (just-in-time) tot `bronze.*` voor
+Deze handbook is voor **data-engineers** die pipelines bouwen en
+beheren. Je hebt **JIT-access** (just-in-time) tot `bronze.*` voor
 debug-doeleinden — niet voor permanent gebruik. Je bouwt NiFi-flows,
-Spark-jobs, dbt-modellen en Airflow-DAGs.
+Spark-jobs, dbt-models en Airflow-DAGs.
 
 ---
 
@@ -19,14 +19,14 @@ platform om:
 
 - Brondata via NiFi naar Kafka te krijgen
 - Spark Structured Streaming jobs te draaien (Kafka → Delta op MinIO)
-- dbt-modellen te bouwen (`silver.*` → `gold.*`)
+- dbt-models te bouwen (`silver.*` → `gold.*`)
 - Airflow-DAGs voor batch en onderhoud te schedulen
 - DQ-tests in te bouwen
 - Bronze-data te debuggen wanneer nodig
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
@@ -46,9 +46,9 @@ platform om:
 
 ### 3.1 Catalogs
 
-| Catalog | Toegang | Hoe? |
+| Catalog | Access | Hoe? |
 |---|---|---|
-| `bronze` | **JIT** — moet aanvragen | Via Trino, alleen na ticket-id in PR/PR-comment |
+| `bronze` | **JIT** — moet request | Via Trino, alleen na ticket-id in PR/PR-comment |
 | `silver`, `gold` | **Indirect** — via dbt-runs en CI | Niet direct queryen voor business-doel |
 | `sensitive`, `sandbox` | **Nee** | Alleen domein-rollen / researcher |
 
@@ -56,7 +56,7 @@ platform om:
 
 1. Ticket aanmaken in tracker (Linear/Jira) met **doel** en **scope**.
 2. Platform-admin keurt goed; rol wordt 4 uur geactiveerd voor jouw account.
-3. Jouw queries worden gelogd. Na 4 uur deactiveert toegang automatisch.
+3. Jouw queries worden gelogd. Na 4 uur deactiveert access automatisch.
 4. Voeg ticket-id toe als comment bij elke query (`-- TICKET-1234`).
 
 ### 3.3 Welke kolommen?
@@ -72,7 +72,7 @@ zuinig: **kijk niet meer dan nodig**.
 
 **Scenario.** Beleid vraagt om data van een nieuw bronsysteem `xyz`.
 
-1. **Ontwerp**: schrijf een mini-spec in `docs/use-cases/uc-xyz.md` (entiteiten, classificatie, doelbinding, bewaartermijn).
+1. **Ontwerp**: schrijf een mini-spec in `docs/use-cases/uc-xyz.md` (entiteiten, classificatie, purpose-limitation, retention period).
 2. **NiFi-flow**: kopieer template `nifi-flows/templates/delta/source-xyz/` aan, pas processors aan.
 3. **Kafka-topic**: definieer `uwv.xyz.event` in `platform/06-kafka/topics.yaml`.
 4. **Spark-job**: voeg `streaming-bronze-xyz.yaml` toe; gebruik helper `lakehouse_io.write_delta()`.
@@ -113,8 +113,8 @@ models:
       eigenaar: data.steward@odap.local
       domain: xyz
       legal_basis: art_6_1e
-      doelbinding: [sturingsinfo]
-      bewaartermijn_jaren: 7
+      purpose-limitation: [sturingsinfo]
+      retention period_jaren: 7
       pii_kolommen: []
     columns:
       - name: dag
@@ -166,7 +166,7 @@ Hive-metastore lock.
 Stel: een dbt-test faalt met `IBAN format invalid`. Je wilt zien hoe de
 ruwe IBAN binnenkomt vanuit bronze.
 
-1. Open ticket: "TICKET-1234: debug iban-validatie WIA-aanvraag, bronze toegang 4u"
+1. Open ticket: "TICKET-1234: debug iban-validatie WIA-aanvraag, bronze access 4u"
 2. Platform-admin keurt goed
 3. Query met ticket-id:
    ```sql
@@ -177,15 +177,15 @@ ruwe IBAN binnenkomt vanuit bronze.
    GROUP  BY iban
    LIMIT  20;
    ```
-4. Los root-cause op, deploy fix, sluit ticket. Toegang verloopt automatisch.
+4. Los root-cause op, deploy fix, sluit ticket. Access verloopt automatisch.
 
 ---
 
 ## 5. Code- en deploy-discipline
 
 - **Geen `latest`-tags.** Pin altijd image-versies; release-pinning in `infrastructure/stackablectl/release.yaml`.
-- **Geen plaintext secrets.** Gebruik Stackable secret-operator + Vault (productie).
-- **Eén ADR per architectuurkeuze.** Zie `docs/adr/` voor format.
+- **Geen plaintext secrets.** Gebruik Stackable secret-operator + Vault (production).
+- **Eén ADR per architecturekeuze.** Zie `docs/adr/` voor format.
 - **Format-agnostisch.** Geen hardcoded `delta` of `iceberg` buiten de switch-points (zie [docs/architecture.md § 4](../architecture.md)).
 - **CI moet groen.** PR's met rode CI worden niet gereviewd.
 
@@ -198,7 +198,7 @@ ruwe IBAN binnenkomt vanuit bronze.
 | Cluster down | Platform-admin (telefonisch) |
 | OPA-policy verandering | Pair met platform-admin + data-steward |
 | Schema-mismatch in bronze | Bron-eigenaar (UWV-zijde) |
-| Productie-incident | Volg [`docs/runbook.md` § 4](../runbook.md) |
+| Production-incident | Volg [`docs/runbook.md` § 4](../runbook.md) |
 
 | Foutmelding | Actie |
 |---|---|
@@ -210,11 +210,11 @@ ruwe IBAN binnenkomt vanuit bronze.
 
 ## 7. Wat je nooit doet
 
-- Permanente toegang tot `bronze.*` activeren — JIT, altijd JIT.
-- Productie-data downloaden naar je laptop voor lokaal werk.
-- Een Spark-job zonder unit-tests in productie deployen.
-- Wijzigingen in `platform-config.yaml::table_format` zonder ADR.
-- Direct `kubectl edit` op productie-CRDs — alles via PR + GitOps.
+- Permanente access tot `bronze.*` activeren — JIT, altijd JIT.
+- Production-data downloaden naar je laptop voor lokaal werk.
+- Een Spark-job zonder unit-tests in production deployen.
+- Changes in `platform-config.yaml::table_format` zonder ADR.
+- Direct `kubectl edit` op production-CRDs — alles via PR + GitOps.
 
 ---
 

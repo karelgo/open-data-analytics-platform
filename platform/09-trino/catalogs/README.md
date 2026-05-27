@@ -1,7 +1,7 @@
 # Trino catalogs
 
 Vier catalogs (bronze, silver, gold, sensitive) komen voort uit de
-medallion-architectuur + Sensitive Vault uit
+medallion-architecture + Sensitive Vault uit
 [`docs/architecture.md`](../../../docs/architecture.md#3-zone-scheiding-medallion--sensitive).
 
 ## Format-rendering

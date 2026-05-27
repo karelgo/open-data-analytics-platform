@@ -1,5 +1,5 @@
 # Continuous deploy: bij elke push naar main re-apply alle platform-manifests
-# op het AKS cluster en publish een verse portal-bundle.
+# on the AKS cluster en publish een verse portal-bundle.
 #
 # Smoke draait NIET hier — die zit in .github/workflows/aks-smoke.yml en
 # wordt automatisch getriggerd via `workflow_run` zodra deze CD groen is.
@@ -9,7 +9,7 @@
 # Path-filter: alleen runnen als iets verandert dat het cluster-state
 # beïnvloedt. Doc-only of data-generation changes triggeren géén deploy.
 #
-# Vereiste secret: AZURE_CREDENTIALS (zie aks-deploy.yml header).
+# Requirede secret: AZURE_CREDENTIALS (zie aks-deploy.yml header).
 name: aks-cd
 
 on:

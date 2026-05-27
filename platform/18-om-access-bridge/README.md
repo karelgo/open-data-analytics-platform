@@ -91,7 +91,7 @@ bash tests/smoke/10-om-access-bridge.sh
 
 ## Security model
 
-- **HMAC-SHA256** over de raw body met header `X-OM-Signature: sha256=<hex>`
+- **HMAC-SHA256** about the raw body met header `X-OM-Signature: sha256=<hex>`
   en `X-OM-Timestamp` (unix-seconds). Replay-window ±300s.
 - **Replay-set** in memory voorkomt dubbele grants per `task.id`.
 - Service-account in Keycloak heeft alleen `manage-users` + `view-realm` —

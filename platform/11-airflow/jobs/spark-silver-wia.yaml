@@ -1,4 +1,4 @@
-# SparkApplication-template — silver batch voor WIA-aanvragen.
+# SparkApplication-template — silver batch voor WIA-request.
 #
 # Wordt door DAG transform_wia_spark.silver_wia ge-`envsubst`'d en ge-applied.
 # Placeholders die Airflow invult:

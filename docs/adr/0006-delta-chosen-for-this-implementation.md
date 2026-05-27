@@ -1,4 +1,4 @@
-# ADR-0006: Delta Lake gekozen voor déze referentie-implementatie
+# ADR-0006: Delta Lake gekozen voor déze reference implementation
 
 | Status | **Geaccepteerd — overrides ADR-0002 default** |
 |---|---|
@@ -11,10 +11,10 @@
 ## Context
 
 [ADR-0002](0002-iceberg-vs-delta.md) bepaalt na een 10-criteria-analyse dat
-**Iceberg** de default is voor het ODAP platform (eindscore 45 vs 37). De
+**Iceberg** de default is for the ODAP platform (eindscore 45 vs 37). De
 analyse blijft inhoudelijk geldig.
 
-Voor **deze** referentie-implementatie heeft de opdrachtgever desondanks
+Voor **deze** reference implementation heeft de opdrachtgever desondanks
 gekozen voor **Delta Lake**. Deze ADR legt die keuze vast en documenteert hoe
 de risico's uit ADR-0002 worden geadresseerd.
 
@@ -68,7 +68,7 @@ Trino's Delta-catalog werkt, maar er is geen voorbeeld-stack.
   in plaats daarvan schrijft NiFi naar **Kafka**, en **Spark Structured
   Streaming** schrijft van Kafka naar Delta op MinIO. Dit pad is robuust en
   goed ondersteund (Delta-Spark connector is first-class).
-- **Trino's Delta-catalog** wordt geconfigureerd met de `delta-lake`
+- **Trino's Delta-catalog** wordt geconfigureerd with the `delta-lake`
   connector + Hive Metastore. Dit is een ondersteunde combinatie.
 - **NiFi-templates voor Iceberg blijven bestaan** in
   `nifi-flows/templates/iceberg/` zodat een terug-switch direct mogelijk is.

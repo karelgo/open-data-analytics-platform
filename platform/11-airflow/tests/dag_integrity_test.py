@@ -13,7 +13,7 @@ Gebruik:
 
 In CI: ci/github-actions/dag-integrity.yml (toe te voegen).
 
-Vereist: airflow + astronomer-cosmos op de host (of skip met SKIP_COSMOS=1).
+Required: airflow + astronomer-cosmos on the host (of skip met SKIP_COSMOS=1).
 """
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ INCLUDE_DIR = AIRFLOW_DIR / "include"
 DAGS_DIR = AIRFLOW_DIR / "dags"
 SOURCES_DIR = AIRFLOW_DIR / "sources"
 
-# Voeg include/ aan sys.path zodat factory-imports werken (matcht productie).
+# Voeg include/ aan sys.path zodat factory-imports werken (matcht production).
 sys.path.insert(0, str(INCLUDE_DIR))
 os.environ.setdefault("SOURCES_DIR", str(SOURCES_DIR))
 
@@ -131,12 +131,12 @@ def test_all_dag_files_import():
 
 
 def test_cosmos_either_available_or_explicitly_fallback():
-    """Productie: cosmos beschikbaar. Dev zonder cosmos: fallback-DAG-modus."""
+    """Production: cosmos beschikbaar. Dev zonder cosmos: fallback-DAG-modus."""
     from silver_factory import COSMOS_AVAILABLE
 
     if not COSMOS_AVAILABLE:
         pytest.skip("Cosmos niet beschikbaar — fallback-mode geactiveerd. "
-                    "Productie moet cosmos installeren (zie ADR-0007).")
+                    "Production moet cosmos installeren (zie ADR-0007).")
     assert COSMOS_AVAILABLE
 
 

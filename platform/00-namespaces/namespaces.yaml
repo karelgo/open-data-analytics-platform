@@ -1,4 +1,4 @@
-# ODAP Platform namespaces — declaratief, met BIO-classificatie en doelbinding
+# ODAP Platform namespaces — declaratief, met BIO-classificatie en purpose-limitation
 # als labels/annotaties zodat OpenMetadata's K8s-connector ze later kan oogsten.
 #
 # Sommige namespaces worden ook door bootstrap.sh aangemaakt (idempotent
@@ -15,7 +15,7 @@ metadata:
   annotations:
     odap.io/description: "Stackable data-platform workloads (Trino, Kafka, Spark, NiFi, etc.)"
     odap.io/bio-classificatie: "vertrouwelijk"
-    odap.io/doelbinding: "primair_proces"
+    odap.io/purpose-limitation: "primair_proces"
 ---
 apiVersion: v1
 kind: Namespace
@@ -28,7 +28,7 @@ metadata:
   annotations:
     odap.io/description: "Gedeelde data-services (PostgreSQL voor HMS/Airflow/Superset/OM/Keycloak)"
     odap.io/bio-classificatie: "vertrouwelijk"
-    odap.io/doelbinding: "primair_proces"
+    odap.io/purpose-limitation: "primair_proces"
 ---
 apiVersion: v1
 kind: Namespace
@@ -41,7 +41,7 @@ metadata:
   annotations:
     odap.io/description: "Catalog, lineage en governance (OpenMetadata, OpenSearch)"
     odap.io/bio-classificatie: "intern"
-    odap.io/doelbinding: "governance"
+    odap.io/purpose-limitation: "governance"
 ---
 apiVersion: v1
 kind: Namespace
@@ -54,7 +54,7 @@ metadata:
   annotations:
     odap.io/description: "Prometheus, Grafana, Alertmanager (privileged i.v.m. node-exporter)"
     odap.io/bio-classificatie: "intern"
-    odap.io/doelbinding: "observability"
+    odap.io/purpose-limitation: "observability"
 ---
 apiVersion: v1
 kind: Namespace
@@ -67,4 +67,4 @@ metadata:
   annotations:
     odap.io/description: "Keycloak (OIDC IdP, mock realm ODAP)"
     odap.io/bio-classificatie: "vertrouwelijk"
-    odap.io/doelbinding: "authenticatie"
+    odap.io/purpose-limitation: "authenticatie"

@@ -9,8 +9,8 @@
 
 > **Versie-update 2026-05-24** — OpenMetadata draait inmiddels op chart/app
 > **1.12.8** (was 1.5.7 toen deze ADR werd geschreven). De convention guard
-> hieronder blijft van toepassing zolang de bridge op de string
-> `"Request Access"` matcht in de task-description. Onderzoek of OM 1.12 een
+> hieronder blijft van toepassing zolang de bridge on the string
+> `"Request Access"` matcht in de task-description. Research of OM 1.12 een
 > native access-request-task-type biedt dat de bridge i.p.v. de string kan
 > consumeren, staat als follow-up — zie
 > [docs/access-request-guide.md](../access-request-guide.md) §Voor ontwikkelaars.
@@ -19,11 +19,11 @@
 
 ## Context
 
-Het platform kent geen self-service mechanisme om data-toegang aan te vragen.
-Een nieuwe gebruiker die toegang wil tot een specifieke dataset moet nu
+Het platform kent geen self-service mechanisme om data-access aan te vragen.
+Een nieuwe gebruiker die access wil tot een specifieke dataset moet nu
 buiten het platform om bij een platform-admin aankloppen — er is geen
 audit-trail, geen reviewer-workflow en geen koppeling met R-AVG-06
-(doelbinding) of R-AVG-10 (inzage).
+(purpose-limitation) of R-AVG-10 (inzage).
 
 Tegelijk staan twee bouwstenen al in de stack:
 
@@ -31,7 +31,7 @@ Tegelijk staan twee bouwstenen al in de stack:
   kent sinds 1.5+ een ingebouwde *Request Access*-flow met **Tasks**,
   **Conversations** en **Reviewers/Owners** op Glossary-terms en Data Assets.
 - **OPA-Rego** als authorisatielaag voor Trino (ADR-0003) — leest realm-roles
-  uit Keycloak via de `groups`-claim en doet daarmee RBAC, doelbinding,
+  uit Keycloak via de `groups`-claim en doet daarmee RBAC, purpose-limitation,
   column-masking en row-filtering.
 
 Wat ontbreekt is de **brug** tussen een goedgekeurde aanvraag in OpenMetadata
@@ -48,12 +48,12 @@ herkent een `data_access:<catalog>.<schema>` rol als geldige grant en
 accepteert de bijbehorende purposes.**
 
 > **Conventie** — OM 1.5 heeft géén ingebouwd "Request Access"-task-type.
-> We hergebruiken `RequestDescription` met een **convention guard** in de
+> We hergebruiken `RequestDescription` with a **convention guard** in de
 > bridge: alleen Tasks waarvan de description of message de string
 > `request access` (case-insensitive) bevat worden als grant verwerkt.
 > Volledige UI-stappen + voorbeelden: [docs/access-request-guide.md](../access-request-guide.md).
 
-Componenten:
+Components:
 
 1. **OpenMetadata config** — elke Glossary-term + Data Asset krijgt
    `reviewers` en een `owner`. De init-Job POST de reviewers nu ook mee
@@ -72,8 +72,8 @@ Componenten:
      (`data_access:<catalog>.<schema>`).
    - `user_allowed_purposes` voegt voor zo'n grant de purposes uit
      `resource_required_purposes` toe (de granted resource bepaalt zelf
-     welke doelbinding-codes mogen).
-5. **Portal** — knop *"Vraag toegang aan in de catalogus"* op
+     welke purpose-limitation-codes mogen).
+5. **Portal** — knop *"Vraag access aan in de catalogus"* op
    `portal/src/pages/me.astro` deeplinkt naar OpenMetadata.
 
 ---
@@ -90,9 +90,9 @@ Componenten:
   geen DB nodig (state zit in Keycloak), past in het bestaande
   `nanitics-observatory`-deploy-patroon (FastAPI + plain Deployment +
   kustomize).
-- **Compliance-anchors.** R-AVG-06 (doelbinding) blijft afgedwongen via de
+- **Compliance-anchors.** R-AVG-06 (purpose-limitation) blijft afgedwongen via de
   bestaande `resource_required_purposes` mapping; R-AVG-10 (inzage en
-  rectificatie) krijgt voor het eerst een platform-pad — de Task-history
+  rectificatie) krijgt for the eerst een platform-pad — de Task-history
   in OM is de audit-bron.
 
 ---
@@ -106,7 +106,7 @@ Componenten:
 | Bridge offline tijdens approval | OM retried webhooks 3× exponential backoff; manual replay-endpoint `/replay/{task_id}` voor recovery |
 | Grant-explosie (1 rol per catalog.schema-combi) | Conventie: rollen scopen op `<catalog>.<schema>`, niet per tabel; reviewer kan in OM één grant op glossary-term doen die meerdere assets dekt |
 | Ongebruikte grants blijven hangen | TTL-veld in role-attributes (`grantedAt`, `expiresAt`) + dagelijkse cleanup-CronJob (out of scope deze ADR, separate improvement) |
-| Geen self-registratie in Keycloak | Out of scope; nieuwe gebruikers komen via Platform IdP federatie (separate improvement). Voor dev-omgeving kan registratie via overlay aanstaan |
+| Geen self-registratie in Keycloak | Out of scope; nieuwe users komen via Platform IdP federatie (separate improvement). Voor dev-omgeving kan registratie via overlay aanstaan |
 
 ---
 
@@ -118,7 +118,7 @@ Componenten:
   gegarandeerd in `input.context.identity.groups`. Realm-roles benutten
   dat bestaande pad zonder mapper-werk. Skip.
 - **OPA-data-feed direct vanuit OM** (`reverse-metadata` of `om-export`).
-  Vereist een extra ConfigMap-sync + bundle-rebuild per grant; verandert
+  Required een extra ConfigMap-sync + bundle-rebuild per grant; verandert
   policy-data buiten Keycloak om wat audit-fragmenteert. Skip — Keycloak
   blijft single source of truth voor identity.
 - **Apache Ranger overnemen.** Ranger heeft self-service ingebouwd maar
@@ -144,7 +144,7 @@ Componenten:
 - `opa-policies-src/trino/trino-data-access.rego` — grant-policy
   `data_access:<catalog>.<schema>` rol-pattern.
 - `opa-policies-src/trino/trino-data-access_test.rego` — unit-tests.
-- `portal/src/pages/me.astro` — knop "Vraag toegang aan" in de hulp-sectie.
+- `portal/src/pages/me.astro` — knop "Vraag access aan" in de hulp-sectie.
 - `Makefile` — target `deploy-om-bridge` + smoke test
   `tests/smoke/10-om-access-bridge.sh`.
 - `docs/improvements.md` — R-AVG-10 update (van 🔴 naar 🟠: GDPR-DAG nog

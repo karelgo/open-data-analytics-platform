@@ -28,13 +28,13 @@ if [[ "$(uname)" != "Darwin" ]]; then
 fi
 
 # Loop: delete-certificate verwijdert één entry per call. Kan meerdere
-# stale kopieën hebben uit de oude (regenererende) workflow.
+# stale kopieën hebben from the oude (regenererende) workflow.
 removed=0
 while sudo security delete-certificate -c "$CN" /Library/Keychains/System.keychain 2>/dev/null; do
   removed=$((removed + 1))
 done
 if [[ $removed -gt 0 ]]; then
-  printf '\033[1;34m==>\033[0m %s\n' "${removed} oude CA-entries verwijderd uit de keychain"
+  printf '\033[1;34m==>\033[0m %s\n' "${removed} oude CA-entries verwijderd from the keychain"
 fi
 
 sudo security add-trusted-cert -d -r trustRoot -p ssl \

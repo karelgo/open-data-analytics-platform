@@ -24,9 +24,9 @@ silver:
 
 governance:
   legal_basis: Wet_SUWI_art_5
-  doelbinding: [verantwoording, sturingsinfo, prognose]
+  purpose-limitation: [verantwoording, sturingsinfo, prognose]
   bio_classificatie: intern
-  bewaartermijn_jaren: 10
+  retention period_jaren: 10
   eigenaar: divisie_fez
   pii_kolommen: []
   risk_tier: laag

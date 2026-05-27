@@ -14,7 +14,7 @@ component horen. Toegevoegd in de "quick-wins"-sessie (zie [improvements.md](../
 | `hpa-trino.yaml` | #3 | HorizontalPodAutoscaler op Trino-workers (1-3 replicas in dev) |
 | `opensearch-ilm-job.yaml` | #15 | One-shot Job die ILM-policies toepast: app-logs 30d delete, audit-logs 7 jaar |
 
-## Architectuur — alert-pipeline
+## Architecture — alert-pipeline
 
 ```
 metrics  → Prometheus ─┐
@@ -27,12 +27,12 @@ logs     → Vector  ────┘                  └→ Slack #odap-data-pl
 - **Log-alerts**: Vector's `detect_alert_events`/`log_to_metric` transforms ([infrastructure/helm/vector/values.yaml](../../infrastructure/helm/vector/values.yaml)) detecteren patterns in container-logs en zetten ze om in een counter. Prometheus scrape't via PodMonitor; PrometheusRule `log-events` alerteert op stijging-snelheid.
 - **Routing**: AlertmanagerConfig `odap-platform-receivers` stuurt warning + critical naar email **én** Slack (continue: true).
 
-## Voorvereisten
+## Prerequisites
 
 - kube-prometheus-stack actief (PrometheusRule + AlertmanagerConfig CRDs).
 - Vector geïnstalleerd in `odap-monitoring` namespace (bootstrap fase 11).
 - OpenSearch operationeel (`odap-meta` namespace).
-- (Voor HPA): metrics-server of prometheus-adapter geïnstalleerd. K3d heeft metrics-server uit; productie heeft 'm aan.
+- (Voor HPA): metrics-server of prometheus-adapter geïnstalleerd. K3d heeft metrics-server uit; production heeft 'm aan.
 
 ## Apply
 
@@ -78,7 +78,7 @@ kubectl -n odap-platform get hpa
 kubectl -n odap-meta logs job/opensearch-ilm-bootstrap
 ```
 
-## Productie checklist (AKS)
+## Production checklist (AKS)
 
 - [ ] `alertmanager.enabled: true` in helm-values (al gezet in `values-aks.yaml`).
 - [ ] Slack-webhook + SMTP-password via External Secrets Operator uit Vault (nu: handmatige patch in `platform-overlays/aks/14-monitoring/secret-smtp-prod.yaml`).

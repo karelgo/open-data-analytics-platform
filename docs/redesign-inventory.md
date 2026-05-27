@@ -59,12 +59,12 @@ This is the deliverable for **Step 1 (Audit)**. No code is changed yet.
 | Route | File | Notes |
 |---|---|---|
 | `/` | [src/pages/index.astro](portal/src/pages/index.astro) | Hero + reference-architecture diagram + lagen overzicht + rol grid. |
-| `/architecture/` | [src/pages/architecture.astro](portal/src/pages/architecture.astro) | Hero + diagram + zoek/filter + per-stage card grid + datazones. |
-| `/me/` | [src/pages/me.astro](portal/src/pages/me.astro) | Role-aware tools, capabilities, shortcuts, "mijn componenten" highlight in diagram. Renders most content client-side via JSON payload. |
+| `/architecture/` | [src/pages/architecture.astro](portal/src/pages/architecture.astro) | Hero + diagram + zoek/filter + per-stage card grid + data zones. |
+| `/me/` | [src/pages/me.astro](portal/src/pages/me.astro) | Role-aware tools, capabilities, shortcuts, "mijn components" highlight in diagram. Renders most content client-side via JSON payload. |
 | `/csv-upload/` | [src/pages/csv-upload.astro](portal/src/pages/csv-upload.astro) | Two-step wizard (MinIO upload → Airflow trigger). |
 | `/go/<service>/` | [src/pages/go/[service].astro](portal/src/pages/go/[service].astro) | SSO redirect stubs (8 services). |
 | `/go/minio/` | [src/pages/go/minio.astro](portal/src/pages/go/minio.astro) | Special MinIO SSO redirect (calls `/api/minio-sso/login`). |
-| `/learn/` | [src/pages/learn/index.astro](portal/src/pages/learn/index.astro) | Academy overview — eindgebruikers + platform-team grids. |
+| `/learn/` | [src/pages/learn/index.astro](portal/src/pages/learn/index.astro) | Academy overview — eindusers + platform team grids. |
 | `/learn/<role>/` | [src/pages/learn/[role]/index.astro](portal/src/pages/learn/[role]/index.astro) | Per-role track (Foundation/Practitioner/Expert) with module list. |
 | `/learn/<role>/<module>/` | [src/pages/learn/[role]/[module].astro](portal/src/pages/learn/[role]/[module].astro) | MDX module renderer with crumbs, lab launcher, checks block, quiz block, prev/next nav. |
 | `/learn/me/` | [src/pages/learn/me.astro](portal/src/pages/learn/me.astro) | Progress table + earned-certificate list + reset button. |
@@ -162,7 +162,7 @@ brief):
 The redesign also wants **dark tokens for technical surfaces** — today
 the entire app uses one dark palette. We do not yet have any "technical
 dashboard" surface that needs the dark vocabulary; once the home /
-architectuur / me pages are token-driven, the dark side comes for free
+architecture / me pages are token-driven, the dark side comes for free
 via `[data-theme="dark"]`.
 
 ## 6. Hard-coded literals (the things that must move into tokens)
@@ -460,13 +460,13 @@ Redesigned topbar in [Layout.astro](portal/src/layouts/Layout.astro): 26 px acce
 
 ### Step 5 — Home + diagram
 
-[scripts/status.ts](portal/src/scripts/status.ts) extracts the triplicated `refreshStatus()` into a shared module imported from each page. [ReferenceArchitecture.astro](portal/src/components/ReferenceArchitecture.astro) completely rewritten as horizontal swim-lane rows: 168 px label column with mono eyebrow + Dutch stage name + optional mono tags, 1px hairlines between lanes, mono → connector arrows between adjacent tiles in pipeline-step lanes only, soft category-tinted backgrounds for the four cross-cutting lanes (discovery / pipeline / observability / identity). Pastel pill chrome removed. [data/components.ts](portal/src/data/components.ts) gained `category` and `tags` on `StageMeta`. [pages/index.astro](portal/src/pages/index.astro) rebuilt around the editorial hero spec: 56 px display h1 with one italic serif accent in `--ink-3`, 56 ch lead, single accent CTA ("Naar mijn werkplek") + two ghost buttons, mono disclaimer with status dot, 380 px live-status side card with 6 representative services. Four numbered sections below.
+[scripts/status.ts](portal/src/scripts/status.ts) extracts the triplicated `refreshStatus()` into a shared module imported from each page. [ReferenceArchitecture.astro](portal/src/components/ReferenceArchitecture.astro) completely rewritten as horizontal swim-lane rows: 168 px label column with mono eyebrow + Dutch stage name + optional mono tags, 1px hairlines between lanes, mono → connector arrows between adjacent tiles in pipeline-step lanes only, soft category-tinted backgrounds for the four cross-cutting lanes (discovery / pipeline / observability / identity). Pastel pill chrome removed. [data/components.ts](portal/src/data/components.ts) gained `category` and `tags` on `StageMeta`. [pages/index.astro](portal/src/pages/index.astro) rebuilt around the editorial hero spec: 56 px display h1 with one italic serif accent in `--ink-3`, 56 ch lead, single accent CTA ("Naar mijn workspace") + two ghost buttons, mono disclaimer with status dot, 380 px live-status side card with 6 representative services. Four numbered sections below.
 
-### Step 6 — Architectuur
+### Step 6 — Architecture
 
-[pages/architecture.astro](portal/src/pages/architecture.astro) rebuilt: editorial hero (44 px), embedded swim-lane diagram, search/filter toolbar with mono `/` prefix (focus ring on `:focus-within`), per-stage detail sections, datazones row. [components/StageSection.astro](portal/src/components/StageSection.astro) and [components/ComponentCard.astro](portal/src/components/ComponentCard.astro) refreshed: eyebrow-led headers with category coloring, 36 px logo squares on `--bg-sunken`, status dot in the card head, mono stage tag in the footer.
+[pages/architecture.astro](portal/src/pages/architecture.astro) rebuilt: editorial hero (44 px), embedded swim-lane diagram, search/filter toolbar with mono `/` prefix (focus ring on `:focus-within`), per-stage detail sections, data zones row. [components/StageSection.astro](portal/src/components/StageSection.astro) and [components/ComponentCard.astro](portal/src/components/ComponentCard.astro) refreshed: eyebrow-led headers with category coloring, 36 px logo squares on `--bg-sunken`, status dot in the card head, mono stage tag in the footer.
 
-### Step 7 — Mijn werkplek
+### Step 7 — Mijn workspace
 
 [pages/me.astro](portal/src/pages/me.astro) rebuilt with the same vocabulary. The capability list is now a key/value table on `--bg-elev` (mono uppercase keys + ink-1 values + status-coloured ja/nee). Shortcuts are restructured 36 px-icon cards. The role-architecture diagram inherits the new swim-lane look. The JS string templates (`renderToolCard`, `renderStageGroup`) were rewritten to mirror the new ComponentCard / StageSection markup verbatim, so client-side-injected tool cards look identical to server-rendered ones.
 

@@ -1,6 +1,6 @@
 """MkDocs hooks: rewrite repo-relative links to GitHub blob URLs.
 
-Veel docs (handleidingen, use-cases, ADRs) verwijzen naar repo-bestanden
+Veel docs (handbooken, use-cases, ADRs) verwijzen naar repo-bestanden
 BUITEN de docs/-tree — `../../dbt/models/...`, `../../opa-policies-src/...`,
 `../../platform/...`. Die werken in de repo (GitHub-blob preview) maar niet
 in de gerenderde docs-site. Deze hook converteert ze tijdens de build naar
@@ -16,7 +16,7 @@ REPO_BLOB = "https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main
 REPO_TREE = "https://github.com/fresh-minds/FreshStackableDataPlatform/tree/main/"
 
 # Repo-root bestanden die GEKOPIEERD zijn naar binnen docs/ — links er naar
-# vanuit elders binnen docs/ moeten naar de interne kopie wijzen, niet naar
+# vanuit elders binnen docs/ moeten to the interne kopie wijzen, niet naar
 # de GitHub-blob URL van het origineel.
 INTERNAL_REWRITE: dict[str, str] = {
     "SECURITY.md": "security.md",
@@ -49,7 +49,7 @@ EXTERNAL_REPO_FILES: tuple[str, ...] = (
     "Makefile",
     "platform-config.yaml",
     "docker-compose.yml",
-    "referentiearchitectuur-odap-data-analytics.md",
+    "referentiearchitecture-odap-data-analytics.md",
     "requirements.md",
     "odap-platform-adr-0002-iceberg-vs-delta.md",
     "odap-platform-mapping-research.md",
@@ -116,7 +116,7 @@ def on_page_markdown(markdown: str, *, page, config, files):  # noqa: ARG001 —
     `../`-segmenten) naar een EXTERNAL_REPO_ROOTS/_FILES-target wijst. Andere
     links (intra-docs, externe URLs, ankers) blijven onveranderd.
 
-    De resolutie houdt rekening met de positie van het bron-bestand: een
+    De resolutie houdt rekening with the positie van het bron-bestand: een
     use-case in docs/use-cases/uc01.md die `../../dbt/X` schrijft, resolveert
     tot `dbt/X` (twee niveaus omhoog → repo-root → omlaag in dbt/).
     """
@@ -164,7 +164,7 @@ def on_page_markdown(markdown: str, *, page, config, files):  # noqa: ARG001 —
         # = `dbt/X`. Voor een bare relative path zoals `portal/src/...` resolveert
         # die tot `docs/portal/src/...` — dat klopt niet, want het ECHTE bedoelde
         # pad is `portal/src/...` (repo-root-relative). We handelen dit af door:
-        # 1. eerst proberen met de docs/-prefix (normaal relative resolution),
+        # 1. eerst proberen with the docs/-prefix (normaal relative resolution),
         # 2. als head dan in EXTERNAL_REPO_ROOTS valt na het strippen van leading
         #    docs-prefix, rewriten we.
         if page_dir_path:
@@ -185,7 +185,7 @@ def on_page_markdown(markdown: str, *, page, config, files):  # noqa: ARG001 —
         # Repo-root file die we INTERN hebben gerendered (SECURITY.md →
         # security.md). Vervang door interne link, niet GitHub-URL.
         if stripped in INTERNAL_REWRITE:
-            # Bereken relatief pad van de huidige page naar de gerenderde versie.
+            # Bereken relatief pad van de huidige page to the gerenderde versie.
             depth = page_dir_path.count("/") + (1 if page_dir_path else 0)
             prefix = "../" * depth
             return f"]({prefix}{INTERNAL_REWRITE[stripped]}{title})"

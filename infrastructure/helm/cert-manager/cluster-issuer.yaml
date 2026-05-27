@@ -3,7 +3,7 @@
 # De CA-cert + privé-sleutel zitten in het Secret `odap-platform-ca` in de
 # `cert-manager` namespace. Het Secret wordt aangemaakt door
 # scripts/bootstrap.sh vanuit ~/.config/odap/ca/ — een persistente
-# CA op de host die *niet* opnieuw wordt gegenereerd bij
+# CA on the host die *niet* opnieuw wordt gegenereerd bij
 # `make clean && make cluster && make bootstrap`. Daardoor blijft de in je
 # OS-keychain vertrouwde CA geldig over cluster-wipes heen.
 #

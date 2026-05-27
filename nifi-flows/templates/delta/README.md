@@ -2,14 +2,14 @@
 
 Status: **flow-design beschreven; geen geautomatiseerde import in fase 4.**
 
-In de referentie-implementatie wordt de `uwv.<domain>.<event>` Kafka-pijp
+In de reference implementation wordt de `uwv.<domain>.<event>` Kafka-pijp
 voorlopig gevuld door [`data-generation/load_to_kafka.py`](../../../data-generation/load_to_kafka.py).
 NiFi-flows volgen in fase 5+ — dit document legt vast hoe ze ontworpen zijn,
 zodat de REST-API-deploy direct kan starten. **NiFi heeft géén publieke
 Ingress meer** — flows zijn as-code (process-group JSON in deze repo) en
 worden via `kubectl port-forward` geïmporteerd, niet via een UI.
 
-## Flow-architectuur per domein
+## Flow-architecture per domein
 
 ```
                                     ┌─────────────────────────────┐
@@ -46,7 +46,7 @@ worden via `kubectl port-forward` geïmporteerd, niet via een UI.
 
 ## Delta-schrijven? Nee — Spark doet dat
 
-In de Iceberg-stack zou NiFi via `PutIceberg` rechtstreeks naar het lakehouse
+In de Iceberg-stack zou NiFi via `PutIceberg` rechtstreeks to the lakehouse
 schrijven (zie Stackable demo). Voor Delta heeft NiFi **geen native processor**;
 de referentie kiest daarom een tussenweg via Kafka. Zie
 [`docs/adr/0006-delta-chosen-for-this-implementation.md`](../../../docs/adr/0006-delta-chosen-for-this-implementation.md)
@@ -54,7 +54,7 @@ de referentie kiest daarom een tussenweg via Kafka. Zie
 
 ## NiFi 2.x import-API
 
-Geen publieke Ingress — eerst port-forwarden naar de NiFi-node, dan curl
+Geen publieke Ingress — eerst port-forwarden to the NiFi-node, dan curl
 tegen `https://localhost:8443/`.
 
 ```bash

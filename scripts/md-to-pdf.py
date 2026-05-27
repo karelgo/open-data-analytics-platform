@@ -355,7 +355,7 @@ def html_to_pdf(html_path: Path, pdf_path: Path) -> None:
     if not chrome:
         print(
             "FAIL: geen Chrome/Chromium/Edge gevonden. Installeer een Chromium-browser "
-            "of pip-install `weasyprint` voor een alternatief.",
+            "of pip-install `weasyprint` for a alternatief.",
             file=sys.stderr,
         )
         sys.exit(1)

@@ -4,7 +4,7 @@
 ) }}
 
 -- UC-klant-tev — customer_satisfaction per kanaal × maand.
--- Sturingsinformatie voor divisie_klantcontact; geen PII.
+-- Sturingsinformatie voor divisie_customer interaction; geen PII.
 -- Aggregaten op maand-niveau zodat éénmalige uploads en periodieke uploads
 -- consistent blijven aggregeren.
 

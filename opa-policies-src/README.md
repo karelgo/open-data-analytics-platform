@@ -2,9 +2,9 @@
 
 Bron van de OPA-bundle die [Trino](../platform/09-trino/) gebruikt voor
 authorisatie. Implementeert default-deny + vier authorisatie-lagen:
-**rollen → doelbinding → row filters → column masks**.
+**rollen → purpose-limitation → row filters → column masks**.
 
-> Zie [ADR-0003](../docs/adr/0003-opa-as-trino-authz.md) voor de keuze
+> Zie [ADR-0003](../docs/adr/0003-opa-as-trino-authz.md) for the keuze
 > van OPA als Trino-authz, en
 > [`docs/compliance-mapping.md`](../docs/compliance-mapping.md) voor de
 > gerelateerde requirements (R-AVG-05/06/07, R-BIO-11).
@@ -17,8 +17,8 @@ opa-policies-src/
 ├── trino/
 │   ├── trino-base.rego         # default-deny + allow-aggregator (fase 9)
 │   ├── trino-platform-roles.rego    # role → catalog/schema mapping
-│   ├── trino-doelbinding.rego  # purpose-binding (R-AVG-05/06)
-│   ├── trino-row-filters.rego  # regio-filter, doelbinding-filter (R-BIO-11)
+│   ├── trino-purpose-limitation.rego  # purpose-binding (R-AVG-05/06)
+│   ├── trino-row-filters.rego  # regio-filter, purpose-limitation-filter (R-BIO-11)
 │   ├── trino-column-masks.rego # PII / medisch maskeren (R-AVG-07)
 │   └── trino-*_test.rego       # rego-unit-tests per laag
 └── data/
@@ -35,10 +35,10 @@ Trino's OPA-access-controller-spec (v2):
 1. **Role-mapping** (`trino-platform-roles.rego`) — koppelt OIDC-rol uit Keycloak
    aan toegestane catalogs + schemas. Bron-of-truth in
    `data/role_mappings.json`.
-2. **Doelbinding** (`trino-doelbinding.rego`) — query-purpose-claim moet
-   overlappen met `meta.doelbinding` van het resource (R-AVG-05/06).
+2. **Purpose limitation** (`trino-purpose-limitation.rego`) — query-purpose-claim moet
+   overlappen met `meta.purpose-limitation` van het resource (R-AVG-05/06).
 3. **Row filters** (`trino-row-filters.rego`) — Trino voegt per query een
-   `WHERE`-clause toe (regio-filter, doelbinding-filter).
+   `WHERE`-clause toe (regio-filter, purpose-limitation-filter).
 4. **Column masks** (`trino-column-masks.rego`) — Per (rol × kolom) een
    SQL-mask die Trino in de SELECT toepast (BSN → `XXX***NNN`, etc.).
 
@@ -55,7 +55,7 @@ make opa-test        # fmt + test
 make opa-bundle      # test + sync naar platform/10-opa/policies/
 ```
 
-`opa` (≥ 0.60) moet op de `PATH` staan — `scripts/doctor.sh` checkt dit.
+`opa` (≥ 0.60) moet on the `PATH` staan — `scripts/doctor.sh` checkt dit.
 
 ## Rollen — `data/role_mappings.json`
 
@@ -66,15 +66,15 @@ JSON met één key per rol. Per rol:
 | `_role_purpose` | Vrije-tekst toelichting (waarom bestaat de rol?). |
 | `catalogs` | Lijst toegestane catalogs (`bronze`, `silver`, `gold`, …). |
 | `schemas` | Lijst toegestane schemas, of `null` voor "alles in `catalogs`". |
-| `purposes` | Toegestane doelbindingen (`uitkering`, `reintegratie`, `sturingsinfo`, `kwaliteitscontrole`, `*`). |
+| `purposes` | Toegestane purpose-limitationen (`claim payout`, `reintegration`, `sturingsinfo`, `kwaliteitscontrole`, `*`). |
 | `can_see_pii` | Boolean — bepaalt BSN/naam-mask. |
 | `can_see_medical` | Boolean — bepaalt medisch-veld-mask. |
 | `can_see_bankrekening` | Boolean — bepaalt IBAN-mask. |
 | `regio_filter` | `false` = geen filter, anders regio-code (`AMS`, `RTM`, …). |
-| `break_glass` | Noodtoegang met audit-log; tijdelijk. |
+| `break_glass` | Noodaccess met audit-log; tijdelijk. |
 
 Een rol toevoegen → JSON bewerken → `make test` → `make bundle` → re-deploy
-de `OpaCluster` met de nieuwe bundle (zie
+de `OpaCluster` with the nieuwe bundle (zie
 [`platform/10-opa/README.md`](../platform/10-opa/README.md)).
 
 ## Bundle-deploy

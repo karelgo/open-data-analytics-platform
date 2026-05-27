@@ -15,12 +15,12 @@ compliance vereist een data catalog met:
 - Technische én business-metadata per data product (R-GOV-02).
 - End-to-end **data lineage** op tabel- én kolomniveau (R-GOV-03).
 - **Classifications**: PII, BIO-classificatie, gezondheid art. 9 AVG,
-  doelbinding-doelen, AI-risk-tier.
+  purpose-limitation-doelen, AI-risk-tier.
 - Verplicht koppelen aan **CGM** (Canoniek Gegevensmodel) via een glossary
   met business-terms.
 - Profiler + data-quality-tests met SLA's (R-GOV-04, UC-07).
-- Auto-classification (PII-detectie, BSN-patronen) bij ingestie.
-- API-toegang voor automatisering (R-NORA-02).
+- Auto-classification (PII-detectie, BSN-patronen) bij ingestion.
+- API-access voor automatisering (R-NORA-02).
 
 Drie open source kandidaten: **DataHub**, **Apache Atlas**, **OpenMetadata**.
 
@@ -39,7 +39,7 @@ Drie open source kandidaten: **DataHub**, **Apache Atlas**, **OpenMetadata**.
   Atlas heeft geen native profiler. Voor UWV scheelt dit één integratie-punt.
 - **Sterke dbt-integratie**. OpenMetadata leest dbt's `manifest.json`,
   `catalog.json` en `run_results.json` direct → kolomniveau-lineage komt
-  "gratis" mee uit de SQL.
+  "gratis" mee from the SQL.
 - **Trino-connector volwassen**. Schema-discovery, query-history-lineage,
   profiler en DQ-tests werken out-of-the-box.
 - **Glossary + Domains + Data Products**. Past 1-op-1 op UWV's mesh-model
@@ -77,7 +77,7 @@ Drie open source kandidaten: **DataHub**, **Apache Atlas**, **OpenMetadata**.
 - `infrastructure/helm/openmetadata/values.yaml` — chart-config (scaled-down,
   shared OpenSearch + Postgres).
 - `platform/13-openmetadata-config/` — declaratieve service- en
-  ingestion-pipeline-definities (gepusht via OM REST API door de in-cluster
+  ingestion-pipeline-definities (gepusht via OM REST API through the in-cluster
   Job in [`init-job.yaml`](../../platform/13-openmetadata-config/init-job.yaml);
   glossary-link + dbt-meta enrichment-jobs draaien als CronJob).
 - `dbt/dbt_project.yml` — exporteer `manifest.json` etc. naar

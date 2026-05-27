@@ -2,15 +2,15 @@ version: 2
 
 models:
   - name: stg_claim_application
-    description: "WIA-aanvragen + incapacity_percentage."
+    description: "WIA-request + incapacity_percentage."
     config:
       tags: ["staging", "claims", "ag"]
     meta:
       domain: ag
       legal_basis: WIA_art_64
-      doelbinding: ["uitkering", "reintegratie"]
+      purpose-limitation: ["claim payout", "reintegration"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_ag
       pii_kolommen: [bsn]
       risk_tier: laag

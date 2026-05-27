@@ -1,5 +1,5 @@
 ---
-title: "Het platform voor de Platform-admin"
+title: "Het platform for the Platform-admin"
 role: platform_admin
 level: foundation
 order: 1
@@ -24,26 +24,26 @@ quiz:
     options:
       - "Een dashboard openen en hopen"
       - "Prometheus job=trino-coordinator + Stackable-CRD-status (kubectl get trinoclusters) — beide moeten klopen"
-      - "De gebruikers vragen"
+      - "De users vragen"
       - "Niets — Stackable regelt alles"
     correct: 1
   - q: "Wat is break-glass?"
     options:
       - "Een glas breken"
-      - "Een tijdelijke uitgebreide toegang in een nood-situatie, met automatische logging en achteraf-review verplicht"
+      - "Een tijdelijke uitgebreide access in een nood-situatie, met automatische logging en achteraf-review verplicht"
       - "Een feature van Keycloak"
       - "Een Spark-job"
     correct: 1
-  - q: "Bij welke wijziging stel je proactief de data-steward op de hoogte?"
+  - q: "Bij welke wijziging stel je proactief de data-steward on the hoogte?"
     options:
       - "Bij elk ding, gebruikt OpenMetadata"
-      - "Bij wijziging in OPA-policy of role-mapping — die raken doelbinding en zijn governance-territorium"
+      - "Bij wijziging in OPA-policy of role-mapping — die raken purpose-limitation en zijn governance-territorium"
       - "Bij een operator-upgrade"
       - "Bij een nieuwe pod"
     correct: 1
 ---
 
-Welkom. Platform-admin draagt de complete operationele keten: cluster,
+Welcome. Platform-admin draagt de complete operationele keten: cluster,
 identity, storage, security, observability. Deze module brengt alleen het
 kader op orde — de Practitioner- en Expert-modules gaan dieper.
 
@@ -56,9 +56,9 @@ kader op orde — de Practitioner- en Expert-modules gaan dieper.
 
 De portal-applicatie is een statische build die op beide ingressen draait —
 client-side wordt `.local` herschreven naar `.cloud` waar nodig. Zie
-[Layout.astro](/portal/src/layouts/Layout.astro) voor de rewrite-script.
+[Layout.astro](/portal/src/layouts/Layout.astro) for the rewrite-script.
 
-## Componenten die alleen jij beheert
+## Components die alleen jij beheert
 
 | Component | Wat doe jij hier? |
 |---|---|
@@ -78,13 +78,13 @@ client-side wordt `.local` herschreven naar `.cloud` waar nodig. Zie
 ```
 
 Een incident is pas geanalyseerd als alle drie consistent zijn. Een
-Prometheus-up=1 met een failing reconcile in Stackable is geen
+Prometheus-up=1 with a failing reconcile in Stackable is geen
 "draaiend" cluster.
 
 ## Break-glass
 
 Voor noodsituaties (uitval, beveiligingsincident) is er een tijdelijke
-break-glass-rol die meer toegang krijgt dan een normale platform-admin —
+break-glass-rol die meer access krijgt dan een normale platform-admin —
 inclusief sensitive.* en audit-bypass voor herstel-acties. Voorwaarden:
 
 - Activatie via een tweede admin (4-eyes);
@@ -93,7 +93,7 @@ inclusief sensitive.* en audit-bypass voor herstel-acties. Voorwaarden:
   de data-steward + security-officer.
 
 Procedure staat in [docs/runbook.md](/docs/runbook.md). Lees het voordat
-je het ooit nodig hebt — niet pas op het moment zelf.
+je het ooit nodig hebt — niet pas on the moment zelf.
 
 ## Drie applicaties + terminal
 

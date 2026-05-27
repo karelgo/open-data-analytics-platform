@@ -1,33 +1,33 @@
 ---
-title: "Het platform voor de Marketing Analyst"
+title: "Het platform for the Marketing Analyst"
 role: marketing_analyst
 level: foundation
 order: 1
 duration: "20 min"
-summary: "Klantbeeld in UC-05 met BSN gemaskeerd, IBAN gehasht — en waarom dat genoeg is voor klantcontact."
+summary: "Customer 360 view in UC-05 met BSN gemaskeerd, IBAN gehasht — en waarom dat genoeg is voor customer interaction."
 labs:
-  - title: "Open Klant 360 (UC-05) in Superset"
+  - title: "Open Customer 360 (UC-05) in Superset"
     hint: "Cliëntbeeld, contactmomenten, status"
     href: "/go/superset/"
   - title: "Tabelpagina gold.uc05_customer_360 in OpenMetadata"
     hint: "Welke kolommen je ziet en wat ze betekenen"
     href: "/go/openmetadata/"
 quiz:
-  - q: "Een cliënt belt en geeft de laatste 4 cijfers van zijn BSN. Hoe vind je hem in Klant 360?"
+  - q: "Een cliënt belt en geeft de laatste 4 cijfers van zijn BSN. Hoe vind je hem in Customer 360?"
     options:
       - "Je vraagt het volledige BSN — dat moet hij gewoon doorgeven"
       - "Je zoekt op naam + birth_date + de laatste 4 BSN-cijfers; UC-05 ondersteunt deze samenstelling"
       - "Je vraagt de IBAN"
       - "Je opent bronze.uwv en zoekt direct"
     correct: 1
-  - q: "Mag jij IBAN zien bij klantcontact?"
+  - q: "Mag jij IBAN zien bij customer interaction?"
     options:
       - "Ja, volledig"
       - "Nee — alleen gehasht. Voor verificatie laat de cliënt zelf iets aan zijn IBAN zien als jij niet uniek kunt matchen op andere kenmerken"
       - "Alleen op donderdag"
       - "Ja, maar je moet hem voorlezen"
     correct: 1
-    explain: "Voor klantcontact is IBAN niet nodig. OPA toont alleen een hash, zodat je kunt valideren zonder te zien."
+    explain: "Voor customer interaction is IBAN niet nodig. OPA toont alleen een hash, zodat je kunt valideren zonder te zien."
   - q: "Een collega van handhaving vraagt of je even het IBAN van een dossier kunt mailen. Wat doe je?"
     options:
       - "Je mailt het direct"
@@ -35,22 +35,22 @@ quiz:
       - "Je opent het bij hem"
       - "Je vraagt de teamleider"
     correct: 1
-    explain: "Doelbinding: data die jij ziet binnen klantcontact, deel je niet voor andere doelen. Handhaving heeft een eigen toegang via hun rol."
+    explain: "Purpose limitation: data die jij ziet binnen customer interaction, deel je niet voor andere doelen. Handhaving heeft een eigen access via hun rol."
 ---
 
-Welkom. Klantcontact is hoog-volume werk: je doet honderden keer per dag
+Welcome. Customer interaction is hoog-volume werk: je doet honderden keer per dag
 een opzoek-en-antwoord-actie. Je hebt PII *zichtbaar* nodig (anders kun je
 geen cliënt herkennen) maar slechts in beperkte vorm — en daar zorgt het
 platform voor.
 
-## Wat is Klant 360?
+## Wat is Customer 360?
 
-`gold.uc05_customer_360` voegt per cliënt samen wat klantcontact nodig heeft:
+`gold.uc05_customer_360` voegt per cliënt samen wat customer interaction nodig heeft:
 
 - naam, birth_date, adres;
-- lopende uitkeringen (WW / WIA / Wajong) op hoog niveau;
+- lopende claim payouten (WW / WIA / Wajong) op hoog niveau;
 - recente contactmomenten (Salesforce → bronze → silver → gold);
-- openstaande to-do's voor de cliënt.
+- openstaande to-do's for the cliënt.
 
 Zie het als één pagina per cliënt, opgebouwd uit acht bronsystemen.
 
@@ -58,8 +58,8 @@ Zie het als één pagina per cliënt, opgebouwd uit acht bronsystemen.
 
 | Kolom | Reden |
 |---|---|
-| `iban` | Niet nodig voor klantcontact — je krijgt een hash |
-| `medisch_dossier` | Sociaal-medisch is sensitive — geen toegang |
+| `iban` | Niet nodig voor customer interaction — je krijgt een hash |
+| `medisch_dossier` | Operational is sensitive — geen access |
 | `risk_score` | UC-03 is voor handhaving |
 | `bsn_volledig` | Je krijgt de laatste 4 cijfers + check via naam/birth_date |
 
@@ -67,27 +67,27 @@ OPA filtert dat al voordat de query je antwoord teruggeeft. Probeer niet
 "creatief" te queryen om hier omheen te werken — elke poging staat in de
 audit-log.
 
-## Doelbinding in praktijk
+## Purpose limitation in praktijk
 
-Klantcontact is één doel. Concreet: data die je in UC-05 ziet, deel je niet
+Customer interaction is één doel. Concreet: data die je in UC-05 ziet, deel je niet
 voor andere doelen — ook niet "even" met handhaving of de financieel analist.
-Zij hebben hun eigen rol-toegang waar zij de juiste data zien voor hún doel.
+Zij hebben hun eigen rol-access waar zij de juiste data zien voor hún doel.
 
 Als je merkt dat collega's structureel via jou data proberen te krijgen die
-zij zelf niet zien — dat is een signaal voor de data-steward. Dat is geen
+zij zelf niet zien — dat is een signaal for the data-steward. Dat is geen
 klikken; dat is helpen het ontwerp van rollen kloppend te houden.
 
 ## Drie applicaties (jij hoeft maar twee te kennen)
 
 | Applicatie | Wanneer? |
 |---|---|
-| **Superset** | Klant 360 dashboard — primaire werkplek |
+| **Superset** | Customer 360 dashboard — primaire workspace |
 | **OpenMetadata** | Bij twijfel: "wat staat er precies in deze kolom?" |
 
 Trino staat technisch open maar gebruik je zelden — Superset dekt 95%.
 
 ## Volgende stap
 
-Open Klant 360 hieronder, kijk hoe één cliënt eruitziet. In de
+Open Customer 360 hieronder, kijk hoe één cliënt eruitziet. In de
 Practitioner-module doorloop je een echte klantvraag: van inkomende telefoon
 tot afgewikkelde to-do.

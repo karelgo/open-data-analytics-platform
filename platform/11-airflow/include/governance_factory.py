@@ -8,7 +8,7 @@ Bouwt twee soorten governance-DAGs:
                   Service-/workflow-YAMLs komen uit ConfigMap
                   `openmetadata-platform-config` (zie
                   platform/13-openmetadata-config/kustomization.yaml).
-  - bewaartermijn: R-AVG-08 enforcement per tabel met meta.bewaartermijn_jaren.
+  - retention period: R-AVG-08 enforcement per tabel met meta.retention period_jaren.
 
 Deze runnen op tijd-schema (geen Dataset-trigger) — ze leunen op rust-state.
 """
@@ -33,7 +33,7 @@ DEFAULT_ARGS = {
     "owner": "data-steward",
     "depends_on_past": False,
     "email_on_failure": False,
-    # 2 retries om transient druk op de shared Postgres (Hive/OM/Airflow/
+    # 2 retries om transient druk on the shared Postgres (Hive/OM/Airflow/
     # Superset delen één instance, max_connections=100) of korte OM-API
     # hapering te overleven. GEEN exponential backoff: de Airflow 3
     # KubernetesExecutor JWT-token heeft een TTL van 600s — als de
@@ -87,7 +87,7 @@ def _om_ingest_task(
     """KPO die `metadata <subcommand> -c <workflow_yaml>` draait.
 
     workflow_yaml is het pad in de pod (gemount uit `openmetadata-platform-config`
-    ConfigMap op /config). `subcommand` is "ingest" voor de meeste workflow-
+    ConfigMap op /config). `subcommand` is "ingest" for the meeste workflow-
     types (DatabaseMetadata/Lineage, Dashboard, Pipeline, Messaging, DBT) en
     "profile" voor type=Profiler.
     """
@@ -96,7 +96,7 @@ def _om_ingest_task(
         namespace="odap-platform",
         image=OM_INGESTION_IMAGE,
         cmds=["bash", "-c"],
-        # envsubst rendert ${VAR}-references uit de YAML op runtime.
+        # envsubst rendert ${VAR}-references from the YAML op runtime.
         arguments=[
             f"envsubst < {workflow_yaml} > /tmp/run.yaml && "
             f"metadata {subcommand} -c /tmp/run.yaml"
@@ -172,7 +172,7 @@ def build_om_ingest_dag() -> DAG:
         default_args=DEFAULT_ARGS,
         # 4-uurs schema ipv hourly: synthetic data verandert nauwelijks
         # tussen runs, en hourly ingest + profiler genereerde te veel druk
-        # op de gedeelde Postgres (zie failure-log van 2026-05-19).
+        # on the gedeelde Postgres (zie failure-log van 2026-05-19).
         schedule=timedelta(hours=4),
         start_date=datetime(2026, 5, 1),
         catchup=False,

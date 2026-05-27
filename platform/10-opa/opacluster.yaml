@@ -2,7 +2,7 @@
 #
 # OPA leest bundles uit ConfigMaps met label `opa.stackable.tech/bundle: "true"`.
 # In fase 3 ladenwe één base-bundle (allow-all met TODO). In fase 9 voegen we
-# de echte platform policies toe (rollen, doelbinding, row filters, column masks).
+# de echte platform policies toe (rollen, purpose-limitation, row filters, column masks).
 #
 # Trino verwijst naar deze cluster via `spec.clusterConfig.authorization.opa.configMapName: opa`.
 ---

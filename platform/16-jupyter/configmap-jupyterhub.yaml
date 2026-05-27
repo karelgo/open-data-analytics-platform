@@ -23,7 +23,7 @@ data:
 
     # ─── Hub network ────────────────────────────────────────────────────
     # Path-routing onder platform.odap.local/jupyter (same-origin
-    # voor de portal embed-shell). base_url is de prefix die JupyterHub
+    # for the portal embed-shell). base_url is de prefix die JupyterHub
     # voor al z'n eigen URLs zet — login-page, kernel-WS, single-user
     # spawn-redirects, alles krijgt /jupyter/* prepended.
     c.JupyterHub.base_url = "/jupyter/"

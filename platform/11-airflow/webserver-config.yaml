@@ -2,7 +2,7 @@
 #
 # Waarom: Stackable Airflow 26.3 genereert een minimale webserver_config.py
 # zonder role-mapping. `configOverrides.webserver_config.py` op de
-# AirflowCluster CRD wordt geaccepteerd maar door de operator NIET
+# AirflowCluster CRD wordt geaccepteerd maar through the operator NIET
 # meegerendered (zie kubectl get cm airflow-webserver-default
 # -o jsonpath='{.data.webserver_config\.py}' — onze keys ontbreken).
 #
@@ -10,7 +10,7 @@
 # FAB's default leest het Keycloak `roles` userinfo-claim niet als
 # role_keys, dus AUTH_ROLES_MAPPING zou alsnog leeg blijven.
 #
-# Airflow 3.x: de security-manager is verhuisd naar het FAB-provider
+# Airflow 3.x: de security-manager is verhuisd to the FAB-provider
 # (apache-airflow-providers-fab); we erven van
 # FabAirflowSecurityManagerOverride i.p.v. de oude
 # airflow.www.security.AirflowSecurityManager (die bestaat niet meer).
@@ -38,7 +38,7 @@ data:
       - AUTH_ROLES_SYNC_AT_LOGIN — re-sync bij elke login
       - PlatformAirflowSecurityManager — leest `roles` claim uit userinfo
         en geeft die door als role_keys (FAB's default doet dat niet
-        voor de keycloak-provider).
+        for the keycloak-provider).
     """
     import os
 
@@ -58,7 +58,7 @@ data:
     AUTH_ROLES_SYNC_AT_LOGIN = True
 
     # Keycloak realm-role → FAB-rol. Onbekende rollen vallen terug op
-    # AUTH_USER_REGISTRATION_ROLE (= Public, geen toegang).
+    # AUTH_USER_REGISTRATION_ROLE (= Public, geen access).
     AUTH_ROLES_MAPPING = {
         "platform_admin": ["Admin"],
         "data_engineer": ["Op"],
@@ -100,7 +100,7 @@ data:
     class PlatformAirflowSecurityManager(FabAirflowSecurityManagerOverride):
         """Leest Keycloak's `roles` userinfo-claim als FAB role_keys.
 
-        FAB's default get_oauth_user_info kent voor de keycloak-provider
+        FAB's default get_oauth_user_info kent for the keycloak-provider
         géén role-mapping. Zonder deze override blijft role_keys leeg en
         valt elke user terug op AUTH_USER_REGISTRATION_ROLE = Public.
         """

@@ -2,15 +2,15 @@ version: 2
 
 models:
   - name: stg_service_request_application
-    description: "WW-aanvragen — getypt uit `bronze.service_requests.application.payload`."
+    description: "WW-request — getypt uit `bronze.service_requests.application.payload`."
     config:
       tags: ["staging", "service_requests"]
     meta:
       domain: ww
       legal_basis: WW_art_24_27
-      doelbinding: ["uitkering"]
+      purpose-limitation: ["claim payout"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_ww
       pii_kolommen: [bsn]
       risk_tier: laag

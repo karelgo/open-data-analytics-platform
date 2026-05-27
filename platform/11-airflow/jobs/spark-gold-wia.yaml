@@ -1,4 +1,4 @@
-# SparkApplication-template — gold batch voor WIA-aanvragen.
+# SparkApplication-template — gold batch voor WIA-request.
 #
 # Wordt door DAG transform_wia_spark.gold_wia ge-`envsubst`'d en ge-applied.
 # Placeholders die Airflow invult:

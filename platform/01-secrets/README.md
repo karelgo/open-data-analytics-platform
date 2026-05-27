@@ -1,6 +1,6 @@
 # 01-secrets
 
-Stackable SecretClasses + Kubernetes Secrets voor het ODAP platform.
+Stackable SecretClasses + Kubernetes Secrets for the ODAP platform.
 
 | Resource | Functie |
 |---|---|
@@ -12,14 +12,14 @@ Stackable SecretClasses + Kubernetes Secrets voor het ODAP platform.
 | `Secret airflow-postgres-credentials` | Adminuser + DB-wachtwoord (fase 6). |
 | `Secret superset-postgres-credentials` | Adminuser + DB-wachtwoord (fase 7). |
 
-## Productie-pad (TODO ADR)
+## Production-pad (TODO ADR)
 
 Vervang `dev-secrets.yaml` door:
 - **SealedSecrets** (Bitnami) of **SOPS** (Mozilla) voor at-rest-encryptie in Git, of
 - **external-secrets-operator** met Vault als bron, of
 - **Stackable secret-operator** met `k8sSearch` op een door Vault gevulde Secret.
 
-Productie-Secret-rotatie: documenteer in `docs/runbook.md` § 5 (Backup/restore)
+Production-Secret-rotatie: documenteer in `docs/runbook.md` § 5 (Backup/restore)
 en koppel aan R-BIO-08 in [`docs/compliance-mapping.md`](../../docs/compliance-mapping.md).
 
 ## Apply

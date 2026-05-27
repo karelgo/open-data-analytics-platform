@@ -1,6 +1,6 @@
 {# Pseudonimiseer een kolom met SHA-256 + zout.
 
-   Productie zou een per-cliënt-zout en HSM-gestuurde re-identificatie-service
+   Production zou een per-cliënt-zout en HSM-gestuurde re-identificatie-service
    gebruiken; voor referentie volstaat een statische zout uit env-var.
 
    Gebruik in een SELECT:

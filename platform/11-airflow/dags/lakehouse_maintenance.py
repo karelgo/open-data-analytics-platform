@@ -20,7 +20,7 @@ from airflow.operators.empty import EmptyOperator
 from airflow.providers.trino.operators.trino import TrinoOperator
 
 # Welke tabellen onderhouden? Voor de smoke houden we het bij de bronze-laag.
-# Productie: dynamisch via SHOW TABLES of een meta-tabel die OM voorziet.
+# Production: dynamisch via SHOW TABLES of een meta-tabel die OM voorziet.
 MAINTAIN_TABLES = [
     ("bronze", "demo", "person_created"),
     ("bronze", "demo", "policy_holders"),

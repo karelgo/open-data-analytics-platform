@@ -3,7 +3,7 @@ version: 2
 models:
   - name: stg_focus_billing
     description: |
-      FOCUS-billing — staging-view op de FinOps Open Cost and Usage Specification
+      FOCUS-billing — staging-view on the FinOps Open Cost and Usage Specification
       CSV-export. Eén rij per (sub_account × resource × charge_period × charge).
       Bron: csv_batch via ingest_csv_focus DAG (zie airflow). Geen PII; kosten-
       bedragen zijn intern (concurrent-gevoelig — bio_classificatie: intern).
@@ -12,9 +12,9 @@ models:
     meta:
       domain: finops
       legal_basis: AVG_art_6_1_f
-      doelbinding: ["finops", "kostenbeheersing", "capaciteitsplanning"]
+      purpose-limitation: ["finops", "kostenbeheersing", "capacity planning"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_finance
       pii_kolommen: []
       risk_tier: laag

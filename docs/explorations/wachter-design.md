@@ -9,7 +9,7 @@
 >   (OpenSearch log-event → Multica-issue → Approve-knop → kubectl-actie
 >   met geverifieerde audit-trail);
 > - de actie-allowlist door Platform Architect + CISO is goedgekeurd;
-> - `docs/compliance-mapping.md` is uitgebreid met de AI Act / AVG-scope
+> - `docs/compliance-mapping.md` is uitgebreid with the AI Act / AVG-scope
 >   van geautomatiseerde runtime-acties.
 
 ---
@@ -20,7 +20,7 @@
 de UDP-observability-streams afspeurt (Vector→OpenSearch logs,
 Prometheus alerts, OpenTelemetry-spans, OpenMetadata DQ-events) en met
 behulp van Nanitics-agents incidenten classificeert. Wat eruit komt is
-**niet** een fix — het is een **Multica-issue** met een voorgestelde
+**niet** een fix — het is een **Multica-issue** with a voorgestelde
 remedie, een afgebakende *action plan*, en een knop "Approve". Pas na
 menselijke goedkeuring voert een uitvoerings-daemon de actie daadwerkelijk
 uit, en alleen acties uit een vooraf gedefinieerde allowlist.
@@ -29,7 +29,7 @@ Het scherpe testwoord dat alle drie agent-lanes scheidt is *waar draait
 de agent en wat raakt-ie?*:
 
 - **Nanitics**: cluster runt de agent, agent **bouwt** demo-tools en LLM-flows.
-- **Multica**: laptop runt de agent, agent **schrijft code** voor de developer.
+- **Multica**: laptop runt de agent, agent **schrijft code** for the developer.
 - **Wachter**: cluster runt de agent, agent **observeert het platform** en
   stelt **runtime-acties** voor die een mens moet goedkeuren.
 
@@ -44,16 +44,16 @@ applicatie samenkomen, maar als aparte profielen:
 
 | Profiel | Wat de agent doet | Wat de agent **niet** doet |
 |---|---|---|
-| **Triage-only** (altijd-aan, default trust) | Logs/traces/alerts groeperen, root-cause hypothesen formuleren, runbook-link bijvoegen, een Multica-issue openen met label `triage` | Schrijven, executeren, of zelfs `kubectl get` aanroepen op productie |
+| **Triage-only** (altijd-aan, default trust) | Logs/traces/alerts groeperen, root-cause hypothesen formuleren, runbook-link bijvoegen, een Multica-issue openen met label `triage` | Schrijven, executeren, of zelfs `kubectl get` aanroepen op production |
 | **Runtime-ops** (opt-in per actie, na approve) | Op approval een afgebakende kubectl/CLI-actie uitvoeren via een uitvoerings-daemon (pod restart, HPA scale, NiFi queue drain, Trino node draining) | Code wijzigen, Helm upgrades doen, secrets aanraken, persistente data muteren |
 
 Concreet betekent dit dat **alle** detecties een triage-issue
 opleveren. Een **deelverzameling** krijgt extra een `proposed-action`
-(JSON-bijlage met exact 1 actie uit de allowlist). Alleen die
+(JSON-bijlage met exact 1 actie from the allowlist). Alleen die
 deelverzameling kan met Approve uitgevoerd worden; de rest is
 informatief en de mens fixt zelf.
 
-Deze splitsing is bewust — zie `## Risks` voor de motivatie.
+Deze splitsing is bewust — zie `## Risks` for the motivatie.
 
 ---
 
@@ -118,7 +118,7 @@ Vier observaties uit dit plaatje die ontwerpkeuzes vastleggen:
 
 ---
 
-## Detectiepijplijn
+## Detectiepipeline
 
 Wachter draait drie soorten detectoren parallel; alle drie convergeren
 op één gemeenschappelijk *incident-record*.
@@ -306,7 +306,7 @@ dispatch-tabel".
    `EXPLAIN`-equivalent voor Trino). Een actie zonder dry-run-diff
    krijgt nooit `awaiting-approval`.
 2. *Audit hook is non-bypass.* Iedere uitvoering schrijft synchroon
-   naar `logs-audit-*` (7 jaar bewaartermijn — ILM-policy in
+   naar `logs-audit-*` (7 jaar retention period — ILM-policy in
    `14-monitoring/opensearch-ilm-job.yaml`). Mislukt het naar OpenSearch
    schrijven, dan vóórdat de actie loopt — dan annuleert de runner.
    Geen audit, geen actie.
@@ -324,19 +324,19 @@ het naar een hoger plan omdat hij **muteert**.
 | **AI Act Annex III (high-risk)** | Argument: Wachter is geen besluitvormingssysteem over personen. Het *adviseert* operationele acties; mens beslist; en de allowlist zit op puur-technische k8s-objecten (geen BSN-data). Te bevestigen door Data Office. |
 | **AVG art. 22 (geautomatiseerde besluitvorming)** | N.v.t. — Wachter raakt geen persoonsgegevens, raakt geen rechten van personen. Vermelden in `compliance-mapping.md`. |
 | **AVG art. 32 (passende technische maatregelen)** | Allowlist + RBAC + audit-trail + dry-run + 4-ogen via Multica = expliciet *minimum-privilege*. |
-| **R-BIO-20 (audit-bewaartermijn)** | 7 jaar via `audit-logs-policy.json` — bestaande beleid, geen wijziging nodig. |
+| **R-BIO-20 (audit-retention period)** | 7 jaar via `audit-logs-policy.json` — bestaande beleid, geen wijziging nodig. |
 | **NORA — controleerbaarheid** | Iedere actie heeft drie tracks: Multica issue, OpenSearch audit-log, Nanitics span-tree. Elk track is onafhankelijk en op zijn eigen manier doorzoekbaar. |
-| **LLM-egress** | Wachter draait Nanitics → Azure AI Foundry. Zelfde lane als 16. *Belangrijk:* logs die naar de LLM gestuurd worden moeten gefilterd zijn op BSN/persoonsgegevens. We hergebruiken OpenMetadata's PII-classifier voor pre-filtering — zie open vraag #2. |
+| **LLM-egress** | Wachter draait Nanitics → Azure AI Foundry. Zelfde lane als 16. *Belangrijk:* logs die to the LLM gestuurd worden moeten gefilterd zijn op BSN/persoonsgegevens. We hergebruiken OpenMetadata's PII-classifier voor pre-filtering — zie open vraag #2. |
 
 ---
 
 ## Risks and sharp edges
 
 1. **Twee agent-platforms zijn al verwarrend; drie is gevaarlijk.** Het
-   *whose-laptop-runs-it*-frame uit de Multica-memo werkt hier niet —
+   *whose-laptop-runs-it*-frame from the Multica-memo werkt hier niet —
    Wachter draait in-cluster, net als Nanitics. Het discriminerend
    begrip wordt **wat raakt-ie**: Nanitics raakt LLM-flows die in de
-   pod blijven; Wachter raakt productie-objecten in de cluster. Onboarding
+   pod blijven; Wachter raakt production-objecten in de cluster. Onboarding
    moet die zin letterlijk leren.
 2. **De allowlist is een politiek artefact.** Acht acties klinken
    weinig, maar elke toevoeging is een mini-CR — *waarom mag de bot dit
@@ -354,7 +354,7 @@ het naar een hoger plan omdat hij **muteert**.
 5. **Multica WS-limitatie (zie 17-multica memo).** Live updates op het
    approval-issue werken in v1 niet zonder refresh. Mitigatie: stuur
    bij goedkeuring een Slack-notificatie via Alertmanager, zodat de
-   reviewer niet hoeft te wachten met F5'en op de runner-output.
+   reviewer niet hoeft te wachten met F5'en on the runner-output.
 6. **Dual-write tussen Multica-DB en OpenSearch-audit.** Theoretisch
    kunnen die uiteenlopen. Mitigatie: OpenSearch is *bron van waarheid*
    voor audit; Multica is *bron van waarheid* voor approval-state.
@@ -378,7 +378,7 @@ de pipeline.
 Acceptatie:
 - Alle bestaande alerts uit `prometheusrule.yaml` produceren een
   Multica-issue binnen 60 s.
-- Issue bevat de runbook-link uit de annotation.
+- Issue bevat de runbook-link from the annotation.
 - Closed-issue-rate na een week ≥ 80 % (anders is signal/noise verkeerd).
 - Zero `proposed_action`-velden in V1 — code-pad is er, allowlist is
   leeg, runner is niet gedeployed.
@@ -394,7 +394,7 @@ waren"? Dat antwoord bepaalt of V3 doorgaat.
 
 Begin minimaal: alleen `kubectl_rollout_restart` en `kubectl_scale`.
 Runner deployen, RBAC strak, audit-pad aansluiten, dry-run-diff
-verplicht. Eerste week alleen op niet-productie-namespace
+verplicht. Eerste week alleen op niet-production-namespace
 (`odap-staging` als die bestaat, anders dev-cluster).
 
 ### V4 — Allowlist uitbreiden naar 8 acties + Trino/Spark/Airflow/NiFi
@@ -416,7 +416,7 @@ groeit.
 1. **Wie is de approver?** Single-reviewer? 4-ogen? Per-component
    eigenaar (`trino-team` etc.)? Multica's `member` + `team`-tabellen
    ondersteunen dat; we moeten gewoon kiezen.
-2. **PII-filter op logs vóór ze naar het LLM gaan.** OpenMetadata heeft
+2. **PII-filter op logs vóór ze to the LLM gaan.** OpenMetadata heeft
    een classifier; bruikbaar als pre-processing? Of bouwen we een
    simpele regex (BSN, IBAN, e-mailadres) als 1e laag en classifier als
    2e? Conservatief: regex wint. Auditeerbaarheid > recall.
@@ -448,7 +448,7 @@ groeit.
 - [ ] Een handmatig `awaiting-approval`-issue (allowlist actie:
       `kubectl_rollout_restart` op een dummy Deployment) leidt na
       Approve tot zichtbare audit-record in `logs-audit-*` met
-      operator-identiteit (Multica-user) en bot-identiteit
+      operator-identity (Multica-user) en bot-identity
       (Wachter-SA).
 - [ ] Een handmatige poging om buiten de allowlist te executeren
       faalt met expliciete `action_not_in_allowlist`-fout en wordt
@@ -456,7 +456,7 @@ groeit.
 - [ ] Nanitics-Observatory toont de span-tree van zowel de
       triage-run als de uitvoeringspoging.
 - [ ] `docs/compliance-mapping.md` heeft een Wachter-sectie waarin
-      AI Act art. 50, AVG art. 22, R-BIO-20 en NORA-controleerbaarheid
+      AI Act art. 50, AVG art. 22, R-BIO-20 en SOC 2-controleerbaarheid
       expliciet zijn afgevinkt.
 - [ ] `docs/runbook.md` heeft minstens één scenario "Wachter heeft
       iets gemarkeerd dat fout is" — fout-positief-procedure.

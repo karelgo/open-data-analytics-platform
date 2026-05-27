@@ -1,7 +1,7 @@
 # SparkApplication: streaming JSONL files in s3a://odap-raw/ → Delta/Iceberg bronze.
 #
 # De PySpark-code wordt via een ConfigMap (gegenereerd door kustomize) gemount
-# op /stackable/spark/jobs. `mainApplicationFile` verwijst naar de gemounte
+# op /stackable/spark/jobs. `mainApplicationFile` verwijst to the gemounte
 # entry-point.
 #
 # TABLE_FORMAT env stuurt format-keuze. Defaults op delta (zie kustomization).

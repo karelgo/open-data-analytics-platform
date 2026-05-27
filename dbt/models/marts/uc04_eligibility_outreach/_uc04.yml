@@ -10,16 +10,16 @@ models:
     meta:
       domain: ww
       legal_basis: Wet_proactieve_dienstverlening_SZW_2025
-      doelbinding: ["proactieve_dienstverlening"]
+      purpose-limitation: ["proactieve_dienstverlening"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_ww
       pii_kolommen: [bsn]
       risk_tier: laag
       profilering: false
       opt_out_supported: true
       dpia_id: DPIA-UC04-2026-Q2
-      cgm_entiteiten: [Uitkering, Inkomen, Huishouden]
+      cgm_entiteiten: [Claim payout, Inkomen, Huishouden]
     columns:
       - name: bsn
         tests:

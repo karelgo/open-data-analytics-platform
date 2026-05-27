@@ -1,7 +1,7 @@
 """Sync Keycloak realm-users → OpenMetadata Users.
 
 OM 1.5 heeft geen SCIM-provisioner; nieuwe Keycloak-users verschijnen pas in
-OM zodra ze inloggen. Dat breekt:
+OM zodra ze sign in. Dat breekt:
   - Owner-toewijzing aan users die nog niet zijn ingelogd.
   - DQ-Test-Suite reviewer-mailings.
   - Lineage-attributie aan "wie heeft die DAG getriggerd".
@@ -60,7 +60,7 @@ def log(msg: str) -> None:
 
 def get_kc_token() -> str:
     """Krijgt admin-token via password-flow op master-realm. Keycloak's
-    admin-API draait altijd op master, niet op het odap-realm."""
+    admin-API draait altijd op master, niet on the odap-realm."""
     r = requests.post(
         f"{KC_URL}/realms/master/protocol/openid-connect/token",
         data={

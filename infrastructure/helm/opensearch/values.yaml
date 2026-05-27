@@ -1,12 +1,12 @@
 # OpenSearch — gedeeld single-node cluster voor zowel Vector logs als
-# OpenMetadata-search (per gebruikerskeuze, vraag 10 in master agent prompt).
+# OpenMetadata-search (per userskeuze, vraag 10 in master agent prompt).
 #
 # Index-prefix-conventie:
 #   logs-YYYY.MM.DD       (Vector)
 #   open_metadata*            (OpenMetadata-search-engine)
 #
 # Chart: opensearch-project/opensearch
-# Productie: ≥ 3 master-eligible nodes met data-tier-rollen + dedicated security.
+# Production: ≥ 3 master-eligible nodes met data-tier-rollen + dedicated security.
 ---
 clusterName: opensearch
 nodeGroup: master
@@ -55,12 +55,12 @@ persistence:
   # storageClass + size are set per-mode in values-{k3d,aks}.yaml.
 
 # Security uit voor dev — Vector + OM kunnen dan zonder TLS/auth schrijven/lezen.
-# Productie: enable security plugin + use root CA voor mTLS.
+# Production: enable security plugin + use root CA voor mTLS.
 securityConfig:
   enabled: false
 
 extraEnvs:
-  # discovery.type wordt door de chart zelf gezet via singleNode/clusterName;
+  # discovery.type wordt through the chart zelf gezet via singleNode/clusterName;
   # duplicate-key error als we 'm hier ook opvoeren.
   - name: DISABLE_SECURITY_PLUGIN
     value: "true"

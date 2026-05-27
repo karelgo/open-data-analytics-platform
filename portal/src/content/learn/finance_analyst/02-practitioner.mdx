@@ -4,13 +4,13 @@ role: finance_analyst
 level: practitioner
 order: 2
 duration: "60 min"
-summary: "Een afwijking in de lastprognose verklaren: dbt-tests checken, lineage volgen, een korte sturingsnotitie opstellen die DQ-status expliciet vermeldt."
+summary: "Een afwijking in de cost forecast verklaren: dbt-tests checken, lineage volgen, een korte sturingsnotitie opstellen die DQ-status expliciet vermeldt."
 prereqs:
   - "finance_analyst/foundation/1"
 labs:
-  - title: "Lastprognose dashboard"
+  - title: "Cost forecast dashboard"
     href: "/go/superset/"
-  - title: "dbt-docs — UC-06 modellen"
+  - title: "dbt-docs — UC-06 models"
     href: "/dbt-docs/"
   - title: "OpenMetadata — lineage UC-06"
     href: "/go/openmetadata/"
@@ -18,7 +18,7 @@ checks:
   - id: "fez_practitioner_note"
     title: "Sturingsnotitie bevat DQ-status en lineage-verwijzing"
 quiz:
-  - q: "Een lastprognose voor regio Noord ligt 8% onder gemiddelde. Welke check is verstandig?"
+  - q: "Een cost forecast voor regio Noord ligt 8% onder gemiddelde. Welke check is verstandig?"
     options:
       - "Direct in de notitie zetten"
       - "Eerst dbt-tests op `gold.uc06_cost_forecast` checken — als de `not_null` op `bedrag_eur` rood staat is de aggregatie onbetrouwbaar"
@@ -42,7 +42,7 @@ quiz:
 ---
 
 In deze module schrijf je een korte sturingsnotitie op basis van een
-afwijking in de lastprognose. Het schrijven is het makkelijke deel; de
+afwijking in de cost forecast. Het schrijven is het makkelijke deel; de
 data-discipline daarvoor is wat we hier oefenen.
 
 ## Casus
@@ -52,7 +52,7 @@ Een leidinggevende vraagt: "De voorspelling voor Noord ligt voor december
 
 ## Stap 1 — afwijking valideren
 
-Open [Lastprognose](/go/superset/) → filter regio Noord → december-cohort.
+Open [Cost forecast](/go/superset/) → filter regio Noord → december-cohort.
 Bevestigt het 8%. Maar: het cijfer kan kloppen *of* het kan een artefact
 zijn van data-issues. Volgende stap.
 
@@ -65,35 +65,35 @@ Drie tests die er nu toe doen:
 | Test | Status | Betekenis |
 |---|---|---|
 | `not_null` op `bedrag_eur` | groen | geen ontbrekende bedragen |
-| `unique` op `(maand, regio, uitkeringsoort)` | groen | geen dubbeltellingen |
-| `accepted_values` op `uitkeringsoort` | **oranje** | onbekende waarde 'WW-flex-pilot' opgedoken |
+| `unique` op `(maand, regio, claim payoutsoort)` | groen | geen dubbeltellingen |
+| `accepted_values` op `claim payoutsoort` | **oranje** | onbekende waarde 'WW-flex-pilot' opgedoken |
 
 De laatste is verdacht. "WW-flex-pilot" is een nieuwe categorie die nog niet
 in de glossary staat — die kan voor december juist het verschil maken.
 
 ## Stap 3 — lineage volgen
 
-Open [lineage UC-06](/go/openmetadata/). Volg `bedrag_eur` terug naar de bron:
+Open [lineage UC-06](/go/openmetadata/). Volg `bedrag_eur` terug to the bron:
 
 ```
-bronze.fin.betaling.bedrag → silver.fin.uitkering_betaling.bedrag_eur → gold.uc06_cost_forecast.bedrag_eur
+bronze.fin.betaling.bedrag → silver.fin.claim payout_betaling.bedrag_eur → gold.uc06_cost_forecast.bedrag_eur
 ```
 
-Op silver staat sinds vorige week een nieuwe `uitkeringsoort` die nog niet
+Op silver staat sinds vorige week een nieuwe `claim payoutsoort` die nog niet
 in de mart wordt meegerekend (filter sluit "WW-flex-pilot" uit). Dat
 verklaart de 8%.
 
 ## Stap 4 — notitie schrijven
 
 ```
-SUBJECT: Lastprognose Noord december — afwijking verklaard
+SUBJECT: Cost forecast Noord december — afwijking verklaard
 
 Cijfer: -8% t.o.v. trend (gold.uc06_cost_forecast, snapshot 2025-09-01)
 
 Onderbouwing:
-- Niet een werkelijke daling in uitkeringen.
-- Sinds week 35 staat in silver.fin.uitkering_betaling een nieuwe
-  uitkeringsoort 'WW-flex-pilot' (~12k records). Deze wordt door de
+- Niet een werkelijke daling in claim payouten.
+- Sinds week 35 staat in silver.fin.claim payout_betaling een nieuwe
+  claim payoutsoort 'WW-flex-pilot' (~12k records). Deze wordt door de
   huidige UC-06 mart nog niet meegerekend (accepted_values-test
   rapporteert oranje sinds 2025-08-30).
 - Verwacht herstel zodra data-engineer de mart-definitie aanvult

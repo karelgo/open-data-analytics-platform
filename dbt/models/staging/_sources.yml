@@ -18,7 +18,7 @@ sources:
     loader: spark-streaming
     meta:
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
 
     tables:
       - name: person_created
@@ -26,15 +26,15 @@ sources:
       - name: policy_holders
         description: "Inkomstenverhoudingen — kerneenheid polisadministratie."
       - name: service_request_application
-        description: "WW-aanvragen incl. reden einde dienstverband."
+        description: "WW-request incl. reden einde dienstverband."
       - name: claim_application
-        description: "WIA-aanvragen + incapacity_percentage."
+        description: "WIA-request + incapacity_percentage."
       - name: eligibility_case
         description: "Wajong-dossiers (UC-02 placeholder; minimaal veld-niveau)."
       - name: incident_report
         description: "Ziektewet-meldingen."
       - name: customer_interaction
-        description: "Klantcontact-events (kanaal, onderwerp)."
+        description: "Customer interaction-events (kanaal, onderwerp)."
       - name: finance_expense
         description: "Geaggregeerde claim_cost per wet × maand × regio."
       - name: customer_satisfaction
@@ -45,7 +45,7 @@ sources:
         loader: csv_batch
         meta:
           bio_classificatie: intern
-          bewaartermijn_jaren: 5
+          retention period_jaren: 5
       - name: focus_billing
         description: |
           FOCUS-billing (UC-12 / FinOps). 49-kolom export volgens FinOps
@@ -56,7 +56,7 @@ sources:
         loader: csv_batch
         meta:
           bio_classificatie: intern
-          bewaartermijn_jaren: 7
+          retention period_jaren: 7
 
   # ─────────────────────────────────────────────────────────────────
   # Silver source — alleen voor Fabric (uc11 multi-platform demo).
@@ -87,19 +87,19 @@ sources:
         description: "Inkomstenverhoudingen. Equivalent van stg_policy_holders."
       - name: service_request_application
         identifier: silver_service_request_application
-        description: "WW-aanvragen. Equivalent van stg_service_request_application."
+        description: "WW-request. Equivalent van stg_service_request_application."
       - name: incident_report
         identifier: silver_incident_report
         description: "Ziektewet-meldingen. Equivalent van stg_incident_report."
       - name: claim_application
         identifier: silver_claim_application
-        description: "WIA-aanvragen. Equivalent van stg_claim_application."
+        description: "WIA-request. Equivalent van stg_claim_application."
       - name: eligibility_case
         identifier: silver_eligibility_case
         description: "Wajong-dossiers. Equivalent van stg_eligibility_case."
       - name: customer_interaction
         identifier: silver_customer_interaction
-        description: "Klantcontact-events. Equivalent van stg_customer_interaction."
+        description: "Customer interaction-events. Equivalent van stg_customer_interaction."
 
   # ─────────────────────────────────────────────────────────────────
   # Silver source voor Databricks (Unity Catalog).
@@ -109,7 +109,7 @@ sources:
   # `silver` source voor Fabric, alleen ander adres.
   #
   # int_customer_journey_events.sql schakelt naar deze source als target.type ==
-  # 'databricks' (zie macro klantreis_entity).
+  # 'databricks' (zie macro customer journey_entity).
   # ─────────────────────────────────────────────────────────────────
   - name: silver_uc
     database: "{{ env_var('DATABRICKS_CATALOG', 'databricks') }}"
@@ -125,12 +125,12 @@ sources:
       - name: policy_holders
         description: "Inkomstenverhoudingen. Equivalent van stg_policy_holders."
       - name: service_request_application
-        description: "WW-aanvragen. Equivalent van stg_service_request_application."
+        description: "WW-request. Equivalent van stg_service_request_application."
       - name: incident_report
         description: "Ziektewet-meldingen. Equivalent van stg_incident_report."
       - name: claim_application
-        description: "WIA-aanvragen. Equivalent van stg_claim_application."
+        description: "WIA-request. Equivalent van stg_claim_application."
       - name: eligibility_case
         description: "Wajong-dossiers. Equivalent van stg_eligibility_case."
       - name: customer_interaction
-        description: "Klantcontact-events. Equivalent van stg_customer_interaction."
+        description: "Customer interaction-events. Equivalent van stg_customer_interaction."

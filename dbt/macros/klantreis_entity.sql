@@ -14,7 +14,7 @@
    onveranderd over engines portable is — de macro encapsuleert de
    engine-specifieke source/ref-keuze.
 #}
-{% macro klantreis_entity(name) -%}
+{% macro customer journey_entity(name) -%}
     {%- if target.type == 'fabricspark' -%}
         {{ source('silver', name) }}
     {%- elif target.type in ('databricks', 'spark') -%}

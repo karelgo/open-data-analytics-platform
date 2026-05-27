@@ -1,5 +1,5 @@
 # Kubernetes Job die data-generation in-cluster runt en JSONL files
-# publiceert naar de S3 raw zone (`s3a://odap-raw/...`).
+# publiceert to the S3 raw zone (`s3a://odap-raw/...`).
 #
 # ConfigMaps `data-generation-generators` en `data-generation-scripts` worden
 # door scripts/seed.sh aangemaakt vanuit data-generation/. Job gebruikt

@@ -1,12 +1,12 @@
-// UC-11 Integrale Klantreis — deck generator
+// UC-11 Integrale Customer journey — deck generator
 // Dark platform-amber theme matching the portal aesthetic.
 const pptxgen = require("pptxgenjs");
 
 const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE"; // 13.3 x 7.5
 pres.author = "UWV Referentie Platform";
-pres.title = "UC-11 — Integrale Klantreis";
-pres.subject = "Demo-deck voor het Open Data & Analytics Platform";
+pres.title = "UC-11 — Integrale Customer journey";
+pres.subject = "Demo-deck for the Open Data & Analytics Platform";
 
 // ── palette (matches portal CSS) ─────────────────────────────────────
 const BG = "14110C";         // near-black with warm tint
@@ -56,7 +56,7 @@ function chrome(slide, eyebrow) {
     x: 0.5, y: SLIDE_H - 0.35, w: SLIDE_W - 1.0, h: 0,
     line: { color: LINE_2, width: 0.5 },
   });
-  slide.addText("UC-11 · Integrale Klantreis · synthetic data · v1", {
+  slide.addText("UC-11 · Integrale Customer journey · synthetic data · v1", {
     x: 0.5, y: SLIDE_H - 0.3, w: SLIDE_W - 1.0, h: 0.25,
     fontFace: F_BODY, fontSize: 9, color: INK_3,
   });
@@ -97,7 +97,7 @@ function subtitle(slide, text) {
     bold: true, charSpacing: 8, margin: 0,
   });
 
-  s.addText("Integrale Klantreis", {
+  s.addText("Integrale Customer journey", {
     x: 1.0, y: 2.0, w: 11.0, h: 1.6,
     fontFace: F_HEAD, fontSize: 60, color: INK_1, margin: 0,
   });
@@ -151,7 +151,7 @@ function subtitle(slide, text) {
     { x: 2.7, label: "Ziek", domain: "ZW" },
     { x: 4.7, label: "WIA-aanvraag", domain: "WIA" },
     { x: 6.7, label: "WGA toegekend", domain: "WIA" },
-    { x: 8.7, label: "Re-integratie", domain: "AG · CRM" },
+    { x: 8.7, label: "Reintegration", domain: "AG · CRM" },
     { x: 10.7, label: "Werkhervatter", domain: "policies" },
   ];
 
@@ -399,7 +399,7 @@ function subtitle(slide, text) {
 
   // Takeaway
   s.addText(
-    "Eén dataflow, vier cross-cutting capabilities. Geen vendor lock-in — alle componenten zijn open-source en Helm-deployable.",
+    "Eén dataflow, vier cross-cutting capabilities. Geen vendor lock-in — alle components zijn open-source en Helm-deployable.",
     {
       x: 0.5, y: 6.15, w: 12.3, h: 0.6,
       fontFace: F_HEAD, fontSize: 14, color: INK_2,
@@ -469,7 +469,7 @@ function subtitle(slide, text) {
       fontFace: F_BODY, fontSize: 11, color: INK_1, margin: 0,
     });
     // Access
-    s.addText("Toegang (default)", {
+    s.addText("Access (default)", {
       x: x + 0.3, y: yCards + 2.55, w: cardW - 0.4, h: 0.3,
       fontFace: F_BODY, fontSize: 8.5, color: AMBER, bold: true,
       charSpacing: 3, margin: 0,
@@ -498,7 +498,7 @@ function subtitle(slide, text) {
   const s = pres.addSlide();
   chrome(s, "SLIDE 05");
   title(s, "Zeven bronnen, één tijdlijn.");
-  subtitle(s, "Live verkenbaar in dbt docs op het platform.");
+  subtitle(s, "Live verkenbaar in dbt docs on the platform.");
 
   // Left column: 7 staging models
   const staging = [
@@ -636,12 +636,12 @@ function subtitle(slide, text) {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// SLIDE 6 — Doelbinding als code
+// SLIDE 6 — Purpose limitation als code
 // ════════════════════════════════════════════════════════════════════
 {
   const s = pres.addSlide();
   chrome(s, "SLIDE 06");
-  title(s, "Doelbinding als code.");
+  title(s, "Purpose limitation als code.");
   subtitle(s, "Tag in catalog → Rego in OPA → query-rewrite in Trino.");
 
   // 3-step horizontal flow
@@ -649,7 +649,7 @@ function subtitle(slide, text) {
     {
       n: "01",
       label: "OpenMetadata",
-      detail: "Kolom event_label krijgt tag\nDoelbinding.Klantcontact.",
+      detail: "Kolom event_label krijgt tag\nPurpose limitation.Customer interaction.",
     },
     {
       n: "02",
@@ -781,7 +781,7 @@ function subtitle(slide, text) {
     fontFace: F_HEAD, fontSize: 26, color: INK_1, bold: true, margin: 0,
   });
   s.addText(
-    "Gegeven de huidige fase van een cliënt, welk klantcontact past het beste?",
+    "Gegeven de huidige fase van een cliënt, welk customer interaction past het beste?",
     {
       x: 7.05, y: 3.7, w: 5.5, h: 0.6,
       fontFace: F_HEAD, fontSize: 14, color: INK_2,
@@ -873,7 +873,7 @@ function subtitle(slide, text) {
     x: 0.75, y: 5.85, w: 11.9, h: 0.4,
     fontFace: F_MONO, fontSize: 12, color: INK_1, margin: 0,
   });
-  s.addText("Retention 7 jaar in Delta-formaat onder bronze.audit.klantreis_reads.", {
+  s.addText("Retention 7 jaar in Delta-formaat onder bronze.audit.customer journey_reads.", {
     x: 0.75, y: 6.25, w: 11.9, h: 0.4,
     fontFace: F_BODY, fontSize: 11, color: INK_2, italic: true, margin: 0,
   });
@@ -885,8 +885,8 @@ function subtitle(slide, text) {
 {
   const s = pres.addSlide();
   chrome(s, "SLIDE 09");
-  title(s, "Self-service toegang — zonder ticket, zonder shell.");
-  subtitle(s, "Nieuwe verzekeringsarts wil toegang tot gold.uc11_customer_journey.");
+  title(s, "Self-service access — zonder ticket, zonder shell.");
+  subtitle(s, "Nieuwe verzekeringsarts wil access tot gold.uc11_customer_journey.");
 
   const flow = [
     {
@@ -906,7 +906,7 @@ function subtitle(slide, text) {
     },
     {
       role: "4 — Arts",
-      action: "Heeft toegang",
+      action: "Heeft access",
       detail: "Volgende login: token bevat\nrole. OPA-policy enforce't.\nGeen handmatige stap meer.",
     },
   ];
@@ -971,13 +971,13 @@ function subtitle(slide, text) {
   const s = pres.addSlide();
   chrome(s, "SLIDE 10");
   title(s, "Wat dit kost.");
-  subtitle(s, "Eén laptop, één commando — productie is dezelfde Helm.");
+  subtitle(s, "Eén laptop, één commando — production is dezelfde Helm.");
 
   // 3 big stat callouts
   const stats = [
     { big: "€0", label: "cloud-bill", sub: "k3d in Docker · alles lokaal" },
     { big: "1", label: "commando voor deploy", sub: "make cluster + bootstrap + deploy + seed" },
-    { big: "0", label: "vendor lock-in", sub: "alle componenten Apache-2 / open-source" },
+    { big: "0", label: "vendor lock-in", sub: "alle components Apache-2 / open-source" },
   ];
 
   const stW = 4.0;
@@ -1015,7 +1015,7 @@ function subtitle(slide, text) {
     x: 0.5, y: 5.6, w: 12.3, h: 1.1,
     fill: { color: BG_ELEV }, line: { color: AMBER, width: 0.5 },
   });
-  s.addText("Update dbt-docs op het platform:", {
+  s.addText("Update dbt-docs on the platform:", {
     x: 0.75, y: 5.7, w: 6.0, h: 0.35,
     fontFace: F_BODY, fontSize: 11, color: INK_2, margin: 0,
   });
@@ -1069,7 +1069,7 @@ function subtitle(slide, text) {
       path: "https://platform.odap.local:8443/dbt-docs.html",
     },
     {
-      label: "Architectuur",
+      label: "Architecture",
       path: "https://platform.odap.local:8443/architecture",
     },
   ];
@@ -1090,7 +1090,7 @@ function subtitle(slide, text) {
     });
   });
 
-  s.addText("UC-11 · Integrale Klantreis · synthetic data · v1", {
+  s.addText("UC-11 · Integrale Customer journey · synthetic data · v1", {
     x: 1.0, y: SLIDE_H - 0.6, w: 11.0, h: 0.3,
     fontFace: F_BODY, fontSize: 10, color: INK_3, margin: 0,
   });

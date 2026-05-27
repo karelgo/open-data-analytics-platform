@@ -1,10 +1,10 @@
 """Format-agnostische lakehouse I/O helper voor Spark.
 
 Leest TABLE_FORMAT uit env (default 'delta'). Switching naar iceberg vergt
-alleen `TABLE_FORMAT=iceberg` op de SparkApplication, geen code-wijziging
+alleen `TABLE_FORMAT=iceberg` on the SparkApplication, geen code-wijziging
 in calling jobs.
 
-Vereisten op Spark-image (via SparkApplication.deps.packages):
+Requireden op Spark-image (via SparkApplication.deps.packages):
   - delta:    io.delta:delta-spark_2.12:3.2.x
   - iceberg:  org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.6.x
   - s3a:      hadoop-aws + aws-sdk-bundle (in Stackable-image meestal aanwezig)
@@ -44,7 +44,7 @@ def get_spark_with_lakehouse_config(app_name: str) -> "SparkSession":
     # S3A — alleen overrides als de SparkApplication GEEN s3connection-ref
     # heeft (i.e. lokale dev runs zonder Stackable-controller). In cluster
     # injecteert `spark.stackable.tech_sparkapplication` al endpoint, ssl,
-    # truststore en credentials uit de S3Connection. Overrides hier
+    # truststore en credentials from the S3Connection. Overrides hier
     # overschrijven die en breken TLS naar HTTPS-MinIO.
     if os.getenv("STACKABLE_S3_AUTOCONFIG", "true").lower() != "true":
         builder = (

@@ -5,7 +5,7 @@
 #   - pull_request (alleen build, geen deploy — checkt of de build niet breekt)
 #   - workflow_dispatch (handmatig vanuit Actions-tab)
 #
-# Architectuur-pagina's worden gegenereerd uit portal/src/data/components.ts
+# Architecture-pagina's worden gegenereerd uit portal/src/data/components.ts
 # door scripts/docs_gen.py, daarna bouwt mkdocs build de statische site.
 # Deploy via de officiële actions/deploy-pages workflow.
 #

@@ -30,10 +30,10 @@ models:
       # `intermediate` mapt naar OM-domain Cross (zie dbt-meta-mapping.yaml).
       # Domain MOET gezet zijn vóór de enricher de dataProduct (uc11_customer_journey,
       # zelf in domain Cross) probeert te koppelen — anders trigger OM's
-      # "Data Product Domain Validation" rule een 400 op de dataProduct-op.
+      # "Data Product Domain Validation" rule een 400 on the dataProduct-op.
       domain: intermediate
-      eigenaar: divisie_klantcontact
-      cgm_entiteiten: [Klantreis, EventStream]
+      eigenaar: divisie_customer interaction
+      cgm_entiteiten: [Customer journey, EventStream]
       pii_kolommen: [bsn, event_label, source_ref_id]
     columns:
       - name: bsn

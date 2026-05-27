@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""Maak OneLake S3-shortcuts voor de UC-12 marts → s3://odap-gold/uc12_focus_finops/...
+"""Maak OneLake S3-shortcuts for the UC-12 marts → s3://odap-gold/uc12_focus_finops/...
 
-End-state architectuur: data leeft in MinIO, Power BI Direct Lake leest via een
+End-state architecture: data leeft in MinIO, Power BI Direct Lake leest via een
 OneLake-shortcut alsof het lokaal in `uc11_lakehouse` staat. Nul data-copy.
 
 5 shortcuts, één per mart, op `Tables/` niveau zodat ze als `dbo.<naam>`
 verschijnen in de SQL endpoint — dat is wat het bestaande UC-12 semantic
 model verwacht (zie platform/12-powerbi/uc12_focus_finops/SemanticModel/model.bim).
 
-Voorvereisten:
+Prerequisites:
   1. MinIO publiek bereikbaar (zie `scripts/fabric-probe-minio.py`).
-  2. Een Fabric Connection naar het S3-endpoint is reeds aangemaakt in de
+  2. Een Fabric Connection to the S3-endpoint is reeds aangemaakt in de
      workspace — Microsoft heeft de Connections-API in beweging, dus voor nu:
      aanmaken via UI eenmalig (`Workspace → Manage connections → New →
-     S3 Compatible` met de MinIO endpoint + access/secret key).
+     S3 Compatible` with the MinIO endpoint + access/secret key).
      De connection-ID komt mee als `--connection-id` argument.
 
 Gebruik:

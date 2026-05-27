@@ -12,9 +12,9 @@
 
 Trino moet rijke authorisatie afdwingen die past bij UWV's compliance-eisen:
 
-- **Doelbinding** (R-AVG-06): toegang tot een dataset is gekoppeld aan een doel
-  (uitkering, re-integratie, handhaving, statistiek). Een query die niet
-  matcht met de doelcode van de gebruiker wordt geweigerd.
+- **Purpose limitation** (R-AVG-06): access tot een dataset is gekoppeld aan een doel
+  (claim payout, reintegration, handhaving, statistiek). Een query die niet
+  matcht with the doelcode van de gebruiker wordt geweigerd.
 - **Dataminimalisatie** (R-AVG-05): kolommen worden alleen blootgesteld als de
   rol/het doel daar aanleiding toe heeft.
 - **Column-level security & masking** (R-BIO-11): BSN, IBAN, diagnose,
@@ -42,14 +42,14 @@ als `OpaCluster` (Stackable) en geconfigureerd via een ConfigMap-bundle.
 - **Policy-as-code** (R-GOV-06): Rego is testbaar (`opa test`), versionable en
   reviewable in PR's. Tegenover hard-coded ACL's of database-grants is dit een
   significante audit-winst.
-- **Eén taal voor alle policy-typen**: doelbinding, RBAC, ABAC, column masks
+- **Eén taal voor alle policy-typen**: purpose-limitation, RBAC, ABAC, column masks
   en row filters zitten in één Rego-bundle. Geen versnipperde mechanismen.
 - **Stackable-native integratie**: OpaCluster + ConfigMap met label
   `opa.stackable.tech/bundle: "true"` wordt automatisch ingelezen door OPA
   en hot-reloaded zonder Trino-restart.
 - **OpenMetadata-integratie pad**: tags die in OM op kolommen staan
-  (bijvoorbeeld `Doelbinding.uitkering`) kunnen via reverse-metadata of een
-  custom export naar de OPA-data feed → policies blijven dichtbij de catalog.
+  (bijvoorbeeld `Purpose limitation.claim payout`) kunnen via reverse-metadata of een
+  custom export to the OPA-data feed → policies blijven dichtbij de catalog.
 - **Open source en vendor-neutraal**: CNCF-graduated project (sinds 2021);
   geen lock-in.
 
@@ -72,9 +72,9 @@ als `OpaCluster` (Stackable) en geconfigureerd via een ConfigMap-bundle.
   plugins). Niet pre-geconfigureerd in Stackable. Skip — past niet bij
   "lichte, code-driven policy"-doel.
 - **Trino file-based access control**. Geen ABAC, geen column masking,
-  geen row filters via expressies. Te beperkt voor doelbinding-eisen.
-- **Database-grants (Trino-gebruikers per Hive-schema)**. Werkt voor
-  catalog/schema-toegang, niet voor row/column-niveau. Skip.
+  geen row filters via expressies. Te beperkt voor purpose-limitation-eisen.
+- **Database-grants (Trino-users per Hive-schema)**. Werkt voor
+  catalog/schema-access, niet voor row/column-niveau. Skip.
 - **Unity Catalog**. Databricks-specifiek; out of scope per ADR-0001.
 
 ---
@@ -83,7 +83,7 @@ als `OpaCluster` (Stackable) en geconfigureerd via een ConfigMap-bundle.
 
 - `platform/10-opa/opacluster.yaml` — Stackable OpaCluster (1 replica
   scaled-down).
-- `platform/10-opa/policies/*.rego` — base, RBAC-rollen, doelbinding, row
+- `platform/10-opa/policies/*.rego` — base, RBAC-rollen, purpose-limitation, row
   filters, column masks; `*_test.rego` voor unit tests.
 - `opa-policies-src/` — bron van waarheid; `make build-opa-bundle` rendert
   naar ConfigMap.

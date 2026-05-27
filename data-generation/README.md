@@ -1,6 +1,6 @@
 # data-generation
 
-Python-package met synthetische data-generators voor het UWV-referentie-platform.
+Python-package met synthetische data-generators for the UWV-referentie-platform.
 
 > **STRIKT SYNTHETISCH.** Geen echte BSN's, geen echte adresgegevens, geen
 > echte cliënt-data. Test-BSN-bereik (`9XXXXXXXX`) per BRP-conventie.
@@ -13,12 +13,12 @@ Python-package met synthetische data-generators voor het UWV-referentie-platform
 |---|---|
 | `generators.persona` | Persoon (BSN+11-proef, naam, birth_date, adres, geslacht). |
 | `generators.polisadministratie` | IKV's per persoon, dienstverbanden, lonen (placeholder, fase 5). |
-| `generators.ww` | WW-aanvragen (placeholder, fase 5). |
-| `generators.wia` | WIA-aanvragen + beoordelingen (placeholder, fase 5). |
+| `generators.ww` | WW-request (placeholder, fase 5). |
+| `generators.wia` | WIA-request + beoordelingen (placeholder, fase 5). |
 | `generators.wajong` | Wajong-dossiers (placeholder, fase 5). |
 | `generators.zw` | Ziektewet-meldingen (placeholder, fase 5). |
-| `generators.crm` | Klantcontact (placeholder, fase 5). |
-| `generators.fez` | Uitkeringslast-aggregaten (placeholder, fase 6). |
+| `generators.crm` | Customer interaction (placeholder, fase 5). |
+| `generators.fez` | Claim payoutslast-aggregaten (placeholder, fase 6). |
 
 Alle generators delen `generators._common` voor faker, header-stempels, en
 deterministische seeding.
@@ -47,6 +47,6 @@ uv run ruff check generators/    # lint
 
 ## In-cluster (via seed-job)
 
-`scripts/seed.sh` past `data-generation/k8s/seed-job.yaml` toe op het cluster.
+`scripts/seed.sh` past `data-generation/k8s/seed-job.yaml` toe on the cluster.
 De Job mount de generator-code via twee ConfigMaps en draait `load_to_s3.py`
 tegen de in-cluster MinIO (`s3://odap-raw/`).

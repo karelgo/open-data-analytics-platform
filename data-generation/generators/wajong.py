@@ -1,4 +1,4 @@
-"""Wajong-aanvragen stub. SYNTHETIC — NOT FOR REAL USE.
+"""Wajong-request stub. SYNTHETIC — NOT FOR REAL USE.
 
 UC-02 hoog-risico AI is in deze referentie placeholder; deze generator levert
 *minimaal* veld-niveau data, geen medische bijzondere PG.

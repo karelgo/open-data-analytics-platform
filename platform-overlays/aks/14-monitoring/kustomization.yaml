@@ -28,7 +28,7 @@ patches:
       version: v1
       kind: Ingress
       name: mailhog
-  # Wijs de email-receiver naar de productie-relay + zet TLS aan.
+  # Wijs de email-receiver to the production-relay + zet TLS aan.
   - path: alertmanager-smtp-prod.yaml
     target:
       group: monitoring.coreos.com

@@ -1,20 +1,20 @@
 ---
-title: Architectuur (verplaatst)
-description: De architectuur-documentatie is verplaatst naar /architectuur/.
+title: Architecture (verplaatst)
+description: De architecture-documentation is verplaatst naar /architecture/.
 ---
 
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
-# Architectuur is verplaatst
+# Architecture is verplaatst
 
-De architectuur-documentatie staat nu onder
-[Architectuur · Overzicht](architectuur/index.md), opgedeeld in:
+De architecture-documentation staat nu onder
+[Architecture · Overview](architecture/index.md), opgedeeld in:
 
-- [Overzicht](architectuur/index.md) — dataflow + lagen
-- [Componenten](architectuur/componenten.md) — per-component pagina's
-- [Datazones](architectuur/datazones.md)
-- [Identiteit & autorisatie](architectuur/auth.md)
-- [Tabel-formaat abstractie](architectuur/tabel-formaat.md)
-- [Naming conventions](architectuur/naming.md)
-- [Originele referentie](architectuur/referentie.md)
+- [Overview](architecture/index.md) — dataflow + lagen
+- [Components](architecture/components.md) — per-component pagina's
+- [Data zones](architecture/data zones.md)
+- [Identity & autorisatie](architecture/auth.md)
+- [Tabel-formaat abstractie](architecture/table-format.md)
+- [Naming conventions](architecture/naming.md)
+- [Originele referentie](architecture/reference.md)

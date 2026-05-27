@@ -20,21 +20,21 @@ quiz:
   - q: "Wat is een ‘dataset-fingerprint’?"
     options:
       - "Een vingerafdruk-scan"
-      - "Een hash over de query-output op een vast as_of_date — zodat een herhaalde run ofwel exact dezelfde hash geeft (data ongewijzigd) ofwel duidelijk afwijkt (data is gewijzigd, oorzaak onderzoeken)"
+      - "Een hash about the query-output op een vast as_of_date — zodat een herhaalde run ofwel exact dezelfde hash geeft (data ongewijzigd) ofwel duidelijk afwijkt (data is gewijzigd, oorzaak onderzoeken)"
       - "Een biometrisch attribuut"
       - "Een naam"
     correct: 1
   - q: "Hoe deel je je conclusies?"
     options:
       - "Email"
-      - "PR met (a) notebook met `as_of_date`, (b) dataset-fingerprint-bestand, (c) markdown-rapport, (d) link naar de glossary-termen die je gebruikt — dan kan een collega het in 1 commando narekenen"
+      - "PR met (a) notebook met `as_of_date`, (b) dataset-fingerprint-bestand, (c) markdown-rapport, (d) link to the glossary-termen die je gebruikt — dan kan een collega het in 1 commando narekenen"
       - "Slack-message"
       - "Mondeling"
     correct: 1
   - q: "Welke glossary-discipline hoort hier?"
     options:
       - "Geen, schrijf gewoon"
-      - "Elke term met meer dan één definitie wordt aan een glossary-term gekoppeld in je rapport (bijv. ‘re-integratie-uitkomst’) — voorkomt latere discussie"
+      - "Elke term met meer dan één definitie wordt aan een glossary-term gekoppeld in je rapport (bijv. ‘reintegration-uitkomst’) — voorkomt latere discussie"
       - "Glossary alleen voor data-engineers"
       - "Niet nodig"
     correct: 1
@@ -63,11 +63,11 @@ research/
 Structuur:
 
 ```markdown
-# UC-09: Re-integratie-uitkomst per groep, Q3 2025
+# UC-09: Reintegration-uitkomst per groep, Q3 2025
 
-## Onderzoeksvraag
-Bestaat er een verschil in re-integratie-uitkomst tussen
-{omschrijving} groepen, gecorrigeerd voor leeftijd en uitkeringsoort?
+## Researchsvraag
+Bestaat er een verschil in reintegration-uitkomst tussen
+{omschrijving} groepen, gecorrigeerd voor leeftijd en claim payoutsoort?
 
 ## Bron
 - Tabellen: sandbox.research.cohort_2025
@@ -104,7 +104,7 @@ $ python -c "from check import verify_fingerprint; verify_fingerprint()"
   "dbt_tag": "research_2025_q3",
   "row_count": 5740,
   "column_hashes": {
-    "uitkeringsoort": "sha256:8a7d...",
+    "claim payoutsoort": "sha256:8a7d...",
     "leeftijdsklasse": "sha256:1f3c...",
     "re_integratie_uitkomst": "sha256:9e2a..."
   }

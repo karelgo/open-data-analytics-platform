@@ -1,26 +1,26 @@
-# UC-05 — 360°-cliëntbeeld voor klantcontact (CRM)
+# UC-05 — 360°-cliëntbeeld voor customer interaction (CRM)
 
 | Status in deze repo | **Volledig geïmplementeerd** met OPA column-masks |
 |---|---|
 | Domein | CRM (cross-domein consumer) |
 | Risicoclassificatie | Laag-midden (geen besluit, wel gevoelige aggregatie) |
 | AVG-grondslag | Art. 6 lid 1e |
-| Bewaartermijn | 7 jaar voor besluit-relaterende velden; 2 jaar voor klantcontactlogs |
+| Retention period | 7 jaar voor besluit-relaterende velden; 2 jaar voor customer interactionlogs |
 
-Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-05](../../referentiearchitectuur-odap-data-analytics.md).
+Bron: [`referentiearchitecture-odap-data-analytics.md` § 8 UC-05](../../referentiearchitecture-odap-data-analytics.md).
 
 ---
 
 ## Probleem
 
-Klanten met meerdere uitkeringen (WW + TW, WIA + Wajong, ...) worden nu door
-medewerkers via meerdere systemen bediend. Werkmap, telefoon en balie hebben
+Klanten met meerdere claim payouten (WW + TW, WIA + Wajong, ...) worden nu door
+medewerkers via meerdere systemen bediend. Workspace, telefoon en balie hebben
 geen samenhangend beeld. UWV-medewerkers zien teveel of te weinig — beide
 zijn fout.
 
 ## Doel
 
-Eén geïntegreerd cliëntbeeld voor UWV-medewerkers. **Doelbinding strikt**:
+Eén geïntegreerd cliëntbeeld voor UWV-medewerkers. **Purpose limitation strikt**:
 medewerker ziet alleen velden die nodig zijn voor diens rol/taak (column-level
 ABAC).
 
@@ -28,17 +28,17 @@ ABAC).
 
 | Bron | Inhoud |
 |---|---|
-| Polisadm + uitkeringssystemen | Lopende uitkeringen, status, bedragen |
-| CRM | Klantcontactlogs, kanaalvoorkeur, klachten |
-| Werkmap | Berichten, opt-out-keuzes |
-| Re-integratie-applicatie | Lopende trajecten |
+| Polisadm + claim payoutssystemen | Lopende claim payouten, status, bedragen |
+| CRM | Customer interactionlogs, kanaalvoorkeur, klachten |
+| Workspace | Berichten, opt-out-keuzes |
+| Reintegration-applicatie | Lopende trajecten |
 
-**CGM-entiteiten**: `Cliënt`, `Uitkering`, `Contact`, `Kanaal`.
+**CGM-entiteiten**: `Cliënt`, `Claim payout`, `Contact`, `Kanaal`.
 
-## Architectuur-pad
+## Architecture-pad
 
 ```
-silver.uitkeringen + silver.contacten + silver.werkmap_berichten + silver.trajecten
+silver.claim payouten + silver.contacten + silver.workspace_berichten + silver.trajecten
                                      │
                                      ▼
                       mart_uc05_customer_360.sql  (denormalized view per BSN)
@@ -46,7 +46,7 @@ silver.uitkeringen + silver.contacten + silver.werkmap_berichten + silver.trajec
                                      ▼
                        gold.uc05_customer_360.client_overview
                                      │  (alle kolommen aanwezig, OPA filtert)
-                                     ├── via Trino REST API → CRM/Werkmap
+                                     ├── via Trino REST API → CRM/Workspace
                                      │
                                      └── via Trino voor analisten (rol `data_steward`)
 ```
@@ -59,9 +59,9 @@ silver.uitkeringen + silver.contacten + silver.werkmap_berichten + silver.trajec
 | `naam` | full | full | full | masked |
 | `birth_date` | full | full | full | bucket per jaar |
 | `adres` | regio-only | full | full | regio-only |
-| `lopende_uitkeringen[]` | full (alle) | full | WW + handhaving-relevant | full |
+| `lopende_claim payouten[]` | full (alle) | full | WW + handhaving-relevant | full |
 | `medische_diagnose` | **deny** | full | **deny** | **deny** |
-| `klantcontact_recent[]` | full | summary | summary | summary |
+| `customer interaction_recent[]` | full | summary | summary | summary |
 | `bankrekening` | masked | masked | full (handhaving) | masked |
 | `klacht_status` | full | full | full | full |
 
@@ -74,15 +74,15 @@ Implementatie: `opa-policies-src/trino/trino-platform-roles.rego` +
 meta:
   domain: crm
   legal_basis: WIA+WW+Wajong+TW (cross)
-  doelbinding: [klantcontact, behandeling]
+  purpose-limitation: [customer interaction, behandeling]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 7   # uitkering-velden
-  bewaartermijn_klantcontact_jaren: 2
+  retention period_jaren: 7   # claim payout-velden
+  retention period_customer interaction_jaren: 2
   eigenaar: divisie_crm
   pii_kolommen: [bsn, naam, adres, bankrekening, birth_date]
   risk_tier: laag-midden
   human_in_the_loop: true
-  toegang_via_OPA_policies: true
+  access_via_OPA_policies: true
 ```
 
 ## "Glass box logging"
@@ -101,9 +101,9 @@ batch naar `bronze.audit.client_360_reads` (Delta, retention 7 jaar).
 
 ## OpenMetadata
 
-- Tags: `Domain.CRM`, `Doelbinding.klantcontact`, `Doelbinding.behandeling`,
+- Tags: `Domain.CRM`, `Purpose limitation.customer interaction`, `Purpose limitation.behandeling`,
   `PII.Sensitive`, `AccessControl.OPA`.
-- Per kolom een specifieke `Doelbinding.*` tag — voedt OPA policies via
+- Per kolom een specifieke `Purpose limitation.*` tag — voedt OPA policies via
   reverse-metadata pad (TODO in fase 8).
 
 ## Outputs
@@ -116,7 +116,7 @@ batch naar `bronze.audit.client_360_reads` (Delta, retention 7 jaar).
 
 ## Quarterly access review
 
-Stap-voor-stap procedure (out-of-scope productie):
+Stap-voor-stap procedure (out-of-scope production):
 
 1. OPA-bundle dump van actieve role-mappings.
 2. Cross-check met Keycloak realm-export.

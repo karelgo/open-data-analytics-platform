@@ -1,18 +1,18 @@
-# dbt profiles voor het ODAP platform.
+# dbt profiles for the ODAP platform.
 #
 # Plaats deze file in ~/.dbt/profiles.yml of zet env DBT_PROFILES_DIR=./dbt
 # (en hernoem naar profiles.yml). Voor in-cluster Airflow-runs (fase 6) wordt
 # een eigen profiles.yml gerenderd vanuit een Kubernetes Secret.
 #
-# Auth: voor referentie gebruiken we Trino's static-user `smoketest`. Productie
+# Auth: voor referentie gebruiken we Trino's static-user `smoketest`. Production
 # gebruikt OIDC met ldap-of-jwt method.
 #
-# Multi-platform: dit profiel heeft drie outputs voor de uc11-demo:
+# Multi-platform: dit profiel heeft drie outputs for the uc11-demo:
 #   - dev / prod       → Stackable Trino (huidige, default)
 #   - databricks_dev   → Databricks SQL warehouse + Unity Catalog
 #   - fabric_dev       → Microsoft Fabric Spark via dbt-fabricspark
 #
-# Adapters die geïnstalleerd moeten zijn voor de extra targets:
+# Adapters die geïnstalleerd moeten zijn for the extra targets:
 #   pip install dbt-databricks   # voor databricks_dev
 #   pip install dbt-fabricspark  # voor fabric_dev
 ---
@@ -38,7 +38,7 @@ trino_default:
 
     prod:
       type: trino
-      method: oidc                   # OIDC via Keycloak (productie)
+      method: oidc                   # OIDC via Keycloak (production)
       user: "{{ env_var('TRINO_USER') }}"
       jwt_token: "{{ env_var('TRINO_JWT') }}"
       host: trino.odap.local
@@ -77,7 +77,7 @@ trino_default:
     # `ServicePrincipal` is daarom puur cosmetisch — de string-naam doet
     # niets afgezien van vallen in de else-branch (zie livysession.get_headers).
     #
-    # Non-schema lakehouse: schema wordt door de adapter geforceerd
+    # Non-schema lakehouse: schema wordt through the adapter geforceerd
     # naar lakehouse-naam (`uc11_lakehouse`). spark_config.name is verplicht.
     # ─────────────────────────────────────────────────────────────────
     fabric_dev:

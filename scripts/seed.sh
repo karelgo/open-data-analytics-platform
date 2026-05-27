@@ -22,7 +22,7 @@ fi
 
 command -v kubectl >/dev/null || fail "kubectl niet gevonden"
 
-# MinIO moet bereikbaar zijn voor de seed-Job. minio-s3-credentials secret
+# MinIO moet bereikbaar zijn for the seed-Job. minio-s3-credentials secret
 # is door 01-secrets aangemaakt; de Job mount die rechtstreeks.
 log "Wacht tot MinIO bereikbaar is (max 5 min)"
 for _ in {1..30}; do

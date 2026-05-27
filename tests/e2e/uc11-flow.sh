@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# E2E test — UC-11 Integrale Klantreis full flow (lichter dan UC-01 e2e).
+# E2E test — UC-11 Integrale Customer journey full flow (lichter dan UC-01 e2e).
 #
 # Voorwaarde: bestaand draaiend k3d-cluster (gebruik `make e2e` of partial flow
-# voor cold-start). Deze test focust op het UC-11-specifieke gold-pad.
+# voor cold-start). Deze test focust on the UC-11-specifieke gold-pad.
 #
 # Stappen:
-#   1. dbt parse + compile valideren met UC-11 modellen geselecteerd
+#   1. dbt parse + compile valideren met UC-11 models geselecteerd
 #   2. (cluster) dbt run -s tag:uc11 — bouwt mart_uc11_customer_journey_{events,phases}
 #   3. (cluster) dbt test -s tag:uc11 — kolom/relationship-tests groen
 #   4. (cluster) Trino SELECT op gold.uc11_customer_journey.* — n_rows > 0
-#   5. (cluster) Trino SELECT met `marketing_analyst`-rol + purpose=klantcontact
+#   5. (cluster) Trino SELECT met `marketing_analyst`-rol + purpose=customer interaction
 #                op gold.uc11_customer_journey.mart_uc11_journey_events met BSN-mask
 #   6. (cluster) Trino SELECT met `claims_analyst` + regio=AMS — row-filter werkt
 #
@@ -37,7 +37,7 @@ TRINO_SVC="${TRINO_SVC:-trino-coordinator}"
 section "Stage 1/5: dbt parse + UC-11 model-detectie"
 bash tests/smoke/04-dbt-parse.sh || fail "smoke 04 (dbt-parse) faalde"
 
-# Controleer dat UC-11 modellen in de manifest zitten.
+# Controleer dat UC-11 models in de manifest zitten.
 MANIFEST="$ROOT/dbt/target/manifest.json"
 if [[ ! -f "$MANIFEST" ]]; then
   warn "Manifest niet gevonden — skip UC-11 model-check"

@@ -29,7 +29,7 @@ interface Props {
 const { component, deepLink = null } = Astro.props;
 
 // Build-time resolutie. De ShellLayout's runtime TLD-rewrite swap't
-// *.odap.local op cloud-hosts naar de juiste TLD voor <a>
+// *.odap.local op cloud-hosts to the juiste TLD voor <a>
 // links; we doen hetzelfde voor iframe-src in <script> hieronder.
 const embedSrc = resolveEmbedSrc(component, deepLink);
 const externalUrl = resolveExternalUrl(component, deepLink);
@@ -300,7 +300,7 @@ const trackHref = deepLink
   });
 
   // ─── Iframe load / failure UX ───
-  // Cross-origin iframes geven ons geen toegang tot contentDocument, maar
+  // Cross-origin iframes geven ons geen access tot contentDocument, maar
   // 'load' vuurt wel zodra de browser response heeft ontvangen.
   //   - load event binnen 8s → spinner weg
   //   - timeout zonder load → toon "blocked"-fallback met

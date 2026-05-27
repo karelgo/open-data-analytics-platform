@@ -69,13 +69,13 @@ check() {
 echo "== Mode: $DEPLOYMENT_MODE  (domain=$PLATFORM_DOMAIN, port=$PLATFORM_PORT) =="
 
 echo
-echo "== Vereiste tooling (gemeenschappelijk) =="
+echo "== Requirede tooling (gemeenschappelijk) =="
 for line in "${common_required[@]}"; do
   check "${line%% *}" yes
 done
 
 echo
-echo "== Vereiste tooling (mode=$DEPLOYMENT_MODE) =="
+echo "== Requirede tooling (mode=$DEPLOYMENT_MODE) =="
 for line in "${mode_required[@]}"; do
   check "${line%% *}" yes
 done

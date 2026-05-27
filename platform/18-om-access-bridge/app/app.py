@@ -38,7 +38,7 @@ Event-shape (subset van OM's webhook payload):
 `<service>.<database>.<schema>.<table>`. We mappen de eerste twee dotted
 segmenten naar `<catalog>.<schema>` (database = catalog in Trino-context).
 
-Security: HMAC-SHA256 over de raw body met shared secret in env
+Security: HMAC-SHA256 about the raw body met shared secret in env
 `OM_WEBHOOK_SECRET`; header `X-OM-Signature: sha256=<hex>`. Replay-window:
 ±300s op `X-OM-Timestamp` (unix-seconds). Idempotent: zelfde task-id
 twee keer is een no-op.
@@ -297,7 +297,7 @@ keycloak = Keycloak(KEYCLOAK_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_C
 
 
 class OpenMetadata:
-    """Dunne wrapper voor het aanmaken van een Task in OpenMetadata.
+    """Dunne wrapper for the aanmaken van een Task in OpenMetadata.
 
     Gebruikt een long-lived admin/ingestion-bot JWT — POST namens een
     gebruiker via het `from`-veld van het Thread/Task-object.
@@ -332,7 +332,7 @@ class OpenMetadata:
         """Vind of maak een OM-user aan voor `username`.
 
         OM 1.5 maakt users normaal automatisch aan bij eerste SSO-login,
-        maar voor het portal-form (waar de gebruiker mogelijk nog nooit
+        maar for the portal-form (waar de gebruiker mogelijk nog nooit
         OM heeft geopend) ensuren we hier expliciet. Idempotent op 409.
         """
         uid = await self.lookup_user_id(client, username)
@@ -461,7 +461,7 @@ openmetadata = OpenMetadata(OM_BASE_URL, OM_ADMIN_TOKEN)
 class AccessRequestBody(BaseModel):
     asset_fqn: str = Field(..., description="trino.<catalog>.<schema>.<table>")
     requester: str = Field(..., min_length=1, description="username uit Keycloak")
-    purpose: str = Field(..., min_length=1, description="doelbinding (klantcontact, etc.)")
+    purpose: str = Field(..., min_length=1, description="purpose-limitation (customer interaction, etc.)")
     motivation: str = ""
     duration: str = ""
 
@@ -558,7 +558,7 @@ def _parse_grant(event: dict[str, Any]) -> tuple[str, str, str]:
     # Convention guard (ADR-0008 / access-request-guide.md): alleen Tasks die
     # expliciet "request access" in titel of description noemen worden als
     # access-request behandeld. Dit voorkomt dat een RequestDescription-Task
-    # voor een puur description-doel per ongeluk een grant triggert.
+    # for a puur description-doel per ongeluk een grant triggert.
     title_or_msg = " ".join(filter(None, [
         thread.get("message"),
         thread.get("description"),
@@ -631,7 +631,7 @@ async def create_access_request(body: AccessRequestBody) -> dict[str, Any]:
     """Maakt een access-request Task aan op een Trino-asset in OpenMetadata.
 
     De portal POST hier wanneer een gebruiker het access-request-formulier
-    submit. Wij vertalen het naar een Task met de conventie-string
+    submit. Wij vertalen het naar een Task with the conventie-string
     "Request Access" in de message zodat de bestaande webhook-flow na
     approval een grant uitvoert.
     """

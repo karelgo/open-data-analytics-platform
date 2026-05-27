@@ -24,7 +24,7 @@ Doorgenummerd `01`..`09`, in volgorde van afhankelijkheid:
 | 05 | [airflow-up](smoke/05-airflow-up.sh) | Airflow scheduler healthy, DAGs geparseerd. |
 | 06 | [superset-up](smoke/06-superset-up.sh) | Superset init-Job complete, Trino-database geregistreerd. |
 | 07 | [openmetadata-up](smoke/07-openmetadata-up.sh) | Classifications + glossary geladen. |
-| 08 | [opa-decisions](smoke/08-opa-decisions.sh) | OPA-decisions kloppen met de platform policies. |
+| 08 | [opa-decisions](smoke/08-opa-decisions.sh) | OPA-decisions kloppen with the platform policies. |
 | 09 | [portal-up](smoke/09-portal-up.sh) | ODAP Portal bereikbaar achter oauth2-proxy. |
 
 ```bash
@@ -32,7 +32,7 @@ make smoke                 # alle smoke tests
 bash tests/smoke/02-trino-query.sh   # eentje individueel
 ```
 
-`run-smoke-tests.sh` faalt op de **eerste** test die non-zero exit geeft —
+`run-smoke-tests.sh` faalt on the **eerste** test die non-zero exit geeft —
 geen "doorgaan en optellen aan het eind".
 
 ## E2E
@@ -53,7 +53,7 @@ Map is **leeg**. Bedoeld voor cross-component tests die meer doen dan smoke
 maar minder dan e2e — bijvoorbeeld OPA-row-filter ↔ Trino-query, of
 NiFi-flow ↔ Kafka-topic ↔ Spark-consumer.
 
-Zie [`docs/improvements.md`](../docs/improvements.md) item 1.13 voor de open
+Zie [`docs/improvements.md`](../docs/improvements.md) item 1.13 for the open
 vraag waar de eerste integration-tests aan moeten voldoen.
 
 ## Conventies
@@ -62,7 +62,7 @@ vraag waar de eerste integration-tests aan moeten voldoen.
 - **Geen** asserties die leesgedrag aanpassen (`grep -q` ✓; `read -r` ✗
   in een loop zonder timeout).
 - Output: één kop per stap (`==> <stap>`), één regel `OK` / `FAIL` per
-  assertion, en een eind-regel met de totaaltelling.
+  assertion, en een eind-regel with the totaaltelling.
 - Geen vaste timeouts — gebruik `kubectl wait --timeout=…` of polling met
   `for i in $(seq 1 60)`.
 - Tests gaan ervan uit dat de **default kubectl-context** het juiste cluster
@@ -70,9 +70,9 @@ vraag waar de eerste integration-tests aan moeten voldoen.
 
 ## Toevoegen van een nieuwe test
 
-1. Smoke: kies het volgende vrije nummer en sluit aan op de naamconventie
+1. Smoke: kies het volgende vrije nummer en sluit aan on the naamconventie
    `NN-<component>-<wat>.sh`. Test-script eindigt met
-   `echo "OK"` op de laatste regel.
+   `echo "OK"` on the laatste regel.
 2. Integration / e2e: één scenario per script, `<scenario>.sh`. Linken vanuit
    deze README en het [Makefile](../Makefile) als de test eigen target verdient.
 

@@ -1,13 +1,13 @@
 # PodDisruptionBudgets — voorkomt dat node-drain meerdere replicas tegelijk
 # omlegt. Voor een single-replica scaled-down setup is dit weinig zinvol; we
-# zetten desondanks PDB's zodat productie-overlay alleen de replicas hoeft op
+# zetten desondanks PDB's zodat production-overlay alleen de replicas hoeft op
 # te schalen.
 #
-# NB: De Stackable-operatoren genereren zelf PDB's voor de producten die ze
+# NB: De Stackable-operatoren genereren zelf PDB's for the producten die ze
 # beheren (hive-metastore, trino-coordinator, trino-worker, airflow-scheduler,
 # airflow-webserver, superset-node). Eigen PDB's daarvoor leveren
 # `MultiplePodDisruptionBudgets`-waarschuwingen op (incident 2026-05-15).
-# Hier alleen PDB's voor componenten die de operatoren NIET zelf afdekken.
+# Hier alleen PDB's voor components die de operatoren NIET zelf afdekken.
 #
 # Convention: minAvailable: 1 voor alle workloads die data hebben.
 ---

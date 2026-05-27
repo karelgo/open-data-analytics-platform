@@ -1,7 +1,7 @@
-"""Databricks REST helpers — gedeeld door de uc11_databricks DAG.
+"""Databricks REST helpers — gedeeld through the uc11_databricks DAG.
 
 Auth via Personal Access Token (DATABRICKS_TOKEN). Geen externe
-Airflow-provider nodig: we praten direct met de Jobs API 2.1 en de
+Airflow-provider nodig: we praten direct with the Jobs API 2.1 en de
 SQL Statements API 2.0. Stackable Airflow image (Python 3.9) blijft
 ongewijzigd.
 

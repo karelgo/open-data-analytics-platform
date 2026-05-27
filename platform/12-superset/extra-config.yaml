@@ -31,7 +31,7 @@ data:
                 return user
             return None
 
-        # Break-glass: hardcoded mapping voor de platform.admin user.
+        # Break-glass: hardcoded mapping for the platform.admin user.
         # Geldt ook als realm_access.roles ontbreekt in het JWT (kan
         # gebeuren met bepaalde Keycloak client-scope configuraties).
         # Tezamen met AUTH_ROLES_SYNC_AT_LOGIN=True (uit Stackable's
@@ -57,7 +57,7 @@ data:
                 claims = {}
             roles = (claims.get("realm_access") or {}).get("roles") or []
             username = claims.get("preferred_username", "")
-            # Break-glass: forceer platform_admin rol voor de hardcoded
+            # Break-glass: forceer platform_admin rol for the hardcoded
             # username, ongeacht wat in het JWT staat. Beschermt tegen
             # client-scope misconfiguraties die realm_access weglaten.
             if username in self.BREAK_GLASS_USERS and "platform_admin" not in roles:

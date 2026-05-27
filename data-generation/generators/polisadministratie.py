@@ -2,7 +2,7 @@
 
 SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 
-Productie-volwaardige generator komt in fase 5 zodra dbt staging-models
+Production-volwaardige generator komt in fase 5 zodra dbt staging-models
 de structuur eisen (UC-07 datakwaliteit als anchor).
 """
 
@@ -38,7 +38,7 @@ def _generate_lh_nummer(rng: random.Random) -> str:
 
 
 def generate_ikv(rng: random.Random, fake, bsn: str) -> IKV:
-    """Eén IKV voor een gegeven persoon."""
+    """Eén IKV for a gegeven persoon."""
     aanvang_jaar = rng.randint(2018, 2025)
     einde_optie = rng.random()
     if einde_optie < 0.7:

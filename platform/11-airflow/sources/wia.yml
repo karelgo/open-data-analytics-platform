@@ -1,4 +1,4 @@
-# Source registry — WIA-aanvragen.
+# Source registry — WIA-request.
 schema_version: 1
 
 name: wia
@@ -22,9 +22,9 @@ silver:
 
 governance:
   legal_basis: WIA_art_64
-  doelbinding: [uitkering, reintegratie, sturingsinfo]
+  purpose-limitation: [claim payout, reintegration, sturingsinfo]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: divisie_ag
   pii_kolommen: [bsn]
   risk_tier: laag

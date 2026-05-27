@@ -93,9 +93,9 @@ silver:
 
 governance:
   legal_basis: AVG_art_6_1_f        # gerechtvaardigd belang — intern kostenbeheer
-  doelbinding: [finops, kostenbeheersing, capaciteitsplanning]
+  purpose-limitation: [finops, kostenbeheersing, capacity planning]
   bio_classificatie: intern
-  bewaartermijn_jaren: 7            # fiscaal/administratief
+  retention period_jaren: 7            # fiscaal/administratief
   eigenaar: divisie_finance
   pii_kolommen: []                  # FOCUS bevat geen persoonsgegevens
   risk_tier: laag

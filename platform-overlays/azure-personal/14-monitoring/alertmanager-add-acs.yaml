@@ -1,6 +1,6 @@
 # JSON6902 patch — voegt een 2e emailConfigs-entry toe aan de bestaande
 # email-alerts receiver. Alertmanager probeert ELKE entry: dus elke
-# alert gaat naar zowel MailHog (entry #0) als naar de Azure-relay (deze
+# alert gaat naar zowel MailHog (entry #0) als to the Azure-relay (deze
 # nieuwe entry).
 #
 # `authUsername` formaat voor Entra-ID-auth op ACS Email SMTP (per MS Learn

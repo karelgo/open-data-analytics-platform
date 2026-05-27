@@ -2,7 +2,7 @@
 
 OM 1.5 heeft geen native Reverse Metadata (community feature pas vanaf
 1.7+). We implementeren het hier custom: deze CronJob leest de
-`Doelbinding.*` tags van elke Trino-tabel in OM en updatet
+`Purpose limitation.*` tags van elke Trino-tabel in OM en updatet
 `role_mappings.resource_purposes` in de OPA-bundle ConfigMap.
 Stackable's OPA-operator herlaadt automatisch via de
 `opa.stackable.tech/bundle: true` label.
@@ -11,7 +11,7 @@ Sluit het lint dbt-meta → enricher → OM → OPA → Trino-rij-/kolom-policy.
 
 Strategy:
   1. GET /api/v1/tables (paginated) met fields=tags.
-  2. Per tabel: extract Doelbinding.* tags → lowercase doelbinding-namen.
+  2. Per tabel: extract Purpose limitation.* tags → lowercase purpose-limitation-namen.
   3. Aggregeer per "<catalog>.<schema>.*" glob — UNION van alle tabel-tags
      binnen die schema.
   4. Read opa-trino-bundle.data.json.
@@ -110,12 +110,12 @@ def _glob_from_fqn(fqn: str) -> str | None:
     return f"{parts[1]}.{parts[2]}.*"
 
 
-def extract_doelbindingen(tags: list[dict]) -> set[str]:
+def extract_purpose-limitationen(tags: list[dict]) -> set[str]:
     out: set[str] = set()
     for t in tags or []:
         fqn = t.get("tagFQN") or ""
-        if fqn.startswith("Doelbinding."):
-            out.add(fqn[len("Doelbinding."):].lower())
+        if fqn.startswith("Purpose limitation."):
+            out.add(fqn[len("Purpose limitation."):].lower())
     return out
 
 
@@ -126,7 +126,7 @@ def aggregate_resource_purposes(tables: list[dict]) -> dict[str, list[str]]:
         glob = _glob_from_fqn(fqn)
         if not glob:
             continue
-        db = extract_doelbindingen(tbl.get("tags") or [])
+        db = extract_purpose-limitationen(tbl.get("tags") or [])
         by_glob[glob].update(db)
     return {g: sorted(s) for g, s in by_glob.items() if s}
 
@@ -177,12 +177,12 @@ def main() -> int:
     log(f"  {len(tables)} tabellen")
 
     om_map = aggregate_resource_purposes(tables)
-    log(f"  {len(om_map)} schema-globs met Doelbinding-tags")
+    log(f"  {len(om_map)} schema-globs met Purpose limitation-tags")
     for g, ds in sorted(om_map.items()):
         log(f"    {g} → {ds}")
 
     if not om_map:
-        log("Geen OM-afgeleide doelbinding-mappings — sla update over.")
+        log("Geen OM-afgeleide purpose-limitation-mappings — sla update over.")
         return 0
 
     log(f"Lees OPA ConfigMap {CM_NS}/{CM_NAME}")

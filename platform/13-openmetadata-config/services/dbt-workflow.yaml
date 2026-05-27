@@ -2,9 +2,9 @@
 # uit s3://odap-meta/dbt/<run_id>/ en koppelt:
 #   - dbt-models aan Trino-tables (lineage)
 #   - dbt-tests aan OpenMetadata data-quality
-#   - dbt-meta (legal_basis, doelbinding, ...) aan OpenMetadata-tags via auto-classification
+#   - dbt-meta (legal_basis, purpose-limitation, ...) aan OpenMetadata-tags via auto-classification
 #
-# Productie: één run-id per dbt-run; airflow DAG `om_ingest_dbt.py` kiest de
+# Production: één run-id per dbt-run; airflow DAG `om_ingest_dbt.py` kiest de
 # juiste prefix per scheduled run.
 ---
 source:

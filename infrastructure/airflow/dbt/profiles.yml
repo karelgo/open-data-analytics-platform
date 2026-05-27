@@ -20,7 +20,7 @@ trino_default:
       port: 8443
       http_scheme: https
       # cert=false → geen TLS-verify. OK voor in-cluster dev (cert-manager
-      # self-signed CA niet aanwezig in dbt-image). Productie injecteert
+      # self-signed CA niet aanwezig in dbt-image). Production injecteert
       # /etc/ssl/odap-platform-ca.crt via volume + extraLoad-config.
       cert: false
       database: silver
@@ -28,7 +28,7 @@ trino_default:
       threads: 4
       session_properties: {}
 
-    # Fabric Lakehouse target voor de uc11 multi-platform demo (gold-marts
+    # Fabric Lakehouse target for the uc11 multi-platform demo (gold-marts
     # via dbt-fabricspark). Wordt aangeroepen door uc11_fabric DAG; SP-creds
     # komen uit K8s Secret 'uc11-multiplatform-creds'.
     fabric_dev:

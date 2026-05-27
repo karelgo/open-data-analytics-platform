@@ -1,4 +1,4 @@
-# Documentatie-site dependencies. Geinstalleerd in CI door
+# Documentation-site dependencies. Geinstalleerd in CI door
 # .github/workflows/docs.yml. Versies gepind voor reproduceerbare builds.
 mkdocs==1.6.1
 mkdocs-material==9.7.6

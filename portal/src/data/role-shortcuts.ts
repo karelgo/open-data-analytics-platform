@@ -16,14 +16,14 @@ export interface Shortcut {
 /**
  * Converteer een rauwe service-URL uit een Shortcut naar een
  * /embed/<id>?path=<deep-link>-pad, zodat de klik in de portal-shell
- * landt in plaats van een tab-switch naar het oude subdomein.
+ * landt in plaats van een tab-switch to the oude subdomein.
  *
- * - Voor componenten die niet iframe-baar zijn (`embed.mode === 'none'`):
+ * - Voor components die niet iframe-baar zijn (`embed.mode === 'none'`):
  *   we laten de originele href ongewijzigd; /me linkt gewoon naar buiten.
  * - Voor portal-interne URLs (`/dbt-docs.html`, `/go/minio/`): href blijft
  *   ongewijzigd. /go/minio/ heeft een SSO-bootstrap die we niet willen
- *   omzeilen door direct in een iframe naar de Console te springen.
- * - Voor externe URLs van iframe-bare componenten: pak het pad-deel uit
+ *   omzeilen door direct in een iframe to the Console te springen.
+ * - Voor externe URLs van iframe-bare components: pak het pad-deel uit
  *   de URL en bouw `/embed/<id>?path=<pad-met-query>`.
  */
 export function toEmbedHref(s: Shortcut): string {
@@ -79,16 +79,16 @@ export const shortcuts: Record<RoleId, Shortcut[]> = {
     { title: 'DQ-violations detail', hint: 'Drill-down per check × severity', component: 'superset', href: 'https://superset.odap.local:8443/dashboard/list/?filters=(slug:dq-violations-detail)' },
     { title: 'Data Quality dashboard', hint: 'DQ-checks en profielen', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/data-quality' },
     { title: 'Glossary onderhouden', hint: 'Termen, eigenaars, classificaties', component: 'openmetadata', href: 'https://openmetadata.odap.local:8443/glossary' },
-    { title: 'dbt docs — modellen & tests', hint: 'Statische export van dbt-projectdefinities', component: 'dbt-docs', href: '/dbt-docs.html' },
+    { title: 'dbt docs — models & tests', hint: 'Statische export van dbt-projectdefinities', component: 'dbt-docs', href: '/dbt-docs.html' },
     { title: 'Notebook DQ-checks (ODAP Lab)', hint: 'Scripted DQ via OpenMetadata-API in Jupyter', component: 'jupyter', href: 'https://jupyter.odap.local:8443' },
   ],
   data_engineer: [
     { title: 'Airflow DAGs', hint: 'Batch- en dbt-runs', component: 'airflow', href: 'https://airflow.odap.local:8443' },
-    { title: 'dbt docs — modellen & lineage', hint: 'Welk model leest welke source, welke tests draaien', component: 'dbt-docs', href: '/dbt-docs.html' },
-    { title: 'ODAP Lab (notebooks)', hint: 'Ad-hoc PySQL / Delta-rs op de lakehouse — git-backed', component: 'jupyter', href: 'https://jupyter.odap.local:8443' },
+    { title: 'dbt docs — models & lineage', hint: 'Welk model leest welke source, welke tests draaien', component: 'dbt-docs', href: '/dbt-docs.html' },
+    { title: 'ODAP Lab (notebooks)', hint: 'Ad-hoc PySQL / Delta-rs on the lakehouse — git-backed', component: 'jupyter', href: 'https://jupyter.odap.local:8443' },
     { title: 'MinIO buckets', hint: 'bronze/silver/gold/sensitive', component: 'minio', href: '/go/minio/' },
     { title: 'Grafana dashboards', hint: 'Pipeline-latency, Spark/Trino metrics — login via Keycloak', component: 'grafana', href: '/embed/grafana/' },
-    { title: 'JIT-toegang aanvragen', hint: 'Bronze alleen met just-in-time', component: 'keycloak', href: 'https://keycloak.odap.local:8443/realms/odap/account' },
+    { title: 'JIT-access request', hint: 'Bronze alleen met just-in-time', component: 'keycloak', href: 'https://keycloak.odap.local:8443/realms/odap/account' },
   ],
   platform_admin: [
     { title: 'Cluster-status (Prometheus)', hint: 'Up/Down per service', component: 'prometheus', href: 'https://prometheus.odap.local:8443' },

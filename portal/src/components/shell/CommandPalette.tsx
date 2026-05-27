@@ -120,7 +120,7 @@ export default function CommandPalette() {
         if (ac.signal.aborted) return;
         setState({
           kind: 'error',
-          msg: 'Kan geen verbinding maken met de zoek-backend.',
+          msg: 'Kan geen verbinding maken with the zoek-backend.',
         });
       }
     }, 200);

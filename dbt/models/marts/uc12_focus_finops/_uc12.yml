@@ -4,7 +4,7 @@ models:
   - name: mart_uc12_focus_spend_monthly
     description: |
       UC-12 — FinOps spend per maand × provider × service-categorie × charge-
-      categorie. Primaire trend-mart voor het FinOps-dashboard. Houdt Usage,
+      categorie. Primaire trend-mart for the FinOps-dashboard. Houdt Usage,
       Purchase en Credit gesplitst zodat het dashboard cleane spend-curves kan
       tonen en credits zichtbaar maakt zonder ze in de Usage-bucket te verbergen.
     config:
@@ -12,9 +12,9 @@ models:
     meta:
       domain: finops
       legal_basis: AVG_art_6_1_f
-      doelbinding: ["finops", "kostenbeheersing"]
+      purpose-limitation: ["finops", "kostenbeheersing"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_finance
       pii_kolommen: []
       risk_tier: laag
@@ -47,9 +47,9 @@ models:
     meta:
       domain: finops
       legal_basis: AVG_art_6_1_f
-      doelbinding: ["finops", "kostenbeheersing", "capaciteitsplanning"]
+      purpose-limitation: ["finops", "kostenbeheersing", "capacity planning"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_finance
       pii_kolommen: []
       risk_tier: laag
@@ -74,9 +74,9 @@ models:
     meta:
       domain: finops
       legal_basis: AVG_art_6_1_f
-      doelbinding: ["finops", "kostenbeheersing"]
+      purpose-limitation: ["finops", "kostenbeheersing"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_finance
       pii_kolommen: []
       risk_tier: laag
@@ -107,9 +107,9 @@ models:
     meta:
       domain: finops
       legal_basis: AVG_art_6_1_f
-      doelbinding: ["finops", "kostenbeheersing"]
+      purpose-limitation: ["finops", "kostenbeheersing"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_finance
       pii_kolommen: []
       risk_tier: laag
@@ -138,9 +138,9 @@ models:
     meta:
       domain: finops
       legal_basis: AVG_art_6_1_f
-      doelbinding: ["finops", "kostenbeheersing"]
+      purpose-limitation: ["finops", "kostenbeheersing"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_finance
       pii_kolommen: []
       risk_tier: laag

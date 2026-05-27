@@ -5,25 +5,25 @@
 # glossary-cgm.yaml. Onbekende waardes worden gelogd en overgeslagen
 # (fail-soft — een typo in één mart blokkeert de hele run niet).
 
-# meta.doelbinding[] (lijst) → tags Doelbinding.*
-doelbinding_to_tag:
-  sturingsinfo: Doelbinding.Sturingsinfo
-  klantcontact: Doelbinding.Klantcontact
-  behandeling: Doelbinding.Behandeling
-  proactieve_dienstverlening: Doelbinding.Proactieve_Dienstverlening
-  kwaliteitscontrole: Doelbinding.Kwaliteitscontrole
-  actuarie: Doelbinding.Actuarie
-  beleid: Doelbinding.Beleid
-  statistisch_onderzoek: Doelbinding.Statistisch_Onderzoek
-  uitkering: Doelbinding.Uitkering
-  reintegratie: Doelbinding.Reintegratie
-  handhaving: Doelbinding.Handhaving
-  externe_levering: Doelbinding.Externe_Levering
-  planning: Doelbinding.Planning
+# meta.purpose-limitation[] (lijst) → tags Purpose limitation.*
+purpose-limitation_to_tag:
+  sturingsinfo: Purpose limitation.Sturingsinfo
+  customer interaction: Purpose limitation.Customer interaction
+  behandeling: Purpose limitation.Behandeling
+  proactieve_dienstverlening: Purpose limitation.Proactieve_Dienstverlening
+  kwaliteitscontrole: Purpose limitation.Kwaliteitscontrole
+  actuarie: Purpose limitation.Actuarie
+  beleid: Purpose limitation.Beleid
+  statistisch_onderzoek: Purpose limitation.Statistisch_Research
+  claim payout: Purpose limitation.Claim payout
+  reintegration: Purpose limitation.Reintegration
+  handhaving: Purpose limitation.Handhaving
+  externe_levering: Purpose limitation.Externe_Levering
+  planning: Purpose limitation.Planning
   # "primair_proces" = claim handling (primaire taak).
-  primair_proces: Doelbinding.Uitkering
+  primair_proces: Purpose limitation.Claim payout
   # Klanttevredenheids- / UX-onderzoek = sturings-/beleidsinput.
-  klantonderzoek: Doelbinding.Sturingsinfo
+  klantonderzoek: Purpose limitation.Sturingsinfo
 
 # meta.legal_basis → tags LegalBasis.* (lijst). Rauwe waarde bewaard als
 # custom property `legal_basis_text` zodat de exacte wetsverwijzing
@@ -88,7 +88,7 @@ eigenaar_to_team:
   divisie_wia: divisie_wia
   divisie_fez: divisie_fez
   divisie_crm: divisie_crm
-  divisie_klantcontact: divisie_klantcontact
+  divisie_customer interaction: divisie_customer interaction
   divisie_finance: divisie_finance
   knowledge_center: knowledge_center
   data_steward_polisadm: data_steward_polisadm
@@ -96,7 +96,7 @@ eigenaar_to_team:
   data_office: data_office
 
 # Tier-default per tabel. Override-regels overstemmen de default:
-# - DoD-anchor marts (UC01 WIA Funnel, UC11 Klantreis)        → Tier1
+# - DoD-anchor marts (UC01 WIA Funnel, UC11 Customer journey)        → Tier1
 # - sandbox / research marts                                    → Tier3
 # - alle andere marts                                           → Tier2
 # - non-mart tabellen (bronze/silver staging)                   → Tier4
@@ -111,7 +111,7 @@ tier_rules:
     uc12: Tier2     # FinOps spend dashboard — tactical, geen DoD-anchor
 
 # Custom-properties die op Table-entiteit geregistreerd worden door de
-# init-Job (PUT /metadata/types/{table-id}). Eenmalige registratie;
+# init-Job (PUT /metadata/types/{table-id}). One-offe registratie;
 # enricher zet de waardes per tabel via PATCH /tables/{id} extension.
 #
 # OM 1.5 heeft GEEN `boolean` primitive — booleans worden gemodelleerd als
@@ -119,9 +119,9 @@ tier_rules:
 # ARRAY opgeslagen, zelfs bij multiSelect=false; enricher schrijft ["true"]
 # of ["false"], niet de scalaire string.
 custom_properties:
-  - name: bewaartermijn_jaren
+  - name: retention period_jaren
     propertyType: integer
-    description: "Retentie-periode in jaren (R-AVG-08). Bron: dbt meta.bewaartermijn_jaren."
+    description: "Retentie-periode in jaren (R-AVG-08). Bron: dbt meta.retention period_jaren."
   - name: dpia_id
     propertyType: string
     description: "Referentie naar DPIA-document. Bron: dbt meta.dpia_id."
@@ -138,10 +138,10 @@ custom_properties:
     propertyType: enum
     enumValues: ["true", "false"]
     description: "Menselijke tussenkomst vereist voor besluit (AVG art. 22)."
-  - name: toegang_via_OPA_policies
+  - name: access_via_OPA_policies
     propertyType: enum
     enumValues: ["true", "false"]
-    description: "Toegang afgedwongen via OPA-Trino policies (rij/kolom-filter)."
+    description: "Access afgedwongen via OPA-Trino policies (rij/kolom-filter)."
   - name: profilering
     propertyType: enum
     enumValues: ["true", "false"]
@@ -187,8 +187,8 @@ teams:
   - name: divisie_crm
     displayName: "Divisie CRM"
     teamType: Group
-  - name: divisie_klantcontact
-    displayName: "Divisie Klantcontact"
+  - name: divisie_customer interaction
+    displayName: "Divisie Customer interaction"
     teamType: Group
   - name: knowledge_center
     displayName: "Knowledge Center"
@@ -218,7 +218,7 @@ domains:
     owner: divisie_ag
   - name: WW
     displayName: "Divisie WW"
-    description: "Werkloosheidswet — uitkeringen + re-integratie. Bron-domein."
+    description: "Werkloosheidswet — claim payouten + reintegration. Bron-domein."
     domainType: Source-aligned
     owner: divisie_ww
   - name: WIA
@@ -228,7 +228,7 @@ domains:
     owner: divisie_wia
   - name: FEZ
     displayName: "Divisie FEZ"
-    description: "Financieel-economische zaken: lastprognose, actuariële berekeningen."
+    description: "Financieel-economische zaken: cost forecast, actuariële berekeningen."
     domainType: Source-aligned
     owner: divisie_fez
   - name: CRM
@@ -236,11 +236,11 @@ domains:
     description: "Klantrelatiebeheer — contacten, kanalen, cliënt-360."
     domainType: Source-aligned
     owner: divisie_crm
-  - name: Klantcontact
-    displayName: "Divisie Klantcontact"
-    description: "Klantcontact / customer_satisfaction. Cross-divisie."
+  - name: Customer interaction
+    displayName: "Divisie Customer interaction"
+    description: "Customer interaction / customer_satisfaction. Cross-divisie."
     domainType: Source-aligned
-    owner: divisie_klantcontact
+    owner: divisie_customer interaction
   - name: Polisadm
     displayName: "Polisadministratie"
     description: "Werknemer/werkgever/IKV brondomein. Wet SUWI + Wfsv."
@@ -253,9 +253,9 @@ domains:
     owner: data_office
   - name: Cross
     displayName: "Cross-Domain"
-    description: "Cross-domain integraties zoals UC-11 Klantreis. Aggregaat."
+    description: "Cross-domain integraties zoals UC-11 Customer journey. Aggregaat."
     domainType: Aggregate
-    owner: divisie_klantcontact
+    owner: divisie_customer interaction
   - name: Governance
     displayName: "Governance & Data Quality"
     description: "Data-quality overzicht, audit, lineage-monitoring."
@@ -274,7 +274,7 @@ dbt_domain_to_om:
   wia: WIA
   fez: FEZ
   crm: CRM
-  klantcontact: Klantcontact
+  customer interaction: Customer interaction
   polisadm: Polisadm
   persoon: Persoon
   cross: Cross
@@ -289,7 +289,7 @@ dbt_domain_to_om:
 data_products:
   - name: uc01_claims_funnel
     displayName: "UC-01 — WIA Funnel"
-    description: "Sturings-dashboard dagelijkse WIA-aanvragen (DoD-anchor)."
+    description: "Sturings-dashboard dagelijkse WIA-request (DoD-anchor)."
     domain: AG
     owner: divisie_ag
     dbt_tag: uc01
@@ -301,12 +301,12 @@ data_products:
     dbt_tag: uc04
   - name: uc05_customer_360
     displayName: "UC-05 — Cliënt 360°"
-    description: "360-graden cliëntbeeld voor klantcontact (OPA-masking)."
+    description: "360-graden cliëntbeeld voor customer interaction (OPA-masking)."
     domain: CRM
     owner: divisie_crm
     dbt_tag: uc05
   - name: uc06_cost_forecast
-    displayName: "UC-06 — Lastprognose 5-jaars"
+    displayName: "UC-06 — Cost forecast 5-jaars"
     description: "Actuariële projectie claim_cost + scenario's."
     domain: FEZ
     owner: divisie_fez
@@ -318,22 +318,22 @@ data_products:
     owner: data_steward_polisadm
     dbt_tag: uc07
   - name: uc09_reintegration_effect
-    displayName: "UC-09 — Re-integratie effectmeting"
-    description: "Onderzoekspanel re-integratie (sandbox, pseudonimisering)."
+    displayName: "UC-09 — Reintegration effectmeting"
+    description: "Researchspanel reintegration (sandbox, pseudonimisering)."
     domain: AG
     owner: knowledge_center
     dbt_tag: uc09
   - name: uc11_customer_journey
-    displayName: "UC-11 — Integrale Klantreis"
-    description: "Cross-domein klantreis (Kafka → bronze → silver → gold)."
+    displayName: "UC-11 — Integrale Customer journey"
+    description: "Cross-domein customer journey (Kafka → bronze → silver → gold)."
     domain: Cross
-    owner: divisie_klantcontact
+    owner: divisie_customer interaction
     dbt_tag: uc11
   - name: uc_customer_satisfaction
     displayName: "UC — Klanttevredenheid"
     description: "Klanttevredenheids-trend per kanaal × maand."
-    domain: Klantcontact
-    owner: divisie_klantcontact
+    domain: Customer interaction
+    owner: divisie_customer interaction
     dbt_tag: uc_customer_satisfaction
   - name: dq_overview
     displayName: "DQ Overview (cross-UC)"

@@ -1,13 +1,13 @@
-# UC-02 — Wajong re-integratie-kansen (hoog-risico AI)
+# UC-02 — Wajong reintegration-kansen (hoog-risico AI)
 
 | Status in deze repo | **Placeholder** — geen werkende ML-pipeline |
 |---|---|
 | Domein | AG (Wajong) |
 | Risicoclassificatie | **Hoog (AI Act, Annex III)** |
 | AVG-grondslag | Art. 6 lid 1e (wettelijke taak) **+ art. 9 lid 2h** (gezondheid, sociale zekerheid) |
-| Bewaartermijn | 7 jaar besluitvormingsdata; trainingsset apart, onder eigen retentie |
+| Retention period | 7 jaar besluitvormingsdata; trainingsset apart, onder eigen retentie |
 
-Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-02](../../referentiearchitectuur-odap-data-analytics.md).
+Bron: [`referentiearchitecture-odap-data-analytics.md` § 8 UC-02](../../referentiearchitecture-odap-data-analytics.md).
 
 > **Belangrijk.** Op verzoek van de opdrachtgever wordt UC-02 in deze referentie
 > niet als werkend ML-systeem geïmplementeerd. Reden: een echt hoog-risico
@@ -17,16 +17,16 @@ Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-02](../../referen
 >
 > Wat er wél staat: een **complete spec**, een **placeholder-mart** met
 > `meta.risk_tier: hoog` en `meta.dpia_required: true`, en **TODO's** die
-> voor een echte implementatie afgevinkt moeten worden.
+> for a echte implementatie afgevinkt moeten worden.
 
 ---
 
 ## Probleem
 
-Onderzoek "Wat werkt bij Wajongers" toonde dat naast harde dossierkenmerken
+Research "Wat werkt bij Wajongers" toonde dat naast harde dossierkenmerken
 ook zachte factoren (motivatie, omgeving) voorspellend zijn. UWV-arbeids-
 deskundigen hebben behoefte aan beslissingsondersteuning bij keuze van
-re-integratietraject (IPS, proefplaatsing, scholing).
+reintegrationtraject (IPS, proefplaatsing, scholing).
 
 ## Doel
 
@@ -38,15 +38,15 @@ adviseert, arbeidsdeskundige beslist.
 
 | Bron | Inhoud | Klassificatie |
 |---|---|---|
-| Wajong-dossier | Beoordeling, participatieplan | Vertrouwelijk |
-| Sociaal-medisch dossier | Diagnose, beperkingen | **Bijzonder PG art. 9** |
+| Wajong-dossier | Assessment, participatieplan | Vertrouwelijk |
+| Operational dossier | Diagnose, beperkingen | **Bijzonder PG art. 9** |
 | Eerdere trajecten | Uitkomst (werk ja/nee, duur) | Vertrouwelijk |
 | Polisadministratie | Werkhistorie, dagloon | Vertrouwelijk |
 | Scholingsbudget-data | Toegekende scholing | Intern |
 
 **CGM-entiteiten**: `Cliënt`, `Diagnose`, `Traject`, `Werkhervatting`.
 
-## Architectuur-pad (placeholder)
+## Architecture-pad (placeholder)
 
 ```
 [BRONZE]    sensitive.eligibility_cases.dossier (Sensitive Vault, art. 9)
@@ -75,10 +75,10 @@ meta:
   domain: ag
   subdomain: wajong
   legal_basis: WIA_art_64+art_9_2h
-  doelbinding: [reintegratie]
+  purpose-limitation: [reintegration]
   bio_classificatie: vertrouwelijk
   pii_kolommen: [bsn_pseudo]   # geen ruwe BSN; alleen pseudoniem
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: divisie_ag
   risk_tier: hoog              # AI Act Annex III
   dpia_required: true
@@ -100,7 +100,7 @@ meta:
 ## OPA-policies
 
 - `sensitive.eligibility_cases.*` is **default-deny** voor alle rollen behalve
-  `claims_analyst` met expliciete doelcode `reintegratie`.
+  `claims_analyst` met expliciete doelcode `reintegration`.
 - 4-eyes principe op `sensitive.eligibility_cases.dossier`: query met
   `bsn_pseudo IS NOT NULL` vereist dual-approval (Rego-policy controleert
   `request_context.dual_approval_token`).
@@ -135,5 +135,5 @@ meta:
 
 ## Open vragen
 
-- Volgens AI Act-deadline aug 2026 vereist een productie-versie EU-registratie.
+- Volgens AI Act-deadline aug 2026 vereist een production-versie EU-registratie.
   Voor de referentie volstaat `algoritmeregister_id: TBD`.

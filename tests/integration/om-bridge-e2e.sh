@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# End-to-end integration test voor de OM→Keycloak access-bridge (ADR-0008).
+# End-to-end integration test for the OM→Keycloak access-bridge (ADR-0008).
 #
 # Flow (allemaal via API, geen UI nodig):
 #   1. Pick een Trino-table asset uit OM (default: een silver/gold mart).
 #   2. POST een Task type=RequestDescription, met "Request Access ..." in
 #      de message, assignees = data.steward.
-#   3. PATCH de Task naar Resolved/Approved (via admin-token; in productie
+#   3. PATCH de Task naar Resolved/Approved (via admin-token; in production
 #      doet de assignee dit).
 #   4. Wacht tot OM het taskResolved event publiceert + de bridge het
 #      verwerkt.
 #   5. Verifieer dat user X de realm-role `data_access:<cat>.<schema>` in
 #      Keycloak heeft.
 #
-# Vereist: kubectl-exec/port-forward in een gezonde k3d/AKS-cluster
+# Required: kubectl-exec/port-forward in een gezonde k3d/AKS-cluster
 # (Keycloak in odap-auth, OM in odap-meta, bridge in odap-platform). Run via:
 #
 #   bash tests/integration/om-bridge-e2e.sh
@@ -108,7 +108,7 @@ log "POST nieuwe Task (Request Access) op asset"
 THREAD_BODY=$(cat <<EOF
 {
   "from": "${REQUESTER}",
-  "message": "Request Access — gebruiker ${REQUESTER}, doel klantcontact. E2E-test.",
+  "message": "Request Access — gebruiker ${REQUESTER}, doel customer interaction. E2E-test.",
   "about": "<#E::table::${ASSET_FQN}>",
   "type": "Task",
   "task": {

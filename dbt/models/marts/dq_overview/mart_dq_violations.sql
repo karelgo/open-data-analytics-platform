@@ -4,7 +4,7 @@
 ) }}
 
 -- Cross-UC DQ-violations: 1 rij per (use_case × check), live geteld
--- op de gold-marts. Bron voor het Superset "Datakwaliteit per UC"-
+-- on the gold-marts. Bron for the Superset "Datakwaliteit per UC"-
 -- dashboard. Houdt dezelfde semantiek aan als de dbt-tests in
 -- _uc*.yml; verschil: hier gematerialiseerd zodat een dashboard
 -- continu kan tonen zonder de test-runner aan te roepen.
@@ -25,8 +25,8 @@ with uc01_checks as (
            count(*) filter (where status is null), count(*)
     from {{ ref('mart_uc01_claims_funnel_daily') }}
     union all
-    select 'uc01', 'WIA Funnel', 'n_aanvragen_non_negative', 'high',
-           count(*) filter (where n_aanvragen < 0), count(*)
+    select 'uc01', 'WIA Funnel', 'n_request_non_negative', 'high',
+           count(*) filter (where n_request < 0), count(*)
     from {{ ref('mart_uc01_claims_funnel_daily') }}
     union all
     select 'uc01', 'WIA Funnel', 'onderdeel_in_WGA_IVA', 'medium',
@@ -71,13 +71,13 @@ uc05_checks as (
 ),
 
 uc06_checks as (
-    select 'uc06' as uc_code, 'Lastprognose' as uc_name,
+    select 'uc06' as uc_code, 'Cost forecast' as uc_name,
            'jaar_in_2026_2030' as check_name, 'high' as severity,
            count(*) filter (where jaar < 2026 or jaar > 2030) as n_violations,
            count(*) as n_records
     from {{ ref('mart_uc06_cost_5y') }}
     union all
-    select 'uc06', 'Lastprognose', 'maand_in_1_12', 'high',
+    select 'uc06', 'Cost forecast', 'maand_in_1_12', 'high',
            count(*) filter (where maand < 1 or maand > 12), count(*)
     from {{ ref('mart_uc06_cost_5y') }}
 ),

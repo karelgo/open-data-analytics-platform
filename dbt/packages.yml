@@ -1,4 +1,4 @@
-# dbt-packages voor het ODAP platform.
+# dbt-packages for the ODAP platform.
 # Versie-pin per `dbt deps`-run. Update bewust.
 
 packages:

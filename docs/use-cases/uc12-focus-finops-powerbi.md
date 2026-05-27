@@ -1,12 +1,12 @@
 # UC-12 — FinOps (FOCUS) — Power BI / Fabric variant
 
 **Doel**: dezelfde FOCUS-billing-export uit [UC-12](uc12-focus-finops.md), maar de
-visualisatie-laag is **Microsoft Power BI** op de Fabric workspace i.p.v. Apache
+visualisatie-laag is **Microsoft Power BI** on the Fabric workspace i.p.v. Apache
 Superset. Direct Lake-mode tegen het bestaande `uc11_lakehouse` SQL endpoint —
 nul data-copy, nul refresh-schedule.
 
 Mirror van het Superset-dashboard: zelfde 12 visuals in dezelfde 5 rijen, zelfde
-KPI-strip, zelfde drill-downs. De data-pijplijn (CSV → bronze → silver → 5 gold-
+KPI-strip, zelfde drill-downs. De data-pipeline (CSV → bronze → silver → 5 gold-
 marts) blijft onveranderd; de marts moeten alleen óók in de Fabric lakehouse
 verschijnen voor Direct Lake kan lezen.
 
@@ -75,7 +75,7 @@ De Power BI-laag leeft in dezelfde Fabric workspace als UC-11 (`uc11_lakehouse`)
 | [scripts/fabric-seed-uc12.py](../../scripts/fabric-seed-uc12.py) | One-shot synthetic-seed orkestrator (CSV → notebook → reframe) |
 | [platform/12-powerbi/uc12_focus_finops/SemanticModel/](../../platform/12-powerbi/uc12_focus_finops/SemanticModel/) | `definition.pbism` + `model.bim` met 5 tabellen, 11 DAX measures |
 | [platform/12-powerbi/uc12_focus_finops/Report/](../../platform/12-powerbi/uc12_focus_finops/Report/) | PBIR-tree, 12 visuals × 5 rijen (= 19 files) |
-| [platform/11-airflow/fabric-notebooks/uc12_focus_seed.ipynb](../../platform/11-airflow/fabric-notebooks/uc12_focus_seed.ipynb) | Spark-notebook dat de 5 marts uit de CSV bouwt |
+| [platform/11-airflow/fabric-notebooks/uc12_focus_seed.ipynb](../../platform/11-airflow/fabric-notebooks/uc12_focus_seed.ipynb) | Spark-notebook dat de 5 marts from the CSV bouwt |
 | [platform/11-airflow/include/fabric_helpers.py](../../platform/11-airflow/include/fabric_helpers.py) | OAuth2 client-credentials + Fabric REST helpers (gedeeld met UC-11) |
 
 **Items in de Fabric workspace** na een succesvolle upload:
@@ -134,11 +134,11 @@ PageId: `uc12dashpage1`. 1280×1040 viewport, fit-to-page. Schema: PBIR 2.7
 ## 6. Eerste keer deployen
 
 ### Voorwaarden
-- Service Principal met workspace-Contributor op de Fabric workspace.
+- Service Principal met workspace-Contributor on the Fabric workspace.
   Env-vars uit `secrets/local/uc11-multiplatform.env`:
   - `FABRIC_TENANT_ID`, `FABRIC_CLIENT_ID`, `FABRIC_CLIENT_SECRET`
   - `FABRIC_WORKSPACE_ID`, `FABRIC_LAKEHOUSE_ID`, `FABRIC_LAKEHOUSE_NAME`
-  - `FABRIC_SQL_ENDPOINT_HOST` (gebruikt door de M-expression in `model.bim`)
+  - `FABRIC_SQL_ENDPOINT_HOST` (gebruikt through the M-expression in `model.bim`)
 - Python 3.9+. Geen externe deps — alles via `urllib` in `fabric_helpers.py`.
 
 ### Stappen
@@ -153,7 +153,7 @@ python3 scripts/fabric-generate-powerbi-uc12.py
 # 3. Upload de SemanticModel eerst (PBIR heeft het ID nodig)
 python3 scripts/fabric-upload-powerbi.py --project uc12_focus_finops --semanticmodel-only
 
-# 4. Regenereer met het echte SemanticModel-ID, dan upload het report
+# 4. Regenereer with the echte SemanticModel-ID, dan upload het report
 python3 scripts/fabric-generate-powerbi-uc12.py    # leest het ID via REST auto-discovery
 python3 scripts/fabric-upload-powerbi.py --project uc12_focus_finops --report-only
 ```
@@ -191,7 +191,7 @@ Wat er gebeurt onder de motorkap (zie `scripts/fabric-seed-uc12.py`):
 1. CSV upload naar `Files/uc12_seed/focus-test.csv` via OneLake DFS (3-step
    append-flow met `storage.azure.com` scope).
 2. Upload van [`platform/11-airflow/fabric-notebooks/uc12_focus_seed.ipynb`](../../platform/11-airflow/fabric-notebooks/uc12_focus_seed.ipynb)
-   naar de workspace (idempotent — bestaande notebook krijgt
+   to the workspace (idempotent — bestaande notebook krijgt
    `updateDefinition`).
 3. Trigger het notebook via `fabric_helpers.trigger_notebook` met
    `workspace_id` + `lakehouse_id` + `csv_relative_path` parameters.
@@ -205,7 +205,7 @@ Idempotent: `mode("overwrite")` op elke target, dus opnieuw runnen vervangt de
 data zonder dat oude rijen blijven hangen.
 
 **Wanneer je dit niet wilt**: real data uit OCI/AWS — gebruik dan Optie A
-(productie-pijplijn) of Optie C (shortcut).
+(production-pipeline) of Optie C (shortcut).
 
 ### Optie A — dbt-fabricspark target (analoog aan UC-11)
 
@@ -238,13 +238,13 @@ draaien. Plan voor v1.1:
 er zijn. Tot dan tonen de visuals "No data" maar het schema klopt en RLS-
 testen kunnen al beginnen.)
 
-### Optie C — OneLake shortcut naar de MinIO-marts
+### Optie C — OneLake shortcut to the MinIO-marts
 
 Cross-cloud shortcut van `s3://warehouse/gold/uc12_focus_finops/*` naar
 `Tables/uc12_focus_finops/*` in `uc11_lakehouse`. Voorbeeld in
 [FreshLakehouse/docs/research](https://github.com/FreshMinds_Programming/FreshDataPlatform/blob/main/FreshLakehouse/docs/research/powerbi-as-bi-and-self-service-layer.md).
 
-Vereist een werkende S3-credential in Fabric (cross-tenant), en dan staat de
+Required een werkende S3-credential in Fabric (cross-tenant), en dan staat de
 data automatisch in sync — geen DAG, geen dbt-run. Trade-off: query-latency
 hoger dan native Delta in OneLake (cross-region read).
 
@@ -293,7 +293,7 @@ omdat Microsoft een restrictieve `frame-ancestors` CSP-header stuurt. Voor
 een ingebouwde iframe-ervaring is een Power BI Embedded SDK-integratie met
 App-Owns-Data + GenerateToken-backend nodig — zie
 [FreshLakehouse/docs/research/powerbi-as-bi-and-self-service-layer.md](https://github.com/FreshMinds_Programming/FreshDataPlatform/blob/main/FreshLakehouse/docs/research/powerbi-as-bi-and-self-service-layer.md)
-Fase 4 voor de wiring.
+Fase 4 for the wiring.
 
 ---
 

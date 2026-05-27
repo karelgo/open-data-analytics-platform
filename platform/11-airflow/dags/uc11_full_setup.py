@@ -471,7 +471,7 @@ raise SystemExit(f"job {JOB} timeout (5 min)")
 with DAG(
     dag_id="uc11_full_setup",
     description=(
-        "UC-11 Integrale Klantreis — eind-tot-eind bootstrap. "
+        "UC-11 Integrale Customer journey — eind-tot-eind bootstrap. "
         "Chain't silver-builds → gold-mart → OM-ingest → cleanup → "
         "Superset-dashboard."
     ),
@@ -505,7 +505,7 @@ with DAG(
     # `allowed_states=[success, failed]` is bewust ruim: Cosmos draait
     # `dbt test` AFTER_EACH model, en de seed-data heeft een paar bekende
     # DQ-issues (5 duplicate BSNs in stg_persons, service_request_application.dlq events,
-    # ...). De modellen ZIJN gebouwd; de UC-11 downstream-keten heeft de
+    # ...). De models ZIJN gebouwd; de UC-11 downstream-keten heeft de
     # data, ook al klaagt een test. We zien `failed_states=[]` zodat
     # TriggerDagRunOperator nooit zelf raisen — alleen door `allowed_states`
     # mismatch (= staat onbekend) zou-ie falen.

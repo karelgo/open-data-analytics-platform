@@ -2,51 +2,51 @@
 
 **Eén gebundeld handboek met alle 12 rollen.**
 
-> Dit document bundelt alle per-rol handleidingen achter elkaar. Voor het
-> delen met één specifieke gebruiker is de aparte rol-handleiding vaak
-> handiger; dit handboek is bedoeld voor distributie naar het hele team,
+> Dit document bundelt alle per-rol handbooken achter elkaar. Voor het
+> delen met één specifieke gebruiker is de aparte rol-handbook vaak
+> handiger; dit handboek is bedoeld voor distributie to the hele team,
 > bibliotheek-archief, of als training-materiaal.
 
 ---
 
-Dit is de gebruikersdocumentatie van het UWV Referentie Data- en Analyseplatform,
-opgesplitst per rol. Elke rol heeft zijn eigen handleiding met:
+Dit is de usersdocumentation van het UWV Referentie Data- en Analyseplatform,
+opgesplitst per rol. Elke rol heeft zijn eigen handbook met:
 
-1. **Inloggen, MFA & applicaties** — hoe je begint
+1. **Sign in, MFA & applicaties** — hoe je begint
 2. **Welke data je wel en niet ziet** — catalogs, schemas, kolom-maskers, rij-filters
 3. **Dagelijkse workflows met voorbeelden** — concrete scenario's, queries, dashboards
 4. **Hulp, fouten & escalatie** — wat te doen bij problemen
 
-> **Belangrijk.** Dit platform is een **fictieve, illustratieve referentie-implementatie**.
+> **Belangrijk.** Dit platform is een **fictieve, illustratieve reference implementation**.
 > Alle datasets zijn synthetisch (alleen 9-prefix BSN's, `meta.synthetic: true`).
-> De handleidingen beschrijven hoe het platform *werkt*, niet hoe production werkt.
-> Productie-installaties verwijzen naar dit document als blauwdruk, niet als procedure.
+> De handbooken beschrijven hoe het platform *werkt*, niet hoe production werkt.
+> Production-installaties verwijzen naar dit document als blauwdruk, niet als procedure.
 
 ---
 
 --8<-- "_snippets/url-modes.md"
 
-## Overzicht van rollen
+## Overview van rollen
 
 Het platform onderscheidt **11 menselijke rollen** + **1 systeemrol**, gemodelleerd
 in [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json)
 en [`opa-policies-src/data/role_mappings.json`](../../opa-policies-src/data/role_mappings.json).
 
-### Business-rollen (eindgebruikers)
+### Business-rollen (eindusers)
 
-1. **Claims Analyst** — AG / WIA — beoordeelt WIA-aanvragen, ziet PII en medisch in eigen regio
+1. **Claims Analyst** — AG / WIA — beoordeelt WIA-request, ziet PII en medisch in eigen regio
 2. **Fraud Analyst** — WW / Handhaving — onderzoekt signalen, ziet bankrekening voor onderzoek
 3. **Claims Analyst** — AG / Wajong — Sensitive Vault (4-eyes), ziet medisch
-4. **Marketing Analyst** — Klantcontact — werkt met 360°-cliëntbeeld, BSN gemaskeerd
+4. **Marketing Analyst** — Customer interaction — werkt met 360°-cliëntbeeld, BSN gemaskeerd
 5. **Finance Analyst** — Financiën / Beleid — alleen aggregaten, geen PII
-6. **Operations Manager** — Sociaal-medische zaken — capaciteitsplanning, geen cliënt-PII
+6. **Operations Manager** — Operationale zaken — capacity planning, geen cliënt-PII
 7. **Marketing Analyst** — Toeslagenwet — werklijst-rol, opt-out gerespecteerd
-8. **Researcher** — Onderzoek — alleen sandbox, gepseudonimiseerde panels
+8. **Researcher** — Research — alleen sandbox, gepseudonimiseerde panels
 
-### Technische rollen (platform-team)
+### Technische rollen (platform team)
 
 9. **Data-steward** — datakwaliteit, governance, lineage, sensitive-review
-10. **Data-engineer** — pipelines, ingestion, transformaties, JIT op bronze
+10. **Data-engineer** — pipelines, ingestion, transformations, JIT op bronze
 11. **Platform-admin** — cluster, security, break-glass, incident-respons
 
 ### Systeemrol
@@ -69,23 +69,23 @@ rollen achter elkaar:
 
 | Term | Uitleg |
 |---|---|
-| **Catalog** | Trino-namespace die overeenkomt met een datazone: `bronze`, `silver`, `gold`, `sensitive`, `sandbox`. |
+| **Catalog** | Trino-namespace die overeenkomt with a datazone: `bronze`, `silver`, `gold`, `sensitive`, `sandbox`. |
 | **Schema** | Domein binnen een catalog, bv. `silver.wia` of `gold.uc01_claims_funnel`. |
 | **OPA** | Open Policy Agent — bepaalt bij elke query wie wat mag zien. |
-| **Doelbinding** | De wettelijke taak waarvoor data verwerkt mag worden. Toegang vereist een geldig doel. |
+| **Purpose limitation** | De wettelijke taak waarvoor data verwerkt mag worden. Access vereist een geldig doel. |
 | **PII** | Persoonlijk Identificeerbare Informatie (BSN, naam, birth_date, adres). |
 | **Pseudonimisering** | Vervangen van BSN door een hash + zout — niet herleidbaar zonder sleutel. |
 | **Sensitive Vault** | Aparte catalog voor bijzondere persoonsgegevens (art. 9 AVG). |
 | **Mart** | Eindproduct van dbt: een tabel/view klaar voor consumptie in `gold.*`. |
-| **JIT-toegang** | Just-in-time: tijdelijke verhoogde rechten met audit-log, alleen op aanvraag. |
-| **Break-glass** | Noodprocedure: admin-toegang die altijd gelogd en achteraf gereviewd wordt. |
+| **JIT-access** | Just-in-time: tijdelijke verhoogde rechten met audit-log, alleen op aanvraag. |
+| **Break-glass** | Noodprocedure: admin-access die altijd gelogd en achteraf gereviewd wordt. |
 
 ---
 
 ## Zes regels die voor iedereen gelden
 
-1. **Doelbinding eerst** — gebruik data alleen voor de taak waarvoor je rol toegang heeft.
-2. **Niets is "zomaar"** — elke query wordt gelogd, elke toegang is herleidbaar.
+1. **Purpose limitation eerst** — gebruik data alleen for the taak waarvoor je rol access heeft.
+2. **Niets is "zomaar"** — elke query wordt gelogd, elke access is herleidbaar.
 3. **Mens beslist** — algoritmes geven advies, jij neemt het besluit.
 4. **Bij twijfel niet doen** — vraag eerst de data-steward of platform-admin.
 5. **Geen schermafbeeldingen van persoonsgegevens** — ook niet voor bug-rapporten.
@@ -97,10 +97,10 @@ rollen achter elkaar:
 
 Werkt iets niet? In deze volgorde:
 
-1. **Lees** de sectie *Hulp, fouten & escalatie* in jouw rol-handleiding.
+1. **Lees** de sectie *Hulp, fouten & escalatie* in jouw rol-handbook.
 2. **Vraag** een collega met dezelfde rol.
 3. **Mail** de data-steward (`data.steward@odap.local:8443`).
-4. **Voor incidenten** (rare meldingen, plotse toegang verloren, vermoede inbreuk):
+4. **Voor incidenten** (rare meldingen, plotse access verloren, vermoede inbreuk):
    bel de platform-admin direct, niet via e-mail.
 
 
@@ -108,12 +108,12 @@ Werkt iets niet? In deze volgorde:
 
 
 
-## Handleiding — Claims Analyst
+## Handbook — Claims Analyst
 
-> Rol-key: `claims_analyst` · Domein: AG / WIA · Risiconiveau toegang: hoog (PII + medisch)
+> Rol-key: `claims_analyst` · Domein: AG / WIA · Risiconiveau access: hoog (PII + medisch)
 
-Deze handleiding is voor **verzekeringsartsen, arbeidsdeskundigen en
-beoordelaars** die WIA-aanvragen behandelen. Je gebruikt het platform om
+Deze handbook is voor **verzekeringsartsen, arbeidsdeskundigen en
+beoordelaars** die WIA-request behandelen. Je gebruikt het platform om
 dossiers te raadplegen, voorraad en doorlooptijden in jouw regio te bewaken
 en sturingsinformatie op te vragen.
 
@@ -124,21 +124,21 @@ en sturingsinformatie op te vragen.
 Je beoordeelt of een aanvrager recht heeft op WIA en, zo ja, in welke
 categorie (IVA, WGA volledig, WGA gedeeltelijk). Je gebruikt het platform om:
 
-- Lopende WIA-aanvragen in jouw regio in te zien
+- Lopende WIA-request in jouw regio in te zien
 - Doorlooptijden, wachtgelden en voorraad te bewaken
 - Sturingsinformatie te genereren voor je teamleider
-- Geanonimiseerde overzichten te maken voor capaciteitsplanning
+- Geanonimiseerde overzichten te maken voor capacity planning
 
-Je hebt **geen** toegang tot dossiers buiten je eigen regio en geen toegang
-tot de Sensitive Vault (`sensitive.*`) — die is voor de Claims Analyst.
+Je hebt **geen** access tot dossiers buiten je eigen regio en geen access
+tot de Sensitive Vault (`sensitive.*`) — die is for the Claims Analyst.
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 ### 2.1 Account
 
-Je accountnaam is `claims.analyst` (in productie: je eigen platform account, gefedereerd via SSO).
+Je accountnaam is `claims.analyst` (in production: je eigen platform account, gefedereerd via SSO).
 Het wachtwoord wijzig je bij eerste inlog. **MFA is verplicht** —
 configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Password etc.).
 
@@ -149,21 +149,21 @@ configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Passwo
 | **Apache Superset** | Dashboards bekijken: WIA-funnel, doorlooptijden | https://superset.odap.local:8443 |
 | **OpenMetadata** | Opzoeken welke kolom wat betekent, wie eigenaar is | https://openmetadata.odap.local:8443 |
 
-> Je gebruikt **niet**: NiFi (ingestion), Airflow (orchestratie). Die zijn voor het platform-team.
+> Je gebruikt **niet**: NiFi (ingestion), Airflow (orchestratie). Die zijn for the platform team.
 
-### 2.3 Eerste keer inloggen — stappen
+### 2.3 Eerste keer sign in — stappen
 
 1. Open https://superset.odap.local:8443
-2. Klik **Inloggen via Keycloak (UWV)**
-3. Vul gebruikersnaam + wachtwoord; bij eerste login wijzig je het wachtwoord
+2. Klik **Sign in via Keycloak (UWV)**
+3. Vul usersnaam + wachtwoord; bij eerste login wijzig je het wachtwoord
 4. Scan de QR-code met je TOTP-app en bevestig de eerste 6-cijferige code
-5. Je belandt op de Superset-startpagina; rechts staat je rol: **WIA Beoordelaar**
+5. Je belandt on the Superset-startpagina; rechts staat je rol: **WIA Beoordelaar**
 
 ### 2.4 Sessie & timeout
 
 - Inactiviteits-timeout: **30 minuten**
 - Maximale sessieduur: **8 uur**
-- Bij verlopen sessie: opnieuw inloggen via Keycloak — Superset/Trino starten een fresh OIDC-flow
+- Bij verlopen sessie: opnieuw sign in via Keycloak — Superset/Trino starten een fresh OIDC-flow
 
 ---
 
@@ -173,10 +173,10 @@ configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Passwo
 
 | Catalog | Schema | Wat zit erin? | Zie jij het? |
 |---|---|---|---|
-| `silver` | `wia` | Geconformeerde WIA-aanvragen, beoordelingen, status-historie | **Ja** (jouw regio) |
+| `silver` | `wia` | Geconformeerde WIA-request, beoordelingen, status-historie | **Ja** (jouw regio) |
 | `gold` | `uc01_claims_funnel` | Sturingsmart: voorraad, doorlooptijden, voorspelling | **Ja** |
 | `silver` | `ww`, `wajong`, `crm`, ... | Andere domeinen | **Nee** |
-| `sensitive` | `wajong.*` | Sociaal-medisch dossier Wajong | **Nee** |
+| `sensitive` | `wajong.*` | Operational dossier Wajong | **Nee** |
 | `bronze` | alles | Ruwe brondata | **Nee** |
 
 ### 3.2 Welke kolommen zie je?
@@ -185,13 +185,13 @@ Voor `silver.claims.application` en `gold.uc01_claims_funnel.*`:
 
 | Kolom | Wat zie je? | Waarom? |
 |---|---|---|
-| `bsn` | **Volledig** | Je hebt PII-doel "uitkering/behandeling/reintegratie" |
+| `bsn` | **Volledig** | Je hebt PII-doel "claim payout/behandeling/reintegration" |
 | `voornaam`, `achternaam` | Volledig | Idem |
 | `birth_date` | Volledig | Idem |
 | `straat`, `huisnummer` | Volledig | Idem |
 | `iban`, `bankrekening` | **GEMASKEERD** (bv. `NL**********1234`) | Jij beoordeelt geen betalingen — die staat bij FEZ |
 | `diagnose`, `icd10` | Volledig (alleen voor je eigen regio) | Medisch noodzakelijk voor WIA-beoordeling |
-| `regio` | Filter — **alleen jouw regio's** | Doelbinding regio-gebonden |
+| `regio` | Filter — **alleen jouw regio's** | Purpose limitation regio-gebonden |
 
 > **Rij-filter (regio_filter).** Het platform past automatisch een rij-filter toe:
 > `WHERE regio IN (jouw toegewezen regio's)`. Je hoeft dit niet zelf te schrijven.
@@ -199,10 +199,10 @@ Voor `silver.claims.application` en `gold.uc01_claims_funnel.*`:
 
 ### 3.3 Wat zie je echt **niet**?
 
-- WW-data (`silver.service_requests.*`) — andere doelbinding (handhaving, niet WIA)
+- WW-data (`silver.service_requests.*`) — andere purpose-limitation (handhaving, niet WIA)
 - Wajong sensitive (`sensitive.eligibility_cases.*`) — alleen Claims Analystn
 - Bankrekening- en IBAN-velden onmasked — niet nodig voor WIA-beoordeling
-- Bronze-laag (`bronze.*`) — alleen voor data-engineers met JIT-toegang
+- Bronze-laag (`bronze.*`) — alleen voor data-engineers met JIT-access
 - Andere regio's dan die jou zijn toegewezen
 
 ---
@@ -211,7 +211,7 @@ Voor `silver.claims.application` en `gold.uc01_claims_funnel.*`:
 
 ### 4.1 Workflow A — Voorraad en doorlooptijden bekijken
 
-**Scenario.** Het is maandagochtend, je wilt weten hoeveel aanvragen er
+**Scenario.** Het is maandagochtend, je wilt weten hoeveel request er
 deze week binnenkwamen en hoeveel langer dan 8 weken open staan.
 
 1. Open **Superset** → linker menu → **Dashboards** → **WIA Funnel**
@@ -219,7 +219,7 @@ deze week binnenkwamen en hoeveel langer dan 8 weken open staan.
    - Periode: laatste 7 dagen
    - Regio: (al automatisch ingesteld op jouw regio's)
 3. Bekijk de tegels:
-   - **Nieuwe aanvragen deze week** (totaal + verschil met vorige week)
+   - **Nieuwe request deze week** (totaal + verschil met vorige week)
    - **Open > 8 weken** (de wettelijke termijn)
    - **Voorspelde instroom volgende week**
 
@@ -257,7 +257,7 @@ ten opzichte van het regio-gemiddelde.
 SELECT
   team,
   AVG(doorlooptijd_dagen) AS gem_doorlooptijd,
-  COUNT(*)               AS aantal_aanvragen
+  COUNT(*)               AS aantal_request
 FROM gold.uc01_claims_funnel.afgehandeld
 WHERE afhandel_datum >= DATE '2026-04-01'
 GROUP BY team
@@ -286,7 +286,7 @@ ORDER BY gem_doorlooptijd DESC;
 1. Open https://openmetadata.odap.local:8443
 2. Zoek op `mart_uc01_claims_funnel_daily` of op kolomnaam
 3. Bij elke kolom zie je: **definitie**, **eigenaar** (data-steward), **bron-tabel**,
-   **bewaartermijn**, **classificatie**
+   **retention period**, **classificatie**
 4. Klik **Lineage** om de keten van bron → mart te zien
 
 ---
@@ -294,7 +294,7 @@ ORDER BY gem_doorlooptijd DESC;
 ## 5. Veelgebruikte queries (kort)
 
 ```sql
--- Aantal aanvragen per status, jouw regio's automatisch
+-- Aantal request per status, jouw regio's automatisch
 SELECT status, COUNT(*) FROM silver.claims.application GROUP BY status;
 
 -- Dossiers > 8 weken open
@@ -314,19 +314,19 @@ ORDER  BY n DESC LIMIT 10;
 
 ## 6. Hulp, fouten & escalatie
 
-### 6.1 Veelvoorkomende foutmeldingen
+### 6.1 Veelvoorkomende errors
 
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
 | `Access Denied: cannot select from gold.uc02_complex_cases.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Claims Analyst |
 | `Access Denied: regio = 'Zuid' niet toegestaan` | Je rij-filter blokkeert dit, BSN valt buiten je regio | Vraag een collega in de juiste regio |
-| `Access Denied: column 'iban' is masked` | Je probeert IBAN onmasked te zien — niet voor WIA | Leef met de mask, of vraag FEZ |
+| `Access Denied: column 'iban' is masked` | Je probeert IBAN onmasked te zien — niet voor WIA | Leef with the mask, of vraag FEZ |
 | `Authentication failed: token expired` | OIDC-token is verlopen | Log opnieuw in via Keycloak |
 | `Error: schema 'claims' not found` | Trino-catalog niet bereikbaar | Vraag platform-admin (zie 6.3) |
 
 ### 6.2 Wat doe je bij een vermoede inbreuk?
 
-Vermoed je dat iemand toegang heeft die niet zou moeten, of zie je data die
+Vermoed je dat iemand access heeft die niet zou moeten, of zie je data die
 je niet zou mogen zien?
 
 1. **Stop met kijken** — niet doorklikken, niet downloaden
@@ -338,9 +338,9 @@ je niet zou mogen zien?
 
 | Probleem | Contact |
 |---|---|
-| Inloggen lukt niet, MFA-app weg | Platform-admin |
+| Sign in lukt niet, MFA-app weg | Platform-admin |
 | Vraag over kolom-betekenis | Data-steward |
-| "Ik denk dat de data fout is" | Data-steward (kwaliteitscontrole-doelbinding) |
+| "Ik denk dat de data fout is" | Data-steward (kwaliteitscontrole-purpose-limitation) |
 | Trino is traag | Platform-admin |
 | Dashboard ontbreekt | Data-steward / dashboard-eigenaar |
 | Vermoede beveiligingsincident | Platform-admin (telefonisch) |
@@ -349,35 +349,35 @@ je niet zou mogen zien?
 
 ## 7. Wat je nooit doet
 
-- Een dossier inzien zonder zaakreden — toegang ≠ rechtvaardiging.
+- Een dossier inzien zonder zaakreden — access ≠ rechtvaardiging.
 - BSN's mailen, in chats plakken of in shared documenten zetten.
-- Schermafbeeldingen met persoonsgegevens delen — ook niet "even" voor een bug-rapport.
+- Schermafbeeldingen met persoonsgegevens delen — ook niet "even" for a bug-rapport.
 - Wachtwoorden of TOTP-secrets delen, ook niet met je teamleider.
-- Inloggen op een onbeheerd device — sluit altijd je sessie af.
+- Sign in op een onbeheerd device — sluit altijd je sessie af.
 
 ---
 
 ## 8. Verantwoordelijkheid (kort)
 
-Je rol staat onder **doelbinding "uitkering" / "behandeling" / "reintegratie"**
+Je rol staat onder **purpose-limitation "claim payout" / "behandeling" / "reintegration"**
 (art. 6 lid 1e + art. 9 lid 2h AVG). Elke query wordt gelogd. Steekproefsgewijs
 toetst de data-steward of de queries passen bij jouw caseload. Onverwacht
 massaal data lezen valt op.
 
 ---
 
-**Volgende handleiding:** [02-fraud-analyst.md](02-fraud-analyst.md) ·
+**Volgende handbook:** [02-fraud-analyst.md](02-fraud-analyst.md) ·
 **Index:** [README.md](README.md)
 
 ---
 
 
-## Handleiding — Fraud Analyst
+## Handbook — Fraud Analyst
 
-> Rol-key: `fraud_analyst` · Domein: WW / Handhaving · Risiconiveau toegang: hoog (PII + bankrekening)
+> Rol-key: `fraud_analyst` · Domein: WW / Handhaving · Risiconiveau access: hoog (PII + bankrekening)
 
-Deze handleiding is voor **handhavers** die WW-uitkeringen onderzoeken op
-recht- en doelmatigheid. Je hebt toegang tot WW-data en een aantal
+Deze handbook is voor **handhavers** die WW-claim payouten onderzoeken op
+recht- en doelmatigheid. Je hebt access tot WW-data en een aantal
 financiële kolommen die voor andere rollen gemaskeerd zijn — zoals
 bankrekening-/IBAN-velden voor onderzoeksdoeleinden.
 
@@ -385,21 +385,21 @@ bankrekening-/IBAN-velden voor onderzoeksdoeleinden.
 
 ## 1. Wat doet jouw rol?
 
-Je onderzoekt signalen van mogelijk oneigenlijk gebruik van WW-uitkeringen.
+Je onderzoekt signalen van mogelijk oneigenlijk gebruik van WW-claim payouten.
 Je gebruikt het platform om:
 
-- WW-aanvragen, betalingen en vermogensvelden te combineren
-- Risico-indicatoren uit het UC-03-model te raadplegen
-- Onderzoeksdossiers samen te stellen
+- WW-request, betalingen en vermogensvelden te combineren
+- Risico-indicatoren from the UC-03-model te raadplegen
+- Researchsdossiers samen te stellen
 - Caseload-overzichten te bekijken
 
-Je hebt **niet**: medische velden (`diagnose`, `icd10`) en geen toegang tot
+Je hebt **niet**: medische velden (`diagnose`, `icd10`) en geen access tot
 Wajong of WIA. Bankrekening- en IBAN-velden zie je **wel**, maar uitsluitend
 voor het doel "handhaving".
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 ### 2.1 Account
 
@@ -429,7 +429,7 @@ goede gewoonte is een korte notitie in je eigen onderzoeksysteem.
 
 | Catalog | Schema | Wat zit erin? | Zie jij het? |
 |---|---|---|---|
-| `silver` | `ww` | WW-aanvragen, betalingen, status-historie | **Ja** |
+| `silver` | `ww` | WW-request, betalingen, status-historie | **Ja** |
 | `gold` | `uc03_fraud_risk` | Risico-indicatoren per dossier | **Ja** |
 | `silver` | `wia`, `wajong`, `crm` | Andere domeinen | **Nee** |
 | `sensitive` | `wajong.*` | Bijzondere persoonsgegevens | **Nee** |
@@ -468,7 +468,7 @@ Op `silver.persons.persoon` zien:
 3. Bekijk top-20 in de tegel **Hoogste scores**
 4. Klik door op een rij → **Drill-through naar dossierdetails**
 
-### 4.2 Workflow B — Onderzoek op één dossier
+### 4.2 Workflow B — Research op één dossier
 
 **Scenario.** Je hebt een tip ontvangen over BSN 999000456.
 
@@ -503,11 +503,11 @@ GROUP BY team_handhaver
 ORDER BY aantal_open DESC;
 ```
 
-### 4.4 Workflow D — Onderzoeksdossier samenstellen
+### 4.4 Workflow D — Researchsdossier samenstellen
 
 **Scenario.** Je hebt voldoende signaal voor formeel onderzoek; je wilt een gestructureerd dossier.
 
-1. Maak een nieuwe **Saved Query** in Superset met de joins van workflow B
+1. Maak een nieuwe **Saved Query** in Superset with the joins van workflow B
 2. Exporteer het resultaat als CSV
 3. Plaats het CSV in het zaak-dossier in jouw onderzoeksysteem (out-of-platform)
 4. Voeg je query in de zaak-aantekening: zo is reproduceerbaar wat je zag
@@ -533,7 +533,7 @@ ORDER BY 1;
 
 ## 5. Hulp, fouten & escalatie
 
-### 5.1 Veelvoorkomende foutmeldingen
+### 5.1 Veelvoorkomende errors
 
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
@@ -558,7 +558,7 @@ Het model levert een score en een korte uitleg (top-drivers). Volg deze regels:
 
 | Probleem | Contact |
 |---|---|
-| Inloggen, MFA | Platform-admin |
+| Sign in, MFA | Platform-admin |
 | Kolom-betekenis | Data-steward |
 | "De score klopt niet" | Data-steward → MLOps-team |
 | Vermoede inbreuk | Platform-admin (telefonisch) |
@@ -581,20 +581,20 @@ Het model levert een score en een korte uitleg (top-drivers). Volg deze regels:
 ---
 
 
-## Handleiding — Claims Analyst
+## Handbook — Claims Analyst
 
-> Rol-key: `claims_analyst` · Domein: AG / Wajong · Risiconiveau toegang: zeer hoog (Sensitive Vault, art. 9 AVG)
+> Rol-key: `claims_analyst` · Domein: AG / Wajong · Risiconiveau access: zeer hoog (Sensitive Vault, art. 9 AVG)
 
-Deze handleiding is voor **arbeidsdeskundigen die Wajong-trajecten begeleiden**.
-Jouw rol is bijzonder: je hebt als enige business-rol toegang tot de
-**Sensitive Vault** met sociaal-medische gegevens. Voor sommige acties geldt
+Deze handbook is voor **arbeidsdeskundigen die Wajong-trajecten begeleiden**.
+Jouw rol is bijzonder: je hebt als enige business-rol access tot de
+**Sensitive Vault** met operationale gegevens. Voor sommige acties geldt
 een **vier-ogen-principe**.
 
 ---
 
 ## 1. Wat doet jouw rol?
 
-Je beoordeelt re-integratiekansen voor Wajongers en stelt trajecten op
+Je beoordeelt reintegrationkansen voor Wajongers en stelt trajecten op
 (IPS, proefplaatsing, scholing). Je gebruikt het platform om:
 
 - Wajong-dossiers te raadplegen (incl. medische gegevens)
@@ -609,12 +609,12 @@ model-card, EU-registratie en externe audit. Dat is geen referentie-werk.
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 ### 2.1 Account
 
 Accountnaam `case.manager`. **MFA verplicht** + extra waarschuwing
-in de Keycloak-login: "Je hebt toegang tot de Sensitive Vault. Elke query wordt
+in de Keycloak-login: "Je hebt access tot de Sensitive Vault. Elke query wordt
 gelogd en periodiek gereviewd."
 
 ### 2.2 Welke applicaties?
@@ -626,14 +626,14 @@ gelogd en periodiek gereviewd."
 
 ### 2.3 Vier-ogen-principe
 
-Voor toegang tot `sensitive.eligibility_cases.*` geldt: **bepaalde queries vereisen een
+Voor access tot `sensitive.eligibility_cases.*` geldt: **bepaalde queries vereisen een
 co-signer**. In de huidige referentie wordt dit gemodelleerd door:
 
 - Audit-log met automatische dagelijkse review door data-steward
-- Voor productie: workflow-tool waarin een collega de aanvraag goedkeurt vóór de query
+- Voor production: workflow-tool waarin een collega de aanvraag goedkeurt vóór de query
 
 In deze referentie kun je alle sensitive-queries draaien, maar weet:
-**elke sensitive-query verschijnt op het reviewscherm van de data-steward**
+**elke sensitive-query verschijnt on the reviewscherm van de data-steward**
 de volgende ochtend.
 
 ---
@@ -642,18 +642,18 @@ de volgende ochtend.
 
 ### 3.1 Catalogs en schemas
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
 | `silver` | `wajong` | Geconformeerd Wajong-dossier (gepseudonimiseerd waar mogelijk) | **Ja** |
 | `gold` | `uc02_complex_cases` | Adviezen (placeholder mart) | **Ja** |
-| `sensitive` | `wajong` | Sociaal-medisch dossier, diagnoses (art. 9 AVG) | **Ja** (4-eyes) |
+| `sensitive` | `wajong` | Operational dossier, diagnoses (art. 9 AVG) | **Ja** (4-eyes) |
 | `silver` | `wia`, `ww`, `crm` | Andere domeinen | **Nee** |
 
 ### 3.2 Welke kolommen?
 
 | Kolom | Wat zie je? |
 |---|---|
-| `bsn`, naam, birth_date, adres | Volledig — doel "reintegratie/behandeling" |
+| `bsn`, naam, birth_date, adres | Volledig — doel "reintegration/behandeling" |
 | `diagnose`, `icd10` | **Volledig** — uniek aan jouw rol (samen met platform-admin) |
 | `iban`, `bankrekening` | Gemaskeerd — geen financieel doel |
 | `regio` | Geen regio-filter — Wajong-traject mag landelijk |
@@ -691,7 +691,7 @@ ORDER BY lopend DESC;
 hebt het dossier nodig.
 
 > **Let op.** Deze query raakt `sensitive.*`. Je doel ("behandeling") wordt
-> meegegeven. De query verschijnt op het reviewscherm van de data-steward.
+> meegegeven. De query verschijnt on the reviewscherm van de data-steward.
 
 ```sql
 SELECT
@@ -753,21 +753,21 @@ LIMIT 50;
 
 1. Open OpenMetadata → zoek `sensitive.eligibility_cases.dossier`
 2. Klik **Lineage** — zie alle bronnen die naar dit dossier leiden
-3. Klik elke bron aan → zie eigenaar, classificatie, doelbinding
-4. Antwoord de cliënt op basis van wat je daar ziet (gestructureerd, niet uit het hoofd)
+3. Klik elke bron aan → zie eigenaar, classificatie, purpose-limitation
+4. Antwoord de cliënt op basis van wat je daar ziet (gestructureerd, niet from the hoofd)
 
 ---
 
 ## 5. Hulp, fouten & escalatie
 
-### 5.1 Foutmeldingen
+### 5.1 Errors
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `Access Denied: column 'iban' is masked` | IBAN niet voor jouw doel | Doorgaan, niet nodig voor reintegratie |
+| `Access Denied: column 'iban' is masked` | IBAN niet voor jouw doel | Doorgaan, niet nodig voor reintegration |
 | `Access Denied: silver.claims.*` | WIA-domein niet toegankelijk | Vraag Claims Analyst |
 | `Audit-flag: review required` | Sensitive-query staat klaar voor review | Niets doen — review verloopt automatisch |
-| `Authentication failed: token expired` | Sessie verlopen | Opnieuw inloggen via Keycloak |
+| `Authentication failed: token expired` | Sessie verlopen | Opnieuw sign in via Keycloak |
 
 ### 5.2 Datalek-vermoeden
 
@@ -784,7 +784,7 @@ Dit valt onder de **NIS2-meldplicht 24 uur vroegsignalering**.
 
 | Probleem | Contact |
 |---|---|
-| Inloggen / MFA | Platform-admin |
+| Sign in / MFA | Platform-admin |
 | Vraag over diagnose-codes | Data-steward → glossary in OpenMetadata |
 | "Ik twijfel of ik dit mag zien" | Data-steward — vraag het vóór je het doet |
 | Vermoeden van inbreuk | Platform-admin telefonisch + Platform CISO |
@@ -803,9 +803,9 @@ Dit valt onder de **NIS2-meldplicht 24 uur vroegsignalering**.
 
 ## 7. Verantwoordelijkheid (kort)
 
-Je rol staat onder **doelbinding "reintegratie" / "behandeling"** met
+Je rol staat onder **purpose-limitation "reintegration" / "behandeling"** met
 AVG-grondslag art. 6 lid 1e + art. 9 lid 2h (gezondheid, sociale zekerheid).
-Vier-ogen-principe geldt voor sensitive-queries in productie. Bewaartermijn
+Vier-ogen-principe geldt voor sensitive-queries in production. Retention period
 voor besluitvormingsdata: 7 jaar.
 
 ---
@@ -817,30 +817,30 @@ voor besluitvormingsdata: 7 jaar.
 ---
 
 
-## Handleiding — Marketing Analyst
+## Handbook — Marketing Analyst
 
-> Rol-key: `marketing_analyst` · Domein: Klantcontact · Risiconiveau toegang: middel (PII gemaskeerd, geen medisch)
+> Rol-key: `marketing_analyst` · Domein: Customer interaction · Risiconiveau access: middel (PII gemaskeerd, geen medisch)
 
-Deze handleiding is voor **medewerkers van klantcontact en CRM**. Je werkt
+Deze handbook is voor **medewerkers van customer interaction en CRM**. Je werkt
 met het 360°-cliëntbeeld (UC-05) en helpt cliënten via telefoon, balie of
-Werkmap. Je ziet **gemaskeerde BSN's** en **geen medische gegevens** —
+Workspace. Je ziet **gemaskeerde BSN's** en **geen medische gegevens** —
 beide bewust beperkt om dataminimalisatie te respecteren.
 
 ---
 
 ## 1. Wat doet jouw rol?
 
-Je beantwoordt vragen van cliënten en routeert hen naar de juiste afdeling.
+Je beantwoordt vragen van cliënten en routeert hen to the juiste afdeling.
 Je gebruikt het platform om:
 
 - Het 360°-cliëntbeeld te raadplegen (UC-05)
-- Te zien welke uitkeringen lopen, welke klantcontacten al hebben plaatsgevonden
+- Te zien welke claim payouten lopen, welke customer interactionen al hebben plaatsgevonden
 - Trends in klantvraag te zien per kanaal
-- Geen besluiten te nemen over uitkering of behandeling — dat doen domein-rollen
+- Geen besluiten te nemen over claim payout of behandeling — dat doen domein-rollen
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 ### 2.1 Account
 
@@ -854,7 +854,7 @@ wachtwoord wijzigen.
 | **Apache Superset** | Cliënt-360-dashboard, contact-trends | https://superset.odap.local:8443 |
 | **OpenMetadata** | Begrippen opzoeken | https://openmetadata.odap.local:8443 |
 
-Voor productie: meestal werk je vanuit een **Werkmap-frontend** die UC-05
+Voor production: meestal werk je vanuit een **Workspace-frontend** die UC-05
 via Trino REST API consumeert. Het platform is dan onzichtbaar; deze
 referentie laat zien wat erachter zit.
 
@@ -864,10 +864,10 @@ referentie laat zien wat erachter zit.
 
 ### 3.1 Catalog en schema
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
 | `gold` | `uc05_customer_360` | 360°-cliëntbeeld | **Ja** |
-| `silver` | `crm` | Klantcontact-historie | **Indirect** (alleen via UC-05) |
+| `silver` | `crm` | Customer interaction-historie | **Indirect** (alleen via UC-05) |
 | `silver` | `wia`, `ww`, `wajong` | Domein-data | **Nee** |
 | `sensitive` | * | (geen) | **Nee** |
 
@@ -881,15 +881,15 @@ In `gold.uc05_customer_360.client_overview`:
 | `voornaam`, `achternaam` | Volledig — voor herkenning aan de telefoon |
 | `birth_date` | Volledig — voor identificatie |
 | `straat`, `huisnummer` | Volledig — adres voor balie |
-| `iban`, `bankrekening` | **GEMASKEERD** — niet nodig voor klantcontact |
+| `iban`, `bankrekening` | **GEMASKEERD** — niet nodig voor customer interaction |
 | `diagnose`, `icd10` | NULL (kolom-mask) — geen medisch |
-| `lopende_uitkeringen` | Type + status + bedrag-categorie | Voor doorverwijzing |
-| `kanaal_voorkeur` | Telefoon / Werkmap / Brief | Voor klantcontact |
+| `lopende_claim payouten` | Type + status + bedrag-categorie | Voor doorverwijzing |
+| `kanaal_voorkeur` | Telefoon / Workspace / Brief | Voor customer interaction |
 | `opt_out` | Ja/nee proactieve dienstverlening | Respecteer altijd |
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
-Je rol heeft de purposes **"klantcontact"** en **"behandeling"**. Een query
+Je rol heeft de purposes **"customer interaction"** en **"behandeling"**. Een query
 die data uit een andere zone aanspreekt zonder geldig doel wordt geweigerd.
 
 ---
@@ -903,13 +903,13 @@ betaling. Klopt dat?"
 
 1. Vraag haar birth_date + de laatste 2 cijfers van haar BSN voor identificatie.
 2. Open **Superset → dashboard "Cliënt 360°"**, zoek op gemaskeerde BSN of birth_date + naam.
-3. Bekijk de tegels: Lopende uitkering, Laatste contact, Kanaalvoorkeur.
-4. Beantwoord de vraag of route je haar naar de juiste afdeling.
+3. Bekijk de tegels: Lopende claim payout, Laatste contact, Kanaalvoorkeur.
+4. Beantwoord de vraag of route je haar to the juiste afdeling.
 
 ### 4.2 Workflow B — Trends in kanaalkeuze
 
 **Scenario.** Hoeveel cliënten zijn de afgelopen maand overgestapt van
-brief naar Werkmap?
+brief naar Workspace?
 
 ```sql
 SELECT
@@ -935,7 +935,7 @@ GROUP BY 1
 ORDER BY 1;
 ```
 
-### 4.4 Workflow D — Overzicht voor teamleider
+### 4.4 Workflow D — Overview voor teamleider
 
 In Superset → dashboard "CRM Trends" → filteren op je team → exporteer als PDF.
 
@@ -947,14 +947,14 @@ In Superset → dashboard "CRM Trends" → filteren op je team → exporteer als
 Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 1. Wat **jij** ziet in het 360°-beeld (= een **deel** van het volledige platform image)
-2. Verwijs voor volledige inzage naar het AVG-inzageformulier (out-of-platform proces)
-3. Geef nooit een uitprint van het scherm — laat zien op het scherm en lees voor
+2. Verwijs voor volledige inzage to the AVG-inzageformulier (out-of-platform proces)
+3. Geef nooit een uitprint van het scherm — laat zien on the scherm en lees voor
 
 ---
 
 ## 5. Hulp, fouten & escalatie
 
-### 5.1 Foutmeldingen
+### 5.1 Errors
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
@@ -966,7 +966,7 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 | Probleem | Contact |
 |---|---|
-| Inloggen / MFA | Platform-admin |
+| Sign in / MFA | Platform-admin |
 | Cliënt staat niet in 360° | Data-steward (mogelijke ingestion-vertraging) |
 | Cliënt vraagt complexe inzage | Verwijs naar AVG-loket UWV |
 
@@ -975,7 +975,7 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 ## 6. Wat je nooit doet
 
 - Een volledige BSN noemen aan de telefoon — gebruik gemaskeerde versie.
-- Beslissingen nemen over uitkeringen — alleen WIA/WW/Wajong-rollen.
+- Decisions nemen over claim payouten — alleen WIA/WW/Wajong-rollen.
 - Schermafbeeldingen mailen, ook niet "even" naar een collega.
 - Cliënt-data combineren in eigen Excel — alle analyses gaan via Superset.
 
@@ -988,33 +988,33 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 ---
 
 
-## Handleiding — Finance Analyst
+## Handbook — Finance Analyst
 
-> Rol-key: `finance_analyst` · Domein: Financiën / Beleid · Risiconiveau toegang: laag (alleen aggregaten, geen PII)
+> Rol-key: `finance_analyst` · Domein: Financiën / Beleid · Risiconiveau access: laag (alleen aggregaten, geen PII)
 
-Deze handleiding is voor **financieel-economische analisten** die werken
-aan schadelast, prognoses en beleidsanalyses. Je werkt op **geaggregeerde
+Deze handbook is voor **financieel-economische analisten** die werken
+aan cost forecast, prognoses en beleidsanalyses. Je werkt op **geaggregeerde
 data**: geen ruwe BSN, geen individuele claim_amounten.
 
 ---
 
 ## 1. Wat doet jouw rol?
 
-Je maakt prognoses voor schadelast, doorrekent beleidsscenario's en levert
+Je maakt prognoses voor cost forecast, doorrekent beleidsscenario's en levert
 input voor begrotingen. Je gebruikt het platform om:
 
-- UC-06 lastprognose-mart te raadplegen
+- UC-06 cost forecast-mart te raadplegen
 - Scenario-analyses te draaien op aggregaten
 - Trends in instroom/uitstroom te volgen
 - Geen individuele dossiers te zien
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Apache Superset** | Dashboards: schadelast, prognoses | https://superset.odap.local:8443 |
+| **Apache Superset** | Dashboards: cost forecast, prognoses | https://superset.odap.local:8443 |
 | **OpenMetadata** | Definities, eigenaarschap | https://openmetadata.odap.local:8443 |
 
 ---
@@ -1023,9 +1023,9 @@ input voor begrotingen. Je gebruikt het platform om:
 
 ### 3.1 Catalog en schema
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
-| `gold` | `uc06_cost_forecast` | Schadelast-aggregaten en prognoses | **Ja** |
+| `gold` | `uc06_cost_forecast` | Cost forecast-aggregaten en prognoses | **Ja** |
 | `silver` | * | PII en domein-data | **Nee** |
 | `bronze`, `sensitive` | * | (geen) | **Nee** |
 
@@ -1040,16 +1040,16 @@ Je werkt op aggregaten:
 | `leeftijdsgroep` | Buckets van 5 jaar |
 | `instroom_aantal` | Aantal nieuwe instromers per maand |
 | `uitstroom_aantal` | Aantal uitstroom per maand |
-| `gem_duur_dagen` | Gemiddelde uitkeringsduur |
+| `gem_duur_dagen` | Gemiddelde claim payoutsduur |
 | `totale_last_eur` | Totaal uitbetaald per maand |
 | `prognose_komende_12_mnd` | Prognose-getallen |
 
 > **Geen ruwe BSN.** Het platform weigert je rauwe persoons-queries
 > (`silver.persons.*`) — niet jouw doel.
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
-Purposes: **"actuarie"** en **"beleid"**. Modellen in `gold.uc06_*` zijn
+Purposes: **"actuarie"** en **"beleid"**. Models in `gold.uc06_*` zijn
 gemarkeerd met deze purposes; queries op andere marts zonder geldig doel
 worden geweigerd.
 
@@ -1057,7 +1057,7 @@ worden geweigerd.
 
 ## 4. Dagelijkse workflows met voorbeelden
 
-### 4.1 Workflow A — Schadelast huidig jaar
+### 4.1 Workflow A — Cost forecast huidig jaar
 
 ```sql
 SELECT
@@ -1127,14 +1127,14 @@ WHERE peilkwartaal = '2026-Q1';
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
 | `Access Denied: silver.persons.*` | Geen PII voor jouw rol | Werk op aggregaat-marts |
-| `Access Denied: gold.uc05_customer_360` | Andere doelbinding | Niet jouw scope |
+| `Access Denied: gold.uc05_customer_360` | Andere purpose-limitation | Niet jouw scope |
 | `Result has only 8 rows` | Te kleine groep, mogelijk privacy-onderdrukking | Aggregeer ruwer |
 
 | Probleem | Contact |
 |---|---|
-| Inloggen, MFA | Platform-admin |
+| Sign in, MFA | Platform-admin |
 | Definitie van een prognose-veld | Data-steward |
-| "De cijfers verschillen van Werkmap" | Data-steward (kwaliteit) |
+| "De cijfers verschillen van Workspace" | Data-steward (kwaliteit) |
 
 ---
 
@@ -1153,11 +1153,11 @@ WHERE peilkwartaal = '2026-Q1';
 ---
 
 
-## Handleiding — Operations Manager
+## Handbook — Operations Manager
 
-> Rol-key: `operations_manager` · Domein: Sociaal-medische zaken · Risiconiveau toegang: laag (geen cliënt-PII)
+> Rol-key: `operations_manager` · Domein: Operationale zaken · Risiconiveau access: laag (geen cliënt-PII)
 
-Deze handleiding is voor **planners die SMZ-capaciteit beheren**:
+Deze handbook is voor **planners die SMZ-capaciteit beheren**:
 verzekeringsartsen, arbeidsdeskundigen, roosters en wachttijden. Je werkt
 op **planningsdata zonder cliënt-PII** — je ziet wel beoordelaar-roosters
 en case-counts, maar geen individuele dossiers.
@@ -1176,7 +1176,7 @@ waar je op werkt. Je gebruikt het platform om:
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
@@ -1189,7 +1189,7 @@ waar je op werkt. Je gebruikt het platform om:
 
 ### 3.1 Catalogs en schemas
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
 | `gold` | `uc08_capacity_planning` | Capaciteits-aggregaten | **Ja** |
 | `silver` | `smz` | SMZ-rooster en case-counts | **Ja** |
@@ -1210,7 +1210,7 @@ In `gold.uc08_capacity_planning.*` en `silver.smz.*`:
 | `bsn`, naam, diagnose, etc. | NULL (kolom-mask) — geen cliënt-PII |
 | `doorlooptijd_dagen` (geaggregeerd) | Volledig |
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
 Purpose: **"planning"**. Je rol kan dus geen behandelingsdoelen aanspreken.
 
@@ -1290,7 +1290,7 @@ teamleider — geen BSN's, alleen aggregaten.
 
 | Probleem | Contact |
 |---|---|
-| Inloggen | Platform-admin |
+| Sign in | Platform-admin |
 | Definities | Data-steward |
 | Onverwachte wachttijdpiek | Teamleider (operationeel), data-steward (data) |
 
@@ -1311,13 +1311,13 @@ teamleider — geen BSN's, alleen aggregaten.
 ---
 
 
-## Handleiding — Marketing Analyst
+## Handbook — Marketing Analyst
 
-> Rol-key: `marketing_analyst` · Domein: Toeslagenwet (proactief) · Risiconiveau toegang: middel (PII, geen medisch)
+> Rol-key: `marketing_analyst` · Domein: Toeslagenwet (proactief) · Risiconiveau access: middel (PII, geen medisch)
 
-Deze handleiding is voor **medewerkers die proactief cliënten benaderen
+Deze handbook is voor **medewerkers die proactief cliënten benaderen
 voor TW-eligibility** (Toeslagenwet). De use case (UC-04) gebruikt
-voorspelmodellen om cliënten te identificeren die mogelijk recht hebben
+voorspelmodels om cliënten te identificeren die mogelijk recht hebben
 maar niet hebben aangevraagd. **Opt-out van de cliënt is leidend.**
 
 ---
@@ -1336,7 +1336,7 @@ case en initieert proactief contact. Je gebruikt het platform om:
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
@@ -1349,7 +1349,7 @@ case en initieert proactief contact. Je gebruikt het platform om:
 
 ### 3.1 Catalog en schema
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
 | `gold` | `uc04_eligibility_outreach` | Werklijst proactief TW | **Ja** |
 | `silver` | * | Niet voor jouw rol | **Nee** |
@@ -1361,16 +1361,16 @@ In `gold.uc04_eligibility_outreach.werklijst`:
 
 | Kolom | Wat zie je? |
 |---|---|
-| `bsn`, naam, birth_date | Volledig — nodig voor klantcontact |
+| `bsn`, naam, birth_date | Volledig — nodig voor customer interaction |
 | `adres`, kanaalvoorkeur | Volledig |
 | `iban`, `bankrekening` | Gemaskeerd |
 | `diagnose`, `icd10` | NULL — niet jouw doel |
-| `eligibility_score` | Score uit het model |
+| `eligibility_score` | Score from the model |
 | `top_drivers` | Korte uitleg waarom voorgedragen |
 | `opt_out` | Altijd `false` — opt-outs zijn al uitgefilterd |
 | `laatste_benadering` | Datum / kanaal van vorige poging |
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
 Purpose: **"proactieve_dienstverlening"**. Je werklijst wordt gefilterd
 op cliënten die **niet** opt-out hebben gegeven; opt-out is een rij-filter
@@ -1404,9 +1404,9 @@ LIMIT 50;
 
 ### 4.2 Workflow B — Per case context bekijken
 
-**Scenario.** Cliënt 999000234 staat hoog op de lijst. Waarom?
+**Scenario.** Cliënt 999000234 staat hoog on the lijst. Waarom?
 
-1. Klik in Superset op de rij → **Drill-through naar Detail**.
+1. Klik in Superset on the rij → **Drill-through naar Detail**.
 2. Bekijk **Top drivers**: bv. "WW eindigt over 2 weken; geen TW-aanvraag bekend".
 3. Bekijk **Vorige benadering**: bv. "Brief 2026-03-15, geen reactie".
 4. Beslis: bel, schrijf, of pak hem niet (cliënt heeft mogelijk al actie ondernomen elders).
@@ -1415,11 +1415,11 @@ LIMIT 50;
 
 **Scenario.** Je hebt mevrouw Jansen gebeld; ze gaat een TW-aanvraag indienen.
 
-In de Werkmap (out-of-platform): leg het contact + de uitkomst vast.
+In de Workspace (out-of-platform): leg het contact + de uitkomst vast.
 Het mart wordt morgen ververst en haar score zal vermoedelijk dalen.
 
 > Je legt **niet** in dit platform direct iets vast — dit is een leesbare
-> mart. Vastlegging gaat via Werkmap/CRM.
+> mart. Vastlegging gaat via Workspace/CRM.
 
 ### 4.4 Workflow D — Effectiviteit van benadering
 
@@ -1439,7 +1439,7 @@ ORDER  BY conversie_pct DESC;
 
 **Scenario.** Cliënt belt: "Bel me niet meer."
 
-1. Geef cliënt door waar opt-out wordt vastgelegd (Werkmap-instellingen / formulier).
+1. Geef cliënt door waar opt-out wordt vastgelegd (Workspace-instellingen / formulier).
 2. Werklijst wordt automatisch gefilterd vanaf de eerstvolgende refresh.
 3. **Bel deze cliënt niet meer**, ook niet via een andere lijst — het is opt-out, niet opt-out-per-kanaal.
 
@@ -1455,7 +1455,7 @@ ORDER  BY conversie_pct DESC;
 
 | Probleem | Contact |
 |---|---|
-| Inloggen | Platform-admin |
+| Sign in | Platform-admin |
 | "De score klopt niet" | Data-steward |
 | Cliënt klaagt over benadering | Bias/grievance-kanaal UWV (out-of-platform) |
 
@@ -1477,32 +1477,32 @@ ORDER  BY conversie_pct DESC;
 ---
 
 
-## Handleiding — Researcher
+## Handbook — Researcher
 
-> Rol-key: `researcher` · Domein: Statistisch onderzoek (sandbox) · Risiconiveau toegang: laag (alleen sandbox, gepseudonimiseerd)
+> Rol-key: `researcher` · Domein: Statistisch onderzoek (sandbox) · Risiconiveau access: laag (alleen sandbox, gepseudonimiseerd)
 
-Deze handleiding is voor **onderzoekers** die statistisch onderzoek doen
+Deze handbook is voor **onderzoekers** die statistisch onderzoek doen
 op ODAP data. Je werkt **uitsluitend in de sandbox-zone** met
-gepseudonimiseerde panels — geen productie-PII, geen rauwe BSN's.
+gepseudonimiseerde panels — geen production-PII, geen rauwe BSN's.
 
 ---
 
 ## 1. Wat doet jouw rol?
 
-Je doet wetenschappelijk-statistisch onderzoek (UC-09 — re-integratie-effectiviteit
+Je doet wetenschappelijk-statistisch onderzoek (UC-09 — reintegration-effectiviteit
 en vergelijkbare studies). Je gebruikt het platform om:
 
 - Gepseudonimiseerde panels uit `sandbox.*` te raadplegen
 - Cohort-analyses, regressies en controlled comparisons te draaien
 - Resultaten alleen geaggregeerd te exporteren
 
-> Als je rauwe productie-data nodig hebt, ben je in de **verkeerde rol**.
+> Als je rauwe production-data nodig hebt, ben je in de **verkeerde rol**.
 > Vraag dan een formele DPIA-aanvraag bij Data Office; deze wordt buiten
 > dit platform afgehandeld.
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
@@ -1519,10 +1519,10 @@ Voor ad-hoc gebruik van Trino: `kubectl -n odap-platform port-forward svc/trino-
 
 ### 3.1 Catalog en schema
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
 | `sandbox` | * | Gepseudonimiseerde panels, synthetische cohorts | **Ja** |
-| `silver`, `gold`, `bronze`, `sensitive` | * | Productie-zones | **Nee** |
+| `silver`, `gold`, `bronze`, `sensitive` | * | Production-zones | **Nee** |
 
 ### 3.2 Welke kolommen?
 
@@ -1536,10 +1536,10 @@ In `sandbox.*`:
 | `traject_soort`, `uitkomst` | Volledig — kern van je analyse |
 | `bsn`, naam, etc. | NIET aanwezig — bij ingestion al verwijderd |
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
 Purpose: **"statistisch_onderzoek"**. Het platform staat geen joins toe
-tussen `sandbox.*` en productiezones — die paden zijn fysiek dichtgezet.
+tussen `sandbox.*` en productionzones — die paden zijn fysiek dichtgezet.
 
 ---
 
@@ -1628,15 +1628,15 @@ SELECT COUNT(*) FROM gematched;
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `Access Denied: silver.*` | Productie-data niet voor researcher | Werk in sandbox |
+| `Access Denied: silver.*` | Production-data niet voor researcher | Werk in sandbox |
 | `JOIN across catalogs not allowed` | Bewust geblokkeerd | Vraag Data Office voor combinatie-traject |
 | `Result has < 30 rows` | Mogelijk privacy-onderdrukking | Aggregeer ruwer |
 
 | Probleem | Contact |
 |---|---|
-| Inloggen | Platform-admin |
+| Sign in | Platform-admin |
 | Cohort-vraag, panel-versies | Data Office (out-of-platform) |
-| "Ik heb productie-data nodig" | DPIA-aanvraag via Data Office |
+| "Ik heb production-data nodig" | DPIA-aanvraag via Data Office |
 
 ---
 
@@ -1645,7 +1645,7 @@ SELECT COUNT(*) FROM gematched;
 - Pseudoniemen koppelen aan externe data om te de-anonimiseren — strafbaar.
 - Cohort-data extern delen zonder Data Office-akkoord.
 - Aggregaten met < 10 records publiceren.
-- Toegang tot productie-zones forceren via een ander account.
+- Access tot production-zones forceren via een ander account.
 
 ---
 
@@ -1656,12 +1656,12 @@ SELECT COUNT(*) FROM gematched;
 ---
 
 
-## Handleiding — Data-steward
+## Handbook — Data-steward
 
-> Rol-key: `data_steward` · Domein: Datakwaliteit & governance · Risiconiveau toegang: hoog (PII voor DQ-controle)
+> Rol-key: `data_steward` · Domein: Datakwaliteit & governance · Risiconiveau access: hoog (PII voor DQ-controle)
 
-Deze handleiding is voor **data-stewards**. Jij bent de spil tussen
-data-engineers (die pipelines bouwen) en eindgebruikers (die data
+Deze handbook is voor **data-stewards**. Jij bent de spil tussen
+data-engineers (die pipelines bouwen) en eindusers (die data
 gebruiken). Je zorgt voor kwaliteit, lineage, eigenaarschap en juiste
 classificatie. Je ziet PII voor controledoeleinden, **niet** medische data.
 
@@ -1672,19 +1672,19 @@ classificatie. Je ziet PII voor controledoeleinden, **niet** medische data.
 Je bewaakt de governance van het platform. Je gebruikt het platform om:
 
 - Datakwaliteit te bewaken (dbt-tests, OpenMetadata-profiler)
-- Eigenaarschap, classificaties en doelbindingen actueel te houden
+- Eigenaarschap, classificaties en purpose-limitationen actueel te houden
 - Lineage te valideren (van bron tot dashboard)
 - Glossary (CGM-begrippen) te onderhouden
 - Sensitive-queries van Claims Analystn te reviewen
-- Eindgebruikers te helpen bij begrip en interpretatie van data
+- Eindusers te helpen bij begrip en interpretatie van data
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **OpenMetadata** | Hoofdwerkplek: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.odap.local:8443 |
+| **OpenMetadata** | Hoofdworkspace: catalog, glossary, classificaties, profiler, lineage | https://openmetadata.odap.local:8443 |
 | **Apache Superset** | Dashboards reviewen, ownership-overzichten | https://superset.odap.local:8443 |
 | **Apache Airflow** | DQ-DAGs draaien | https://airflow.odap.local:8443 |
 | **OpenSearch (Kibana-achtig)** | OPA-decision-logs reviewen | https://opensearch.odap.local:8443/logs |
@@ -1696,7 +1696,7 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 
 ### 3.1 Catalogs
 
-| Catalog | Toegang | Doel |
+| Catalog | Access | Doel |
 |---|---|---|
 | `bronze` | **Ja** (kwaliteitscontrole) | Vergelijken bron met silver |
 | `silver` | **Ja** | DQ-bewaking, profiler |
@@ -1709,10 +1709,10 @@ Je bewaakt de governance van het platform. Je gebruikt het platform om:
 PII (BSN, naam, IBAN) zie je **volledig** voor DQ-controle. Medisch
 (`diagnose`, `icd10`) zie je **niet** — daarvoor heb je geen doel.
 
-> **Vuistregel.** Je hebt PII-toegang om datakwaliteit te valideren, niet om
+> **Vuistregel.** Je hebt PII-access om datakwaliteit te valideren, niet om
 > dossiers te lezen. Steekproeven, niet bulk-exports.
 
-### 3.3 Doelbindingen
+### 3.3 Purpose limitationen
 
 Purposes: **"sturingsinfo"** en **"kwaliteitscontrole"**. Sommige
 doel-specifieke marts (UC-04, UC-05) zijn voor jou alleen vanuit
@@ -1726,7 +1726,7 @@ kwaliteitscontrole-perspectief beschikbaar.
 
 1. Open **OpenMetadata** → **Quality** → **Test Suites**.
 2. Bekijk welke dbt-tests vannacht faalden (rood).
-3. Per fout: klik door naar de testbeschrijving + de records die faalden.
+3. Per fout: klik door to the testbeschrijving + de records die faalden.
 
 Of via Trino:
 
@@ -1756,7 +1756,7 @@ GROUP  BY 1
 ORDER  BY 1;
 ```
 
-Vermoeden: ingestion-issue. Je escaleert naar de data-engineer.
+Vermoeden: ingestion-issue. Je escaleert to the data-engineer.
 
 ### 4.3 Workflow C — Sensitive-review
 
@@ -1784,7 +1784,7 @@ de arbeidsdeskundige om context. Anomalieën meld je bij platform-admin.
 1. Open OpenMetadata → **Glossary** → **CGM**.
 2. Voeg term toe: definitie, eigenaar, gerelateerd aan welke kolommen.
 3. Koppel de term aan `silver.claims.voorschot.bedrag`.
-4. Communiceer naar gebruikers (e-mail of dashboard-update).
+4. Communiceer naar users (e-mail of dashboard-update).
 
 ### 4.6 Workflow F — Lineage valideren
 
@@ -1807,17 +1807,17 @@ Voor periodieke audits exporteer je:
 - dbt-test-history van de laatste 30 dagen
 - Decision-log statistieken
 
-Zie [`docs/runbook.md` § 10](../runbook.md) voor de volledige procedure.
+Zie [`docs/runbook.md` § 10](../runbook.md) for the volledige procedure.
 
 ---
 
 ## 5. Verantwoordelijkheden in volgorde van prioriteit
 
-1. **Kwaliteit van productie-zones** (silver/gold) — fouten hier raken besluiten.
+1. **Kwaliteit van production-zones** (silver/gold) — fouten hier raken besluiten.
 2. **Sensitive-review** — dagelijks, 1e taak van de ochtend.
 3. **Eigenaarschap-coverage** — > 95% van datasets moet een eigenaar hebben.
 4. **DPIA-evidence** — actueel en toegankelijk voor toezichthouders.
-5. **Glossary-onderhoud** — gebruikers moeten begrippen kunnen vinden.
+5. **Glossary-onderhoud** — users moeten begrippen kunnen vinden.
 
 ---
 
@@ -1855,14 +1855,14 @@ Zie [`docs/runbook.md` § 10](../runbook.md) voor de volledige procedure.
 ---
 
 
-## Handleiding — Data-engineer
+## Handbook — Data-engineer
 
-> Rol-key: `data_engineer` · Domein: Data-pipelines & ingestion · Risiconiveau toegang: hoog (PII in bronze, JIT)
+> Rol-key: `data_engineer` · Domein: Data-pipelines & ingestion · Risiconiveau access: hoog (PII in bronze, JIT)
 
-Deze handleiding is voor **data-engineers** die pipelines bouwen en
-beheren. Je hebt **JIT-toegang** (just-in-time) tot `bronze.*` voor
+Deze handbook is voor **data-engineers** die pipelines bouwen en
+beheren. Je hebt **JIT-access** (just-in-time) tot `bronze.*` voor
 debug-doeleinden — niet voor permanent gebruik. Je bouwt NiFi-flows,
-Spark-jobs, dbt-modellen en Airflow-DAGs.
+Spark-jobs, dbt-models en Airflow-DAGs.
 
 ---
 
@@ -1873,14 +1873,14 @@ platform om:
 
 - Brondata via NiFi naar Kafka te krijgen
 - Spark Structured Streaming jobs te draaien (Kafka → Delta op MinIO)
-- dbt-modellen te bouwen (`silver.*` → `gold.*`)
+- dbt-models te bouwen (`silver.*` → `gold.*`)
 - Airflow-DAGs voor batch en onderhoud te schedulen
 - DQ-tests in te bouwen
 - Bronze-data te debuggen wanneer nodig
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
@@ -1900,9 +1900,9 @@ platform om:
 
 ### 3.1 Catalogs
 
-| Catalog | Toegang | Hoe? |
+| Catalog | Access | Hoe? |
 |---|---|---|
-| `bronze` | **JIT** — moet aanvragen | Via Trino, alleen na ticket-id in PR/PR-comment |
+| `bronze` | **JIT** — moet request | Via Trino, alleen na ticket-id in PR/PR-comment |
 | `silver`, `gold` | **Indirect** — via dbt-runs en CI | Niet direct queryen voor business-doel |
 | `sensitive`, `sandbox` | **Nee** | Alleen domein-rollen / researcher |
 
@@ -1910,7 +1910,7 @@ platform om:
 
 1. Ticket aanmaken in tracker (Linear/Jira) met **doel** en **scope**.
 2. Platform-admin keurt goed; rol wordt 4 uur geactiveerd voor jouw account.
-3. Jouw queries worden gelogd. Na 4 uur deactiveert toegang automatisch.
+3. Jouw queries worden gelogd. Na 4 uur deactiveert access automatisch.
 4. Voeg ticket-id toe als comment bij elke query (`-- TICKET-1234`).
 
 ### 3.3 Welke kolommen?
@@ -1926,7 +1926,7 @@ zuinig: **kijk niet meer dan nodig**.
 
 **Scenario.** Beleid vraagt om data van een nieuw bronsysteem `xyz`.
 
-1. **Ontwerp**: schrijf een mini-spec in `docs/use-cases/uc-xyz.md` (entiteiten, classificatie, doelbinding, bewaartermijn).
+1. **Ontwerp**: schrijf een mini-spec in `docs/use-cases/uc-xyz.md` (entiteiten, classificatie, purpose-limitation, retention period).
 2. **NiFi-flow**: kopieer template `nifi-flows/templates/delta/source-xyz/` aan, pas processors aan.
 3. **Kafka-topic**: definieer `uwv.xyz.event` in `platform/06-kafka/topics.yaml`.
 4. **Spark-job**: voeg `streaming-bronze-xyz.yaml` toe; gebruik helper `lakehouse_io.write_delta()`.
@@ -1967,8 +1967,8 @@ models:
       eigenaar: data.steward@odap.local:8443
       domain: xyz
       legal_basis: art_6_1e
-      doelbinding: [sturingsinfo]
-      bewaartermijn_jaren: 7
+      purpose-limitation: [sturingsinfo]
+      retention period_jaren: 7
       pii_kolommen: []
     columns:
       - name: dag
@@ -2020,7 +2020,7 @@ Hive-metastore lock.
 Stel: een dbt-test faalt met `IBAN format invalid`. Je wilt zien hoe de
 ruwe IBAN binnenkomt vanuit bronze.
 
-1. Open ticket: "TICKET-1234: debug iban-validatie WIA-aanvraag, bronze toegang 4u"
+1. Open ticket: "TICKET-1234: debug iban-validatie WIA-aanvraag, bronze access 4u"
 2. Platform-admin keurt goed
 3. Query met ticket-id:
    ```sql
@@ -2031,15 +2031,15 @@ ruwe IBAN binnenkomt vanuit bronze.
    GROUP  BY iban
    LIMIT  20;
    ```
-4. Los root-cause op, deploy fix, sluit ticket. Toegang verloopt automatisch.
+4. Los root-cause op, deploy fix, sluit ticket. Access verloopt automatisch.
 
 ---
 
 ## 5. Code- en deploy-discipline
 
 - **Geen `latest`-tags.** Pin altijd image-versies; release-pinning in `infrastructure/stackablectl/release.yaml`.
-- **Geen plaintext secrets.** Gebruik Stackable secret-operator + Vault (productie).
-- **Eén ADR per architectuurkeuze.** Zie `docs/adr/` voor format.
+- **Geen plaintext secrets.** Gebruik Stackable secret-operator + Vault (production).
+- **Eén ADR per architecturekeuze.** Zie `docs/adr/` voor format.
 - **Format-agnostisch.** Geen hardcoded `delta` of `iceberg` buiten de switch-points (zie [docs/architecture.md § 4](../architecture.md)).
 - **CI moet groen.** PR's met rode CI worden niet gereviewd.
 
@@ -2052,7 +2052,7 @@ ruwe IBAN binnenkomt vanuit bronze.
 | Cluster down | Platform-admin (telefonisch) |
 | OPA-policy verandering | Pair met platform-admin + data-steward |
 | Schema-mismatch in bronze | Bron-eigenaar (UWV-zijde) |
-| Productie-incident | Volg [`docs/runbook.md` § 4](../runbook.md) |
+| Production-incident | Volg [`docs/runbook.md` § 4](../runbook.md) |
 
 | Foutmelding | Actie |
 |---|---|
@@ -2064,11 +2064,11 @@ ruwe IBAN binnenkomt vanuit bronze.
 
 ## 7. Wat je nooit doet
 
-- Permanente toegang tot `bronze.*` activeren — JIT, altijd JIT.
-- Productie-data downloaden naar je laptop voor lokaal werk.
-- Een Spark-job zonder unit-tests in productie deployen.
-- Wijzigingen in `platform-config.yaml::table_format` zonder ADR.
-- Direct `kubectl edit` op productie-CRDs — alles via PR + GitOps.
+- Permanente access tot `bronze.*` activeren — JIT, altijd JIT.
+- Production-data downloaden naar je laptop voor lokaal werk.
+- Een Spark-job zonder unit-tests in production deployen.
+- Changes in `platform-config.yaml::table_format` zonder ADR.
+- Direct `kubectl edit` op production-CRDs — alles via PR + GitOps.
 
 ---
 
@@ -2079,11 +2079,11 @@ ruwe IBAN binnenkomt vanuit bronze.
 ---
 
 
-## Handleiding — Platform-admin
+## Handbook — Platform-admin
 
-> Rol-key: `platform_admin` · Domein: Cluster + security · Risiconiveau toegang: maximaal (break-glass)
+> Rol-key: `platform_admin` · Domein: Cluster + security · Risiconiveau access: maximaal (break-glass)
 
-Deze handleiding is voor **platform-admins**. Je hebt break-glass-toegang
+Deze handbook is voor **platform-admins**. Je hebt break-glass-access
 tot **alle catalogs**, inclusief `sensitive` en `sandbox`. Je rol is **niet
 voor day-to-day werk** — je bent er voor incidenten, structurele wijzigingen
 en governance van het platform zelf. **Elke break-glass-actie wordt gelogd
@@ -2093,24 +2093,24 @@ en achteraf gereviewd.**
 
 ## 1. Wat doet jouw rol?
 
-Je bent eindverantwoordelijk voor de werking en veiligheid van het
+Je bent eindverantwoordelijk for the werking en veiligheid van het
 platform. Je gebruikt het platform om:
 
 - Cluster-incidenten op te lossen
-- Toegang en rollen te beheren in Keycloak
+- Access en rollen te beheren in Keycloak
 - OPA-policies te beoordelen en te deployen
 - Backups en restores uit te voeren
 - Compliance-evidence te exporteren
-- JIT-aanvragen van data-engineers goed te keuren
-- Structurele wijzigingen (architectuur, ADR's, security) te begeleiden
+- JIT-request van data-engineers goed te keuren
+- Structurele wijzigingen (architecture, ADR's, security) te begeleiden
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 | Applicatie | Wat doe je daar? | URL |
 |---|---|---|
-| **Keycloak Admin** | Rolbeheer, gebruikers, MFA-policies | https://keycloak.odap.local:8443/admin |
+| **Keycloak Admin** | Rolbeheer, users, MFA-policies | https://keycloak.odap.local:8443/admin |
 | **kubectl + k9s** | Alle clusters, alle pods | terminal |
 | **Apache Airflow** | Maintenance-DAGs | https://airflow.odap.local:8443 |
 | **OpenSearch / OPA-logs** | Audit-log review | via Vector ingestion |
@@ -2120,7 +2120,7 @@ platform. Je gebruikt het platform om:
 
 - Trino break-glass queries: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443` en dan via DBeaver op `localhost:8443`.
 
-> **MFA verplicht en hardware-gebonden.** Voor productie: WebAuthn-passkey of
+> **MFA verplicht en hardware-gebonden.** Voor production: WebAuthn-passkey of
 > hardware-token (YubiKey). Geen TOTP-app op een mobiel.
 
 ---
@@ -2129,12 +2129,12 @@ platform. Je gebruikt het platform om:
 
 ### 3.1 Catalogs
 
-Je hebt toegang tot **alles**: `bronze`, `silver`, `gold`, `sensitive`,
-`sandbox`. Toegang valt onder **break-glass**: elke query staat de
-volgende ochtend op het reviewscherm van de data-steward.
+Je hebt access tot **alles**: `bronze`, `silver`, `gold`, `sensitive`,
+`sandbox`. Access valt onder **break-glass**: elke query staat de
+volgende ochtend on the reviewscherm van de data-steward.
 
 > **Vuistregel break-glass.** Doe het alleen voor:
-> 1. Incident-respons (productie down, data corrupt)
+> 1. Incident-respons (production down, data corrupt)
 > 2. Compliance-evidence verzamelen
 > 3. Onderhouds-validatie (niet voor begripsmatige queries)
 >
@@ -2142,7 +2142,7 @@ volgende ochtend op het reviewscherm van de data-steward.
 
 ### 3.2 Audit-discipline
 
-Elke break-glass-query begint met een comment:
+Elke break-glass-query begint with a comment:
 
 ```sql
 -- BREAK-GLASS REASON: incident INC-2026-04-30 / cliënt 999000123 / data corruptie review
@@ -2174,7 +2174,7 @@ kubectl get trinocluster,kafkacluster,hivecluster,opacluster,airflowcluster,supe
 
 ### 4.2 Workflow B — Nieuwe gebruiker toevoegen
 
-> In productie: gebeurt via SSO-federatie (DigiD/eHerkenning of Entra ID).
+> In production: gebeurt via SSO-federatie (DigiD/eHerkenning of Entra ID).
 > In deze referentie via Keycloak Admin.
 
 1. Open https://keycloak.odap.local:8443/admin → realm `uwv` → **Users → Add user**.
@@ -2187,13 +2187,13 @@ kubectl get trinocluster,kafkacluster,hivecluster,opacluster,airflowcluster,supe
 
 1. Data-engineer maakt ticket "TICKET-1234: bronze access 4u, doel debug iban".
 2. Lees doel + scope. Bij twijfel: bel de data-engineer voor toelichting.
-3. Activeer rol via Keycloak (4 uur). In productie: dit gaat via een
+3. Activeer rol via Keycloak (4 uur). In production: dit gaat via een
    automatiseringsscript dat de mapping in OPA tijdelijk aanpast.
 4. Sluit het ticket met je goedkeuring; markeer in audit-log waarom.
 
 ### 4.4 Workflow D — OPA-policy deployen
 
-Wijzigingen aan policies gebeuren in `opa-policies-src/`. Process:
+Changes aan policies gebeuren in `opa-policies-src/`. Process:
 
 ```bash
 # 1. Test lokaal
@@ -2288,7 +2288,7 @@ Templates en escalatie-paden: out-of-platform via Platform CISO.
 In volgorde van prioriteit:
 
 1. **Beschikbaarheid en integriteit** van het platform.
-2. **Toegangs-discipline**: alleen wie het nodig heeft, alleen wat nodig is.
+2. **Accesss-discipline**: alleen wie het nodig heeft, alleen wat nodig is.
 3. **Incident-respons**: snel, gestructureerd, navolgbaar.
 4. **Backup en restore**: getest, niet alleen "ingericht".
 5. **Compliance-evidence**: actueel, exporteerbaar.
@@ -2300,7 +2300,7 @@ In volgorde van prioriteit:
 
 | Probleem | Contact |
 |---|---|
-| Productie-incident | Volg runbook + UWV SRE-team |
+| Production-incident | Volg runbook + UWV SRE-team |
 | Beleidsvraag | Platform CISO + Data Office |
 | Wettelijke vraag | Privacy Officer (FG) |
 | Burnout / overbelasting | Manager + collega-admin (rol moet redundant zijn!) |
@@ -2309,9 +2309,9 @@ In volgorde van prioriteit:
 
 ## 7. Wat je nooit doet
 
-- Break-glass-toegang gebruiken voor "snelle vragen" — maak een non-admin account.
-- Een productie-OPA-policy patchen zonder PR + tweede paar ogen.
-- Direct `kubectl edit` op productie-CRDs — altijd via GitOps.
+- Break-glass-access gebruiken voor "snelle vragen" — maak een non-admin account.
+- Een production-OPA-policy patchen zonder PR + tweede paar ogen.
+- Direct `kubectl edit` op production-CRDs — altijd via GitOps.
 - Een wachtwoord in plaintext doorsturen, ook niet "tijdelijk".
 - MFA disable-en voor "even debuggen".
 - Nieuwe rollen creëren zonder vermelding in `role_mappings.json` + ADR.
@@ -2325,13 +2325,13 @@ In volgorde van prioriteit:
 ---
 
 
-## Handleiding — Smoketest (systeemrol)
+## Handbook — Smoketest (systeemrol)
 
-> Rol-key: `smoketest` · Type: **service-account, geen mens** · Risiconiveau toegang: middel
+> Rol-key: `smoketest` · Type: **service-account, geen mens** · Risiconiveau access: middel
 
 Dit is **geen rol voor mensen**. Het is een service-account voor
 geautomatiseerde tests, dbt-runs in CI en smoke tests bij deploy.
-Deze handleiding is voor de **platform-admins en data-engineers** die
+Deze handbook is for the **platform-admins en data-engineers** die
 deze rol configureren en bewaken.
 
 ---
@@ -2341,7 +2341,7 @@ deze rol configureren en bewaken.
 - **CI-pipeline** (`ci/github-actions/`) — bij elke PR run je `dbt parse`, `opa test`, smoke tests.
 - **Smoke tests** (`scripts/run-smoke-tests.sh`, `tests/smoke/*.sh`) — verifiëren dat het cluster werkt.
 - **dbt-runs** in Airflow voor `staging`/`marts` — non-interactief.
-- **Geen interactieve gebruikers** — login geweigerd, alleen service-account-flow.
+- **Geen interactieve users** — login geweigerd, alleen service-account-flow.
 
 ---
 
@@ -2364,8 +2364,8 @@ deze rol configureren en bewaken.
 ```
 
 > **Waarom alle purposes (`*`)?** Smoke tests valideren dat queries
-> *technisch* werken. De purposes zijn niet bedoeld als doelbinding maar
-> als test-coverage. In productie wordt deze rol **alleen vanuit de CI**
+> *technisch* werken. De purposes zijn niet bedoeld als purpose-limitation maar
+> als test-coverage. In production wordt deze rol **alleen vanuit de CI**
 > aangesproken, niet vanaf werkstations.
 
 ### 2.2 Authenticatie
@@ -2373,11 +2373,11 @@ deze rol configureren en bewaken.
 Geen password-flow. Het service-account gebruikt:
 
 - **Static OIDC client credentials** (Keycloak `client_credentials`-grant)
-- Secret in `Stackable secret-operator` (productie: External Secrets + Vault)
+- Secret in `Stackable secret-operator` (production: External Secrets + Vault)
 
 ### 2.3 Geen sensitive
 
-`smoketest` heeft **geen** toegang tot `sensitive.*` of `sandbox.*`.
+`smoketest` heeft **geen** access tot `sensitive.*` of `sandbox.*`.
 
 ---
 
@@ -2432,7 +2432,7 @@ Alerts gaan via Prometheus → AlertManager → Slack `#platform-alerts`.
 
 Maandelijks (data-steward + platform-admin):
 
-1. Bekijk OPA decision-log voor `smoketest` op productie-zones.
+1. Bekijk OPA decision-log voor `smoketest` op production-zones.
 2. Controleer of er **geen** queries zijn met cliënt-specifieke filters
    (`WHERE bsn = '...'`) — dat zou betekenen dat een mens deze rol misbruikt.
 3. Verifieer dat secret-rotatie afgelopen periode is uitgevoerd.
@@ -2445,7 +2445,7 @@ Maandelijks (data-steward + platform-admin):
 
 1. Check Airflow voor lopende DAGs — vermoedelijk een retry-loop.
 2. Pauzeer de DAG.
-3. Onderzoek de fout.
+3. Research de fout.
 4. Hervat na fix.
 
 ### 5.2 `smoketest` doet plotseling sensitive-queries
@@ -2453,7 +2453,7 @@ Maandelijks (data-steward + platform-admin):
 Dit is **niet** mogelijk volgens OPA-policy: deny default. Als toch:
 
 1. **Direct** smoke-test deactiveren in Keycloak.
-2. Onderzoek hoe een sensitive-query überhaupt door OPA kwam.
+2. Research hoe een sensitive-query überhaupt door OPA kwam.
 3. Audit-log van laatste 24u exporteren.
 4. Incident melden volgens NIS2-procedure (zie [11-platform-admin.md](11-platform-admin.md) § 4.8).
 
@@ -2477,7 +2477,7 @@ Als CI-runs failen met `401 Unauthorized` voor `smoketest`:
   is technisch geblokkeerd (geen direct grant).
 - **Geen gedeeld secret.** Het OIDC-client-secret komt alleen uit de
   secret-operator; staat **niet** in code, niet in env-files, niet in chats.
-- **Roteer per kwartaal** (productie). In dev: bij elke fresh `make bootstrap`.
+- **Roteer per kwartaal** (production). In dev: bij elke fresh `make bootstrap`.
 - **Audit-log = bewijs.** Bij twijfel over wat de rol gedaan heeft, lees
   de log; vraag het niet aan de developers.
 
@@ -2487,7 +2487,7 @@ Als CI-runs failen met `401 Unauthorized` voor `smoketest`:
 
 - `smoketest`-credentials gebruiken voor "snel een query" — gebruik je eigen account.
 - `smoketest` extra rechten geven om een test te laten slagen — fix de test.
-- Een productie-DAG schrijven die `smoketest` als impersonatie van een mens-rol gebruikt.
+- Een production-DAG schrijven die `smoketest` als impersonatie van een mens-rol gebruikt.
 
 ---
 

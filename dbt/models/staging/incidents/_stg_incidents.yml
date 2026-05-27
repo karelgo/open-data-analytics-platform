@@ -9,9 +9,9 @@ models:
       domain: ag
       subdomain: zw
       legal_basis: ZW_art_29
-      doelbinding: ["uitkering"]
+      purpose-limitation: ["claim payout"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_ag
       pii_kolommen: [bsn]
       risk_tier: laag

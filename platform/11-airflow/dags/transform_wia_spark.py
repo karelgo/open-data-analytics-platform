@@ -34,7 +34,7 @@ create/get/delete in odap-platform — zie platform/11-airflow/rbac-spark.yaml.
 Schedule:
   None (alleen handmatige trigger of via TriggerDagRunOperator). Reden:
   bronze.claims.application wordt nu handmatig geseed (zie seed-bronze-claims
-  SparkApplication), niet door een streaming-DAG. Voor productie: vervang
+  SparkApplication), niet door een streaming-DAG. Voor production: vervang
   door schedule=[bronze_wia_dataset].
 
 SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
@@ -169,7 +169,7 @@ with DAG(
     description=(
         "Spark-pad voor WIA bronze→silver→gold (parallel aan dbt). "
         "Tasks roepen SparkApplications aan in odap-platform namespace. "
-        "Vereist seed-bronze-claims te zijn gedraaid (zie platform/08-spark/README.md)."
+        "Required seed-bronze-claims te zijn gedraaid (zie platform/08-spark/README.md)."
     ),
     default_args=DEFAULT_ARGS,
     schedule=None,

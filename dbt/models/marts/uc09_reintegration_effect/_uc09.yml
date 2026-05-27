@@ -3,17 +3,17 @@ version: 2
 models:
   - name: mart_uc09_effect_panel
     description: |
-      Gepseudonimiseerd onderzoekspanel voor UC-09 (re-integratie effectmeting).
+      Gepseudonimiseerd onderzoekspanel voor UC-09 (reintegration effectmeting).
       Bevat alleen pseudo-IDs, geen ruwe BSN. Geschikt voor researcher-rol in
-      sandbox-zone. Verenigbaar gebruik AVG art. 5 lid 1b.
+      sandbox-zone. Verenigbaar gebruik GDPR Art. 5(1)(b).
     config:
       tags: ["marts", "uc09", "ag", "sandbox"]
     meta:
       domain: ag
       legal_basis: art_5_1b_verenigbaar_gebruik
-      doelbinding: ["statistisch_onderzoek"]
+      purpose-limitation: ["statistisch_onderzoek"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 10
+      retention period_jaren: 10
       eigenaar: knowledge_center
       pii_kolommen: []
       risk_tier: laag

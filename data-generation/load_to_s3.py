@@ -113,7 +113,7 @@ def _emit(writer, stream: str, items: Iterable, to_envelope) -> int:
 @click.command()
 @click.option("--count", default=10000, show_default=True, help="Aantal personas (anchor count).")
 @click.option("--seed", default=2026, show_default=True, help="RNG-seed.")
-@click.option("--bucket", default="odap-raw", show_default=True, help="S3 bucket voor de raw zone.")
+@click.option("--bucket", default="odap-raw", show_default=True, help="S3 bucket for the raw zone.")
 @click.option(
     "--endpoint",
     envvar="S3_ENDPOINT",
@@ -151,7 +151,7 @@ def main(
     include_domains: str,
     dry_run: bool,
 ) -> None:
-    """Genereer en publiceer synthetische events naar de S3 raw zone."""
+    """Genereer en publiceer synthetische events to the S3 raw zone."""
     domains = {d.strip() for d in include_domains.split(",") if d.strip()}
     batch_id = uuid.uuid4().hex[:8]
 
@@ -163,7 +163,7 @@ def main(
         secret_key = os.environ.get("S3_SECRET_KEY") or os.environ.get("AWS_SECRET_ACCESS_KEY")
         if not access_key or not secret_key:
             raise click.UsageError(
-                "Vereist S3_ACCESS_KEY/S3_SECRET_KEY (of AWS_*) env vars voor non-dry-run."
+                "Required S3_ACCESS_KEY/S3_SECRET_KEY (of AWS_*) env vars voor non-dry-run."
             )
         if insecure or endpoint.startswith("https://"):
             import urllib3
@@ -205,7 +205,7 @@ def main(
         _emit(
             writer,
             "service_requests.application",
-            ww.generate_ww_aanvragen(bsns, seed=seed),
+            ww.generate_ww_request(bsns, seed=seed),
             ww.to_kafka_envelope,
         )
 
@@ -213,7 +213,7 @@ def main(
         _emit(
             writer,
             "claims.application",
-            wia.generate_wia_aanvragen(bsns, seed=seed),
+            wia.generate_wia_request(bsns, seed=seed),
             wia.to_kafka_envelope,
         )
 
@@ -237,7 +237,7 @@ def main(
         _emit(
             writer,
             "customers.interaction",
-            crm.generate_klantcontacten(bsns, seed=seed),
+            crm.generate_customer interactionen(bsns, seed=seed),
             crm.to_kafka_envelope,
         )
 

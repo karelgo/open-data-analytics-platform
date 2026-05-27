@@ -1,5 +1,5 @@
 # Service + Ingress voor Superset.
-# Stackable maakt alleen headless Services; voor browser-toegang is een
+# Stackable maakt alleen headless Services; voor browser-access is een
 # normale ClusterIP Service + nginx-ingress nodig.
 ---
 apiVersion: v1
@@ -30,7 +30,7 @@ metadata:
     # host:8443 naar cluster:443, dus zonder X-Forwarded-Port bouwt Superset
     # een URL zonder :8443 → browser landt op port 443 die niet luistert.
     #
-    # Iframe-allow voor de portal embed-shell (cross-origin). Zonder
+    # Iframe-allow for the portal embed-shell (cross-origin). Zonder
     # frame-ancestors hier zou Superset's default Talisman-CSP de iframe
     # blokkeren; X-Frame-Options strippen want sommige Stackable-versies
     # zetten 'm op DENY.

@@ -13,7 +13,7 @@ Stappen:
      (idempotent — eerste run maakt entry, volgende runs no-op)
   7. Verplaats CSV naar processed/ prefix
 
-Vereiste env-vars (gezet door csv_ingest_factory):
+Requirede env-vars (gezet door csv_ingest_factory):
   SOURCE_NAME       — naam van de bron (matcht <name>.yml)
   OBJECT_KEY        — s3-key binnen staging-bucket (uit dag_run.conf)
   S3_ENDPOINT           — bv. http://minio.odap-platform.svc.cluster.local:9000
@@ -187,7 +187,7 @@ def parse_csv(data: bytes, schema_cols: list[dict], delimiter: str,
 
 
 def validate_constraints(table: pa.Table, schema_cols: list[dict]) -> None:
-    """Check required + min/max op de pyarrow-tabel; faal hard bij overtreding."""
+    """Check required + min/max on the pyarrow-tabel; faal hard bij overtreding."""
     n_rows = table.num_rows
     if n_rows == 0:
         sys.exit("ERROR: CSV bevat geen data-rijen")

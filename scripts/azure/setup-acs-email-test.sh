@@ -6,11 +6,11 @@
 #
 # Twee modi:
 #
-#   A) "CLI-modus" (Graph-toegang beschikbaar):
+#   A) "CLI-modus" (Graph-access beschikbaar):
 #      Script maakt zelf Entra-app + client-secret + role-assignment.
-#      Vereist `az login --scope https://graph.microsoft.com//.default`.
+#      Required `az login --scope https://graph.microsoft.com//.default`.
 #
-#   B) "Portal-modus" (Graph-toegang geblokkeerd door Conditional Access):
+#   B) "Portal-modus" (Graph-access geblokkeerd door Conditional Access):
 #      Jij doet stappen 1-3 in de Azure-portal en geeft de client-ID +
 #      secret-waarde mee als flag. Script slaat alle Graph-calls over.
 #      Zie platform-overlays/azure-personal/14-monitoring/README.md.
@@ -23,7 +23,7 @@
 #   5. Patch het k8s-Secret 'alertmanager-receivers' (odap-monitoring NS)
 #      met smtp_password_acs = <client-secret>
 #   6. Patch platform-overlays/azure-personal/14-monitoring/
-#      alertmanager-add-acs.yaml met de authUsername.
+#      alertmanager-add-acs.yaml with the authUsername.
 #
 # Voorbeeld portal-modus:
 #   bash scripts/azure/setup-acs-email-test.sh \
@@ -110,7 +110,7 @@ $(warn "Microsoft Graph wordt geblokkeerd door Conditional Access.")
 
 Twee opties:
 
-  Optie 1 — interactief opnieuw inloggen (vereist browser-MFA):
+  Optie 1 — interactief opnieuw sign in (vereist browser-MFA):
       az login --scope https://graph.microsoft.com//.default
     en run dit script opnieuw zonder argumenten.
 

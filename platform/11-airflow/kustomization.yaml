@@ -2,14 +2,14 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: odap-platform
 
-# Architectuur: docs/adr/0007-airflow-pipeline-architecture.md.
+# Architecture: docs/adr/0007-airflow-pipeline-architecture.md.
 #
 # DAGs worden via 3 ConfigMaps gemount:
 #   - airflow-dags     → /stackable/airflow/dags/  (DAG-aanroepers)
 #   - airflow-include  → /opt/odap/airflow/include/ (factories + helpers, op PYTHONPATH)
 #   - airflow-sources  → /opt/odap/airflow/sources/ (YAML-registry)
 #
-# Productie: vervang door Stackable's `dagsGitSync` met een interne git-mirror.
+# Production: vervang door Stackable's `dagsGitSync` with a interne git-mirror.
 
 resources:
   - airflowcluster.yaml
@@ -32,14 +32,14 @@ configMapGenerator:
       - dags/transform_silver_per_domain.py
       - dags/transform_gold_per_usecase.py
       - dags/governance_om_ingest.py
-      - dags/bewaartermijn_enforcer.py
+      - dags/retention period_enforcer.py
       - dags/lakehouse_maintenance.py
       - dags/uc11_full_setup.py
       - dags/uc11_databricks.py
       - dags/uc11_fabric.py
       - dags/convert_to_delta.py
       # Spark-pad voor WIA bronze→silver→gold (parallel aan dbt).
-      # Zie platform/08-spark/README.md voor de seed-stap.
+      # Zie platform/08-spark/README.md for the seed-stap.
       - dags/transform_wia_spark.py
       # synthetic_data_load.py uitgesloten — gebruikt verouderde
       # KubernetesJobOperator signature (job_template is geen geldige arg meer).
@@ -85,7 +85,7 @@ configMapGenerator:
       - jobs/convert_to_delta.py
       # SparkApplication-templates voor DAG transform_wia_spark.
       # De DAG mountert deze ConfigMap en doet `sed | kubectl apply -f -`
-      # met een unieke ${RUN_ID} per run.
+      # with a unieke ${RUN_ID} per run.
       - jobs/spark-silver-wia.yaml
       - jobs/spark-gold-wia.yaml
 

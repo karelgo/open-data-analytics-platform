@@ -1,6 +1,6 @@
 # PrometheusRule — log-based alerts uit Vector's log_to_metric pipeline.
 #
-# Vereist Vector-helm-values met `detect_alert_events`/`log_to_metric`/
+# Required Vector-helm-values met `detect_alert_events`/`log_to_metric`/
 # `prometheus_log_events` (zie infrastructure/helm/vector/values.yaml) en
 # de PodMonitor in podmonitor-vector.yaml.
 #
@@ -31,7 +31,7 @@ spec:
             component: opa
           annotations:
             summary: "OPA-deny rate hoog (> 12/min over 5m)"
-            description: "OPA weigert > 12 beslissingen/minuut. Controleer of een nieuwe rol-mapping of policy-update onbedoeld toegang afsluit. Decision-IDs in OpenSearch: index logs-audit-*"
+            description: "OPA weigert > 12 beslissingen/minuut. Controleer of een nieuwe rol-mapping of policy-update onbedoeld access afsluit. Decision-IDs in OpenSearch: index logs-audit-*"
             runbook_url: "/docs/runbook.md#94-log-based-alert-opadecisiondenyspike"
 
         - alert: TrinoAccessDeniedSpike

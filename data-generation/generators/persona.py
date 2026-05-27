@@ -26,7 +26,7 @@ TEST_BSN_PREFIX = "9"
 
 
 def calculate_bsn_check_digit(first_8_digits: str) -> int | None:
-    """Bereken het 9e cijfer voor een gegeven prefix van 8 cijfers.
+    """Bereken het 9e cijfer for a gegeven prefix van 8 cijfers.
 
     Retourneer None als er geen geldig 9e cijfer is (mod 11 == 10).
     """
@@ -88,7 +88,7 @@ class Persona:
 
 
 def _random_birthdate(rng: random.Random, min_age: int = 18, max_age: int = 80) -> date:
-    today = date(2026, 5, 1)  # repo-anker; productie gebruikt date.today()
+    today = date(2026, 5, 1)  # repo-anker; production gebruikt date.today()
     days = rng.randint(min_age * 365, max_age * 365)
     return today - timedelta(days=days)
 

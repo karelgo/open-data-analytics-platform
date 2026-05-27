@@ -1,30 +1,30 @@
 ---
-title: "Handleiding — Marketing Analyst"
+title: "Handbook — Marketing Analyst"
 role: marketing_analyst
 ---
 
-> Rol-key: `marketing_analyst` · Domein: Klantcontact · Risiconiveau toegang: middel (PII gemaskeerd, geen medisch)
+> Rol-key: `marketing_analyst` · Domein: Customer interaction · Risiconiveau access: middel (PII gemaskeerd, geen medisch)
 
-Deze handleiding is voor **medewerkers van klantcontact en CRM**. Je werkt
+Deze handbook is voor **medewerkers van customer interaction en CRM**. Je werkt
 met het 360°-cliëntbeeld (UC-05) en helpt cliënten via telefoon, balie of
-Werkmap. Je ziet **gemaskeerde BSN's** en **geen medische gegevens** —
+Workspace. Je ziet **gemaskeerde BSN's** en **geen medische gegevens** —
 beide bewust beperkt om dataminimalisatie te respecteren.
 
 ---
 
 ## 1. Wat doet jouw rol?
 
-Je beantwoordt vragen van cliënten en routeert hen naar de juiste afdeling.
+Je beantwoordt vragen van cliënten en routeert hen to the juiste afdeling.
 Je gebruikt het platform om:
 
 - Het 360°-cliëntbeeld te raadplegen (UC-05)
-- Te zien welke uitkeringen lopen, welke klantcontacten al hebben plaatsgevonden
+- Te zien welke claim payouten lopen, welke customer interactionen al hebben plaatsgevonden
 - Trends in klantvraag te zien per kanaal
-- Geen besluiten te nemen over uitkering of behandeling — dat doen domein-rollen
+- Geen besluiten te nemen over claim payout of behandeling — dat doen domein-rollen
 
 ---
 
-## 2. Inloggen, MFA & applicaties
+## 2. Sign in, MFA & applicaties
 
 ### 2.1 Account
 
@@ -38,7 +38,7 @@ wachtwoord wijzigen.
 | **Apache Superset** | Cliënt-360-dashboard, contact-trends | https://superset.odap.local |
 | **OpenMetadata** | Begrippen opzoeken | https://openmetadata.odap.local |
 
-Voor productie: meestal werk je vanuit een **Werkmap-frontend** die UC-05
+Voor production: meestal werk je vanuit een **Workspace-frontend** die UC-05
 via Trino REST API consumeert. Het platform is dan onzichtbaar; deze
 referentie laat zien wat erachter zit.
 
@@ -48,10 +48,10 @@ referentie laat zien wat erachter zit.
 
 ### 3.1 Catalog en schema
 
-| Catalog | Schema | Inhoud | Toegang |
+| Catalog | Schema | Inhoud | Access |
 |---|---|---|---|
 | `gold` | `uc05_customer_360` | 360°-cliëntbeeld | **Ja** |
-| `silver` | `crm` | Klantcontact-historie | **Indirect** (alleen via UC-05) |
+| `silver` | `crm` | Customer interaction-historie | **Indirect** (alleen via UC-05) |
 | `silver` | `wia`, `ww`, `wajong` | Domein-data | **Nee** |
 | `sensitive` | * | (geen) | **Nee** |
 
@@ -65,15 +65,15 @@ In `gold.uc05_customer_360.client_overview`:
 | `voornaam`, `achternaam` | Volledig — voor herkenning aan de telefoon |
 | `birth_date` | Volledig — voor identificatie |
 | `straat`, `huisnummer` | Volledig — adres voor balie |
-| `iban`, `bankrekening` | **GEMASKEERD** — niet nodig voor klantcontact |
+| `iban`, `bankrekening` | **GEMASKEERD** — niet nodig voor customer interaction |
 | `diagnose`, `icd10` | NULL (kolom-mask) — geen medisch |
-| `lopende_uitkeringen` | Type + status + bedrag-categorie | Voor doorverwijzing |
-| `kanaal_voorkeur` | Telefoon / Werkmap / Brief | Voor klantcontact |
+| `lopende_claim payouten` | Type + status + bedrag-categorie | Voor doorverwijzing |
+| `kanaal_voorkeur` | Telefoon / Workspace / Brief | Voor customer interaction |
 | `opt_out` | Ja/nee proactieve dienstverlening | Respecteer altijd |
 
-### 3.3 Doelbinding
+### 3.3 Purpose limitation
 
-Je rol heeft de purposes **"klantcontact"** en **"behandeling"**. Een query
+Je rol heeft de purposes **"customer interaction"** en **"behandeling"**. Een query
 die data uit een andere zone aanspreekt zonder geldig doel wordt geweigerd.
 
 ---
@@ -87,13 +87,13 @@ betaling. Klopt dat?"
 
 1. Vraag haar birth_date + de laatste 2 cijfers van haar BSN voor identificatie.
 2. Open **Superset → dashboard "Cliënt 360°"**, zoek op gemaskeerde BSN of birth_date + naam.
-3. Bekijk de tegels: Lopende uitkering, Laatste contact, Kanaalvoorkeur.
-4. Beantwoord de vraag of route je haar naar de juiste afdeling.
+3. Bekijk de tegels: Lopende claim payout, Laatste contact, Kanaalvoorkeur.
+4. Beantwoord de vraag of route je haar to the juiste afdeling.
 
 ### 4.2 Workflow B — Trends in kanaalkeuze
 
 **Scenario.** Hoeveel cliënten zijn de afgelopen maand overgestapt van
-brief naar Werkmap?
+brief naar Workspace?
 
 ```sql
 SELECT
@@ -119,7 +119,7 @@ GROUP BY 1
 ORDER BY 1;
 ```
 
-### 4.4 Workflow D — Overzicht voor teamleider
+### 4.4 Workflow D — Overview voor teamleider
 
 In Superset → dashboard "CRM Trends" → filteren op je team → exporteer als PDF.
 
@@ -131,14 +131,14 @@ In Superset → dashboard "CRM Trends" → filteren op je team → exporteer als
 Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 1. Wat **jij** ziet in het 360°-beeld (= een **deel** van het volledige platform image)
-2. Verwijs voor volledige inzage naar het AVG-inzageformulier (out-of-platform proces)
-3. Geef nooit een uitprint van het scherm — laat zien op het scherm en lees voor
+2. Verwijs voor volledige inzage to the AVG-inzageformulier (out-of-platform proces)
+3. Geef nooit een uitprint van het scherm — laat zien on the scherm en lees voor
 
 ---
 
 ## 5. Hulp, fouten & escalatie
 
-### 5.1 Foutmeldingen
+### 5.1 Errors
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
@@ -150,7 +150,7 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 | Probleem | Contact |
 |---|---|
-| Inloggen / MFA | Platform-admin |
+| Sign in / MFA | Platform-admin |
 | Cliënt staat niet in 360° | Data-steward (mogelijke ingestion-vertraging) |
 | Cliënt vraagt complexe inzage | Verwijs naar AVG-loket UWV |
 
@@ -159,7 +159,7 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 ## 6. Wat je nooit doet
 
 - Een volledige BSN noemen aan de telefoon — gebruik gemaskeerde versie.
-- Beslissingen nemen over uitkeringen — alleen WIA/WW/Wajong-rollen.
+- Decisions nemen over claim payouten — alleen WIA/WW/Wajong-rollen.
 - Schermafbeeldingen mailen, ook niet "even" naar een collega.
 - Cliënt-data combineren in eigen Excel — alle analyses gaan via Superset.
 

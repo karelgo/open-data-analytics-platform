@@ -3,7 +3,7 @@
      preserveAspectRatio="xMidYMid meet"
      font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
      role="img"
-     aria-label="Open Data & Analytics Platform — visuele referentie-architectuur">
+     aria-label="Open Data & Analytics Platform — visuele referentie-architecture">
   <title>Open Data & Analytics Platform</title>
   <desc>Reference architecture in Monte Carlo style: sources, ingestion, storage and processing, transformation and models, and BI/data products — with overlay layers for data discovery, pipeline orchestration, and observability, plus an identity pillar on the right.</desc>
 
@@ -282,7 +282,7 @@
   <use href="#flow-arrow" x="200" y="445" width="30" height="60"/>
 
   <!-- ─── Ingestion stage ─── -->
-  <g aria-label="Ingestie" transform="translate(230,200)">
+  <g aria-label="Ingestion" transform="translate(230,200)">
     <rect width="270" height="540" rx="10" fill="#161b22" stroke="#30363d"/>
     <use href="#stage-ingestion" x="20" y="20" width="22" height="22" color="#e6edf3"/>
     <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Ingestion</text>
@@ -312,7 +312,7 @@
   <use href="#flow-arrow" x="500" y="445" width="30" height="60"/>
 
   <!-- ─── Storage stage ─── -->
-  <g aria-label="Opslag en verwerking" transform="translate(530,200)">
+  <g aria-label="Storage en processing" transform="translate(530,200)">
     <rect width="270" height="540" rx="10" fill="#161b22" stroke="#30363d"/>
     <use href="#stage-storage" x="20" y="20" width="22" height="22" color="#e6edf3"/>
     <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Storage &amp; Processing</text>
@@ -359,7 +359,7 @@
   <use href="#flow-arrow" x="800" y="445" width="30" height="60"/>
 
   <!-- ─── Transformation stage ─── -->
-  <g aria-label="Transformatie en modellen" transform="translate(830,200)">
+  <g aria-label="Transformation en models" transform="translate(830,200)">
     <rect width="310" height="540" rx="10" fill="#161b22" stroke="#30363d"/>
     <use href="#stage-transformation" x="20" y="20" width="22" height="22" color="#e6edf3"/>
     <text x="50" y="37" font-size="16" font-weight="700" fill="#e6edf3">Transformation &amp; Models</text>
@@ -389,7 +389,7 @@
       <rect width="280" height="64" rx="8" fill="#1f262d" stroke="#3a434c"/>
       <use href="#brand-opa" x="12" y="12" width="40" height="40"/>
       <text x="62"  y="30" font-size="14" font-weight="600" fill="#e6edf3">OPA</text>
-      <text x="62"  y="46" font-size="11" fill="#9ba6b1">doelbinding · rij-filter · masker</text>
+      <text x="62"  y="46" font-size="11" fill="#9ba6b1">purpose-limitation · rij-filter · masker</text>
       <circle cx="260" cy="32" r="4" fill="#3fb950"/>
     </g>
 
@@ -450,8 +450,8 @@
     </g>
   </g>
 
-  <!-- ─── Identiteits-pijler (rechts) ─── -->
-  <g aria-label="Identiteit en toegang" transform="translate(1470,200)">
+  <!-- ─── Identitys-pijler (rechts) ─── -->
+  <g aria-label="Identity en access" transform="translate(1470,200)">
     <rect width="100" height="540" rx="10" fill="#181a23" stroke="#f87171" stroke-opacity="0.45"/>
     <use href="#stage-identity" x="40" y="20" width="22" height="22" color="#f87171"/>
     <text x="50" y="60" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.4" fill="#f87171">IDENTITY</text>
@@ -474,7 +474,7 @@
 
     <!-- Tekst -->
     <text x="50" y="430" text-anchor="middle" font-size="10" fill="#9ba6b1">SSO over</text>
-    <text x="50" y="445" text-anchor="middle" font-size="10" fill="#9ba6b1">alle componenten</text>
+    <text x="50" y="445" text-anchor="middle" font-size="10" fill="#9ba6b1">alle components</text>
     <text x="50" y="460" text-anchor="middle" font-size="10" fill="#9ba6b1">— elk valideert</text>
     <text x="50" y="475" text-anchor="middle" font-size="10" fill="#9ba6b1">the OIDC token</text>
 
@@ -565,7 +565,7 @@
     </g>
 
     <text x="0" y="48" font-size="10" fill="#6b7682">
-      Geïnspireerd op het Monte-Carlo-data-platform-model · alle componenten zijn open source · toegang en data-zichtbaarheid via OPA-policies en Keycloak-rollen.
+      Geïnspireerd on the Monte-Carlo-data-platform-model · alle components zijn open source · access en data-zichtbaarheid via OPA-policies en Keycloak-rollen.
     </text>
   </g>
 </svg>

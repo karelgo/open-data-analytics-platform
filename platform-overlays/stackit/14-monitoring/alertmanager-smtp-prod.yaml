@@ -1,5 +1,5 @@
 # JSON6902 patch: vervang de MailHog-defaults in de email-receiver
-# door de Platform SMTP relay (placeholder — vul `smarthost`/`to`/`from` in
+# through the Platform SMTP relay (placeholder — vul `smarthost`/`to`/`from` in
 # zodra de echte relay-coordinaten bekend zijn).
 - op: replace
   path: /spec/receivers/0/emailConfigs/0/smarthost

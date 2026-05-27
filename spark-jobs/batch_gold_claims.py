@@ -1,7 +1,7 @@
 """Gold batch: silver.wia_spark.aanvraag → gold.uc01_wia_spark.funnel_daily.
 
 Parallel-Spark equivalent van dbt's marts/uc01_claims_funnel/mart_uc01_claims_funnel_daily.
-Aggregateert silver-aanvragen tot een daily funnel:
+Aggregateert silver-request tot een daily funnel:
 
   per (aanvraag_datum, onderdeel, status):
     aantal                       (count)
@@ -103,7 +103,7 @@ def main() -> int:
         f"  Gold klaar: {GOLD_TABLE} bevat {final_cnt} rijen ({GOLD_PATH})",
         flush=True,
     )
-    # Korte preview voor de logs.
+    # Korte preview for the logs.
     print("  Top 5 funnel-rijen:", flush=True)
     spark.table(GOLD_TABLE).orderBy("aanvraag_datum", "onderdeel", "status").show(
         5, truncate=False

@@ -3,12 +3,12 @@ import ShellLayout from '../../layouts/ShellLayout.astro';
 import { components, isEmbeddable } from '../../data/components';
 
 // Backwards-compat /go/<service>/ — vroegere bookmarks stuurden hier door
-// naar het externe service-subdomein. Met de embed-shell sturen we ze nu
+// to the externe service-subdomein. Met de embed-shell sturen we ze nu
 // naar /embed/<service-id>/ zodat de UI gehuld blijft in de unified top-bar.
 //
 // Voor services die NIET embed-baar zijn (Keycloak admin, Trino, NiFi):
-// we 302'en naar de oorspronkelijke subdomein-URL als fallback, want
-// /embed/<id> toont voor die componenten een "open in nieuw tabblad"-shell.
+// we 302'en to the oorspronkelijke subdomein-URL als fallback, want
+// /embed/<id> toont voor die components een "open in nieuw tabblad"-shell.
 //
 // Voor MinIO is /go/minio/ een aparte pagina met SSO-bootstrap — zie
 // /go/minio.astro.

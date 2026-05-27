@@ -1,7 +1,7 @@
 # Ingress voor Grafana onder platform.odap.local/grafana.
 # Vervangt de chart-managed ingress op grafana.odap.local
 # (uitgeschakeld in infrastructure/helm/prometheus-stack/values.yaml).
-# Same-origin met de portal-shell → /embed/grafana kan z'n iframe
+# Same-origin with the portal-shell → /embed/grafana kan z'n iframe
 # laden zonder cross-origin cookie- of CSP-gedoe.
 #
 # Service `prometheus-grafana` wordt door kube-prometheus-stack

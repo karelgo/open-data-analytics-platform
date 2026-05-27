@@ -1,6 +1,6 @@
 # PrometheusRule — ODAP platform alerts (improvements #1).
 #
-# Vereist kube-prometheus-stack (provides PrometheusRule CRD).
+# Required kube-prometheus-stack (provides PrometheusRule CRD).
 # Severity-mapping:
 #   critical → page (Alertmanager → PagerDuty)
 #   warning  → notify (Alertmanager → Slack #odap-data-platform)

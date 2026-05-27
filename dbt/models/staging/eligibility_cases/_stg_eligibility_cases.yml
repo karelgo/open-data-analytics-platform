@@ -11,9 +11,9 @@ models:
       domain: ag
       subdomain: wajong
       legal_basis: WIA_art_64+art_9_2h
-      doelbinding: ["uitkering", "reintegratie"]
+      purpose-limitation: ["claim payout", "reintegration"]
       bio_classificatie: vertrouwelijk
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: divisie_ag
       pii_kolommen: [bsn]
       risk_tier: hoog   # UC-02 hoog-risico AI Act

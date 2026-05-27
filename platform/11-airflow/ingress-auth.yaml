@@ -8,10 +8,10 @@
 # bootstrap.min.css → de hidden Bootstrap-modal in baselayout.html
 # verschijnt als "User confirmation needed"-tekst zonder styling.
 #
-# Door deze tweede ingress op het meer-specifieke pad /airflow/auth
+# Door deze tweede ingress on the meer-specifieke pad /airflow/auth
 # (nginx-ingress kiest altijd de meest-specifieke path-match) krijgen
 # alleen FAB-rendered requests X-Forwarded-Prefix=/airflow/auth. De
-# main-ingress blijft /airflow voor de React-SPA + /api/v2-routes.
+# main-ingress blijft /airflow for the React-SPA + /api/v2-routes.
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

@@ -1,5 +1,5 @@
 ---
-title: "Het platform voor de Data-steward"
+title: "Het platform for the Data-steward"
 role: data_steward
 level: foundation
 order: 1
@@ -14,7 +14,7 @@ labs:
     href: "/dbt-docs/"
     vscodePath: "dbt/models"
   - title: "Bekijk role-mappings in vscode.dev"
-    hint: "Waar de doelbinding-regels per rol staan"
+    hint: "Waar de purpose-limitation-regels per rol staan"
     href: "/go/openmetadata/"
     vscodePath: "opa-policies-src/data/role_mappings.json"
 quiz:
@@ -30,9 +30,9 @@ quiz:
       - "Geen — engineers regelen dat zelf"
       - "Tag-classificatie (PII / medisch / financieel), eigenaar, dbt-tests, glossary-koppeling — anders gaat het door classificatie heen"
       - "Alleen of de kolomnaam goed gespeld is"
-      - "Of het in productie staat"
+      - "Of het in production staat"
     correct: 1
-  - q: "Waar zie jij in één oogopslag dat een DQ-test al een week faalt?"
+  - q: "Waar zie jij in één oogstorage dat een DQ-test al een week faalt?"
     options:
       - "In Airflow"
       - "In het Data Quality dashboard van OpenMetadata, met severity-kleuring"
@@ -41,9 +41,9 @@ quiz:
     correct: 1
 ---
 
-Welkom. Data-steward is een coördinerende rol: jij bewaakt dat de
+Welcome. Data-steward is een coördinerende rol: jij bewaakt dat de
 afspraken die wij over data maken (eigenaar, classificatie, kwaliteit,
-doelbinding) ook in praktijk staan. Geen Rego nodig — wel een goed oog
+purpose-limitation) ook in praktijk staan. Geen Rego nodig — wel een goed oog
 voor afwijkingen.
 
 ## Vier werkbanken
@@ -51,7 +51,7 @@ voor afwijkingen.
 | Tool | Waarvoor? |
 |---|---|
 | **OpenMetadata** | Classificaties, glossary, lineage, DQ-overzicht |
-| **dbt-docs** | Tests, model-eigenaren, kolomdocumentatie |
+| **dbt-docs** | Tests, model-eigenaren, kolomdocumentation |
 | **Superset (DQ-overview)** | Cross-UC kwaliteits-totaal |
 | **Trino (profiler)** | Adhoc kolom-profielen op kwaliteits-doel |
 
@@ -59,14 +59,14 @@ voor afwijkingen.
 
 ### 1. Classificeer
 
-Elke kolom krijgt minstens één tag uit de standaard-set: `PII`,
+Elke kolom krijgt minstens één tag from the standaard-set: `PII`,
 `medisch`, `financieel`, `bsn`, `iban`, `regio_code`, `intern`. Tags
 zijn de input voor OPA: zonder tag geen automatische masking. De data-
 engineer stelt voor; jij keurt goed.
 
 ### 2. Borg de glossary
 
-Termen als "doorlooptijd", "no-show", "lastprognose" hebben in elk
+Termen als "doorlooptijd", "no-show", "cost forecast" hebben in elk
 domein hun eigen variant. De glossary geeft één definitie per term,
 gekoppeld aan alle kolommen waar hij van toepassing is. Zonder glossary
 bestaat een sturingsmaat alleen in iemands hoofd.
@@ -85,12 +85,12 @@ OPA-regels staan in `opa-policies-src/`, maar de data ervan staat in
 Daarin lees je per rol:
 
 - welke catalogs/schemas;
-- welke doelbinding(en);
+- welke purpose-limitation(en);
 - welke kolommen ge-unmask't worden;
 - of JIT en/of 4-eyes vereist is.
 
 Jouw review-vraag bij een wijziging: "klopt dit met de
-doelbinding-afspraak in de glossary?" Niet de Rego-syntax, wel de
+purpose-limitation-afspraak in de glossary?" Niet de Rego-syntax, wel de
 intentie.
 
 ## Volgende stap

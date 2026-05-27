@@ -1,11 +1,11 @@
 # 02-authentication
 
-Stackable AuthenticationClass voor de ODAP Keycloak realm + interne TLS-CA-secretclass.
+Stackable AuthenticationClass for the ODAP Keycloak realm + interne TLS-CA-secretclass.
 
 | Resource | Doel |
 |---|---|
 | `AuthenticationClass keycloak` | OIDC-config voor Trino/Superset/Airflow/NiFi/OpenMetadata. Issuer: `https://keycloak.odap.local:8443/realms/odap`. |
-| `SecretClass tls-internal` | Locatie voor het CA-cert dat de Keycloak-OIDC-endpoint heeft getekend. |
+| `SecretClass tls-internal` | Locatie for the CA-cert dat de Keycloak-OIDC-endpoint heeft getekend. |
 
 ## CA distribution (TODO fase-1+)
 
@@ -39,14 +39,14 @@ kubectl apply -k platform/02-authentication/
 ## Entra ID brokering (feature/entra-id-broker)
 
 Naast de Keycloak-eigen accounts kan het platform federeren met Microsoft
-Entra ID. Architectuur: **Keycloak als IdP-broker** — Entra is een externe
+Entra ID. Architecture: **Keycloak als IdP-broker** — Entra is een externe
 Identity Provider in het `uwv` realm; downstream services (Trino, Superset,
 Airflow, NiFi, OpenMetadata, Portal) blijven onveranderd Keycloak-tokens
 zien. Op de Keycloak-loginpagina verschijnt een knop **"Microsoft Entra ID"**
 naast het reguliere username/password-veld; de gebruiker kiest.
 
 Zie [`docs/adr/0003-entra-broker-via-keycloak.md`](../../docs/adr/0003-entra-broker-via-keycloak.md)
-voor de architectuurkeuze (broker vs. parallelle IDPs).
+voor de architecturekeuze (broker vs. parallelle IDPs).
 
 ### Wat is in de repo gewijzigd
 
@@ -94,12 +94,12 @@ bestaan (idealiter `platform-role-{rolename}`). Vraag de GUIDs op:
 
 ```bash
 az ad group show --group "platform-role-claims_analyst" --query id -o tsv
-# herhaal voor de andere 10 rollen
+# herhaal for the andere 10 rollen
 ```
 
 #### 3. Placeholders vervangen
 
-Patch het realm-bestand met de echte waardes (Keycloak doet **geen** env-var
+Patch het realm-bestand with the echte waardes (Keycloak doet **geen** env-var
 substitutie binnen `--import-realm` — de placeholders moeten letterlijk
 vervangen worden vóór de import):
 
@@ -123,7 +123,7 @@ done
 rm infrastructure/helm/keycloak/realm.json.bak
 ```
 
-> **Productie:** vervang dit door een SealedSecret of External Secrets +
+> **Production:** vervang dit door een SealedSecret of External Secrets +
 > Vault-injection, en gebruik de Keycloak Admin REST API (`PUT
 > /admin/realms/odap/identity-provider/instances/entra`) om de IdP-config
 > roterend bij te werken zonder realm-re-import.
@@ -140,7 +140,7 @@ helm upgrade --install keycloak bitnami/keycloak \
 
 Bij het herstarten van de Keycloak-pod wordt het realm opnieuw
 geïmporteerd; de IdP `entra` verschijnt onder Realm settings → Identity
-Providers en op de loginpagina.
+Providers en on the loginpagina.
 
 ### Verifiëren
 
@@ -157,7 +157,7 @@ Manueel:
 2. De Keycloak-loginpagina toont nu twee opties: username/password
    (interne platform accounts) of de knop **"Microsoft Entra ID"**.
 3. Kies "Microsoft Entra ID" — wordt geredirect naar
-   `login.microsoftonline.com`. Log in met een Entra-testaccount dat lid
+   `login.microsoftonline.com`. Log in with a Entra-testaccount dat lid
    is van een van de 11 `platform-role-*` security-groups.
 4. Eerste login: Keycloak's "first broker login"-flow vraagt of je het
    account wil koppelen aan een bestaand platform account (op email-match) of
@@ -174,5 +174,5 @@ Manueel:
 | Entra weigert `*.local` redirect | Gebruik in dev een echte test-tenant + ngrok-tunnel met publieke hostname; of een Azure dev-tenant met `*.localhost` whitelisted (recente Entra-update). |
 | `groups` claim is leeg in token | Manifest `groupMembershipClaims: "SecurityGroup"` ontbreekt, of de gebruiker zit in >200 groepen → Entra zendt dan een `_claim_names` overage-claim. Optioneel: switch naar Graph API resolve. |
 | Gebruiker heeft geen rol na login | GUID in realm.json matcht niet met groep-GUID in tenant. Check Keycloak Admin → Sessions → Last logged-in users → bekijk token. |
-| MFA niet afgedwongen voor `platform_admin` | Keycloak's TOTP-policy geldt alleen voor lokale users. Voor brokered users moet **Entra Conditional Access** MFA afdwingen op de app-registration. De `entra-trigger-totp-for-platform-admin` mapper is een back-stop maar idealiter staat MFA al bij Entra. |
+| MFA niet afgedwongen voor `platform_admin` | Keycloak's TOTP-policy geldt alleen voor lokale users. Voor brokered users moet **Entra Conditional Access** MFA afdwingen on the app-registration. De `entra-trigger-totp-for-platform-admin` mapper is een back-stop maar idealiter staat MFA al bij Entra. |
 | `pkceEnabled: true` werkt niet | Sommige oudere Entra app-registrations hebben "Allow public client flows" nodig — staat default op `No`, laat dat ook zo voor confidential client. PKCE op confidential client is OK vanaf Keycloak 24. |

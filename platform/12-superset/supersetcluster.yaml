@@ -52,7 +52,7 @@ spec:
         SESSION_COOKIE_SECURE: "True"
         # Custom SecurityManager: vangt None-user op (stale session cookie
         # na DB-reset) zodat Flask-Login naar /login redirect i.p.v. 500.
-        # Tweede taak: extract Keycloak realm-roles uit het JWT en geef
+        # Tweede taak: extract Keycloak realm-roles from the JWT en geef
         # ze als `role_keys` zodat AUTH_ROLES_MAPPING (zie hieronder)
         # ze naar Superset-rollen kan mappen. Module komt uit
         # superset-extra-config ConfigMap, gemount op /stackable/extras

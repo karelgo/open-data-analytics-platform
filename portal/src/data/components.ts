@@ -1,7 +1,7 @@
-// Centrale registry van platform-componenten.
+// Centrale registry van platform-components.
 // Enige plek waar URLs, beschrijvingen en welke rollen welke component
-// gebruiken bij elkaar staan. Wordt gelezen door architectuur-diagram,
-// rol-werkplek en status-badges.
+// gebruiken bij elkaar staan. Wordt gelezen door architecture-diagram,
+// rol-workspace en status-badges.
 
 export type ComponentId =
   | 'keycloak'
@@ -24,7 +24,7 @@ export type ComponentId =
   | 'multica'
   | 'nanitics';
 
-// Legacy "layer" — fijne granulariteit voor de oude card-tag.
+// Legacy "layer" — fijne granulariteit for the oude card-tag.
 export type ComponentLayer =
   | 'auth'
   | 'storage'
@@ -40,7 +40,7 @@ export type ComponentLayer =
   | 'ai-agents';
 
 // Reference-architecture lanes (Monte-Carlo-stijl).
-// Hier groeperen we componenten in de plek die ze in de pipeline innemen.
+// Hier groeperen we components in de plek die ze in de pipeline innemen.
 export type ComponentStage =
   | 'sources'
   | 'ingestion'
@@ -56,12 +56,12 @@ export type ComponentStage =
 // Embed-config — bepaalt of een component in de portal-shell (iframe) past,
 // en welke URL we als iframe.src gebruiken. Apart van `url` zodat het
 // "open in nieuw tabblad"-gedrag (en de TLD-rewrite in Layout.astro) blijft
-// werken met de oorspronkelijke externe URL.
+// werken with the oorspronkelijke externe URL.
 //
 // - 'subpath':   de service draait onder platform.odap.local/<path>/
 //                (same-origin, geen cross-origin cookie-issues).
 // - 'subdomain': service draait op een eigen <svc>.<tld> en wordt cross-origin
-//                geiframed. Vereist dat de service X-Frame-Options/CSP toestaat
+//                geiframed. Required dat de service X-Frame-Options/CSP toestaat
 //                en cookies SameSite=None;Secure heeft.
 // - 'none':      niet iframe-baar (Keycloak login, MinIO S3-API, …).
 //                Link altijd in nieuw tabblad.
@@ -74,7 +74,7 @@ export interface EmbedConfig {
   path?: string;
   // Override de iframe-src base. Nuttig als `url` naar een portal-pagina
   // wijst (bv. MinIO's /go/minio/ SSO-bootstrap) maar de iframe gewoon
-  // direct naar het service-subdomein moet. Layout-chrome in een iframe
+  // direct to the service-subdomein moet. Layout-chrome in een iframe
   // is verwarrend; betere UX is direct laden.
   iframeBase?: string;
 }
@@ -147,7 +147,7 @@ export const components: PlatformComponent[] = [
     purpose: 'The lakehouse where all data physically lives — layered in zones with separate access rules.',
     icon: '/icons/brand/minio.svg',
     // /go/minio/ — minimale iframe-bootstrap die de Keycloak SSO-flow
-    // start (via portal-nginx in-cluster proxy naar de MinIO Console
+    // start (via portal-nginx in-cluster proxy to the MinIO Console
     // /api/v1/login). MinIO Console's externe /api/v1/login retourneert
     // `redirectRules: null` (Console-quirk), maar de in-cluster Service
     // wél — dus we proxyen die ene endpoint via portal/nginx.conf
@@ -157,7 +157,7 @@ export const components: PlatformComponent[] = [
     // iframeBase = /go/minio/: de iframe laadt onze bootstrap-page die
     // synchroon door-302't naar Keycloak SSO. Geen flashing portal-chrome
     // — bootstrap-page heeft alleen een spinner. Eindresultaat: user
-    // landt direct op de MinIO Console UI ingelogd, zonder klik.
+    // landt direct on the MinIO Console UI ingelogd, zonder klik.
     embed: {
       mode: 'subdomain',
       iframeBase: '/go/minio/',
@@ -186,7 +186,7 @@ export const components: PlatformComponent[] = [
     short: 'Streaming + batch jobs that write Delta tables on MinIO.',
     purpose: 'Heavy data work — cleaning, joining, aggregating — in stream or batch.',
     icon: '/icons/brand/spark.svg',
-    // Wijst naar de live driver-UI van de `streaming-bronze` SparkApplication
+    // Wijst to the live driver-UI van de `streaming-bronze` SparkApplication
     // (via een eigen Service+Ingress, zie platform/08-spark/ingress.yaml).
     // Op de Executors-tab vind je stderr/stdout per pod = "spark cluster logs".
     // 503 als de driver niet draait.
@@ -204,7 +204,7 @@ export const components: PlatformComponent[] = [
     purpose: 'Run SQL fast over the entire lakehouse — for dbt models and end users alike.',
     icon: '/icons/brand/trino.svg',
     // Trino-UI is bereikbaar onder de portal Compute-tab (embed iframe,
-    // zelfde patroon als Spark). Eindgebruikers blijven Trino vooral via
+    // zelfde patroon als Spark). Eindusers blijven Trino vooral via
     // Superset, Jupyter, dbt en Airflow gebruiken; de UI is handig voor
     // query-history, EXPLAIN-plans en het killen van runaway queries.
     url: 'https://trino.odap.local:8443',
@@ -294,7 +294,7 @@ export const components: PlatformComponent[] = [
     layer: 'governance',
     stage: 'discovery',
     // Statisch geëxporteerde `dbt docs generate --static`-bundel. Geserveerd
-    // door de portal-nginx zelf op /dbt-docs/ — geen aparte service, geen
+    // through the portal-nginx zelf op /dbt-docs/ — geen aparte service, geen
     // Prometheus-job (vandaar geen status-dot).
     short: 'Models, tests, sources, and lineage from the dbt project definitions.',
     purpose: 'What do our dbt models do, which tests run, and how does data flow from staging to marts?',
@@ -367,7 +367,7 @@ export const components: PlatformComponent[] = [
     purpose: 'Visualise Prometheus metrics in dashboards; gateway for SRE work.',
     icon: '/icons/brand/grafana.svg',
     // Login via Keycloak SSO (auth.generic_oauth in helm/prometheus-stack/values.yaml).
-    // Klik op "Sign in with Keycloak" op de Grafana-loginpagina; admin-account
+    // Klik op "Sign in with Keycloak" on the Grafana-loginpagina; admin-account
     // blijft beschikbaar als break-glass.
     url: 'https://grafana.odap.local:8443',
     // server.root_url + serve_from_sub_path=true in grafana.ini; werkt
@@ -399,7 +399,7 @@ export const components: PlatformComponent[] = [
     layer: 'ai-agents',
     stage: 'agents',
     // Dev-loop-lane: coördineert coding agents (Claude Code/Codex/Copilot CLI/…)
-    // die op de laptop van de developer draaien — de server houdt taken,
+    // die on the laptop van de developer draaien — de server houdt taken,
     // voortgang en skills bij. Niet hetzelfde als Nanitics (runtime).
     short: 'Coordination of coding agents (Claude Code, Codex, Copilot CLI, …) — tasks, progress, skills.',
     purpose: 'Assign tasks to coding agents; track progress. Agents run on your laptop.',
@@ -416,7 +416,7 @@ export const components: PlatformComponent[] = [
     name: 'Power BI',
     layer: 'bi',
     stage: 'consumption',
-    // Microsoft Power BI / Fabric als dashboarding-laag. Eindgebruikers
+    // Microsoft Power BI / Fabric als dashboarding-laag. Eindusers
     // loggen in met hun eigen Azure-tenant (Entra ID SSO) op
     // app.fabric.microsoft.com — geen aparte account in dit cluster.
     //
@@ -424,7 +424,7 @@ export const components: PlatformComponent[] = [
     // restrictieve `Content-Security-Policy: frame-ancestors`-header, dus
     // de iframe wordt geblokt. EmbedLayout heeft een 8s-timeout die
     // automatisch de "Open in nieuw tabblad"-fallback toont — de gebruiker
-    // landt dan direct op de Fabric-portal met SSO via z'n eigen tenant.
+    // landt dan direct on the Fabric-portal met SSO via z'n eigen tenant.
     //
     // Voor een echt-ingesloten ervaring (Power BI Embedded SDK +
     // App-Owns-Data + GenerateToken-backend) zie
@@ -455,11 +455,11 @@ export const components: PlatformComponent[] = [
     // Runtime-lane: in-cluster FastAPI + Nanitics SDK met vier demo-agents
     // (ReAct/ReWOO/Reflexion/LATS) plús een platform-watcher die periodiek
     // Prometheus/K8s-events/OpenSearch leest en bevindingen als Multica-tasks
-    // filed in `platform-ops`. URL wijst naar de Observatory trace-viewer;
+    // filed in `platform-ops`. URL wijst to the Observatory trace-viewer;
     // /chat is een tweede entry voor handmatige watcher-triggers.
     short: 'In-cluster agent runtime + trace viewer. Watcher monitors the platform and files issues to Multica.',
     purpose: 'Inspect watcher runs (span tree, LLM calls, tool calls) and trigger manual investigations.',
-    // Geen eigen brand-svg; valt terug op het generieke agents-stage-icoon
+    // Geen eigen brand-svg; valt terug on the generieke agents-stage-icoon
     // tot er een Nanitics-logo aan public/icons/brand/ is toegevoegd.
     icon: '/icons/stage/agents.svg',
     url: 'https://nanitics.odap.local:8443/api/observatory/',
@@ -491,7 +491,7 @@ export function isEmbeddable(c: PlatformComponent): boolean {
 }
 
 /**
- * Componenten die /embed/<id>-pagina krijgen. Gebruikt door
+ * Components die /embed/<id>-pagina krijgen. Gebruikt door
  * getStaticPaths() in pages/embed/[id].astro.
  */
 export function embeddableComponents(): PlatformComponent[] {
@@ -499,9 +499,9 @@ export function embeddableComponents(): PlatformComponent[] {
 }
 
 /**
- * Href die in de portal-UI (architectuur-diagram, role-shortcuts, /me)
+ * Href die in de portal-UI (architecture-diagram, role-shortcuts, /me)
  * gebruikt moet worden bij een klik op een component. Voor iframe-bare
- * componenten landt 'ie in /embed/<id>/ (portal-shell); anders de
+ * components landt 'ie in /embed/<id>/ (portal-shell); anders de
  * originele externe URL (Keycloak, MinIO-via-go-redirect, etc.).
  */
 export function tileHref(c: PlatformComponent): string | null {
@@ -510,9 +510,9 @@ export function tileHref(c: PlatformComponent): string | null {
 }
 
 /**
- * Resolveert de iframe-src URL voor een component, optioneel met deep-link
+ * Resolveert de iframe-src URL for a component, optioneel met deep-link
  * pad. Bouwt op build-time de odap.local-URL; Layout.astro's
- * runtime TLD-rewrite swap't naar de juiste cloud-host. De DEEP-LINK is een
+ * runtime TLD-rewrite swap't to the juiste cloud-host. De DEEP-LINK is een
  * pad-inclusief-query (bv. "/dashboard/list/?filters=…") relatief aan de
  * service-root.
  */
@@ -531,7 +531,7 @@ export function resolveEmbedSrc(
   // *.odap.local hostname.
   // Path die op een bestand wijst (bv. `/dbt-docs.html`) krijgt geen
   // trailing slash — anders bouwen we `/dbt-docs.html/` en dat 404't.
-  // Heuristic: een laatste segment met een '.' is een bestand.
+  // Heuristic: een laatste segment with a '.' is een bestand.
   const looksLikeFile = (p: string) => /\.[a-z0-9]+$/i.test(p.split('/').pop() ?? '');
 
   if (c.embed.mode === 'subpath') {
@@ -555,11 +555,11 @@ export function resolveEmbedSrc(
 }
 
 /**
- * Bouwt de externe (open-in-new-tab) URL voor een component, inclusief
- * eventueel deep-link pad. Voor subpath-componenten plakken we op de
- * portal-host, voor subdomain-componenten op de service-host.
+ * Bouwt de externe (open-in-new-tab) URL for a component, inclusief
+ * eventueel deep-link pad. Voor subpath-components plakken we op de
+ * portal-host, voor subdomain-components on the service-host.
  *
- * Wordt door EmbedShell gebruikt voor de "↗ open in nieuw tabblad"-knop.
+ * Wordt door EmbedShell gebruikt for the "↗ open in nieuw tabblad"-knop.
  */
 export function resolveExternalUrl(
   c: PlatformComponent,
@@ -574,7 +574,7 @@ export function resolveExternalUrl(
     return base + (cleanDeep.startsWith('/') ? cleanDeep : '/' + cleanDeep);
   }
   // Subdomain mode: voor "open in nieuw tabblad" gebruiken we dezelfde
-  // base als de iframe — gebruiker landt op de echte service-URL, niet op
+  // base als de iframe — gebruiker landt on the echte service-URL, niet op
   // een tussenpagina als /go/minio/.
   if (c.embed?.mode === 'subdomain' && c.embed.iframeBase) {
     const baseUrl = c.embed.iframeBase.replace(/\/+$/, '');

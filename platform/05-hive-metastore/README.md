@@ -14,7 +14,7 @@ of `provider=iceberg` voor Iceberg). Trino, Spark en Hive lezen die properties
 en weten welke connector te gebruiken. **Hetzelfde HMS** kan dus tabellen
 beheren in beide formaten.
 
-## Voorvereisten
+## Prerequisites
 
 - `platform/01-secrets/` toegepast (hive-postgres-credentials).
 - `platform/03-storage/` toegepast (s3-minio S3Connection).

@@ -156,15 +156,15 @@ mirror_om_config_cm() {
 mirror_om_config_cm
 
 # CoreDNS-override voor in-cluster resolutie van *.odap.local.
-# Achtergrond: k3d kopieert de host-/etc/hosts naar de cluster-resolver
+# Achtergrond: k3d kopieert de host-/etc/hosts to the cluster-resolver
 # zodat alle hostnames die de gebruiker daar heeft staan (127.0.0.1
 # minio-console.odap.local etc.) ook in de pods naar 127.0.0.1
 # wijzen. Voor MinIO/OpenMetadata/Superset/Airflow/Trino/NiFi die
 # server-side OIDC-discovery doen tegen https://keycloak.odap.local:8443
 # is dat fataal — ze proberen verbinding te maken met hun eigen loopback.
-# Fix: laat CoreDNS *.odap.local naar de keycloak-external Service
+# Fix: laat CoreDNS *.odap.local to the keycloak-external Service
 # in ingress-nginx wijzen (die mappt 8443 → 443 op ingress-nginx-controller).
-# platform-ca-bundle uitbreiden met de Stackable secret-operator self-signed CA.
+# platform-ca-bundle uitbreiden with the Stackable secret-operator self-signed CA.
 # Bootstrap probeert dit ook (via een trigger-pod), maar als de operator dan
 # nog niet klaar is om certs uit te delen, blijft de bundle alleen het
 # platform-issuer CA en faalt later TLS-verify naar Trino/Hive
@@ -219,7 +219,7 @@ if [[ "${IS_LOCAL}" == "yes" ]]; then
   if [[ -z "$KC_SVC_IP" || "$KC_SVC_IP" == "None" ]]; then
     printf '\033[1;33m!!\033[0m keycloak-external Service nog niet beschikbaar; CoreDNS-override overgeslagen\n'
   else
-    # k3d: rewrite *.${PLATFORM_DOMAIN} naar de keycloak-external ClusterIP
+    # k3d: rewrite *.${PLATFORM_DOMAIN} to the keycloak-external ClusterIP
     # zodat in-cluster OIDC-discovery van MinIO/Trino/Superset/Airflow/NiFi/
     # OpenMetadata werkt zonder /etc/hosts loopback.
     # IN AAAA-template levert NOERROR (lege answer-set) zodat Go's parallel
@@ -253,12 +253,12 @@ fi
 # MinIO laadt OIDC-config alleen bij startup. Als de pod bootte vóór dat
 # keycloak.odap.local resolveerbaar was (CoreDNS-override boven),
 # faalt de eerste OpenID-discovery met "connection refused" en MinIO valt
-# terug op `loginStrategy: form` — geen Keycloak-knop op de console of
+# terug op `loginStrategy: form` — geen Keycloak-knop on the console of
 # /go/minio/ portal-redirect. Restart pakt OIDC opnieuw op.
 log "MinIO restarten zodat OIDC-discovery via Keycloak slaagt"
 kubectl -n odap-platform delete pod -l app=minio --ignore-not-found >/dev/null 2>&1 || true
 
-# Live Keycloak runtime patches die niet uit de realm-import komen.
+# Live Keycloak runtime patches die niet from the realm-import komen.
 # Realm-import strategy=IGNORE_EXISTING raakt bestaande users niet aan; en
 # attributen op users zoals `policy=consoleAdmin` (vereist door MinIO's
 # `MINIO_IDENTITY_OPENID_CLAIM_NAME=policy` claim-mapper) zitten niet
@@ -388,7 +388,7 @@ if docker image inspect odap/dbt-trino:1.9.0 >/dev/null 2>&1; then
     cp target/manifest.json /out/manifest.json 2>/dev/null || true
     # NB: --exclude pattern moet `./<naam>` zijn (niet kale `<naam>`) en
     # vóór de bron staan. .venv (~107MB) sluipt anders mee uit nieuwere
-    # dbt-images en blaast de tarball over de 3MB etcd-record-limiet.
+    # dbt-images en blaast de tarball about the 3MB etcd-record-limiet.
     tar -czf /out/dbt-project.tar.gz \
       --exclude=./target --exclude=./logs --exclude=./dbt_packages \
       --exclude=./.venv --exclude=./.user.yml --exclude=./.dockerignore \
@@ -423,11 +423,11 @@ if kubectl -n odap-platform wait --for=condition=Ready pod/airflow-scheduler-def
   kubectl -n odap-platform exec airflow-scheduler-default-0 -c airflow -- bash -c '
 for dag in bronze_watch \
            silver_persoon silver_polisadm silver_ww silver_wia \
-           silver_wajong silver_zw silver_crm silver_fez silver_klantcontact \
+           silver_wajong silver_zw silver_crm silver_fez silver_customer interaction \
            gold_uc01_claims_funnel gold_uc04_eligibility_outreach gold_uc05_customer_360 \
            gold_uc06_cost_forecast gold_uc07_dq_policies gold_uc09_reintegration_effect \
            gold_uc_customer_satisfaction_customer_satisfaction \
-           governance_om_ingest bewaartermijn_enforcer lakehouse_maintenance; do
+           governance_om_ingest retention period_enforcer lakehouse_maintenance; do
   airflow dags unpause "$dag" >/dev/null 2>&1 || true
 done
 echo "DAGs unpaused (skipped any that don'\''t exist yet — parse delay is normal)"
@@ -442,7 +442,7 @@ fi
 # JWT moet seeden, en die JWT bestaat pas nadat OpenMetadata up is. We
 # wachten kort tot dat secret er is en draaien dan de bridge-deploy.
 # Faalt elegant als OM nog niet ready is — gebruiker krijgt een waarschuwing
-# met de hint om `make deploy-om-bridge` zelf te draaien.
+# with the hint om `make deploy-om-bridge` zelf te draaien.
 log "om-access-bridge (ADR-0008): wait for OM admin token, then deploy"
 om_ready=false
 for i in 1 2 3 4 5 6; do

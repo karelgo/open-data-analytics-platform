@@ -3,7 +3,7 @@
 # Eén PostgreSQL-pod hoste meerdere databases (één per consumer). Init-script
 # in templates/init-odap-databases.sql maakt ze aan bij eerste boot.
 #
-# Productie: aparte instances met eigen retentie, replicatie, backup-strategie.
+# Production: aparte instances met eigen retentie, replicatie, backup-strategie.
 #
 # Chart: bitnami/postgresql
 #
@@ -41,7 +41,7 @@ primary:
     # storageClass is set per-mode in values-{k3d,aks}.yaml.
     size: 8Gi
 
-  # Init-script maakt extra databases en gebruikers aan voor de consumers.
+  # Init-script maakt extra databases en users aan for the consumers.
   # Draait als 'postgres' superuser (i.p.v. default odap) zodat
   # CREATE DATABASE ... OWNER niet faalt op rechten.
   initdb:
@@ -68,7 +68,7 @@ primary:
   # Bitnami chart 16.0.6 + bitnamilegacy/postgresql:17 mountt die ConfigMaps
   # zo dat de default postgresql.conf leeg blijft (alleen `port = '5432'`)
   # en de pod crasht in de init-fase. Chart-defaults werken wel.
-  # Productie: tune via Bitnami secure-image of stap over op CloudNativePG.
+  # Production: tune via Bitnami secure-image of stap over op CloudNativePG.
 
 # Service exposure (binnen-cluster only)
 service:

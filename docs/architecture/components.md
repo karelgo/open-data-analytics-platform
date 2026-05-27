@@ -1,34 +1,34 @@
 ---
-title: Componenten
+title: Components
 description: Per-component overzicht — verantwoordelijkheid, doel, URL, gebruikende rollen.
 ---
 
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
-# Componenten
+# Components
 
 Per-component overzicht. Voor het diagram op laag-niveau zie
-[Architectuur · Overzicht](index.md); voor de relatie tussen rollen en
-componenten zie de [rol-matrix](#rol-matrix) onderaan.
+[Architecture · Overview](index.md); for the relatie tussen rollen en
+components zie de [rol-matrix](#rol-matrix) onderaan.
 
-## Identiteit & Toegang
+## Identity & Access
 
 _SSO regelt wie wat mag — elk onderdeel checkt het token._
 
 ### Keycloak { #keycloak }
 
 !!! abstract "Wat doet Keycloak?"
-    Eén keer inloggen, overal toegang volgens je rol. MFA en audit-log centraal.
+    Eén keer sign in, overal access volgens je rol. MFA en audit-log centraal.
 
 **Laag:** `auth` · **Stage:** `identity` · **Prometheus job:** `keycloak`
 
-OIDC-identity provider — single sign-on en MFA voor alle componenten.
+OIDC-identity provider — single sign-on en MFA voor alle components.
 
 - **URL:** [Live UI ↗](https://keycloak.odap.local:8443)
 - **Gebruikt door:** **alle rollen**
 
-## Ingestie
+## Ingestion
 
 _Data binnenhalen en op een event-bus zetten._
 
@@ -47,7 +47,7 @@ Visuele ingestion-flows — bronsystemen → Kafka.
 ### Kafka { #kafka }
 
 !!! abstract "Wat doet Kafka?"
-    Data-events bufferen en doorzetten naar verwerking. Schaalbare doorvoer.
+    Data-events bufferen en doorzetten naar processing. Schaalbare doorvoer.
 
 **Laag:** `streaming` · **Stage:** `ingestion` · **Prometheus job:** `kafka`
 
@@ -56,14 +56,14 @@ Event-bus tussen NiFi-ingestion en Spark Structured Streaming.
 - **URL:** _geen UI_
 - **Gebruikt door:** `platform_admin`, `data_engineer`
 
-## Opslag & Verwerking
+## Storage & Processing
 
 _Lakehouse met zones en een tabel-catalog._
 
 ### MinIO { #minio }
 
 !!! abstract "Wat doet MinIO?"
-    Het lakehouse waar alle data fysiek staat — gelaagd in zones met aparte toegangsregels.
+    Het lakehouse waar alle data fysiek staat — gelaagd in zones met aparte accesssregels.
 
 **Laag:** `storage` · **Stage:** `storage` · **Prometheus job:** `minio`
 
@@ -84,7 +84,7 @@ Catalog backend — houdt tabel-schemas en partities bij voor Trino en Spark.
 - **URL:** _geen UI_
 - **Gebruikt door:** `platform_admin`, `data_engineer`
 
-## Transformatie & Modellen
+## Transformation & Models
 
 _Opschonen, joinen, modelleren — met policy-checks per query._
 
@@ -103,7 +103,7 @@ Streaming + batch jobs die Delta-tabellen op MinIO schrijven.
 ### Trino { #trino }
 
 !!! abstract "Wat doet Trino?"
-    Snel SQL draaien over de hele lakehouse — voor dbt-modellen én eindgebruikers.
+    Snel SQL draaien about the hele lakehouse — voor dbt-models én eindusers.
 
 **Laag:** `query` · **Stage:** `transformation` · **Prometheus job:** `trino`
 
@@ -115,18 +115,18 @@ SQL query-engine over Delta-lakehouse, met OPA-authorisatie.
 ### OPA { #opa }
 
 !!! abstract "Wat doet OPA?"
-    Doelbinding, rij-filters en kolom-maskering afdwingen op iedere query.
+    Purpose limitation, rij-filters en kolom-maskering afdwingen op iedere query.
 
 **Laag:** `policy` · **Stage:** `transformation` · **Prometheus job:** `opa`
 
-Open Policy Agent — beslist per Trino-query wat een rol mag zien (rij-filters, kolom-maskers, doelbinding).
+Open Policy Agent — beslist per Trino-query wat een rol mag zien (rij-filters, kolom-maskers, purpose-limitation).
 
 - **URL:** _geen UI_
 - **Gebruikt door:** `platform_admin`
 
 ## BI / Analytics
 
-_Eindgebruikers consumeren via dashboards en SQL._
+_Eindusers consumeren via dashboards en SQL._
 
 ### Apache Superset { #superset }
 
@@ -135,7 +135,7 @@ _Eindgebruikers consumeren via dashboards en SQL._
 
 **Laag:** `bi` · **Stage:** `consumption` · **Prometheus job:** `superset`
 
-Dashboards en SQL Lab — primaire UI voor de meeste eindgebruikers.
+Dashboards en SQL Lab — primaire UI for the meeste eindusers.
 
 - **URL:** [Live UI ↗](https://superset.odap.local:8443)
 - **Gebruikt door:** `claims_analyst`, `fraud_analyst`, `claims_analyst`, `marketing_analyst`, `finance_analyst`, `operations_manager`, `marketing_analyst`, `researcher`, `data_steward`, `platform_admin`
@@ -143,7 +143,7 @@ Dashboards en SQL Lab — primaire UI voor de meeste eindgebruikers.
 ### ODAP Lab (Jupyter) { #jupyter }
 
 !!! abstract "Wat doet ODAP Lab (Jupyter)?"
-    Interactief data verkennen en analyseren — Trino, Delta, MinIO, OpenMetadata vanuit één Python-kernel; werk versioneren met Git.
+    Interactief data explore en analyseren — Trino, Delta, MinIO, OpenMetadata vanuit één Python-kernel; werk versioneren met Git.
 
 **Laag:** `compute` · **Stage:** `consumption` · **Prometheus job:** _niet gemonitord_
 
@@ -183,11 +183,11 @@ Catalog, glossary, lineage, data-quality.
 ### dbt docs { #dbt-docs }
 
 !!! abstract "Wat doet dbt docs?"
-    Wat doen onze dbt-modellen, welke tests draaien er, en hoe vloeit data van staging naar marts?
+    Wat doen onze dbt-models, welke tests draaien er, en hoe vloeit data van staging naar marts?
 
 **Laag:** `governance` · **Stage:** `discovery` · **Prometheus job:** _niet gemonitord_
 
-Modellen, tests, sources en lineage van de dbt-projectdefinities.
+Models, tests, sources en lineage van de dbt-projectdefinities.
 
 - **URL:** `/dbt-docs.html`
 - **Gebruikt door:** `data_engineer`, `data_steward`, `platform_admin`
@@ -280,9 +280,9 @@ In-cluster agent-runtime + trace-viewer. Watcher monitort het platform en filed 
 ## Rol-matrix { #rol-matrix }
 
 Welke rol gebruikt welk component? Een ✓ betekent dat de rol in deze
-referentie-implementatie via de portal-shortcuts naar de UI van het
+reference implementation via de portal-shortcuts to the UI van het
 component wordt gestuurd. Een lege cel betekent dat de rol normaliter geen
-directe toegang nodig heeft (toegang kan alsnog via JIT/break-glass).
+directe access nodig heeft (access kan alsnog via JIT/break-glass).
 
 | Rol | keycloak | nifi | kafka | minio | hive | spark | trino | opa | superset | openmetadata | dbt-docs | jupyter | airflow | prometheus | grafana | opensearch | multica | powerbi | nanitics |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|

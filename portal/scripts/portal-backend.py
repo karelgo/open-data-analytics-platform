@@ -20,7 +20,7 @@ Auth
 oauth2-proxy zet X-Auth-Request-Email; we vertrouwen alleen die header
 achter de proxy. Zonder header → 401.
 
-Vereiste env
+Requirede env
 ------------
 PORTAL_DB_PATH       /var/lib/portal-backend/portal.db   (default)
 PORT                 8089                                (default)
@@ -657,12 +657,12 @@ async def events_stream(req: Request) -> StreamingResponse:
 
 
 # ─── Power BI embed ──────────────────────────────────────────────────────
-# Mint short-lived embed tokens voor de Astro-portal via een Service Principal.
-# De SP heeft Workspace-Contributor op de Fabric workspace (zie
+# Mint short-lived embed tokens for the Astro-portal via een Service Principal.
+# De SP heeft Workspace-Contributor on the Fabric workspace (zie
 # secrets/local/uc11-multiplatform.env). We doen geen pure User-Owns-Data
 # (waar de user z'n eigen Entra-token gebruikt) omdat dat een per-user
 # Power BI Pro/PPU licentie zou eisen. In plaats daarvan: App-Owns-Data
-# met een `effectiveIdentity` waarin de gefedereerde Entra-email wordt
+# with a `effectiveIdentity` waarin de gefedereerde Entra-email wordt
 # meegegeven — Power BI logt de user voor audit en kan via DAX (USERNAME,
 # CUSTOMDATA) row-level security toepassen.
 #
@@ -684,7 +684,7 @@ _pbi_token_lock = Lock()
 
 
 async def _pbi_sp_token() -> str:
-    """OAuth2 client-credentials token voor de Power BI API. Caches tot 5min
+    """OAuth2 client-credentials token for the Power BI API. Caches tot 5min
     voor expiry."""
     cached = _pbi_token_cache.get("sp")
     if cached and cached[1] > time.time() + 60:
@@ -751,7 +751,7 @@ async def _pbi_post(path: str, token: str, body: dict) -> dict:
 async def list_powerbi_reports(req: Request) -> dict:
     """Lijst de reports in de geconfigureerde workspace.
 
-    Front-end gebruikt dit voor een dropdown op /embed/powerbi/. Auth-gewise
+    Front-end gebruikt dit for a dropdown op /embed/powerbi/. Auth-gewise
     is dit user-context — de SP haalt de lijst op, maar we returnen 'm
     alleen aan een ingelogde portal-gebruiker."""
     user_email = _email_from_request(req)  # noqa: F841 — audit/log

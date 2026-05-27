@@ -37,7 +37,7 @@ quiz:
   - q: "Wat is het verschil tussen ‘dry-run’ en ‘rollende upgrade’?"
     options:
       - "Geen"
-      - "Dry-run: toepassen op een tijdelijk identiek cluster (k3d-clone) om verschillen te zien; rollende upgrade: één service tegelijk in productie, met smoke-test ertussen, met rollback-plan klaar"
+      - "Dry-run: toepassen op een tijdelijk identiek cluster (k3d-clone) om verschillen te zien; rollende upgrade: één service tegelijk in production, met smoke-test ertussen, met rollback-plan klaar"
       - "Rollende = sneller"
       - "Dry-run = met sudo"
     correct: 1
@@ -69,7 +69,7 @@ Maak een tabel:
 
 ## Stap 2 — dry-run op k3d
 
-Maak een lokaal k3d cluster, restore de productie-state met
+Maak een lokaal k3d cluster, restore de production-state met
 synthetische data, voer de upgrade uit. Documenteer alle hand-acties.
 
 ```bash
@@ -82,7 +82,7 @@ make test SUITE=full
 
 Falen verwacht — dat is precies waarom je dry-runt.
 
-## Stap 3 — productie-plan
+## Stap 3 — production-plan
 
 ```markdown
 # Upgrade Stackable 26.3 → 27.0 — plan
@@ -126,20 +126,20 @@ Een korte e-mail aan alle rollen, helder en concreet:
 ```
 Onderwerp: data-platform onderhoud zaterdag 23-09 21:00 — 03:00
 
-We voeren onderhoud uit op het data-platform. Tijdens dit venster:
+We voeren onderhoud uit on the data-platform. Tijdens dit venster:
 - Dashboards in Superset zijn niet bereikbaar.
 - Trino, NiFi, Airflow zijn niet bereikbaar.
 - Lopende dbt-runs en streaming pauzeren.
-- Geen data-loss; achtergebleven verwerking pakt op zondag automatisch op.
+- Geen data-loss; achtergebleven processing pakt op zondag automatisch op.
 
 Bij vragen tijdens het venster: niet bellen. Live updates op
 #data-platform-Slack-channel.
 
-Maandag 06:00 staat alles op nieuwe versie. Verwachte gebruikers-impact:
+Maandag 06:00 staat alles op nieuwe versie. Verwachte users-impact:
 nul (UI ongewijzigd; achterliggend nieuwer).
 
 Met vriendelijke groet,
-Platform-team
+Platform team
 ```
 
 ## Wat je niet doet
@@ -148,7 +148,7 @@ Platform-team
 - Niet alle services tegelijk.
 - Niet zonder backup.
 - Niet zonder rollback-plan dat is *getest*.
-- Niet "ach, het komt wel goed" — zorg voor een tweede admin als
+- Niet "ach, het komt wel goed" — zorg for a tweede admin als
   4-eyes-aanwezigheid tijdens kritieke stappen (Trino, OpenMetadata).
 
 ## Verificatie

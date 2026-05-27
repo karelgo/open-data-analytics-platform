@@ -1,10 +1,10 @@
-"""DAG: bewaartermijn-enforcer (R-AVG-08, improvements #9).
+"""DAG: retention period-enforcer (R-AVG-08, improvements #9).
 
 Loopt dagelijks. Per tabel: DELETE waar `event_date < current_date - interval
-<bewaartermijn_jaren>`. Bewaartermijnen zijn afgeleid uit dbt-meta in elke
+<retention period_jaren>`. Retention perioden zijn afgeleid uit dbt-meta in elke
 mart's `_*.yml` (zie compliance-mapping).
 
-Productie-overweging: voor immutable Delta-tabellen is `DELETE FROM` mogelijk
+Production-overweging: voor immutable Delta-tabellen is `DELETE FROM` mogelijk
 maar zwaarder dan een PARTITION DROP. Voor dagelijks-gepartitioneerde tabellen
 zou een aparte DROP PARTITION-pad efficiënter zijn.
 """
@@ -25,8 +25,8 @@ DEFAULT_ARGS = {
     "retry_delay": timedelta(minutes=15),
 }
 
-# Bewaartermijn per tabel (jaren). Bron: dbt schema.yml `meta.bewaartermijn_jaren`.
-# In productie zou dit dynamisch via OpenMetadata custom-properties komen.
+# Retention period per tabel (jaren). Bron: dbt schema.yml `meta.retention period_jaren`.
+# In production zou dit dynamisch via OpenMetadata custom-properties komen.
 RETENTION_RULES = [
     # (catalog, schema, table, year_column, retention_years, dry_run_only)
     ("silver", "customers", "stg_customer_interaction", "event_date", 2, False),
@@ -81,8 +81,8 @@ def _delete_sql(
 
 
 with DAG(
-    dag_id="bewaartermijn_enforcer",
-    description="Dagelijkse bewaartermijn-enforcement (R-AVG-08).",
+    dag_id="retention period_enforcer",
+    description="Dagelijkse retention period-enforcement (R-AVG-08).",
     default_args=DEFAULT_ARGS,
     schedule="0 4 * * *",  # 04:00 UTC daily, low-traffic window
     start_date=datetime(2026, 5, 1),

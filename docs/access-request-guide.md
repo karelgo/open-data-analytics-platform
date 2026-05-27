@@ -1,7 +1,7 @@
-# Toegang aanvragen tot data — gebruikersgids
+# Access request tot data — usersgids
 
-Praktische gids voor het aanvragen van toegang tot een dataset op het UWV
-data-platform. Architectuur: zie [ADR-0008](adr/0008-self-service-data-access.md).
+Praktische gids for the request van access tot een dataset on the UWV
+data-platform. Architecture: zie [ADR-0008](adr/0008-self-service-data-access.md).
 Bridge-service: zie [platform/18-om-access-bridge/](../platform/18-om-access-bridge/README.md).
 
 > **De bridge wordt automatisch meegedeployd** als laatste stap van
@@ -19,9 +19,9 @@ Bridge-service: zie [platform/18-om-access-bridge/](../platform/18-om-access-bri
 
 ## TL;DR — 30 seconden (portal-flow)
 
-1. Open Mijn werkplek → scroll naar **"Andere data nodig?"** → klik **"Vraag toegang aan"**.
-2. Vul het formulier in: dataset-FQN, gebruikersnaam, doelbinding, motivatie.
-3. Submit. De portal maakt namens jou een Task aan in OpenMetadata en stuurt 'm naar de owner.
+1. Open Mijn workspace → scroll naar **"Andere data nodig?"** → klik **"Vraag access aan"**.
+2. Vul het formulier in: dataset-FQN, usersnaam, purpose-limitation, motivatie.
+3. Submit. De portal maakt namens jou een Task aan in OpenMetadata en stuurt 'm to the owner.
 4. Bij approval krijg je automatisch de rol `data_access:<catalog>.<schema>` toegekend.
 
 Direct: `https://platform.odap.local:8443/access-request`.
@@ -30,20 +30,20 @@ Direct: `https://platform.odap.local:8443/access-request`.
 
 ---
 
-## Wat is "toegang aanvragen" hier?
+## Wat is "access request" hier?
 
-Het ODAP platform gebruikt **default-deny** met doelbinding (R-AVG-06). Jouw
+Het ODAP platform gebruikt **default-deny** met purpose-limitation (R-AVG-06). Jouw
 primaire rol (`claims_analyst`, `marketing_analyst`, `researcher`, …)
 bepaalt welke catalogs/schemas je *standaard* mag zien. Als je daarnaast
-toegang nodig hebt tot een andere zone — bv. `gold.uc05_customer_360` —
+access nodig hebt tot een andere zone — bv. `gold.uc05_customer_360` —
 loopt dat via deze flow:
 
-1. Jij maakt een Task op het asset in OpenMetadata.
+1. Jij maakt een Task on the asset in OpenMetadata.
 2. De Owner/Reviewer keurt de Task goed.
 3. De **om-access-bridge** vertaalt de approval naar een realm-role
    `data_access:<catalog>.<schema>` in Keycloak.
 4. OPA-Rego herkent die rol als grant; Trino laat de query door zolang je
-   een doelbinding-purpose declareert die op de granted resource staat.
+   een purpose-limitation-purpose declareert die on the granted resource staat.
 
 De grant geldt op **schema-niveau** (catalog.schema), niet per tabel.
 
@@ -53,16 +53,16 @@ De grant geldt op **schema-niveau** (catalog.schema), niet per tabel.
 
 ### 1. Open het access-request-formulier
 
-Via Mijn werkplek → sectie *"Andere data nodig?"* → knop **"Vraag
-toegang aan"**. Of direct: <https://platform.odap.local:8443/access-request>.
+Via Mijn workspace → sectie *"Andere data nodig?"* → knop **"Vraag
+access aan"**. Of direct: <https://platform.odap.local:8443/access-request>.
 
 ### 2. Vul de velden in
 
 | Veld | Wat je invult |
 |---|---|
-| **Welke dataset?** | OM-FQN — bv. `trino.gold.uc11_customer_journey.mart_uc11_journey_events`. Vind 'm via OpenMetadata → Explore → klik op het asset → kopieer de FQN onder de titel. |
-| **Wie ben je?** | Je Keycloak-gebruikersnaam (eerste deel van je e-mail, bv. `researcher`, `finance.analyst`). |
-| **Voor welk doel?** | Kies een doelbinding (AVG art. 5 lid 1b). |
+| **Welke dataset?** | OM-FQN — bv. `trino.gold.uc11_customer_journey.mart_uc11_journey_events`. Vind 'm via OpenMetadata → Explore → klik on the asset → kopieer de FQN onder de titel. |
+| **Wie ben je?** | Je Keycloak-usersnaam (eerste deel van je e-mail, bv. `researcher`, `finance.analyst`). |
+| **Voor welk doel?** | Kies een purpose-limitation (GDPR Art. 5(1)(b)). |
 | **Hoe lang?** | Optioneel — bv. "2 maanden, t/m 2026-08-01". |
 | **Motivatie** | Korte uitleg: project, waarom de bestaande aggregaten niet volstaan, etc. |
 
@@ -81,16 +81,16 @@ De Owner/Reviewer:
 
 ### 5. Bij approval — automatisch
 
-1. OM publiceert een `taskResolved`-event naar de [om-access-bridge](../platform/18-om-access-bridge/) (HMAC-signed).
+1. OM publiceert een `taskResolved`-event to the [om-access-bridge](../platform/18-om-access-bridge/) (HMAC-signed).
 2. Bridge parsed het asset FQN → `<catalog>.<schema>` → ensures realm-role `data_access:<catalog>.<schema>` in Keycloak en kent 'm aan jou toe.
 3. Bij je volgende JWT-refresh (binnen 15 min) zit de nieuwe rol in je token.
-4. OPA-Rego accepteert de rol als grant; doelbinding moet kloppen met de purposes die op die resource staan (zie [data.json](../platform/10-opa/policies/data.json) → `resource_purposes`).
+4. OPA-Rego accepteert de rol als grant; purpose-limitation moet kloppen with the purposes die op die resource staan (zie [data.json](../platform/10-opa/policies/data.json) → `resource_purposes`).
 
 ---
 
 ## Voorbeelden
 
-### Voorbeeld 1 — Researcher wil naar UC-11 klantreis-mart
+### Voorbeeld 1 — Researcher wil naar UC-11 customer journey-mart
 
 ```
 Asset:      trino.gold.uc11_customer_journey.mart_uc11_journey_events
@@ -106,7 +106,7 @@ Grant na approval: realm-role `data_access:gold.uc11_customer_journey`.
 > ⚠️ **Heads-up:** deze specifieke `mart_*` tabel heeft lineage geregistreerd
 > in OM en raakt op OM 1.12 momenteel de OpenSearch lineage-script bug —
 > de approval-PUT geeft 500. Zie de FAQ "Mijn aanvraag op een
-> `mart_*` of `uc11_*` tabel faalt met 500" onderaan voor de workaround
+> `mart_*` of `uc11_*` tabel faalt met 500" onderaan for the workaround
 > (admin kent de role handmatig toe). Een staging/silver-tabel uit
 > dezelfde catalog werkt nu wél foutloos via dezelfde grant.
 
@@ -136,7 +136,7 @@ flow handmatig.
 4. **Description (of message of taskName) bevat ergens `Request Access`** —
    case-insensitive, hoeft niet aan het begin. Anders triggert de bridge
    niet (zie `_parse_grant` "convention guard").
-5. Assignee = de Owner / Reviewer rechts op de asset-pagina. Is dat een
+5. Assignee = de Owner / Reviewer rechts on the asset-pagina. Is dat een
    team zonder users in OM? Set dan een persoon als secundaire owner;
    de portal-flow expandeert dat automatisch, de handmatige niet.
 6. Submit. Verder loopt het identiek aan de portal-flow.
@@ -148,7 +148,7 @@ flow handmatig.
 
 ## Veelgestelde vragen
 
-**Hoe lang duurt het voor de grant actief is?**
+**Hoe lang duurt het for the grant actief is?**
 Zodra de Task is gesloten met Approved: binnen seconden in Keycloak,
 binnen één JWT-refresh in Trino (≤ 15 min, of forceer met logout-login).
 
@@ -166,22 +166,22 @@ Default-SLA: 5 werkdagen. Daarna mag je platform-admin escaleren. (Een
 SLA-DAG op open Tasks is een open issue.)
 
 **Aan wie wordt mijn Task toegewezen als de owner een team is?**
-Veel datasets hebben een **team/group als owner** (bv. `divisie_klantcontact`)
+Veel datasets hebben een **team/group als owner** (bv. `divisie_customer interaction`)
 in plaats van een persoon. De portal-flow expandeert team-owners
 automatisch naar hun users. Als de owner-team géén users heeft
 gekoppeld in OM, valt de bridge terug op `data.steward` zodat de Task
 niet ongeassigned blijft hangen. Wil je dat van een specifiek persoon
-afhangen? Zet die persoon expliciet als owner op het asset in
+afhangen? Zet die persoon expliciet als owner on the asset in
 OpenMetadata.
 
 **Mijn aanvraag op een `mart_*` of `uc11_*` tabel faalt met "500 server
 error" tijdens approval — wat is dat?**
 Bekend probleem in OM 1.12 op assets **met lineage of data-products**:
 de `PUT /api/v1/feed/tasks/{id}/resolve` API gooit een
-`script_exception` op de OpenSearch lineage-index, en de Task wordt niet
+`script_exception` on the OpenSearch lineage-index, en de Task wordt niet
 afgesloten → geen webhook → geen grant. Tijdelijke workaround tot OM-fix:
 laat de platform-admin het Keycloak realm-role
-`data_access:<catalog>.<schema>` met de hand toekennen. Tracking:
+`data_access:<catalog>.<schema>` with the hand toekennen. Tracking:
 [OS lineage script bug — onderzoekstaak (open)](improvements.md).
 Niet-lineage assets (bv. staging-tabellen in `bronze`/`gold.crm`) werken
 zonder probleem.
@@ -205,7 +205,7 @@ Als Owner/Reviewer van een dataset:
 1. Je krijgt notificatie in OM bij een nieuwe access-request Task.
 2. Bekijk de description: wie vraagt, waarvoor, hoe lang.
 3. Check of de aanvrager de purpose mag declareren (zie
-   [trino-doelbinding.rego](../opa-policies-src/trino/trino-doelbinding.rego))
+   [trino-purpose-limitation.rego](../opa-policies-src/trino/trino-purpose-limitation.rego))
    — als de aanvrager's primaire rol de purpose niet kent, helpt de grant
    niet en moet je afwijzen of escaleren.
 4. Klik **Accept Suggestion** (≡ `PUT /tasks/{id}/resolve` → fires
@@ -216,7 +216,7 @@ Als Owner/Reviewer van een dataset:
 "Resolve") en zet een motivatie in een comment. Onder de motorkap is
 dat `PUT /tasks/{id}/close` → fires `taskClosed`. De bridge negeert
 `taskClosed`-events expliciet, dus er volgt géén grant — perfect voor
-audit-trail "aanvraag afgewezen". Vermijd "Resolve" voor een rejection,
+audit-trail "aanvraag afgewezen". Vermijd "Resolve" for a rejection,
 want dat zou de role wél toekennen.
 
 ---
@@ -235,5 +235,5 @@ want dat zou de role wél toekennen.
 - **TTL op grants**: dagelijkse CronJob die `data_access:*` rollen ouder
   dan X weken intrekt. Mooie eerste-uitbreiding.
 - **Inzage/wisrecht (R-AVG-10)**: dit is een **andere** flow — gebruiker
-  vraagt inzage in eigen data, niet toegang tot een dataset. Zie
+  vraagt inzage in eigen data, niet access tot een dataset. Zie
   `gdpr_request`-DAG in [docs/improvements.md](improvements.md).

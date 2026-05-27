@@ -2,7 +2,7 @@
 # Koppel CGM-glossary-termen aan de tabellen waar ze logisch bij horen.
 #
 # Vult de gaten die de standaard enrichment laat liggen: termen die niet
-# in de dbt `cgm_entiteiten`-meta staan (Klantreis, EventStream, Fase,
+# in de dbt `cgm_entiteiten`-meta staan (Customer journey, EventStream, Fase,
 # Persona, Werknemer, Werkgever, Dienstverband, Ontslag, Diagnose,
 # Inkomen, Huishouden, Aggregaat, Uitkomst) krijgen alsnog koppeling aan
 # de bronze stg_*- en relevante mart-tabellen.

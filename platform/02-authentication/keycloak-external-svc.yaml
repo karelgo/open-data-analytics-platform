@@ -11,7 +11,7 @@
 #
 # Hoort in `ingress-nginx` namespace omdat selectors alleen pods in dezelfde
 # namespace matchen. Ingress-nginx routeert vervolgens de Host-header
-# (keycloak.odap.local) naar de Keycloak Service in odap-auth.
+# (keycloak.odap.local) to the Keycloak Service in odap-auth.
 #
 # CoreDNS hosts override pinnt `keycloak.odap.local` op deze ClusterIP
 # (zie scripts/aks-deploy.sh of full-deploy.sh — runtime patch nodig omdat

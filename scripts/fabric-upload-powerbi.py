@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Upload Power BI semantic model + report naar de Fabric workspace.
+"""Upload Power BI semantic model + report to the Fabric workspace.
 
 Idempotent: detecteert bestaande items by displayName en doet
 updateDefinition; anders POST naar create endpoint.

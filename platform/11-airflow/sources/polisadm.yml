@@ -22,9 +22,9 @@ silver:
 
 governance:
   legal_basis: Wet_SUWI_art_33
-  doelbinding: [uitkering, handhaving, statistiek]
+  purpose-limitation: [claim payout, handhaving, statistiek]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: divisie_gegevensdiensten
   pii_kolommen: [bsn, werkgever_loonheffingennummer]
   risk_tier: midden

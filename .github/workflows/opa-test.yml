@@ -29,7 +29,7 @@ jobs:
         # Wraps opa-policies-src/data/role_mappings.json onder
         # data.configmap["opa-trino-bundle"]["odap-platform"] zodat
         # `opa test` dezelfde paden ziet als de Stackable OpaCluster
-        # in productie. Zonder dit falen alle policy-tests omdat de
+        # in production. Zonder dit falen alle policy-tests omdat de
         # rego-regels via `data.configmap.[...]` lezen.
         run: |
           python3 scripts/opa-test-data-wrap.py \

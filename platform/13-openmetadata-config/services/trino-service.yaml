@@ -1,6 +1,6 @@
 # OpenMetadata Trino service-connection + ingestion-workflow.
 #
-# Wordt door de init-Job toegepast via `metadata ingest -c trino-service.yaml`.
+# Wordt through the init-Job toegepast via `metadata ingest -c trino-service.yaml`.
 # Schema-filter dekt alle platform catalogs (bronze/silver/gold/sensitive).
 #
 # JWT-token komt uit Secret openmetadata-admin (env-substitutie in Job).
@@ -26,10 +26,10 @@ source:
     config:
       type: DatabaseMetadata
       # `sensitive` bewust uitgesloten: smoketest (ingestion-user) heeft
-      # geen toegang tot sensitive (art. 9 AVG-zone) — een SELECT op
+      # geen access tot sensitive (art. 9 AVG-zone) — een SELECT op
       # `sensitive.information_schema.schemata` levert OPA-deny en faalt
       # de hele workflow. Sensitive-metadata-ingest vereist een aparte
-      # workflow met een break-glass / sensitive-bot user (zie roadmap).
+      # workflow with a break-glass / sensitive-bot user (zie roadmap).
       databaseFilterPattern:
         includes:
           - bronze
@@ -46,7 +46,7 @@ source:
           - zw
           - crm
           - fez
-          - klantcontact
+          - customer interaction
           - intermediate              # silver
           - uc01_claims_funnel           # gold
           - uc04_eligibility_outreach

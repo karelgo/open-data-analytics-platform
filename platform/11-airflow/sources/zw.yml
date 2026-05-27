@@ -22,9 +22,9 @@ silver:
 
 governance:
   legal_basis: ZW_art_38
-  doelbinding: [uitkering, reintegratie]
+  purpose-limitation: [claim payout, reintegration]
   bio_classificatie: vertrouwelijk
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: divisie_ag
   pii_kolommen: [bsn, eerste_ziektedag]
   risk_tier: midden

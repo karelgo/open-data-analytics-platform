@@ -21,7 +21,7 @@ quiz:
   - q: "Engineer schrijft: ‘Voeg unmasked IBAN toe aan marketing_analyst — handhaving heeft het nodig’. Wat is hier mis?"
     options:
       - "Niets, snel doen"
-      - "Twee dingen: (a) handhaving heeft een eigen rol, niet via marketing_analyst; (b) IBAN unmasking voor klantcontact is geen bestaande doelbinding. Vraag de business-eigenaar in plaats van te approven"
+      - "Twee dingen: (a) handhaving heeft een eigen rol, niet via marketing_analyst; (b) IBAN unmasking voor customer interaction is geen bestaande purpose-limitation. Vraag de business-eigenaar in plaats van te approven"
       - "Naam"
       - "Volgorde"
     correct: 1
@@ -35,14 +35,14 @@ quiz:
   - q: "Wanneer markeer je een wijziging als ‘kritiek’?"
     options:
       - "Altijd"
-      - "Wanneer hij doelbinding wijzigt, of een nieuwe PII-categorie unmaskt — zelfs als hij technisch klein is"
+      - "Wanneer hij purpose-limitation wijzigt, of een nieuwe PII-categorie unmaskt — zelfs als hij technisch klein is"
       - "Bij grote diff"
       - "Bij Engelse PR-titel"
     correct: 1
 certifies: true
 ---
 
-In deze module review je een PR die op het oog klein lijkt maar grote
+In deze module review je een PR die on the oog klein lijkt maar grote
 governance-gevolgen heeft. Doel: leer principle-driven reageren onder
 druk.
 
@@ -63,12 +63,12 @@ PR #5012 — quick: extend marketing_analyst access for handhaving collab
 
 Vier dingen die niet kloppen:
 
-1. **Doelbinding overstegen.** marketing_analyst heeft doelbinding `klantcontact`,
-   niet `handhaving`. IBAN-unmasking voor klantcontact-doel is geen bestaande
+1. **Purpose limitation overstegen.** marketing_analyst heeft purpose-limitation `customer interaction`,
+   niet `handhaving`. IBAN-unmasking voor customer interaction-doel is geen bestaande
    grondslag — en kan niet zomaar uit een collab-verzoek volgen.
 2. **Verkeerde rol gebruikt.** Als handhaving moet kijken: zij hebben
    `fraud_analyst` met al unmasked IBAN. Het probleem is dat hun *werkproces*
-   denkt dat ze dat via klantcontact moeten lopen.
+   denkt dat ze dat via customer interaction moeten lopen.
 3. **Tijdsdruk als argument.** "Project deadline donderdag" is geen
    AVG-uitzondering. Een vraag aan de AVG-coördinator was beter geweest dan
    een quick-PR.
@@ -89,7 +89,7 @@ Niet approven. Vragen die ik wil beantwoord hebben voordat dit verder gaat:
    tijdelijke role-elevation in plaats van permanente uitbreiding?
 
 Geen approval voor donderdag haalbaar; een quick fix op
-doelbinding-niveau hoort niet onder tijdsdruk.
+purpose-limitation-niveau hoort niet onder tijdsdruk.
 
 Eens met dit standpunt? — let me know.
 ```
@@ -98,7 +98,7 @@ Eens met dit standpunt? — let me know.
 
 In de praktijk: ofwel het werkproces wordt aangepast (handhaver doet eigen
 queries, crm verwijst), ofwel een tijdelijke role-elevation met
-verwachtingen-clausule. Niet de doelbinding van marketing_analyst permanent
+verwachtingen-clausule. Niet de purpose-limitation van marketing_analyst permanent
 verbreden.
 
 ## Verificatie

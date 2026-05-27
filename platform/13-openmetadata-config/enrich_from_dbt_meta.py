@@ -3,11 +3,11 @@
 Loopt nadat `metadata ingest -c dbt-workflow.yaml` heeft gedraaid en de
 tabellen in OM bestaan. Per dbt-model:
 
-  - Doelbinding.*, LegalBasis.*, Confidentiality.*, AI.Risk-*   → tags
+  - Purpose limitation.*, LegalBasis.*, Confidentiality.*, AI.Risk-*   → tags
   - CGM.<term>                                                  → glossary-terms
   - meta.eigenaar (divisie_*)                                   → owner (team)
   - config.tags (uc01 / uc11 / cross / sandbox / marts)         → Tier1..4
-  - meta.bewaartermijn_jaren / dpia_id / risk-flags             → Custom Properties
+  - meta.retention period_jaren / dpia_id / risk-flags             → Custom Properties
   - meta.pii_kolommen[]                                         → PII.* op kolom
   - meta.domain                                                  → OM Domain
   - dbt config.tags                                              → OM Data Product(s)
@@ -110,7 +110,7 @@ def load_mapping() -> dict:
 
 def get_table(fqn: str) -> dict | None:
     """Haal table-entity bij FQN. Tags + extension + domains + dataProducts
-    expliciet meegehaald — OM laat ze anders uit het 'lite' antwoord.
+    expliciet meegehaald — OM laat ze anders from the 'lite' antwoord.
 
     OM 1.12: veld heet `domains` (plural array), niet `domain`. De 1.5 single
     `domain` is hernoemd in 1.7+; de v12 server geeft 400 op `?fields=domain`."""
@@ -203,14 +203,14 @@ def derive_tier(model_tags: list[str], mapping: dict) -> str:
     return best
 
 
-def map_doelbinding(values: list[str], mapping: dict) -> list[str]:
+def map_purpose-limitation(values: list[str], mapping: dict) -> list[str]:
     out = []
     for v in values or []:
-        fqn = mapping["doelbinding_to_tag"].get(str(v).lower())
+        fqn = mapping["purpose-limitation_to_tag"].get(str(v).lower())
         if fqn:
             out.append(fqn)
         else:
-            log(f"  ? onbekende doelbinding={v}")
+            log(f"  ? onbekende purpose-limitation={v}")
     return out
 
 
@@ -235,12 +235,12 @@ def map_risk_tier(value: str, mapping: dict) -> str | None:
 def build_table_tags(
     node: dict, mapping: dict, existing_tags: list[dict]
 ) -> list[dict]:
-    """Verzamel alle tag-FQNs voor de tabel-entiteit. Glossary-terms gaan
+    """Verzamel alle tag-FQNs for the tabel-entiteit. Glossary-terms gaan
     ook als tags mee maar met source=Glossary."""
     meta = node.get("meta") or {}
     new_fqns: list[tuple[str, str]] = []
 
-    for fqn in map_doelbinding(meta.get("doelbinding", []), mapping):
+    for fqn in map_purpose-limitation(meta.get("purpose-limitation", []), mapping):
         new_fqns.append((fqn, "Classification"))
 
     for fqn in map_legal_basis(meta.get("legal_basis"), mapping):
@@ -318,8 +318,8 @@ def build_extension(node: dict, mapping: dict) -> dict:
     meta = node.get("meta") or {}
     ext: dict[str, Any] = {}
 
-    if "bewaartermijn_jaren" in meta:
-        ext["bewaartermijn_jaren"] = int(meta["bewaartermijn_jaren"])
+    if "retention period_jaren" in meta:
+        ext["retention period_jaren"] = int(meta["retention period_jaren"])
     if meta.get("dpia_id"):
         ext["dpia_id"] = str(meta["dpia_id"])
     if meta.get("algoritmeregister_id"):
@@ -333,7 +333,7 @@ def build_extension(node: dict, mapping: dict) -> dict:
     # multiSelect=false; ["true"] / ["false"] — niet scalaire strings.
     for boolflag in (
         "human_in_the_loop",
-        "toegang_via_OPA_policies",
+        "access_via_OPA_policies",
         "profilering",
         "opt_out_supported",
         "sandbox_only",

@@ -1,7 +1,7 @@
 # Reverse Metadata sync — OM tags → OPA bundle data.json.
 #
 # OM 1.5 heeft geen native Reverse Metadata (community-feature pas vanaf
-# 1.7+). Deze CronJob implementeert het pad zelf: leest Doelbinding.* tags
+# 1.7+). Deze CronJob implementeert het pad zelf: leest Purpose limitation.* tags
 # van Trino-tabellen in OM en updatet `role_mappings.resource_purposes`
 # in de opa-trino-bundle ConfigMap. Stackable's OPA-operator herlaadt
 # automatisch via de bundle-label.
@@ -54,7 +54,7 @@ metadata:
   labels:
     odap.io/component: om-to-opa-sync
 spec:
-  # Elke 15 min — Doelbinding-tags zijn relatief stabiel (komen uit dbt-meta)
+  # Elke 15 min — Purpose limitation-tags zijn relatief stabiel (komen uit dbt-meta)
   # maar deze cadence vangt nieuwe marts snel op zonder OPA-flapping.
   schedule: "*/15 * * * *"
   concurrencyPolicy: Forbid

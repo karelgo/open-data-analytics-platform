@@ -1,10 +1,10 @@
 ---
-title: "Het platform voor de Data-engineer"
+title: "Het platform for the Data-engineer"
 role: data_engineer
 level: foundation
 order: 1
 duration: "45 min"
-summary: "Stackable-operators, de NiFi → Kafka → Spark → Delta-keten, dbt-trino voor transformatie, en JIT-toegang tot bronze. Wat staat waar in de repo."
+summary: "Stackable-operators, de NiFi → Kafka → Spark → Delta-keten, dbt-trino voor transformation, en JIT-access tot bronze. Wat staat waar in de repo."
 labs:
   - title: "Open NiFi"
     hint: "Visuele ingestion-flows"
@@ -16,10 +16,10 @@ labs:
     hint: "Bekijk de structuur van platform/, dbt/, spark-jobs/, nifi-flows/"
     href: "/dbt-docs/"
     vscodePath: "README.md"
-  - title: "Open de architectuur-doc in vscode.dev"
+  - title: "Open de architecture-doc in vscode.dev"
     hint: "Definitief plaatje van de pipeline"
-    href: "https://fresh-minds.github.io/FreshStackableDataPlatform/architectuur/"
-    vscodePath: "docs/architectuur/index.md"
+    href: "https://fresh-minds.github.io/FreshStackableDataPlatform/architecture/"
+    vscodePath: "docs/architecture/index.md"
 quiz:
   - q: "Welke directory bevat de Stackable-CRD-manifesten?"
     options:
@@ -32,26 +32,26 @@ quiz:
   - q: "Wat is een correcte volgorde van data-stromen?"
     options:
       - "Trino → Kafka → NiFi → Spark"
-      - "NiFi → Kafka → Spark Structured Streaming → Delta op MinIO; daarna dbt-trino voor transformatie"
+      - "NiFi → Kafka → Spark Structured Streaming → Delta op MinIO; daarna dbt-trino voor transformation"
       - "MinIO → NiFi → Trino → Airflow"
       - "Spark → NiFi → Trino"
     correct: 1
-  - q: "Hoe krijg je tijdelijk toegang tot bronze.* voor debug?"
+  - q: "Hoe krijg je tijdelijk access tot bronze.* voor debug?"
     options:
       - "Direct queryen in Trino — engineer-rol mag altijd"
-      - "JIT-procedure: ticket aanmaken met scope + reden, platform-admin keurt goed; toegang 4 uur, queries gelogd, ticket-id in elke SQL als comment"
+      - "JIT-procedure: ticket aanmaken met scope + reden, platform-admin keurt goed; access 4 uur, queries gelogd, ticket-id in elke SQL als comment"
       - "Een collega vragen om copy-paste"
       - "Naar de business gaan"
     correct: 1
 ---
 
-Welkom. Engineer-rol op dit platform combineert vier verantwoordelijkheden:
-ingestion (NiFi), streaming compute (Spark), transformatie (dbt), en
-orkestratie (Airflow). Plus: discipline rondom bronze-toegang.
+Welcome. Engineer-rol op dit platform combineert vier verantwoordelijkheden:
+ingestion (NiFi), streaming compute (Spark), transformation (dbt), en
+orkestratie (Airflow). Plus: discipline rondom bronze-access.
 
 ## Stackable als basis
 
-Alle data-componenten draaien als CRDs onder de Stackable Data Platform
+Alle data-components draaien als CRDs onder de Stackable Data Platform
 operators (NiFi, Kafka, Spark, Hive, Trino, Airflow, Superset, OPA, ZooKeeper).
 Dat betekent:
 
@@ -101,19 +101,19 @@ Alles wat je in deze keten doet is versie-beheerd in deze repo.
 | `tests/smoke/` | Smoke-tests die je in CI én lokaal draait |
 | `Makefile` | `make cluster`, `make bootstrap`, `make seed`, `make test` |
 
-## JIT-toegang tot bronze
+## JIT-access tot bronze
 
-Je werkt 95% van de tijd op silver/gold (dbt-modellen). Voor debug op
+Je werkt 95% van de tijd op silver/gold (dbt-models). Voor debug op
 bronze (PII zichtbaar) geldt JIT:
 
 ```
 1. Ticket aanmaken: scope + reden + verwachte duur
-2. platform-admin keurt goed → 4 uur toegang
+2. platform-admin keurt goed → 4 uur access
 3. queries gelogd; ticket-id verplicht in SQL-comment
 4. automatische deactivatie
 ```
 
-Geen JIT = geen toegang. Geen workarounds — die staan in de audit-log.
+Geen JIT = geen access. Geen workarounds — die staan in de audit-log.
 
 ## Volgende stap
 

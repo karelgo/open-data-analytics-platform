@@ -4,7 +4,7 @@
 # spark-role=driver` → bereik baar zolang die driver draait. Batch-jobs leven
 # seconden tot minuten dus geeft de ingress meestal 503.
 #
-# Nu: route naar de SparkHistoryServer (zie history-server.yaml). Die leest
+# Nu: route to the SparkHistoryServer (zie history-server.yaml). Die leest
 # event-logs uit s3a://odap-checkpoints/spark-events/ en serveert UI op 18080.
 # Permanent beschikbaar, toont alle historische én actieve runs.
 #

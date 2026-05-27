@@ -1,6 +1,6 @@
 ---
 title: Onboarding
-description: Startpunt voor nieuwe gebruikers van het UWV referentie data-platform — kies je pad op basis van rol.
+description: Startpunt voor nieuwe users van het UWV referentie data-platform — kies je pad op basis van rol.
 tags:
   - onboarding
   - nieuw
@@ -8,15 +8,15 @@ tags:
 
 # Onboarding — kies je pad
 
-Welkom bij het **UWV Referentie Data- en Analyseplatform**. Deze pagina is
-het startpunt voor iedereen die voor het eerst met het platform aan de
+Welcome bij het **UWV Referentie Data- en Analyseplatform**. Deze pagina is
+het startpunt voor iedereen die for the eerst with the platform aan de
 slag gaat. Kies hieronder het pad dat bij je rol past — elk pad eindigt
-in een handleiding die in detail beschrijft wat je dagelijks doet.
+in een handbook die in detail beschrijft wat je dagelijks doet.
 
 !!! warning "Geen echte ODAP data"
-    Dit platform is een **fictieve, illustratieve referentie-implementatie**.
+    Dit platform is een **fictieve, illustratieve reference implementation**.
     Alle datasets zijn synthetisch (alleen 9-prefix BSN's, `meta.synthetic: true`).
-    Geen echte productie-ODAP data, geen echte productiecode.
+    Geen echte production-ODAP data, geen echte productioncode.
 
 ---
 
@@ -28,7 +28,7 @@ in een handleiding die in detail beschrijft wat je dagelijks doet.
 
     ---
 
-    Je gaat met het platform werken vanuit een business-rol — Claims Analyst,
+    Je gaat with the platform werken vanuit een business-rol — Claims Analyst,
     Fraud Analyst, Marketing Analyst, Finance Analyst, researcher, … Je werkt via
     de portal, Superset-dashboards en (soms) ad-hoc Trino-queries.
 
@@ -38,7 +38,7 @@ in een handleiding die in detail beschrijft wat je dagelijks doet.
 
     ---
 
-    Je bouwt en onderhoudt pipelines (NiFi, Kafka, Spark), dbt-modellen,
+    Je bouwt en onderhoudt pipelines (NiFi, Kafka, Spark), dbt-models,
     of bewaakt datakwaliteit en lineage in OpenMetadata.
 
     [:octicons-arrow-right-24: Naar pad 2](#pad-2-data-engineer-data-steward)
@@ -56,7 +56,7 @@ in een handleiding die in detail beschrijft wat je dagelijks doet.
 
     ---
 
-    Je draagt bij aan de repo zelf — code, manifests, documentatie.
+    Je draagt bij aan de repo zelf — code, manifests, documentation.
     Begin met `make doctor`, `make cluster MODE=k3d` en de pre-commit
     hooks.
 
@@ -74,12 +74,12 @@ platform werkt:
 | Onderwerp | Wat moet je weten? |
 |---|---|
 | **MFA verplicht** | Alle Keycloak-accounts vereisen TOTP. Configureer Google Authenticator, Microsoft Authenticator of 1Password bij eerste inlog. |
-| **Doelbinding eerst** | Het platform is **default-deny** (R-AVG-06). Toegang volgt uit je rol *plus* een gedeclareerd doel. Zie [Toegang aanvragen](../access-request-guide.md). |
-| **Niets is "zomaar"** | Elke query wordt gelogd, elke toegang is herleidbaar. Treat audit-logs as real. |
+| **Purpose limitation eerst** | Het platform is **default-deny** (R-AVG-06). Access volgt uit je rol *plus* een gedeclareerd doel. Zie [Access request](../access-request-guide.md). |
+| **Niets is "zomaar"** | Elke query wordt gelogd, elke access is herleidbaar. Treat audit-logs as real. |
 | **Bij twijfel: vraag** | Eerst data-steward of platform-admin, dan pas zelf bedenken. |
 | **Geen screenshots van persoonsgegevens** | Ook niet voor bug-rapporten — gebruik synthetische voorbeelden. |
 
-> Zie ook de [zes regels voor iedereen](../rollen/index.md#zes-regels-die-voor-iedereen-gelden) op de Rollen-overzichtspagina.
+> Zie ook de [zes regels voor iedereen](../rollen/index.md#zes-regels-die-voor-iedereen-gelden) on the Rollen-overzichtspagina.
 
 ---
 
@@ -95,41 +95,41 @@ Je platform-admin maakt je Keycloak-account aan en kent één primaire rol
 toe (bv. `claims_analyst`, `researcher`). Die rol bepaalt welke catalogs
 en schemas je standaard mag zien — geen handmatige permissies nodig.
 
-### Stap 2 · Log in op de portal
+### Stap 2 · Log in on the portal
 
 1. Open **<https://platform.odap.local:8443>** (k3d) of
    `https://platform.example.com` (aks).
-2. Klik **Inloggen via Keycloak (UWV)**.
-3. Vul gebruikersnaam + wachtwoord; wijzig wachtwoord bij eerste inlog.
+2. Klik **Sign in via Keycloak (UWV)**.
+3. Vul usersnaam + wachtwoord; wijzig wachtwoord bij eerste inlog.
 4. Scan de QR-code met je TOTP-app en bevestig.
 
-### Stap 3 · Verken **Mijn werkplek**
+### Stap 3 · Verken **Mijn workspace**
 
 Op de portal-landing zie je alleen de applicaties waarvoor jouw rol een
 grant heeft. Typische set voor business-rollen: Superset (dashboards),
 Trino (ad-hoc queries via DBeaver/CLI), OpenMetadata (catalog, lineage).
-NiFi/Airflow/Kafka zijn voor het platform-team — die zie je niet.
+NiFi/Airflow/Kafka zijn for the platform team — die zie je niet.
 
-### Stap 4 · Lees jouw rol-handleiding
+### Stap 4 · Lees jouw rol-handbook
 
-Elke handleiding behandelt: welke data je wél/niet ziet · dagelijkse
+Elke handbook behandelt: welke data je wél/niet ziet · dagelijkse
 workflows met voorbeelden · escalatie bij problemen.
 
-| Rol | Domein | Handleiding |
+| Rol | Domein | Handbook |
 |---|---|---|
 | Claims Analyst | AG / WIA | [01-claims-analyst](../handbooks/01-claims-analyst.md) |
 | Fraud Analyst | WW / Handhaving | [02-fraud-analyst](../handbooks/02-fraud-analyst.md) |
 | Claims Analyst | AG / Wajong (4-eyes) | [03-claims-analyst](../handbooks/03-claims-analyst.md) |
-| Marketing Analyst | Klantcontact | [04-marketing-analyst](../handbooks/04-marketing-analyst.md) |
+| Marketing Analyst | Customer interaction | [04-marketing-analyst](../handbooks/04-marketing-analyst.md) |
 | Finance Analyst | Financiën / Beleid | [05-finance-analyst](../handbooks/05-finance-analyst.md) |
-| Operations Manager | Sociaal-medische zaken | [06-operations-manager](../handbooks/06-operations-manager.md) |
+| Operations Manager | Operationale zaken | [06-operations-manager](../handbooks/06-operations-manager.md) |
 | Marketing Analyst | Toeslagenwet | [07-marketing-analyst](../handbooks/07-marketing-analyst.md) |
-| Researcher | Onderzoek (sandbox) | [08-researcher](../handbooks/08-researcher.md) |
+| Researcher | Research (sandbox) | [08-researcher](../handbooks/08-researcher.md) |
 
 ### Stap 5 · Extra data nodig?
 
 Buiten jouw standaard-scope? Vraag schemagrant aan via de portal-flow:
-zie [Toegang aanvragen tot data](../access-request-guide.md). Approval
+zie [Access request tot data](../access-request-guide.md). Approval
 loopt via de owner in OpenMetadata; de bridge-service kent dan automatisch
 een `data_access:<catalog>.<schema>` rol toe in Keycloak.
 
@@ -137,24 +137,24 @@ een `data_access:<catalog>.<schema>` rol toe in Keycloak.
 
 ## Pad 2 — Data-engineer / Data-steward
 
-Voor: data-engineers (pipelines, ingestion, transformaties) en
+Voor: data-engineers (pipelines, ingestion, transformations) en
 data-stewards (kwaliteit, governance, lineage, sensitive-review).
 
-### Stap 1 · Begrijp de architectuur
+### Stap 1 · Begrijp de architecture
 
 Lees in deze volgorde:
 
-1. [Architectuur — overzicht](../architectuur/index.md) — 15 componenten over 9 lagen.
-2. [Datazones](../architectuur/datazones.md) — bronze → silver → gold → sensitive.
-3. [Tabel-formaat abstractie](../architectuur/tabel-formaat.md) — waarom dbt-macros, niet hardcoded Delta.
-4. [Naming conventions](../architectuur/naming.md) — `catalog.schema.table` patronen.
+1. [Architecture — overzicht](../architecture/index.md) — 15 components over 9 lagen.
+2. [Data zones](../architecture/data zones.md) — bronze → silver → gold → sensitive.
+3. [Tabel-formaat abstractie](../architecture/table-format.md) — waarom dbt-macros, niet hardcoded Delta.
+4. [Naming conventions](../architecture/naming.md) — `catalog.schema.table` patronen.
 
 ### Stap 2 · Lees relevante ADRs
 
 - [ADR-0002 · Iceberg vs Delta](../adr/0002-iceberg-vs-delta.md) en
   [ADR-0006 · Delta gekozen](../adr/0006-delta-chosen-for-this-implementation.md)
-- [ADR-0005 · dbt-trino als transformatielaag](../adr/0005-dbt-trino-as-transform.md)
-- [ADR-0007 · Airflow pipeline-architectuur](../adr/0007-airflow-pipeline-architecture.md)
+- [ADR-0005 · dbt-trino als transformationlaag](../adr/0005-dbt-trino-as-transform.md)
+- [ADR-0007 · Airflow pipeline-architecture](../adr/0007-airflow-pipeline-architecture.md)
 - [ADR-0008 · Self-service data-access](../adr/0008-self-service-data-access.md)
 
 ### Stap 3 · Tools die je gebruikt
@@ -162,17 +162,17 @@ Lees in deze volgorde:
 | Component | Doel | URL (k3d) |
 |---|---|---|
 | **Airflow** | Orchestratie van dbt-runs en pipelines | `https://airflow.odap.local:8443` |
-| **dbt-docs** | Model-lineage en docs | via portal `Mijn werkplek` |
+| **dbt-docs** | Model-lineage en docs | via portal `Mijn workspace` |
 | **OpenMetadata** | Catalog, lineage, ownership, data-quality, sensitive-review | `https://openmetadata.odap.local:8443` |
 | **MinIO** | Object-storage (S3-compatible) | `https://minio.odap.local:8443` |
 
 - NiFi-flows worden as-code beheerd in `nifi-flows/templates/` (REST-import via `kubectl port-forward`); geen UI.
 - Trino is in-cluster; queries gaan via Superset, Jupyter, dbt of Airflow. Ad-hoc debug: `kubectl -n odap-platform port-forward svc/trino-coordinator 8443:8443`.
 
-### Stap 4 · Lees jouw rol-handleiding
+### Stap 4 · Lees jouw rol-handbook
 
 - [09 · Data-steward](../handbooks/09-data-steward.md) — datakwaliteit, governance, lineage, sensitive-review.
-- [10 · Data-engineer](../handbooks/10-data-engineer.md) — pipelines, ingestion, transformaties, JIT op bronze.
+- [10 · Data-engineer](../handbooks/10-data-engineer.md) — pipelines, ingestion, transformations, JIT op bronze.
 
 ### Stap 5 · Eerste hands-on
 
@@ -197,7 +197,7 @@ Lees: [Deployment modes](../deployment-modes.md).
 
 ### Stap 2 · Doe een end-to-end deploy op je laptop
 
-Vóór je productie aanraakt — eerst lokaal werkend krijgen op k3d:
+Vóór je production aanraakt — eerst lokaal werkend krijgen op k3d:
 
 ```bash
 make doctor MODE=k3d        # checkt tooling, kubectl context, /etc/hosts
@@ -205,7 +205,7 @@ make deploy   MODE=k3d      # cluster + bootstrap + platform + portal + smoke
 ```
 
 Volledige snelstart per mode: zie [README.md](../README.md) in de repo-root
-(sectie *Snelstart*).
+(sectie *Quick start*).
 
 ### Stap 3 · Leer het runbook
 
@@ -216,10 +216,10 @@ backup/restore, schaling, debug-commando's.
 ### Stap 4 · Security & compliance
 
 - [Security policy](../security.md) — disclosure, scope, hardening-defaults.
-- [Compliance-mapping](../compliance-mapping.md) — elke R-NORA/AVG/BIO/NIS2/AI-Act-requirement → concreet bestand/setting.
-- [Context (NORA/AVG/BIO/AI Act)](../context-summary.md) — wettelijk kader.
+- [Compliance-mapping](../compliance-mapping.md) — elke R-GDPR/ISO27001/NIS2/NIS2/AI-Act-requirement → concreet bestand/setting.
+- [Context (GDPR/ISO27001/NIS2/AI Act)](../context-summary.md) — wettelijk kader.
 
-### Stap 5 · Lees jouw rol-handleiding
+### Stap 5 · Lees jouw rol-handbook
 
 - [11 · Platform-admin](../handbooks/11-platform-admin.md) — cluster, security, break-glass, incident-respons.
 
@@ -227,7 +227,7 @@ backup/restore, schaling, debug-commando's.
 
 ## Pad 4 — Contributor (ontwikkelaar)
 
-Voor: iedereen die aan de **repo zelf** bijdraagt — code, manifests, documentatie.
+Voor: iedereen die aan de **repo zelf** bijdraagt — code, manifests, documentation.
 
 ### Stap 1 · Clone en doctor
 
@@ -263,7 +263,7 @@ make seed
 make test
 ```
 
-### Stap 4 · Documentatie lokaal previewen
+### Stap 4 · Documentation lokaal previewen
 
 Deze site (MkDocs Material) draait je lokaal voor je een doc-PR opent:
 
@@ -281,7 +281,7 @@ zodra je PR naar `main` mergt.
 |---|---|
 | Mode-aware deploys (`MODE=k3d\|aks`) | [Deployment modes](../deployment-modes.md) |
 | Tabel-formaat via dbt-macro, niet hardcoded | [ADR-0006](../adr/0006-delta-chosen-for-this-implementation.md) |
-| Doelbinding-eerst access-model | [ADR-0008](../adr/0008-self-service-data-access.md) |
+| Purpose limitation-eerst access-model | [ADR-0008](../adr/0008-self-service-data-access.md) |
 | Nederlandstalige docs, Engelse identifiers | [docs/README.md § Conventies](../README.md) |
 | Stackable-operators bezitten PDB's voor hun producten | (geen custom PDB authors voor kafka/hive/zk/trino/nifi/airflow/superset) |
 
@@ -296,7 +296,7 @@ make aks-down     # aks: terraform destroy
 
 ## Volgende stappen
 
-- Helemaal nieuw? Lees eerst de [Home-pagina](../index.md) voor de 30-seconden-pitch.
-- Op zoek naar concrete business-flows? Bekijk de [Use cases](../use-cases/index.md) — 11 scenario's van WIA-funnel tot integrale klantreis.
-- Beslissingen begrijpen? De [ADR-index](../adr/index.md) legt de fundamentele keuzes vast.
+- Helemaal nieuw? Lees eerst de [Home-pagina](../index.md) for the 30-seconden-pitch.
+- Op zoek naar concrete business-flows? Bekijk de [Use cases](../use-cases/index.md) — 11 scenario's van WIA-funnel tot integrale customer journey.
+- Decisions begrijpen? De [ADR-index](../adr/index.md) legt de fundamentele keuzes vast.
 - Iets onduidelijk? Open een issue op [GitHub](https://github.com/fresh-minds/FreshStackableDataPlatform/issues) of escaleer via je platform-admin.

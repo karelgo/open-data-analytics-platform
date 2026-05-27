@@ -3,7 +3,7 @@
 # `logs-*` indices die Vector schrijft.
 #
 # Chart: opensearch-project/opensearch-dashboards
-# Productie: schaal naar ≥ 2 replicas + enable security-plugin (TLS naar OS).
+# Production: schaal naar ≥ 2 replicas + enable security-plugin (TLS naar OS).
 ---
 opensearchHosts: "http://opensearch.odap-meta.svc.cluster.local:9200"
 

@@ -1,6 +1,6 @@
 """UC-11 — multi-platform demo: Microsoft Fabric variant.
 
-Draait een batch-only uc11 pijplijn tegen een Fabric Lakehouse op OneLake.
+Draait een batch-only uc11 pipeline tegen een Fabric Lakehouse op OneLake.
 Geen streaming bronze (zie ADR over scope-versimpeling). Equivalent van
 uc11_full_setup, maar dan met Fabric Spark in plaats van Stackable Spark.
 
@@ -10,12 +10,12 @@ Tasks:
   3. fabric_silver      — trigger 'uc11_silver' notebook (per-domein staging)
   4. fabric_dbt_gold    — KubernetesPodOperator: `dbt run --target fabric_dev`
                           met dbt-fabricspark; runt int_customer_journey_events +
-                          2 marts uit het échte dbt-project (zelfde SQL als
+                          2 marts from the échte dbt-project (zelfde SQL als
                           op Trino — portabiliteits-demo).
   5. fabric_verify      — controleer dat de gold-mart in het Lakehouse staat
 
-Voorvereisten (eerste deploy):
-  - Service Principal met workspace-contributor op de Fabric workspace
+Prerequisites (eerste deploy):
+  - Service Principal met workspace-contributor on the Fabric workspace
     (env-vars FABRIC_*; in-cluster via Kubernetes Secret 'uc11-multiplatform-creds').
     Aanmaken: `kubectl create secret generic uc11-multiplatform-creds
               --namespace odap-platform
@@ -70,7 +70,7 @@ GOLD_MART = "mart_uc11_journey_events"
 # Image die zowel dbt-trino als dbt-fabricspark heeft (zie
 # infrastructure/airflow/dbt/Dockerfile). Bevat het hele dbt-project op
 # /opt/odap/dbt/ en profiles.yml op /root/.dbt/profiles.yml met `fabric_dev`
-# target die env-vars uit het Secret hieronder leest.
+# target die env-vars from the Secret hieronder leest.
 DBT_IMAGE = "odap/dbt-trino:1.9.0"
 DBT_SECRET = "uc11-multiplatform-creds"
 
@@ -147,7 +147,7 @@ def _verify_gold_mart(**_) -> None:
     )
 
 
-# dbt-fabricspark run-script voor de KPO. Werkdir is /opt/odap/dbt (zie image);
+# dbt-fabricspark run-script for the KPO. Werkdir is /opt/odap/dbt (zie image);
 # profiles.yml zit op /root/.dbt/profiles.yml. `--no-partial-parse` voorkomt
 # stale manifest-issues in een verse pod. `--select int_customer_journey_events+`
 # bouwt alleen wat we voor Fabric nodig hebben — staging blijft op Trino.

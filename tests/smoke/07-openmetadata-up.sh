@@ -58,7 +58,7 @@ om_curl() {
 
 classifications=$(om_curl "/api/v1/classifications")
 
-for c in PII Health Confidentiality BIO LegalBasis Doelbinding AI; do
+for c in PII Health Confidentiality BIO LegalBasis Purpose limitation AI; do
   if echo "$classifications" | grep -qE "\"name\":\\s*\"$c\""; then
     pass "classification '$c' aanwezig"
   else
@@ -78,7 +78,7 @@ fi
 # 6. Sample CGM-terms
 log "CGM-terms sample"
 terms=$(om_curl "/api/v1/glossaryTerms?glossary=CGM&limit=50")
-for t in Aanvraag Beoordeling Cliënt IKV Uitkering; do
+for t in Aanvraag Assessment Cliënt IKV Claim payout; do
   # CGM-term heeft FQN `CGM.<name>` in OM
   if echo "$terms" | grep -qE "\"name\":\\s*\"$t\""; then
     pass "term CGM.$t aanwezig"

@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""Probe of een MinIO-endpoint klaar is voor een OneLake S3-shortcut.
+"""Probe of een MinIO-endpoint klaar is for a OneLake S3-shortcut.
 
 Microsoft Fabric maakt vanaf de Azure egress-IPs een HTTPS-verbinding naar
-het opgegeven S3-endpoint. Vier dingen moeten kloppen voor de shortcut werkt:
+het opgegeven S3-endpoint. Vier dingen moeten kloppen for the shortcut werkt:
 
   1. DNS resolveert publiek (geen 10.x / 192.168.x / 127.x).
   2. TCP 443 is open vanaf het publieke internet (geen firewall-block).
   3. TLS-cert is uitgegeven door een publiek vertrouwde CA (Let's Encrypt e.d.),
      niet self-signed of een private CA — Fabric vertrouwt de Microsoft trust
      store, geen custom CA's.
-  4. S3 ListBuckets + GetObject werkt met de meegegeven access/secret key.
+  4. S3 ListBuckets + GetObject werkt with the meegegeven access/secret key.
 
 Deze probe doet 1..4 lokaal en print een groene check / rode kruis per stap.
 Falen op stap 1-3 = de shortcut zal niet werken, ongeacht credentials.
 
 Gebruik:
-    # Met defaults voor de StackIT-cloud:
+    # Met defaults for the StackIT-cloud:
     python3 scripts/fabric-probe-minio.py \\
         --endpoint https://minio.example.com
 
@@ -140,7 +140,7 @@ def step4_s3(
     buckets: tuple[str, ...],
     verify_tls: bool = True,
 ) -> bool:
-    print(f"\n[4/4] S3 API + bucket toegang  — {endpoint}")
+    print(f"\n[4/4] S3 API + bucket access  — {endpoint}")
     try:
         import boto3
         from botocore.client import Config
@@ -178,7 +178,7 @@ def step4_s3(
     if missing:
         print(f"  {WARN} ontbrekende verwachte buckets: {missing}")
 
-    # GetBucketLocation + ListObjectsV2 op de eerste bestaande bucket.
+    # GetBucketLocation + ListObjectsV2 on the eerste bestaande bucket.
     target = next((b for b in buckets if b in names), None)
     if not target:
         print(f"  {FAIL} geen van {buckets} bestaat in dit account")
@@ -259,7 +259,7 @@ def main() -> None:
         )
     elif not args.secret_key:
         print(
-            f"\n[4/4] S3 API + bucket toegang  — \n"
+            f"\n[4/4] S3 API + bucket access  — \n"
             f"  {WARN} geen MINIO_SECRET_KEY — overgeslagen. "
             "Zet `export MINIO_SECRET_KEY=...` om dit te testen."
         )

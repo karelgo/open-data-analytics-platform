@@ -52,7 +52,7 @@ columnMask := {"expression": "date_trunc('year', birth_date)"} if {
 }
 
 # --- UC-11 — event_label sanitization voor non-medische rollen --------
-# Klantreis-labels kunnen medische info bevatten (bv. "WIA-aanvraag, AO 80%").
+# Customer journey-labels kunnen medische info bevatten (bv. "WIA-aanvraag, AO 80%").
 # Voor marketing_analyst / fraud_analyst / data_steward redigeren we het label tot
 # een generiek "WIA-procedure"-label.
 columnMask := {"expression": "concat(domein, '.', event_type)"} if {

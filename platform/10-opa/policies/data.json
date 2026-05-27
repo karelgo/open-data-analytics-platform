@@ -11,7 +11,7 @@
         "proactieve_dienstverlening"
       ],
       "gold.uc05_customer_360.*": [
-        "klantcontact",
+        "customer interaction",
         "behandeling"
       ],
       "gold.uc06_cost_forecast.*": [
@@ -26,11 +26,11 @@
         "planning"
       ],
       "sensitive.eligibility_cases.*": [
-        "reintegratie",
+        "reintegration",
         "behandeling"
       ],
       "silver.customers.*": [
-        "klantcontact",
+        "customer interaction",
         "behandeling"
       ],
       "silver.finance.*": [
@@ -46,20 +46,20 @@
         "kwaliteitscontrole"
       ],
       "silver.eligibility_cases.*": [
-        "reintegratie",
+        "reintegration",
         "behandeling"
       ],
       "silver.claims.*": [
-        "uitkering",
+        "claim payout",
         "behandeling",
-        "reintegratie"
+        "reintegration"
       ],
       "silver.service_requests.*": [
-        "uitkering",
+        "claim payout",
         "handhaving"
       ],
       "silver.incidents.*": [
-        "uitkering"
+        "claim payout"
       ]
     },
     "roles": {

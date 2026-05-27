@@ -1,4 +1,4 @@
-# ADR-0005: dbt-core + dbt-trino als transformatielaag
+# ADR-0005: dbt-core + dbt-trino als transformationlaag
 
 | Status | **Geaccepteerd** |
 |---|---|
@@ -10,22 +10,22 @@
 
 ## Context
 
-We hebben een transformatielaag nodig tussen bronze (raw, incl. PII) en
+We hebben een transformationlaag nodig tussen bronze (raw, incl. PII) en
 silver/gold (CGM-conform, business-ready). Eisen:
 
 - SQL-first: domein-experts en analisten schrijven SQL, geen JVM-builds.
 - Versionable + reviewable per PR.
 - Tests in pipeline (uniqueness, not-null, accepted values, custom business rules).
-- Documentatie genereerbaar (lineage, descriptions).
+- Documentation genereerbaar (lineage, descriptions).
 - Compatibel met Trino + Iceberg/Delta.
-- CGM-naming en doelbinding-tags afdwingbaar.
+- CGM-naming en purpose-limitation-tags afdwingbaar.
 - Open source, Apache 2.0.
 
 ---
 
 ## Beslissing
 
-**dbt-core + dbt-trino adapter** is de transformatielaag, draaiend in
+**dbt-core + dbt-trino adapter** is de transformationlaag, draaiend in
 **Airflow K8s-pods** (KubernetesPodOperator).
 
 ---
@@ -38,10 +38,10 @@ silver/gold (CGM-conform, business-ready). Eisen:
   Implementatie-impact). Eén macro `table_format_properties()` switcht
   Iceberg ↔ Delta.
 - **Built-in tests + dbt-utils + dbt-expectations** dekken UWV-business-rules
-  (BSN-checksum, IBAN-format, accepted-values voor wet/uitkeringssoort).
+  (BSN-checksum, IBAN-format, accepted-values voor wet/claim payoutssoort).
 - **`manifest.json` + `catalog.json` + `run_results.json`** zijn de input voor
   OpenMetadata's dbt-workflow → automatische lineage en descriptions in OM.
-- **`meta` op model-niveau** (legal_basis, doelbinding, bewaartermijn,
+- **`meta` op model-niveau** (legal_basis, purpose-limitation, retention period,
   pii_kolommen, risk_tier) is een natuurlijke plek voor compliance-metadata
   die OM via tags overneemt.
 - **Snapshots** voor SCD-tracking (bv. dossier-status-historie).
@@ -65,11 +65,11 @@ silver/gold (CGM-conform, business-ready). Eisen:
 
 - **SQLMesh**. Veelbelovend, met betere virtual-environments, maar minder
   rijp dan dbt; kleinere community; minder OpenMetadata-integratie. Te jong
-  voor referentie-implementatie.
+  voor reference implementation.
 - **Apache Spark SQL + custom orchestratie**. Geen tests-by-default, geen
   manifest, geen catalog-integratie. Skip.
 - **Hand-geschreven SQL via Airflow SQLOperator**. Geen tests, geen
-  documentatie, geen lineage. Skip.
+  documentation, geen lineage. Skip.
 
 ---
 
@@ -79,9 +79,9 @@ silver/gold (CGM-conform, business-ready). Eisen:
 - `dbt/profiles.yml.template` — Trino-profile met OIDC-auth tegen Keycloak.
 - `dbt/macros/table_format.sql` — formaat-abstractie macro.
 - `dbt/macros/pseudonymize.sql` — hash + zout helper.
-- `dbt/macros/apply_doelbinding_tag.sql` — schrijft `meta` naar dbt-docs +
+- `dbt/macros/apply_purpose-limitation_tag.sql` — schrijft `meta` naar dbt-docs +
   OM-pickup.
-- `dbt/models/{staging,intermediate,marts/uc0x_*}` — modellen per laag/UC.
+- `dbt/models/{staging,intermediate,marts/uc0x_*}` — models per laag/UC.
 - `dbt/tests/` — singular tests; per-model tests via `schema.yml`.
 - Airflow DAG `dbt_run_per_domain.py` — KubernetesPodOperator met dbt-image.
 - CI: `dbt parse` + `dbt compile` + `dbt-checkpoint` (best-effort).

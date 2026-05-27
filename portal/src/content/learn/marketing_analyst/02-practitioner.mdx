@@ -4,13 +4,13 @@ role: marketing_analyst
 level: practitioner
 order: 2
 duration: "30 min"
-summary: "Inkomende telefoon: cliënt zoeken op partial BSN + naam, status van zijn lopende uitkeringen lezen, een nieuwe to-do aanmaken — zonder onnodig data-spitten."
+summary: "Inkomende telefoon: cliënt zoeken op partial BSN + naam, status van zijn lopende claim payouten lezen, een nieuwe to-do aanmaken — zonder onnodig data-spitten."
 prereqs:
   - "marketing_analyst/foundation/1"
 labs:
-  - title: "Klant 360 — zoek-en-open"
+  - title: "Customer 360 — zoek-en-open"
     href: "/go/superset/"
-  - title: "Glossary — wat is ‘re-integratie-status’?"
+  - title: "Glossary — wat is ‘reintegration-status’?"
     href: "/go/openmetadata/"
 checks:
   - id: "crm_practitioner_todo"
@@ -25,21 +25,21 @@ quiz:
     correct: 1
   - q: "De cliënt vraagt naar zijn IBAN omdat hij dat zelf niet weet. Wat doe je?"
     options:
-      - "Je leest het voor uit de hash"
-      - "Je legt uit dat klantcontact alleen een hash ziet, niet het IBAN; verwijs naar bankportaal of MyAccount"
-      - "Je activeert handhaving-toegang"
+      - "Je leest het voor from the hash"
+      - "Je legt uit dat customer interaction alleen een hash ziet, niet het IBAN; verwijs naar bankportaal of MyAccount"
+      - "Je activeert handhaving-access"
       - "Je raadpleegt sensitive.*"
     correct: 1
   - q: "Cliënt geeft door dat hij verhuisd is. Wat doe je in het systeem?"
     options:
       - "Niets, wachten op brief"
-      - "Een to-do aanmaken voor het juiste backoffice-team met type ‘adresmutatie’ + tijdelijk nieuwe-adres-veld; zelf wijzig je geen master-record"
+      - "Een to-do aanmaken for the juiste backoffice-team met type ‘adresmutatie’ + tijdelijk nieuwe-adres-veld; zelf wijzig je geen master-record"
       - "Direct in `silver.crm` bijwerken"
       - "Naar de data-engineer"
     correct: 1
 ---
 
-In deze module behandel je één telefonisch klantcontact volledig. Doel:
+In deze module behandel je één telefonisch customer interaction volledig. Doel:
 zo min mogelijk data zien, zo concreet mogelijk de vraag oplossen.
 
 ## Casus
@@ -49,9 +49,9 @@ Inkomende telefoon. Cliënt zegt:
 > "Hallo, ik ben Jan Bakker, geboren 4 mei 1978, mijn BSN eindigt op 7741.
 > Ik wil graag mijn adres wijzigen want ik ben verhuisd."
 
-## Stap 1 — uniek match in Klant 360
+## Stap 1 — uniek match in Customer 360
 
-Open [Klant 360](/go/superset/) → zoekvenster bovenaan → vul in:
+Open [Customer 360](/go/superset/) → zoekvenster bovenaan → vul in:
 
 - naam = `Bakker`
 - birth_date = `1978-05-04`
@@ -63,9 +63,9 @@ treffer? Verifieer birth_date, dan doorverwijzen.
 
 ## Stap 2 — context lezen
 
-Op de profielpagina zie je de actieve uitkeringen, recent contact en
+Op de profielpagina zie je de actieve claim payouten, recent contact en
 openstaande to-do's. Niet IBAN. Niet medische data. Niet risk-scores.
-Dat is bewust — voor een adreswijziging is dat niet relevant.
+Dat is bewust — for a adreswijziging is dat niet relevant.
 
 ## Stap 3 — verifiëren
 
@@ -77,12 +77,12 @@ In het profiel klik je "Nieuwe to-do":
 
 - type = `adresmutatie`
 - doelteam = `backoffice-mutaties`
-- aangeleverd door = `klantcontact (cliënt aan telefoon)`
+- aangeleverd door = `customer interaction (cliënt aan telefoon)`
 - velden: nieuw adres + ingangsdatum
 - prioriteit = standaard
 
 Belangrijk: jij wijzigt het master-record niet zelf. Het backoffice-team
-heeft de juiste rol om de data-mutatie te doen — met de bron-validaties
+heeft de juiste rol om de data-mutatie te doen — with the bron-validaties
 die voor adres gelden (BRP-koppeling).
 
 ## Stap 5 — afsluiten

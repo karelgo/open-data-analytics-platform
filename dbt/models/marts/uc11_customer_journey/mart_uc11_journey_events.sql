@@ -3,9 +3,9 @@
     properties=table_format_properties()
 ) }}
 
--- UC-11 — Integrale Klantreis (event-stream).
+-- UC-11 — Integrale Customer journey (event-stream).
 --
--- Eén rij per cliënt-gebeurtenis met een uniform schema over zeven domeinen.
+-- Eén rij per cliënt-gebeurtenis with a uniform schema over zeven domeinen.
 -- Genereert een chronologische volgnummer per BSN (event_seq) zodat downstream
 -- visualisaties en fase-reconstructie tegen een stabiele ordering kunnen werken.
 --

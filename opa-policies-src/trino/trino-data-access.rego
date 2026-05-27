@@ -3,15 +3,15 @@ package trino
 # Self-service data-access grants (ADR-0008).
 #
 # Een gebruiker met realm-role `data_access:<catalog>.<schema>` krijgt
-# toegang op die catalog + schema, ongeacht zijn primaire rol-mapping.
+# access op die catalog + schema, ongeacht zijn primaire rol-mapping.
 # Het webhook-pad (`om-access-bridge`) is de enige bron van deze rollen —
-# zie ADR-0008 voor de approval-flow.
+# zie ADR-0008 for the approval-flow.
 #
-# Twee uitbreidingen op de basis-policies:
+# Twee uitbreidingen on the basis-policies:
 #   1. role_allows_resource: een grant-rol matched de target catalog/schema
 #   2. user_allowed_purposes: de aanvrager mag élke purpose declareren die
-#      op de granted resource staat (resource_required_purposes bepaalt
-#      de toegestane purposes — zie trino-doelbinding.rego)
+#      on the granted resource staat (resource_required_purposes bepaalt
+#      de toegestane purposes — zie trino-purpose-limitation.rego)
 
 import rego.v1
 
@@ -43,7 +43,7 @@ role_allows_resource if {
 
 # --- uitbreiding van user_allowed_purposes -----------------------------
 
-# Iedere purpose die op de granted resource staat is toegestaan voor de
+# Iedere purpose die on the granted resource staat is toegestaan voor de
 # user. Geen aparte purpose-rollen nodig.
 user_allowed_purposes contains p if {
 	has_data_access_grant

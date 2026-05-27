@@ -1,6 +1,6 @@
 # MinIO — single-node, single-drive (k3d / scaled-down)
 #
-# In productie: distributed mode (4+ nodes met EC). Voor referentie volstaat
+# In production: distributed mode (4+ nodes met EC). Voor referentie volstaat
 # een enkele Pod. Buckets worden door bootstrap.sh aangemaakt via mc-job.
 #
 # Chart: minio/minio
@@ -12,7 +12,7 @@ persistence:
   enabled: true
   accessMode: ReadWriteOnce
 
-# Auth (DEV ONLY — vervangen in productie via Secret)
+# Auth (DEV ONLY — vervangen in production via Secret)
 # Voor reproduceerbaarheid in dev hardcoded; bootstrap waarschuwt expliciet.
 rootUser: "platformadmin"
 rootPassword: "odap-dev-only-CHANGE-ME"
@@ -113,7 +113,7 @@ tls:
   publicCrt: public.crt
   privateKey: private.key
 
-# OIDC SSO via Keycloak voor de MinIO Console.
+# OIDC SSO via Keycloak for the MinIO Console.
 # Browser-flow: console redirect naar https://keycloak.odap.local:8443
 # (via KC_HOSTNAME). Backend MinIO doet OIDC discovery via dezelfde URL —
 # vereist dat de pod keycloak.odap.local in-cluster kan resolveren
@@ -138,7 +138,7 @@ environment:
 
 # Named policies — chart maakt deze aan via post-install mc-job
 # (`mc admin policy create`). De 'csv-uploader' policy wordt door MinIO
-# toegekend aan gebruikers met user-attribute policy=csv-uploader in Keycloak
+# toegekend aan users met user-attribute policy=csv-uploader in Keycloak
 # (zie infrastructure/helm/keycloak/realm.json) na een
 # AssumeRoleWithWebIdentity STS-call vanuit de portal.
 policies:
@@ -191,7 +191,7 @@ policies:
           - "s3:ListBucket"
       # 4. READ — alleen-lezen op processed-archief, eigen uploads + alle
       # bronze/silver/gold. Maakt "Inkijken"-sectie in portal werkend.
-      # Let op: omvat de hele data-lake; voor productie zou je per use-case
+      # Let op: omvat de hele data-lake; voor production zou je per use-case
       # een eigen policy maken zodat een UC-12-uploader geen UC-11-PII kan zien.
       - effect: Allow
         resources:

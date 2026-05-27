@@ -5,15 +5,15 @@
 | Domein | AG (WIA) |
 | Risicoclassificatie | Laag (sturingsinfo, geen impact op individu) |
 | AVG-grondslag | Art. 6 lid 1e (wettelijke taak); aggregaten zonder herleiding |
-| Bewaartermijn (gold) | 7 jaar (besluitvormingsdata) |
+| Retention period (gold) | 7 jaar (besluitvormingsdata) |
 
-Bron: [`referentiearchitectuur-odap-data-analytics.md` § 8 UC-01](../../referentiearchitectuur-odap-data-analytics.md).
+Bron: [`referentiearchitecture-odap-data-analytics.md` § 8 UC-01](../../referentiearchitecture-odap-data-analytics.md).
 
 ---
 
 ## Probleem
 
-WIA-aanvragen stegen sinds 2022 met 31%, afhandelingen met 19,4%; eind 2025
+WIA-request stegen sinds 2022 met 31%, afhandelingen met 19,4%; eind 2025
 wachten ruim 12.000 mensen langer dan de wettelijke termijn. Capaciteits-
 sturing van verzekeringsartsen en arbeidsdeskundigen is suboptimaal.
 
@@ -26,15 +26,15 @@ voorspelling van workload per regio en specialisme.
 
 | Bron | Inhoud | Klassificatie |
 |---|---|---|
-| WIA-claimsysteem | Aanvraag, Beoordeling, status-historie | Vertrouwelijk (PII gepseudonimiseerd in stuurinfo) |
-| SMZ capaciteitsplanning | Beoordelaar-roosters | Intern |
-| FEZ voorschotbetalingen | Voorschot-uitkering per cliënt | Vertrouwelijk |
-| Re-integratieverslagen | Plan van aanpak werkgever | Vertrouwelijk |
+| WIA-claimsysteem | Aanvraag, Assessment, status-historie | Vertrouwelijk (PII gepseudonimiseerd in stuurinfo) |
+| SMZ capacity planning | Beoordelaar-roosters | Intern |
+| FEZ voorschotbetalingen | Voorschot-claim payout per cliënt | Vertrouwelijk |
+| Reintegrationverslagen | Plan van aanpak werkgever | Vertrouwelijk |
 
-**CGM-entiteiten** (uit referentiearchitectuur): `Aanvraag`, `Beoordeling`,
+**CGM-entiteiten** (uit referentiearchitecture): `Aanvraag`, `Assessment`,
 `Beoordelaar`, `Cliënt` (gepseudonimiseerd in stuurinfo).
 
-## Architectuur-pad in deze repo
+## Architecture-pad in deze repo
 
 ```
 synthetic-WIA-bron (data-generation/generators/wia.py)
@@ -65,9 +65,9 @@ Superset dashboard "WIA Funnel"
 meta:
   domain: ag
   legal_basis: WIA_art_64
-  doelbinding: [sturingsinfo]
+  purpose-limitation: [sturingsinfo]
   bio_classificatie: intern   # geaggregeerd
-  bewaartermijn_jaren: 7
+  retention period_jaren: 7
   eigenaar: divisie_ag
   pii_kolommen: []            # geaggregeerd, geen direct herleidbare PII
   risk_tier: laag
@@ -75,7 +75,7 @@ meta:
 
 ## OPA-policies (UC-relevant)
 
-- Toegang tot `gold.uc01_claims_funnel.*` voor rollen `data_steward`, `claims_analyst`, `platform_admin`.
+- Access tot `gold.uc01_claims_funnel.*` voor rollen `data_steward`, `claims_analyst`, `platform_admin`.
 - Geen row filters nodig (data is regio-aggregaat); regio-filter is een UI-keuze.
 - Geen kolom-masks (geen PII in gold).
 
@@ -83,7 +83,7 @@ meta:
 
 - Service: Trino → schema `gold.uc01_claims_funnel` ingest.
 - Dashboard: Superset-service → "WIA Funnel" met lineage naar mart-tabel.
-- Tags: `Domain.AG`, `Wet.WIA`, `Doelbinding.sturingsinfo`.
+- Tags: `Domain.AG`, `Wet.WIA`, `Purpose limitation.sturingsinfo`.
 - Glossary-term: `Aanvraag` (CGM), gekoppeld aan kolom `application_id`.
 
 ## Outputs (artefacten in repo)

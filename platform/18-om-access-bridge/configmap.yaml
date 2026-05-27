@@ -1,4 +1,4 @@
-# Non-secret runtime config voor de OM access-bridge.
+# Non-secret runtime config for the OM access-bridge.
 #
 # `OM_WEBHOOK_SECRET` en `KEYCLOAK_CLIENT_SECRET` zitten in de aparte
 # Secret `om-access-bridge-secret` (zie README.md voor bootstrap).

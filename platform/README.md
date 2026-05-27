@@ -6,9 +6,9 @@ nummers. `scripts/deploy-platform.sh` past de mappen in deze volgorde toe.
 
 > Wijzig configuratie zoveel mogelijk centraal in
 > [`../platform-config.yaml`](../platform-config.yaml), niet binnen de
-> componenten zelf.
+> components zelf.
 
-## Componenten
+## Components
 
 | # | Component | Wat | Afhankelijkheden |
 |---|---|---|---|
@@ -25,7 +25,7 @@ nummers. `scripts/deploy-platform.sh` past de mappen in deze volgorde toe.
 | 13 | [openmetadata-config](13-openmetadata-config/README.md) | UWV-specifieke OpenMetadata-config: classifications, ingestion-pipelines. | OpenMetadata via `infrastructure/helm/` |
 | 14 | [monitoring](14-monitoring/README.md) | Cross-cutting reliability: PrometheusRules, ServiceMonitors. | Prometheus via `infrastructure/helm/` |
 | 15 | [portal](15-portal/README.md) | Rol-aware launchpad — landingspagina op `https://uwv.odap.local`. | 00, 02 |
-| 16 | [jupyter](16-jupyter/README.md) | ODAP Lab — JupyterHub + KubeSpawner; notebook-werkplek op bronze/silver/gold/sensitive met Git-integratie. | 00, 02, 03, 05, 09 |
+| 16 | [jupyter](16-jupyter/README.md) | ODAP Lab — JupyterHub + KubeSpawner; notebook-workspace op bronze/silver/gold/sensitive met Git-integratie. | 00, 02, 03, 05, 09 |
 
 ## Deploy
 
@@ -36,7 +36,7 @@ make deploy-platform        # past 00..16 in volgorde toe
 Voor één enkel component:
 
 ```bash
-kubectl apply -k platform/09-trino/        # of -f bij niet-kustomize componenten
+kubectl apply -k platform/09-trino/        # of -f bij niet-kustomize components
 ```
 
 ## Cluster-modi
@@ -46,7 +46,7 @@ kubectl apply -k platform/09-trino/        # of -f bij niet-kustomize componente
 - `scaled-down` — 1 replica per service, lage resource requests (k3d-default).
 - `production` — meerdere replicas, hogere requests/limits.
 
-> Kustomize `overlays/` voor de production-flip is nog niet aanwezig — zie
+> Kustomize `overlays/` for the production-flip is nog niet aanwezig — zie
 > [`docs/improvements.md`](../docs/improvements.md) item 1.7.
 
 ## Conventies
@@ -54,6 +54,6 @@ kubectl apply -k platform/09-trino/        # of -f bij niet-kustomize componente
 - Elke submap is **kustomize-compatibel** (kustomization.yaml of plain manifests).
 - README per component: doel, CRD-overzicht, port-forward, bekende issues.
 - Geen geheimen committen — alle Secret-objecten zijn `dev-` gemarkeerd
-  en mogen niet naar productie. Zie [`01-secrets/README.md`](01-secrets/README.md).
+  en mogen niet naar production. Zie [`01-secrets/README.md`](01-secrets/README.md).
 - `table_format` en andere cross-component-keuzes komen uit
   [`../platform-config.yaml`](../platform-config.yaml).

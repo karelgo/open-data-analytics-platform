@@ -70,7 +70,7 @@ spec:
         # Vervang door een scoped service-account in Airflow met enkel
         # `dag:read` + `dag_run:create` op specifieke DAGs. Daarna ook de
         # secret als file mounten ipv env-var (zie comment in airflow-bridge
-        # repo voor de juiste file-mode). Tot dan zijn env-vars-pattern en
+        # repo for the juiste file-mode). Tot dan zijn env-vars-pattern en
         # file-mount feitelijk gelijkwaardig — beide leven in tmpfs, beide
         # zijn via /proc zichtbaar voor processen met dezelfde UID — dus
         # geen quick-win.

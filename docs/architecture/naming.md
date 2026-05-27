@@ -1,15 +1,15 @@
 ---
 title: Naming conventions
-description: Namen voor namespaces, schemas, topics, DNS — consistent over alle componenten.
+description: Namen voor namespaces, schemas, topics, DNS — consistent over alle components.
 ---
 
 <!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Wijzigingen handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
 
 # Naming conventions
 
 Eén consistente naamgevingsstrategie maakt zoeken in OpenMetadata, lineage
-en logs een stuk eenvoudiger. Alle componenten houden zich hieraan.
+en logs een stuk eenvoudiger. Alle components houden zich hieraan.
 
 ## Kubernetes namespaces
 
@@ -25,14 +25,14 @@ en logs een stuk eenvoudiger. Alle componenten houden zich hieraan.
 
 | Pattern | Voorbeelden |
 |---|---|
-| `bronze.demo.<entity>` | `bronze.claims.application`, `bronze.demo.ww_uitkering` |
+| `bronze.demo.<entity>` | `bronze.claims.application`, `bronze.demo.ww_claim payout` |
 | `silver.<domain>.<entity>` | `silver.claims.application_pseudo`, `silver.customers.interaction` |
 | `gold.<uc_id>.<artifact>` | `gold.uc01_claims_funnel.daily_kpi`, `gold.uc05_customer_360.profile` |
 | `sensitive.<domain>.<entity>` | `sensitive.medisch.diagnose` |
 
 Domein-codes: `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`, `smz`.
 
-## dbt-modellen
+## dbt-models
 
 ```
 <layer>_<domain>_<entity>.sql
@@ -54,7 +54,7 @@ Voorbeelden:
 
 - `claims.application`
 - `uwv.wia.beoordeling`
-- `uwv.ww.uitkering`
+- `uwv.ww.claim payout`
 
 ## DNS
 

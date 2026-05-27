@@ -1,9 +1,9 @@
-# Verbeteringen — Roadmap voor het Open Data & Analytics Platform
+# Verbeteringen — Roadmap for the Open Data & Analytics Platform
 
 Status: **post-fase-10 audit** (2026-05-01). Deze lijst is geen verplichting,
 maar inventariseert verbeterruimte op alle vlakken: security, betrouwbaarheid,
 performance, observability, compliance, data-kwaliteit, dev-ex en
-architectuur.
+architecture.
 
 **Update 2026-05-11** — self-service data access opgepakt via
 [ADR-0008](adr/0008-self-service-data-access.md): nieuwe service
@@ -14,7 +14,7 @@ inzage-/wisrecht-flow.
 
 **Notatie**:
 
-- **Prio**: 🔴 productie-blocker · 🟠 hoog-waarde · 🟡 polish
+- **Prio**: 🔴 production-blocker · 🟠 hoog-waarde · 🟡 polish
 - **Effort**: S (≤ 1 dag) · M (1–3 dagen) · L (1 week) · XL (> 1 week)
 
 ---
@@ -29,7 +29,7 @@ voor opvolg-werk.
 | 1.1 | **4 mart-directories leeg**: UC-02, UC-03, UC-08, UC-10 (UC-09 is opgeleverd als `uc09_reintegration_effect`) | `dbt/models/marts/uc{02,03,08,10}*/` | 🟠 | M |
 | 1.2 | **`gdpr_request` DAG ontbreekt** ondanks referentie in [compliance-mapping R-AVG-10](compliance-mapping.md) — inzage- en wisrecht-flow. (Self-service *access-request* is sinds ADR-0008 wél aanwezig — andere R-AVG-10-aspect.) | `platform/11-airflow/dags/` | 🔴 | M |
 | 1.3 | **Geen NetworkPolicies** — pods kunnen vrij cross-namespace praten | `platform/00-namespaces/` | 🔴 | M |
-| 1.4 | **Geen HPA** — PDBs voor Stackable-producten (kafka/hive/zk/trino/nifi/airflow/superset) worden door de operators zelf gemaakt; resterende gap is HPA + PDBs voor niet-Stackable componenten | `platform/*/` | 🟠 | S |
+| 1.4 | **Geen HPA** — PDBs voor Stackable-producten (kafka/hive/zk/trino/nifi/airflow/superset) worden through the operators zelf gemaakt; resterende gap is HPA + PDBs voor niet-Stackable components | `platform/*/` | 🟠 | S |
 | 1.5 | ~~Geen ResourceQuota / LimitRange per namespace~~ — opgelost in [`platform/00-namespaces/resourcequota-limitrange.yaml`](../platform/00-namespaces/resourcequota-limitrange.yaml) | `platform/00-namespaces/` | ✅ | — |
 | 1.6 | **Geen pre-built Superset-dashboards** — DoD-anchor "WIA Funnel" niet voltooid | `platform/12-superset/dashboards/` | 🟠 | M |
 | 1.7 | **Geen kustomize `overlays/`** — geen prod-overlay om scaled-down naar production-replicas te flippen | `platform/*/overlays/` | 🟠 | M |
@@ -54,18 +54,18 @@ voor opvolg-werk.
 | # | Item | Prio | Effort |
 |---|---|---|---|
 | 2.1.1 | **SOPS / SealedSecrets** voor committed secrets — nu plaintext in `dev-secrets.yaml` | 🔴 | M |
-| 2.1.2 | **External Secrets Operator + Vault** voor productie | 🔴 | L |
+| 2.1.2 | **External Secrets Operator + Vault** voor production | 🔴 | L |
 | 2.1.3 | **Secret-rotatie** — Stackable secret-operator kan TLS-certs roteren maar credentials niet | 🟠 | M |
 | 2.1.4 | **JWT-token bootstrap automatiseren** — nu manueel `metadata generate-token` na bootstrap | 🟠 | S |
-| 2.1.5 | **Per-OIDC-client unique secrets** — nu allemaal `odap-dev-only-CHANGE-ME-<service>-secret`; productie roteert via Keycloak admin-API | 🟠 | M |
+| 2.1.5 | **Per-OIDC-client unique secrets** — nu allemaal `odap-dev-only-CHANGE-ME-<service>-secret`; production roteert via Keycloak admin-API | 🟠 | M |
 
 ### 2.2 TLS / encryptie
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 2.2.1 | **MinIO TLS aanzetten** — `tls.enabled: false` in [values.yaml](../infrastructure/helm/minio/values.yaml). Productie: client-CA + server-cert via cert-manager | 🔴 | S |
+| 2.2.1 | **MinIO TLS aanzetten** — `tls.enabled: false` in [values.yaml](../infrastructure/helm/minio/values.yaml). Production: client-CA + server-cert via cert-manager | 🔴 | S |
 | 2.2.2 | **Vector → OpenSearch over TLS + auth** — nu plaintext HTTP | 🔴 | S |
-| 2.2.3 | **Spark s3a-connectie**: `fs.s3a.connection.ssl.enabled=false`. Productie: CA-truststore mounten | 🔴 | S |
+| 2.2.3 | **Spark s3a-connectie**: `fs.s3a.connection.ssl.enabled=false`. Production: CA-truststore mounten | 🔴 | S |
 | 2.2.4 | **trust-manager Bundle** voor CA-distributie naar alle namespaces — runbook documenteert handmatige kopie | 🟠 | M |
 | 2.2.5 | **Pod-to-pod mTLS** via Stackable's `tls-internal` SecretClass — voorbereid maar niet geactiveerd | 🟠 | L |
 | 2.2.6 | **HSTS + Content-Security-Policy** op ingress-nginx | 🟡 | S |
@@ -78,7 +78,7 @@ voor opvolg-werk.
 | 2.3.2 | **WebAuthn/passkeys** voor `platform_admin` | 🟠 | M |
 | 2.3.3 | **Sessietimeouts** in realm — nu defaults | 🟡 | S |
 | 2.3.4 | **DigiD/eHerkenning federatie-stub** in Keycloak realm — referentie noemt het, geen voorbeeld | 🟡 | M |
-| 2.3.5 | **`smoketest`-static-auth verwijderen** in productie-overlay — CI-check dat het er niet bij staat | 🟠 | S |
+| 2.3.5 | **`smoketest`-static-auth verwijderen** in production-overlay — CI-check dat het er niet bij staat | 🟠 | S |
 
 ### 2.4 Authorisatie / OPA
 
@@ -91,16 +91,16 @@ voor opvolg-werk.
 | 2.4.5 | **Policy voor write-ops uitwerken** — nu alleen `data_engineer` + `platform_admin` mogen schrijven; geen tests voor specifieke schrijf-paden | 🟠 | M |
 | 2.4.6 | **Verplicht regio-attribuut voor claims_analyst** — als `extraCredentials.regio` ontbreekt, deny i.p.v. fall-back-no-filter | 🟠 | S |
 | 2.4.7 | **OPA bundle-coverage > 80%** — `opa test --coverage` toevoegen aan CI | 🟡 | S |
-| 2.4.8 | **Reverse-metadata OM → OPA** — OM tags `Doelbinding.*` als bron voor `resource_purposes` (vervangt hardcoded data.json) | 🟠 | XL |
+| 2.4.8 | **Reverse-metadata OM → OPA** — OM tags `Purpose limitation.*` als bron voor `resource_purposes` (vervangt hardcoded data.json) | 🟠 | XL |
 
 ### 2.5 Netwerk-segmentatie
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
 | 2.5.1 | **NetworkPolicy per namespace** — `odap-platform` mag alleen praten naar `odap-data` (DB) en `odap-meta` (OM) | 🔴 | M |
-| 2.5.2 | **Cilium of Calico** voor L7-NetworkPolicies (productie) | 🟡 | L |
+| 2.5.2 | **Cilium of Calico** voor L7-NetworkPolicies (production) | 🟡 | L |
 | 2.5.3 | **Egress-filtering** — pods mogen alleen externe images + Kafka producers van bron-mocks bereiken | 🟠 | M |
-| 2.5.4 | **MinIO en OpenSearch in private VPC** in productie — niet via ingress-nginx | 🟠 | M |
+| 2.5.4 | **MinIO en OpenSearch in private VPC** in production — niet via ingress-nginx | 🟠 | M |
 
 ### 2.6 Container-/supply-chain-security
 
@@ -129,7 +129,7 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 3.1.1 | **Postgres HA** — productie-overlay met cnpg-operator (CloudNativePG) of Zalando-postgres | 🔴 | L |
+| 3.1.1 | **Postgres HA** — production-overlay met cnpg-operator (CloudNativePG) of Zalando-postgres | 🔴 | L |
 | 3.1.2 | **MinIO distributed mode** — minimaal 4 nodes met EC | 🔴 | L |
 | 3.1.3 | **OpenSearch ≥ 3 master + dedicated data-tier** | 🟠 | M |
 | 3.1.4 | **Kafka ≥ 3 brokers** met `min.insync.replicas=2` | 🔴 | M |
@@ -145,7 +145,7 @@ voor opvolg-werk.
 | 3.2.2 | **Retries + circuit-breakers** in spark-jobs voor transiente Kafka/HMS-issues | 🟡 | S |
 | 3.2.3 | **PodDisruptionBudgets** voor alle Stackable-clusters | 🟠 | S |
 | 3.2.4 | **HorizontalPodAutoscaler** voor Trino-workers + Spark-executors (gebaseerd op CPU/queue-depth) | 🟡 | M |
-| 3.2.5 | **Spark Streaming `failOnDataLoss: true`** in productie i.p.v. nu `false` | 🟡 | S |
+| 3.2.5 | **Spark Streaming `failOnDataLoss: true`** in production i.p.v. nu `false` | 🟡 | S |
 | 3.2.6 | **Kafka topic-replication-factor 3** — nu RF=1 dev-only | 🔴 | S |
 
 ### 3.3 Backup / recovery
@@ -154,7 +154,7 @@ voor opvolg-werk.
 |---|---|---|---|
 | 3.3.1 | **Backup-Job CronJob** in `odap-data` — nu manueel via runbook | 🔴 | M |
 | 3.3.2 | **Restore-test-script** dat backup-restore daadwerkelijk valideert | 🔴 | M |
-| 3.3.3 | **Off-site / cross-region backup** voor productie — out-of-scope dev | 🟠 | L |
+| 3.3.3 | **Off-site / cross-region backup** voor production — out-of-scope dev | 🟠 | L |
 | 3.3.4 | **MinIO bucket-versioning** voor accidentele deletes | 🟠 | S |
 | 3.3.5 | **Velero** voor K8s-resource backup (config + Secrets) | 🟡 | M |
 
@@ -171,7 +171,7 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 4.1 | **Productie-overlay met scaled-up resources** — kustomize `overlays/production/` met groter CPU/RAM | 🟠 | M |
+| 4.1 | **Production-overlay met scaled-up resources** — kustomize `overlays/production/` met groter CPU/RAM | 🟠 | M |
 | 4.2 | **Iceberg vs Delta benchmark** — concrete script dat per-format-keuze meetbaar maakt | 🟡 | M |
 | 4.3 | **Trino result-cache** + workload-isolation (resource-groups) | 🟡 | M |
 | 4.4 | **dbt-marts partitionering verbeteren** — UC-04 / UC-05 / UC-07 missen partition_columns hint | 🟡 | S |
@@ -208,15 +208,15 @@ voor opvolg-werk.
 | 6.1 | **DPIA template** in `docs/dpia/uc02-complex-cases.md` — nu enkel placeholder-link | 🔴 | M |
 | 6.2 | **IAMA template** in `docs/iama/` voor UC-02/UC-03 | 🔴 | M |
 | 6.3 | **`gdpr_request` DAG** — geautomatiseerde inzage/correctie/verwijdering per BSN | 🔴 | L |
-| 6.4 | **Bewaartermijn-DAG** — drop records ouder dan `meta.bewaartermijn_jaren` | 🔴 | M |
+| 6.4 | **Retention period-DAG** — drop records ouder dan `meta.retention period_jaren` | 🔴 | M |
 | 6.5 | **Audit-log retention 7 jaar** — ILM-policy op `logs-audit-*` apart van app-logs | 🟠 | S |
 | 6.6 | **OPA decision-log → OpenSearch + 7-jaar-retention** | 🔴 | M |
 | 6.7 | **Quarterly access-review-script** — exporteert role-mappings + Keycloak-users naar Excel voor manager-bevestiging | 🟠 | M |
-| 6.8 | **Algoritmeregister-export** — JSON-feed met alle `meta.risk_tier=hoog` modellen | 🟠 | M |
-| 6.9 | **Verwerkingsregister art. 30** export uit OM custom-properties (R-AVG-02) | 🟠 | M |
+| 6.8 | **Algoritmeregister-export** — JSON-feed met alle `meta.risk_tier=hoog` models | 🟠 | M |
+| 6.9 | **Processingsregister art. 30** export uit OM custom-properties (R-AVG-02) | 🟠 | M |
 | 6.10 | **`make compliance-evidence`** — gebundelde tar met opa-test-rapport + OM-classifications + dbt-test-resultaten | 🟠 | M |
 | 6.11 | **Reproduceerbaarheid van scenario-runs** UC-06 — hash van inputs + scenario opnemen in elk run-record | 🟡 | S |
-| 6.12 | **Policy-coverage-rapport** — welke catalog/schema/table heeft géén `meta.doelbinding` (en zou dat eigenlijk wel moeten hebben)? | 🟠 | S |
+| 6.12 | **Policy-coverage-rapport** — welke catalog/schema/table heeft géén `meta.purpose-limitation` (en zou dat eigenlijk wel moeten hebben)? | 🟠 | S |
 
 ---
 
@@ -226,22 +226,22 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 7.1.1 | **Realistische cross-domein-relaties** — een WW-aanvraag refereert nu aan een random BSN i.p.v. één met een recente afsluiting van een dienstverband | 🟠 | M |
+| 7.1.1 | **Realistische cross-domein-relaties** — een WW-aanvraag refereert nu aan een random BSN i.p.v. één with a recente afsluiting van een dienstverband | 🟠 | M |
 | 7.1.2 | **Stress-volume-tests** (1M cliënten) | 🟡 | S |
 | 7.1.3 | **Tijdsverloop simuleren** — niet alleen "snapshot maken" maar event-stream over 30 dagen | 🟠 | M |
 | 7.1.4 | **PII-detectie-test** met opzettelijk-ingespoten edge-cases (BSN-look-alike, etc.) | 🟡 | S |
-| 7.1.5 | **CBS-microdata-mockup** voor UC-06 macro-trend modellen | 🟡 | M |
+| 7.1.5 | **CBS-microdata-mockup** voor UC-06 macro-trend models | 🟡 | M |
 
 ### 7.2 dbt models
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
 | 7.2.1 | **5 ontbrekende mart-folders invullen** (UC-02/03/08/09/10) — nu alleen specs | 🟠 | L |
-| 7.2.2 | **dbt snapshots** — SCD-2 voor dossier-status, uitkering-status | 🟡 | M |
+| 7.2.2 | **dbt snapshots** — SCD-2 voor dossier-status, claim payout-status | 🟡 | M |
 | 7.2.3 | **dbt-expectations toevoegen** — meer regel-based DQ (tussen-tabellen, conditional checks) | 🟡 | M |
 | 7.2.4 | **dbt sources `freshness` checks** — alarmeer als bronze-tabel > 1u geen nieuwe rij heeft | 🟠 | S |
-| 7.2.5 | **dbt-meta-block CI-check** — script dat alle marts verplichte `meta`-keys hebben (legal_basis, doelbinding, bewaartermijn, eigenaar, risk_tier) | 🟠 | S |
-| 7.2.6 | **Macro `apply_doelbinding_tag` daadwerkelijk SQL emitteren** — nu no-op | 🟡 | S |
+| 7.2.5 | **dbt-meta-block CI-check** — script dat alle marts verplichte `meta`-keys hebben (legal_basis, purpose-limitation, retention period, eigenaar, risk_tier) | 🟠 | S |
+| 7.2.6 | **Macro `apply_purpose-limitation_tag` daadwerkelijk SQL emitteren** — nu no-op | 🟡 | S |
 | 7.2.7 | **UC-01 funnel echte funnel** — nu alleen daily-aggregaat per status; flow `INGEDIEND→IN_BEHANDELING→TOEGEKEND` mist | 🟠 | S |
 | 7.2.8 | **UC-05 met SCD-2 + 30-dagen-window-metrics** | 🟡 | M |
 
@@ -250,7 +250,7 @@ voor opvolg-werk.
 | # | Item | Prio | Effort |
 |---|---|---|---|
 | 7.3.1 | **NiFi-flows daadwerkelijk implementeren** — nu placeholder; importeer JSON | 🟡 | L |
-| 7.3.2 | **`spark-jobs/lakehouse_maintenance.py`** — maintenance-DAG verwijst nu naar Trino-procedures, maar voor productie is een Spark-batch met statistics-update + manifest-rewrite-strategie beter | 🟡 | M |
+| 7.3.2 | **`spark-jobs/lakehouse_maintenance.py`** — maintenance-DAG verwijst nu naar Trino-procedures, maar voor production is een Spark-batch met statistics-update + manifest-rewrite-strategie beter | 🟡 | M |
 | 7.3.3 | **dbt-runs in Airflow-DAG echt werkend krijgen** — `repo_url` Variable instructions in runbook, maar nooit getest | 🟠 | S |
 | 7.3.4 | **dbt manifest-upload naar MinIO** als post-task in `dbt_run_per_domain.py` (nu vereist door `om_ingest_dbt`) | 🟠 | S |
 
@@ -261,7 +261,7 @@ voor opvolg-werk.
 | # | Item | Prio | Effort |
 |---|---|---|---|
 | 8.1 | **WIA Funnel-dashboard** als zip — DoD-anchor | 🟠 | M |
-| 8.2 | **UC-06 Lastprognose-dashboard** met scenario-vergelijking | 🟠 | M |
+| 8.2 | **UC-06 Cost forecast-dashboard** met scenario-vergelijking | 🟠 | M |
 | 8.3 | **UC-07 DQ-dashboard** met alerts | 🟠 | S |
 | 8.4 | **Superset row-level security** bovenop OPA — extra zekerheid | 🟡 | M |
 | 8.5 | **Superset OIDC role-mapping** — automatisch `data_steward` → Superset `Alpha`, `marketing_analyst` → `Gamma` | 🟠 | S |
@@ -274,23 +274,23 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 9.1 | **Reverse Metadata aan zetten** — OM `Doelbinding.*` tags terug schrijven naar Trino kolom-tags → OPA-feed | 🟠 | M |
+| 9.1 | **Reverse Metadata aan zetten** — OM `Purpose limitation.*` tags terug schrijven naar Trino kolom-tags → OPA-feed | 🟠 | M |
 | 9.2 | **Auto-classification AAN** — laat OM zelf BSN-patronen detecteren | 🟠 | S |
 | 9.3 | **Custom properties voor `algoritmeregister_id`** in OM-config | 🟡 | S |
-| 9.4 | **Data Lifecycle Manager (DLM)** met `bewaartermijn_jaren` | 🟠 | M |
+| 9.4 | **Data Lifecycle Manager (DLM)** met `retention period_jaren` | 🟠 | M |
 | 9.5 | **Lineage-waarschuwing** — alarmeer als nieuwe gold-tabel geen lineage heeft naar bronze | 🟡 | S |
 | 9.6 | **OM observability-pipelines** voor query-history-volume per gebruiker | 🟡 | M |
 
 ---
 
-## 10. Architectuur / Design
+## 10. Architecture / Design
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
 | 10.1 | **GitOps met ArgoCD** — vervangt manuele `kubectl apply -k` | 🟠 | M |
 | 10.2 | **Multi-tenant overlays** — als meerdere divisies dezelfde infra delen | 🟡 | XL |
 | 10.3 | **API-gateway voor UC-10** — Kong/APISIX voor `Mijn Gegevensdiensten 2.0` | 🟡 | XL |
-| 10.4 | **Apart Spark-cluster per workload-type** — productie kan streaming/batch/ML scheiden | 🟡 | L |
+| 10.4 | **Apart Spark-cluster per workload-type** — production kan streaming/batch/ML scheiden | 🟡 | L |
 | 10.5 | **Stackable Cockpit UI** voor operationeel beheer | 🟡 | S |
 | 10.6 | **ADR-0007: kustomize vs Helm-only** | 🟡 | S |
 | 10.7 | **ADR-0008: NiFi → Kafka → Spark vs alternative ingest-strategie** | 🟡 | S |
@@ -313,16 +313,16 @@ voor opvolg-werk.
 
 ---
 
-## 12. Documentatie
+## 12. Documentation
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 12.1 | **Architectuurdiagram als image** (Mermaid in `docs/architecture.md` of PNG via draw.io) | 🟠 | S |
+| 12.1 | **Architecturediagram als image** (Mermaid in `docs/architecture.md` of PNG via draw.io) | 🟠 | S |
 | 12.2 | **Project-glossary** in `docs/glossary.md` (afkortingen + UWV-specifieke begrippen) | 🟡 | S |
 | 12.3 | **Data-flow-diagram** per UC (sequence-diagrams) | 🟡 | M |
 | 12.4 | **Onboarding-doc** voor nieuwe engineers — "in 1 dag van clone tot eerste DAG-run" | 🟠 | M |
 | 12.5 | **API-cookbook** — `curl`-voorbeelden voor Trino, OM, Superset REST-API | 🟡 | M |
-| 12.6 | **Use-case-spec verdiepen** voor UC-08, UC-09, UC-10 (nu 1 pagina, productie wil 5+ pagina's) | 🟡 | L |
+| 12.6 | **Use-case-spec verdiepen** voor UC-08, UC-09, UC-10 (nu 1 pagina, production wil 5+ pagina's) | 🟡 | L |
 | 12.7 | **CGM-glossary in `docs/`** parallel aan OM-glossary (offline-readable) | 🟡 | S |
 | 12.8 | **Operationele runbooks per UC** in plaats van alleen platform-runbook | 🟡 | M |
 
@@ -393,7 +393,7 @@ Kort + hoog-rendement, in volgorde:
 6. **§2.3.1 MFA verplicht** (S, 🔴) — security-baseline
 7. **§2.7.1 Pseudonymize-macro gebruiken** (M, 🔴) — UC-09 sandbox vraagt erom
 8. **§11.1 Pre-commit hooks** (S, 🟠) — verlaagt CI-friction
-9. **§6.4 Bewaartermijn-DAG** (M, 🔴) — AVG-verplichting
+9. **§6.4 Retention period-DAG** (M, 🔴) — AVG-verplichting
 10. **§1.16 SECURITY.md** (S, 🟠) — NIS2 vulnerability disclosure
 11. **§7.2.5 dbt-meta-block CI-check** (S, 🟠) — voorkomt regressie van compliance-meta
 12. **§2.4.1 OPA decision-log naar OS** (M, 🔴) — audit-trail
@@ -405,7 +405,7 @@ Kort + hoog-rendement, in volgorde:
 
 ## Wat NIET op deze lijst staat
 
-- **Zaken die expliciet "out-of-scope referentie" zijn**: actuele wettelijke teksten, productie-Hyperscaler-keuze, formele aanbestedingsdocumenten, ENSIA-audit, NEN 7510-certificering. Dat zijn organisatorische/juridische trajecten.
+- **Zaken die expliciet "out-of-scope referentie" zijn**: actuele wettelijke teksten, production-Hyperscaler-keuze, formele aanbestedingsdocumenten, ENSIA-audit, NEN 7510-certificering. Dat zijn organisatorische/juridische trajecten.
 - **Niet-werkende items uit master-prompt-aanname** die we al goed verwerkten: smoketest-via-NiFi (we kozen Python-loader), Helm-only-deploy (we mixen kustomize), Iceberg-default (we draaien Delta — ADR-0006 dekt het).
 
 ---

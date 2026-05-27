@@ -3,7 +3,7 @@
 # Thin wrapper around scripts/deploy-platform.sh --mode=aks with AKS-specific
 # post-steps:
 #  - CoreDNS hosts-override (`coredns-custom` ConfigMap) zodat
-#    keycloak.odap.local in-cluster routeert naar de keycloak-external
+#    keycloak.odap.local in-cluster routeert to the keycloak-external
 #    Service in ingress-nginx (zie platform/02-authentication/keycloak-external-svc.yaml).
 #  - Public DNS upsert (CNAME → apex) for every *.${PLATFORM_DOMAIN} subdomain.
 #  - MinIO restart zodat de OIDC-discovery slaagt na de DNS-fix (Console toont
@@ -95,7 +95,7 @@ fi
 # ---- AKS-only post-deploy: CoreDNS hosts-override ----
 # AKS CoreDNS gebruikt een 'coredns-custom' ConfigMap met *.override files
 # die geïmporteerd worden via `import custom/*.override` in de hoofd-Corefile.
-# We pinnen `keycloak.odap.local` op de ClusterIP van de
+# We pinnen `keycloak.odap.local` on the ClusterIP van de
 # keycloak-external Service (zie platform/02-authentication/keycloak-external-svc.yaml).
 log "AKS-post: CoreDNS hosts-override voor keycloak.odap.local"
 KCEXT_IP=""
@@ -166,7 +166,7 @@ for c in superset airflow nifi openmetadata minio; do
   done
 done
 
-# 2b. Lange access-tokens voor de openmetadata client.
+# 2b. Lange access-tokens for the openmetadata client.
 # access.token.lifespan=86400 (24h) zodat een werkdag zonder re-auth
 # doorgaat. use.refresh.tokens=true is verplicht voor OM 1.12+
 # (Pac4j slaat het refresh-token op in z'n session; bij /api/v1/auth/login

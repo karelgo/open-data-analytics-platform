@@ -100,7 +100,7 @@ def emit_row(writer: csv.DictWriter, rnd: random.Random, *,
              service: tuple, region_pair: tuple, compartment: tuple,
              environment: str, application: str, cost_center: str,
              resource_seq: int) -> None:
-    """Schrijf één FOCUS-billing rij voor een (service × region × resource)."""
+    """Schrijf één FOCUS-billing rij for a (service × region × resource)."""
     svc_cat, svc_name, res_type, pricing_unit, usage_unit, unit_price = service
     region, azs = region_pair
     az = rnd.choice(azs) if res_type == "VirtualMachine" else ""
@@ -176,7 +176,7 @@ def emit_row(writer: csv.DictWriter, rnd: random.Random, *,
         "environment":  environment,
         "application":  application,
         "cost_center":  cost_center,
-        "owner_team":   "platform-team" if application == "platform-shared" else "data-team",
+        "owner_team":   "platform team" if application == "platform-shared" else "data-team",
     }, separators=(",", ":"))
 
     resource_id = (

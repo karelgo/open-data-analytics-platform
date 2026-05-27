@@ -1,10 +1,10 @@
 # Open Data & Analytics Platform — centrale configuratie
 #
-# Eén bron van waarheid voor implementatie-keuzes die door meerdere componenten
+# Eén bron van waarheid voor implementatie-keuzes die door meerdere components
 # worden gelezen (Trino-catalogs, dbt-macros, Spark-env, NiFi-templates, Airflow-DAGs).
 #
-# Wijzig hier — niet hardcoden in componenten. Zie docs/adr/0002-iceberg-vs-delta.md
-# en docs/adr/0006-delta-chosen-for-this-implementation.md voor de afweging
+# Wijzig hier — niet hardcoden in components. Zie docs/adr/0002-iceberg-vs-delta.md
+# en docs/adr/0006-delta-chosen-for-this-implementation.md for the afweging
 # achter `table_format`.
 
 platform:
@@ -12,7 +12,7 @@ platform:
   version: 0.1.0
 
   # Open table format. Toegestaan: "delta" | "iceberg".
-  # Default per ADR-0002 is iceberg; deze referentie-implementatie kiest delta
+  # Default per ADR-0002 is iceberg; deze reference implementation kiest delta
   # — zie ADR-0006 voor motivatie en mitigaties.
   table_format: delta
 

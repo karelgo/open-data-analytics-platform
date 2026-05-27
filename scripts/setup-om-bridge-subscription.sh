@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Idempotent setup van de OpenMetadata EventSubscription die taskResolved-
-# events naar de om-access-bridge stuurt.
+# events to the om-access-bridge stuurt.
 #
 # Achtergrond: subscriptions zitten in OM's database, niet in de
 # ConfigMap/init-Job. Bij een platform-reset zijn ze weg. Dit script

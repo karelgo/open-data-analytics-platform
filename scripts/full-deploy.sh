@@ -103,7 +103,7 @@ log "4/10  platform-ca-bundle ConfigMap (Mozilla public roots + Platform CA)"
 # Mozilla public roots zijn essentieel voor cloud-mode: OIDC token-exchange
 # tegen keycloak.example.com (LE cert) faalt anders met
 # 'unable to get local issuer certificate'. deploy-platform extendt de
-# bundle later met de Stackable secret-operator CA voor in-cluster TLS.
+# bundle later with the Stackable secret-operator CA voor in-cluster TLS.
 kubectl create namespace odap-platform --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 TMP=$(mktemp -d)
 curl -fsSL --connect-timeout 10 https://curl.se/ca/cacert.pem -o "$TMP/public.crt"
@@ -230,7 +230,7 @@ for c in superset airflow openmetadata minio; do
   done
 done
 
-# 3b. Lange access-tokens voor de openmetadata client.
+# 3b. Lange access-tokens for the openmetadata client.
 # access.token.lifespan=86400 (24h) zodat een werkdag zonder
 # re-auth doorgaat. use.refresh.tokens=true is verplicht voor OM 1.12+
 # (Pac4j slaat het refresh-token op in z'n session; bij /api/v1/auth/login
@@ -322,7 +322,7 @@ bash tests/smoke/14-embed-shell.sh || warn "smoke 14 meldt fouten"
 
 # ---------------------------------------------------------------------- 11
 log "11/11 OpenMetadata demo-seed: UI-fix + UC-mart entities + CGM-glossary links"
-# Drie idempotente acties die OM representatief maken voor de demo:
+# Drie idempotente acties die OM representatief maken for the demo:
 #  - om-fix-search-mapping: patcht OS-index mappings — OM 1.12 markeert
 #                           glossaryTags/classificationTags als plain text
 #                           waardoor de Explore-UI 500't bij elke search.
@@ -330,11 +330,11 @@ log "11/11 OpenMetadata demo-seed: UI-fix + UC-mart entities + CGM-glossary link
 #  - om-demo-seed         : synthetiseert UC-mart tabel-entities + governance-
 #                           meta (owner/domain/dataProduct/Tier/CGM/PII) voor
 #                           UCs die dbt nog niet in Trino heeft gematerialiseerd.
-#  - om-glossary-link     : koppelt CGM-termen (Klantreis, EventStream, Fase,
+#  - om-glossary-link     : koppelt CGM-termen (Customer journey, EventStream, Fase,
 #                           Persona, Werknemer, Werkgever, Dienstverband, etc.)
 #                           aan bronze stg_- en mart-tables die de standaard
 #                           enrichment niet dekt.
-# Demo-seed + glossary-link wachten zelf op de openmetadata-init Job
+# Demo-seed + glossary-link wachten zelf on the openmetadata-init Job
 # (teams/domains/dataProducts/glossary). Faalt onschadelijk als OM nog
 # opspint — re-run met 'make om-fix-search-mapping && make om-demo-seed
 # && make om-glossary-link' is altijd veilig.

@@ -10,7 +10,7 @@
 # Voor non-fatale "warning-only" smoke: gebruik aks-deploy.yml met
 # smoke_required=false.
 #
-# Vereiste secret: AZURE_CREDENTIALS.
+# Requirede secret: AZURE_CREDENTIALS.
 name: aks-smoke
 
 on:

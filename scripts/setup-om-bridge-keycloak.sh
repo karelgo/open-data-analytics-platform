@@ -52,7 +52,7 @@ if [ -z "$CLIENT_UUID" ]; then
     "$KC/admin/realms/odap/clients" -d "{
       \"clientId\":\"${CLIENT_ID}\",
       \"name\":\"OpenMetadata Access Bridge (service account)\",
-      \"description\":\"Service-account voor de om-access-bridge; kent realm-roles data_access:<catalog>.<schema> toe na approval in OpenMetadata. Zie ADR-0008.\",
+      \"description\":\"Service-account for the om-access-bridge; kent realm-roles data_access:<catalog>.<schema> toe na approval in OpenMetadata. Zie ADR-0008.\",
       \"enabled\":true,
       \"protocol\":\"openid-connect\",
       \"publicClient\":false,

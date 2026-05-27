@@ -14,7 +14,7 @@ USER = os.environ["SS_USER"]
 PASS = os.environ["SS_PASS"]
 
 UC11_NAMES = [
-    "Unieke cliënten in klantreis",
+    "Unieke cliënten in customer journey",
     "Totaal events",
     "Totaal fase-overgangen",
     "Gem. fase-duur (dagen)",

@@ -3,7 +3,7 @@
 # Toepassen:
 #   stackablectl operator install --release-file infrastructure/stackablectl/release.yaml
 #
-# Documentatie versie-compatibiliteit:
+# Documentation versie-compatibiliteit:
 #   https://docs.stackable.tech/home/stable/release-notes/release-26-3.html
 #
 # Per operator één regel; alle versies zijn gepind voor reproduceerbare deploys.

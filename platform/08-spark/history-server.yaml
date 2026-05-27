@@ -6,7 +6,7 @@
 # minuten — daartussen geeft de ingress 503. De history-server leeft permanent
 # en toont historische jobs (completed + actief, via event-log polling).
 #
-# Vereist: alle SparkApplications moeten spark.eventLog.enabled=true zetten
+# Required: alle SparkApplications moeten spark.eventLog.enabled=true zetten
 # en spark.eventLog.dir naar deze locatie. Zie apps/*.yaml en
 # platform/11-airflow/jobs/spark-*.yaml.
 ---

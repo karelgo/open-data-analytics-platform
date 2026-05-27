@@ -59,7 +59,7 @@ select
     coalesce(w.n_lopende_ww, 0)              as n_lopende_ww,
     coalesce(a.n_lopende_wia, 0)             as n_lopende_wia,
     a.max_ao_pct,
-    coalesce(c.n_contacts_30d, 0)            as n_klantcontacten_30d
+    coalesce(c.n_contacts_30d, 0)            as n_customer interactionen_30d
 from persona p
 left join ikv_lopend i  on p.bsn = i.bsn
 left join ww_status  w  on p.bsn = w.bsn

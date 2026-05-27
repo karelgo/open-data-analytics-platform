@@ -7,7 +7,7 @@ package trino
 #  Vervangt de allow-all base-policy uit fase 3.
 #  Default-deny + bouwt allow op via:
 #    - role-mapping     (trino-platform-roles.rego)
-#    - doelbinding      (trino-doelbinding.rego, R-AVG-06)
+#    - purpose-limitation      (trino-purpose-limitation.rego, R-AVG-06)
 #    - row filters      (trino-row-filters.rego, R-BIO-11)
 #    - column masks     (trino-column-masks.rego, R-AVG-07 + R-BIO-11)
 #
@@ -148,7 +148,7 @@ allow if {
 	is_meta_op
 }
 
-# Read-operations — full chain: role + doelbinding.
+# Read-operations — full chain: role + purpose-limitation.
 allow if {
 	authenticated
 	is_read_op

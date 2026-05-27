@@ -1,7 +1,7 @@
 # Achtergrondsamenvatting — vier referentiedocumenten
 
 Deze samenvatting bundelt de kernpunten van de vier achtergronddocumenten
-die de scope, kaders en technische blauwdruk van deze referentie-implementatie
+die de scope, kaders en technische blauwdruk van deze reference implementation
 bepalen. Elk document is op zichzelf leidend voor zijn deelgebied; deze
 samenvatting verwijst terug per beslissing.
 
@@ -12,13 +12,13 @@ samenvatting verwijst terug per beslissing.
 **Inhoud.** Generieke requirementsbaseline met circa 75 genummerde eisen,
 gegroepeerd in:
 
-- **NORA** (R-NORA-01..09) — open standaarden, modulariteit, FAIR, federatieve identiteit, semantische interoperabiliteit.
-- **AVG** (R-AVG-01..15) — rechtmatigheid (art. 6/9), privacy by design (dataminimalisatie, doelbinding, pseudonimisering), bewaartermijnen, rechten van betrokkenen, inbreukmeldingen.
-- **BIO/BIO2** (R-BIO-01..24) — ISMS, RBAC/ABAC, encryption at rest/in transit, column-/row-level security, netwerksegmentatie, hardening, secure SDLC, immutable backups.
+- **NORA** (R-NORA-01..09) — open standaarden, modulariteit, FAIR, federatieve identity, semantische interoperabiliteit.
+- **AVG** (R-AVG-01..15) — rechtmatigheid (art. 6/9), privacy by design (dataminimalisatie, purpose-limitation, pseudonimisering), retention perioden, rechten van betrokkenen, inbreukmeldingen.
+- **ISO 27001 / ISO 27002** (R-BIO-01..24) — ISMS, RBAC/ABAC, encryption at rest/in transit, column-/row-level security, netwerksegmentatie, hardening, secure SDLC, immutable backups.
 - **NIS2** (R-NIS2-01..10) — bestuurlijke verantwoordelijkheid, supply chain security, 24-uurs vroegsignalering + 72-uurs incident report.
 - **Governance** (R-GOV), **functioneel** (R-FUN), **niet-functioneel** (R-NF), **compliance/audit** (R-COMP).
 
-**Implicatie voor de bouw.** Elke maatregel die hier geïmplementeerd wordt,
+**Implicatie for the bouw.** Elke maatregel die hier geïmplementeerd wordt,
 moet één-op-één traceerbaar zijn naar een R-* code. De
 [compliance-mapping](compliance-mapping.md) is daarom een verplichte tabel,
 géén optionele bijlage. De skeleton wordt in fase 0 opgezet en groeit per fase
@@ -26,11 +26,11 @@ mee.
 
 ---
 
-## 2. `referentiearchitectuur-odap-data-analytics.md` — UWV-specifieke scope
+## 2. `referentiearchitecture-odap-data-analytics.md` — UWV-specifieke scope
 
 **Inhoud.**
 
-- 12 architectuurprincipes (P-01..12), waaronder *doelbinding by design*,
+- 12 architectureprincipes (P-01..12), waaronder *purpose-limitation by design*,
   *eenmalig vastleggen meervoudig hergebruiken*, *CGM is leidend*, *zero-trust /
   least privilege / just-in-time*, *pseudonimiseren tenzij*, *mens-in-de-lus
   voor impactvolle besluiten*, *ethiek vooraf*.
@@ -42,10 +42,10 @@ mee.
   via verticale lineage.
 - 10 uitgewerkte use cases (UC-01..UC-10), waaronder UC-02 (Wajong AI) als
   **hoog-risico AI Act**-systeem en UC-05 (cliënt 360°) waar
-  doelbinding-policies kritiek zijn.
-- Bijlage A: mapping use-cases ↔ wetten ↔ CGM ↔ AVG-grondslag.
+  purpose-limitation-policies kritiek zijn.
+- Bijlage A: mapping use-cases ↔ laws ↔ CGM ↔ AVG-grondslag.
 
-**Implicatie voor de bouw.** De use-case specs in `docs/use-cases/` worden
+**Implicatie for the bouw.** De use-case specs in `docs/use-cases/` worden
 **gedestilleerd uit hoofdstuk 8** van dit document (entiteiten, bronnen,
 compliance-eisen, risico's). De CGM-glossary in OpenMetadata baseert op
 **bijlage B**. Sensitive Vault wordt een **aparte Trino-catalog** (`sensitive`)
@@ -61,7 +61,7 @@ met striktere OPA-policies.
   (event backbone), Spark (batch + streaming), Hive Metastore (catalog
   backend), Trino (SQL engine), Airflow (orchestratie), Superset (BI), OPA
   (authorisatie), ZooKeeper, secret-/listener-/commons-operator.
-- **dbt-trino** (Apache 2.0) levert de transformatielaag (staging/intermediate/marts).
+- **dbt-trino** (Apache 2.0) levert de transformationlaag (staging/intermediate/marts).
 - **OpenMetadata** levert catalog (technisch + business), classifications,
   glossary, lineage, data quality, profiler.
 
@@ -69,8 +69,8 @@ Per use case is genoteerd welk Stackable-component, welk dbt-model en welke
 OpenMetadata-tag of -workflow nodig is. Compliance-mapping (kort) geeft per
 eis (AVG/BIO/NIS2/AI Act/NORA) de concrete maatregel.
 
-**Implicatie voor de bouw.** Deze mapping is leidend; afwijken vereist een ADR.
-"Wie doet wat" is hier vastgelegd. De architectuur-overview in
+**Implicatie for the bouw.** Deze mapping is leidend; afwijken vereist een ADR.
+"Wie doet wat" is hier vastgelegd. De architecture-overview in
 [`docs/architecture.md`](architecture.md) is een schaal-aangepaste hertaling
 van deze mapping naar onze k3d-context.
 
@@ -93,7 +93,7 @@ agnostisch genoeg gebouwd wordt. Concreet:
 - NiFi: twee parallelle template-sets.
 - OPA: format-onafhankelijk (kijkt naar catalog/schema/table-namen).
 
-**Implicatie voor de bouw.** Voor *deze* implementatie is via gebruikerskeuze
+**Implicatie for the bouw.** Voor *deze* implementatie is via userskeuze
 gekozen voor **Delta Lake** — zie [ADR-0006](adr/0006-delta-chosen-for-this-implementation.md).
 De abstractie blijft volledig in stand zodat een latere switch werkbaar is.
 
@@ -101,12 +101,12 @@ De abstractie blijft volledig in stand zodat een latere switch werkbaar is.
 
 ## Samenvattende implicaties
 
-1. **Eén bron van waarheid voor het tabelformaat.** `platform-config.yaml`
+1. **Eén bron van waarheid for the tabelformaat.** `platform-config.yaml`
    bepaalt of Iceberg of Delta wordt gebruikt; geen hardcoded keuzes elders.
 2. **Compliance-mapping** is een levend document, geen poster.
-3. **CGM is dwingend** voor gold-modellen; afwijking vraagt waiver.
+3. **CGM is dwingend** voor gold-models; afwijking vraagt waiver.
 4. **Sensitive data** krijgt een eigen catalog en striktere OPA-policies.
 5. **Mens-in-de-lus** is non-negotiable voor besluitvormingsondersteunende
-   modellen (UC-02, UC-03).
-6. **Stackable + dbt + OpenMetadata** is de spilarchitectuur — geen
+   models (UC-02, UC-03).
+6. **Stackable + dbt + OpenMetadata** is de spilarchitecture — geen
    parallel-stacks, geen "zelf bouwen wat al opgelost is".

@@ -1,7 +1,7 @@
 {{ config(materialized='view', tags=['intermediate']) }}
 
 -- Pseudo-identifier voor downstream-marts die geen ruwe BSN nodig hebben.
--- Gebruikt de centrale `pseudonymize`-macro (SHA-256 + zout) — productie zou
+-- Gebruikt de centrale `pseudonymize`-macro (SHA-256 + zout) — production zou
 -- HSM-gestuurde tokenisatie + per-cliënt-zout gebruiken.
 --
 -- Improvements #7: macro daadwerkelijk toepassen.

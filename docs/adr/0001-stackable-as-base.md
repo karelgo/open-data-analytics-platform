@@ -10,10 +10,10 @@
 
 ## Context
 
-Het ODAP platform moet open source zijn, vendor-onafhankelijk, NORA-conform en
+Het ODAP platform moet open source zijn, vendor-onafhankelijk, SOC 2-conform en
 declaratief op Kubernetes draaien. We hebben een keuze nodig voor de
 "runtime-kit" die NiFi, Kafka, Spark, Trino, Hive Metastore, Airflow,
-Superset, OPA en ZooKeeper als productie-grade workloads op Kubernetes brengt.
+Superset, OPA en ZooKeeper als production-grade workloads op Kubernetes brengt.
 
 Drie reële paden:
 
@@ -47,7 +47,7 @@ We kiezen **Stackable Data Platform 26.3** als operator-baseline.
   publiek (`docker.stackable.tech`) zonder license-lock-in.
 - **Native Kubernetes**. Geen "VM-gebaseerd cluster van NiFi/Kafka/Trino" —
   alles is K8s-Pod, met StatefulSet/Deployment, NetworkPolicies, RBAC.
-  Dit past 1-op-1 op de UWV-doelarchitectuur (zone-scheiding, segmentatie).
+  Dit past 1-op-1 on the UWV-doelarchitecture (zone-scheiding, segmentatie).
 - **Geschikt voor sovereign / on-prem deployment**. Geen cloud-leverancier
   vereist; werkt op IONOS, OpenShift, on-prem K8s — relevant voor UWV's
   bijzondere persoonsgegevens.

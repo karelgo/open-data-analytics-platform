@@ -1,34 +1,34 @@
 ---
-title: "Het platform voor de Finance Analyst"
+title: "Het platform for the Finance Analyst"
 role: finance_analyst
 level: foundation
 order: 1
 duration: "25 min"
-summary: "Lastprognose en schadelast op gemodelleerde marts, geen PII — en hoe je een DQ-test in dbt-docs leest voordat je op een cijfer vertrouwt."
+summary: "Cost forecast en cost forecast op gemodelleerde marts, geen PII — en hoe je een DQ-test in dbt-docs leest voordat je op een cijfer vertrouwt."
 labs:
-  - title: "Open Lastprognose dashboard (UC-06)"
-    hint: "Geaggregeerd per maand, regio, uitkeringsoort"
+  - title: "Open Cost forecast dashboard (UC-06)"
+    hint: "Geaggregeerd per maand, regio, claim payoutsoort"
     href: "/go/superset/"
-  - title: "dbt docs — modellen achter UC-06"
+  - title: "dbt docs — models achter UC-06"
     hint: "Welke tests draaien, welke sources voeden de mart"
     href: "/dbt-docs/"
 quiz:
   - q: "Waarom zie jij geen BSN of IBAN in `gold.uc06_cost_forecast`?"
     options:
       - "Omdat het te veel ruimte zou kosten"
-      - "Omdat een lastprognose een geaggregeerde sturingsmart is — PII is daarvoor niet nodig en wordt op modelniveau weggehaald"
+      - "Omdat een cost forecast een geaggregeerde sturingsmart is — PII is daarvoor niet nodig en wordt op modelniveau weggehaald"
       - "Omdat het soms op donderdag wel mag"
       - "Omdat de policies stuk zijn"
     correct: 1
   - q: "Een dashboard-cijfer wijkt 5% af van wat je verwacht. Welke check doe je eerst?"
     options:
       - "Niets — het cijfer staat in Superset, dus klopt het"
-      - "Open dbt docs en bekijk of de tests op het onderliggende model groen zijn — een falende `not_null` of `unique` test verklaart vaak een uitschieter"
+      - "Open dbt docs en bekijk of de tests on the onderliggende model groen zijn — een falende `not_null` of `unique` test verklaart vaak een uitschieter"
       - "Mail de data-engineer"
       - "Reset het dashboard"
     correct: 1
     explain: "dbt-tests zijn de eerste defensielinie. Een test op `bedrag_eur` die soms faalt is direct relevant voor je interpretatie."
-  - q: "Wat is de relatie tussen `silver.fin.uitkering_betaling` en `gold.uc06_cost_forecast`?"
+  - q: "Wat is de relatie tussen `silver.fin.claim payout_betaling` en `gold.uc06_cost_forecast`?"
     options:
       - "Geen — verschillende systemen"
       - "silver is bron, gold is afgeleid via dbt; lineage zichtbaar in OpenMetadata of dbt-docs"
@@ -37,7 +37,7 @@ quiz:
     correct: 1
 ---
 
-Welkom. FEZ werkt met geld op organisatie-niveau, niet op individuele
+Welcome. FEZ werkt met geld op organisatie-niveau, niet op individuele
 cliënt-niveau. Je rol is in de breedte: trends, prognoses, afwijkingen.
 Het platform is daar precies op ingericht.
 
@@ -46,9 +46,9 @@ Het platform is daar precies op ingericht.
 `gold.uc06_cost_forecast` is een dbt-model: een afgeleide tabel die elke nacht
 opnieuw wordt opgebouwd uit `silver.fin.*`. De mart bevat:
 
-- per maand × regio × uitkeringsoort de uitgekeerde som;
+- per maand × regio × claim payoutsoort de uitgekeerde som;
 - een 12-maands voortschrijdend gemiddelde;
-- de prognose voor de komende 6 maanden (op basis van een eenvoudig ARIMA);
+- de prognose for the komende 6 maanden (op basis van een eenvoudig ARIMA);
 - een DQ-score per record.
 
 Geen PII. Geen BSN's. Geaggregeerd vanaf laag silver.
@@ -56,14 +56,14 @@ Geen PII. Geen BSN's. Geaggregeerd vanaf laag silver.
 ## Waarom dbt-docs jouw belangrijkste secundaire applicatie is
 
 Voordat je iets uit een dashboard meeneemt naar een rapport: open dbt-docs
-en bekijk de testen op het onderliggende model. Drie tests die er bij UC-06
+en bekijk de testen on the onderliggende model. Drie tests die er bij UC-06
 toe doen:
 
 | Test | Wat zegt hij? |
 |---|---|
 | `not_null` op `bedrag_eur` | Is er een record zonder bedrag? Dan klopt de som niet. |
-| `unique` op `(maand, regio, uitkeringsoort)` | Geen dubbeltellingen. |
-| `accepted_values` op `uitkeringsoort` | Geen onbekende soorten — anders draait je groupby door. |
+| `unique` op `(maand, regio, claim payoutsoort)` | Geen dubbeltellingen. |
+| `accepted_values` op `claim payoutsoort` | Geen onbekende soorten — anders draait je groupby door. |
 
 De [Data Quality dashboard](/go/openmetadata/) toont dezelfde tests in
 groter verband: een 24-uurs trend, falende tests met severity, doorlooptijd
@@ -75,10 +75,10 @@ OpenMetadata laat per kolom zien waar hij vandaan komt. Voor
 `gold.uc06_cost_forecast.bedrag_eur` zie je:
 
 ```
-bronze.fin.betaling.bedrag → silver.fin.uitkering_betaling.bedrag_eur → gold.uc06_cost_forecast.bedrag_eur
+bronze.fin.betaling.bedrag → silver.fin.claim payout_betaling.bedrag_eur → gold.uc06_cost_forecast.bedrag_eur
 ```
 
-Bij elke pijl staat de transformatie (`SUM`, `*1.0`, etc). Voor je in een
+Bij elke pijl staat de transformation (`SUM`, `*1.0`, etc). Voor je in een
 overleg een cijfer presenteert, moet je deze keten één keer in je hoofd
 hebben — anders is het cijfer een black box.
 
@@ -86,8 +86,8 @@ hebben — anders is het cijfer een black box.
 
 | Applicatie | Wanneer? |
 |---|---|
-| **Superset** | Lastprognose, schadelast, DQ-overzicht |
-| **dbt-docs** | Welke transformaties achter een cijfer zitten |
+| **Superset** | Cost forecast, cost forecast, DQ-overzicht |
+| **dbt-docs** | Welke transformations achter een cijfer zitten |
 | **OpenMetadata** | Lineage, eigenaar, glossary |
 
 ## Volgende stap

@@ -1,4 +1,4 @@
-# Maandelijkse JWT-rotatie voor de OM ingestion-bot.
+# Maandelijkse JWT-rotatie for the OM ingestion-bot.
 #
 # Het stock-token in `openmetadata-admin` heeft `exp=null` — nooit-vervalbaar
 # en daarmee een audit-finding. Deze CronJob genereert maandelijks een
@@ -9,7 +9,7 @@
 # (secrets/get,patch in beide NS); cluster-rolebinding is een NamespaceRole-
 # combinatie omdat ServiceAccount cross-NS-bindings ondersteunt.
 #
-# Productie-overweging: vervang in-cluster rotation door External Secrets
+# Production-overweging: vervang in-cluster rotation door External Secrets
 # Operator + Vault dynamic-secret. Tot dan houdt deze CronJob compliance
 # (R-NIS2-04 secret-rotation) op orde.
 ---

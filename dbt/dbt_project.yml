@@ -20,7 +20,7 @@ clean-targets:
 # Switching naar iceberg: TABLE_FORMAT=iceberg dbt run.
 vars:
   table_format: "{{ env_var('TABLE_FORMAT', 'delta') }}"
-  # Zout voor pseudonymize-macro. DEV-only; productie via secret.
+  # Zout voor pseudonymize-macro. DEV-only; production via secret.
   pseudonymize_salt: "{{ env_var('PSEUDONYMIZE_SALT', 'ODAP-DEV-SALT') }}"
 
 # Schemas met expliciete S3-locatie pre-creëren. Stackable's Hive-Metastore
@@ -39,7 +39,7 @@ on-run-start:
 #   intermediate -> catalog `silver`, schema = `intermediate`
 #   marts    -> catalog `gold`,      schema = uc-id
 #
-# Table-format (delta vs iceberg) wordt niet hier gehard-codeerd; modellen
+# Table-format (delta vs iceberg) wordt niet hier gehard-codeerd; models
 # gebruiken `properties=table_format_properties()` via de macro.
 # ----------------------------------------------------------------------
 models:
@@ -65,7 +65,7 @@ models:
         +schema: customers
       fez:
         +schema: finance
-      klantcontact:
+      customer interaction:
         +schema: customer_interactions
       finops:
         +schema: finops
@@ -107,7 +107,7 @@ seeds:
     +database: silver
     +schema: seed
     +quote_columns: false
-    cgm_uitkering_typen:
+    cgm_claim payout_typen:
       +column_types:
         code: varchar(8)
         beschrijving: varchar(200)

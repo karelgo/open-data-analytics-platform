@@ -1,7 +1,7 @@
-"""WW-aanvragen stub.
+"""WW-request stub.
 
 SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
-Productie-volwaardige generator: fase 5.
+Production-volwaardige generator: fase 5.
 """
 
 from __future__ import annotations
@@ -45,10 +45,10 @@ def generate_service_request_application(rng: random.Random, bsn: str) -> WWAanv
     )
 
 
-def generate_ww_aanvragen(
+def generate_ww_request(
     persona_bsns: list[str], rate: float = 0.3, seed: int | None = None
 ) -> Iterator[WWAanvraag]:
-    """Genereer WW-aanvragen voor een fractie van de personen."""
+    """Genereer WW-request for a fractie van de personen."""
     rng = make_rng(seed)
     for bsn in persona_bsns:
         if rng.random() < rate:

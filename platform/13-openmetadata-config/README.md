@@ -1,15 +1,15 @@
 # 13-openmetadata-config
 
 UWV-specifieke configuratie voor OpenMetadata: classifications (PII / Health /
-Confidentiality / BIO / LegalBasis / Doelbinding / AI), CGM-glossary, en
+Confidentiality / BIO / LegalBasis / Purpose limitation / AI), CGM-glossary, en
 service-connection definities voor Trino / dbt / Superset / Airflow / Kafka.
 
 ## Bestanden
 
 | Bestand | Doel |
 |---|---|
-| [classifications.yaml](classifications.yaml) | 7 classifications met ~50 tags totaal — PII, Health.Article9, BIO.BIV, LegalBasis, Doelbinding, AI.Risk-\*. |
-| [glossary-cgm.yaml](glossary-cgm.yaml) | CGM-glossary met ~22 termen uit referentiearchitectuur Bijlage B. |
+| [classifications.yaml](classifications.yaml) | 7 classifications met ~50 tags totaal — PII, Health.Article9, BIO.BIV, LegalBasis, Purpose limitation, AI.Risk-\*. |
+| [glossary-cgm.yaml](glossary-cgm.yaml) | CGM-glossary met ~22 termen uit referentiearchitecture Bijlage B. |
 | [services/trino-service.yaml](services/trino-service.yaml) | Trino DatabaseService config — schema-filter dekt alle platform catalogs. |
 | [services/trino-lineage.yaml](services/trino-lineage.yaml) | Lineage-workflow uit Trino query-history. |
 | [services/trino-profiler.yaml](services/trino-profiler.yaml) | Profiler op silver.\* (kolom-statistieken voor UC-07). |
@@ -28,7 +28,7 @@ service-connection definities voor Trino / dbt / Superset / Airflow / Kafka.
 
 ## SSO via Keycloak
 
-OpenMetadata is gekoppeld aan Keycloak met de `openmetadata` confidential
+OpenMetadata is gekoppeld aan Keycloak with the `openmetadata` confidential
 client (zie [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json) regel ~458).
 Configuratie zit in [`infrastructure/helm/openmetadata/values.yaml`](../../infrastructure/helm/openmetadata/values.yaml) onder `openmetadata.config.authentication`:
 
@@ -43,7 +43,7 @@ Configuratie zit in [`infrastructure/helm/openmetadata/values.yaml`](../../infra
 
 Het client-secret zit in K8s Secret `openmetadata-oidc-client` (NS `odap-meta`,
 zie [`platform/01-secrets/dev-secrets.yaml`](../01-secrets/dev-secrets.yaml)) en moet identiek zijn
-aan de `secret`-waarde in `realm.json` voor de `openmetadata` client.
+aan de `secret`-waarde in `realm.json` for the `openmetadata` client.
 
 Initial admins (aangemaakt bij eerste login via Keycloak): `data.steward`,
 `platform.admin`. Andere users krijgen viewer-rechten — promoten via OM UI.
@@ -68,7 +68,7 @@ na de install moet opvangen:
    `openmetadata-mysql-password`, ook als de database `postgres` is. Wordt
    vóór de helm-install aangemaakt.
 2. **`openmetadata.config.openmetadata.host` default = `openmetadata`.** Dat
-   DNS-resolveert naar de Service ClusterIP en de pod kan daar niet aan
+   DNS-resolveert to the Service ClusterIP en de pod kan daar niet aan
    binden → `BindException: Address not available`. Override in
    [`values.yaml`](../../infrastructure/helm/openmetadata/values.yaml) naar `0.0.0.0`.
 3. **`OIDC_CUSTOM_PARAMS` quote-bug.** Chart rendert via `{{ .customParams |
@@ -108,9 +108,9 @@ curl -s -H "Authorization: Bearer $TOKEN" \
   "http://localhost:8585/api/v1/glossaryTerms?glossary=CGM" | jq '.data[].name'
 ```
 
-## Productie
+## Production
 
 - JWT-tokens roteren via External Secrets + Vault (geen statische tokens in Secrets).
 - Auto-classification AAN — laat OM zelf BSN-patronen detecteren naast de declaratieve tags.
 - Reverse Metadata aan zetten zodat OM-tags terug naar Trino propageren → voedsel voor OPA-policies (fase 9).
-- DLM (Data Lifecycle Manager) configureren met `bewaartermijn_jaren`-meta uit dbt-models.
+- DLM (Data Lifecycle Manager) configureren met `retention period_jaren`-meta uit dbt-models.

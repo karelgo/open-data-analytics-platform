@@ -1,6 +1,6 @@
 # platform/15-portal — ODAP Portal
 
-Rol-aware launchpad + architectuurkaart + UDP Academy (certificeringstracks),
+Rol-aware launchpad + architecturekaart + UDP Academy (certificeringstracks),
 bereikbaar op **`https://platform.odap.local`** na `make deploy-platform`.
 
 ## UDP Academy
@@ -19,7 +19,7 @@ Zonder de backend werkt alles op localStorage; voortgang is dan per browser.
 De backend praat met Keycloak admin-API via `client_id=portal-backend`
 (zie [realm.json](../../infrastructure/helm/keycloak/realm.json)).
 
-Eenmalig na realm-import: ken `realm-management:manage-users` toe aan het
+One-off na realm-import: ken `realm-management:manage-users` toe aan het
 service-account user:
 
 ```bash
@@ -32,7 +32,7 @@ kcadm.sh add-roles \
 
 Daarna kan de backend voortgang naar user-attributes schrijven.
 
-## Architectuur
+## Architecture
 
 ```
 Browser ── ingress-nginx ──► Service portal:80
@@ -67,7 +67,7 @@ Browser ── ingress-nginx ──► Service portal:80
     zonder `keycloak.odap.local` te hoeven resolveren.
 - **nginx-unprivileged** serveert de Astro-dist op `:8080` en proxy't
   `/api/status/up?job=…` door naar `prometheus-server.odap-monitoring.svc`
-  voor de live status-badges.
+  for the live status-badges.
 - **Realm-client `portal`** wordt gedeployd via
   [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json).
   Secrets staan in [`secret.yaml`](secret.yaml) (DEV-ONLY).

@@ -1,8 +1,8 @@
 # 11-airflow
 
-Apache Airflow via Stackable's AirflowCluster CRD. Pipeline-architectuur volgens
+Apache Airflow via Stackable's AirflowCluster CRD. Pipeline-architecture volgens
 [**ADR-0007**](../../docs/adr/0007-airflow-pipeline-architecture.md): Cosmos +
-Datasets + YAML-source-registry. Eén YAML toevoegen = nieuwe bron in productie.
+Datasets + YAML-source-registry. Eén YAML toevoegen = nieuwe bron in production.
 
 | Resource | Doel |
 |---|---|
@@ -11,7 +11,7 @@ Datasets + YAML-source-registry. Eén YAML toevoegen = nieuwe bron in productie.
 | `ConfigMap airflow-include` | Mount op `/opt/odap/airflow/include` (PYTHONPATH) — factories + helpers. |
 | `ConfigMap airflow-sources` | Mount op `/opt/odap/airflow/sources` — YAML-registry. |
 | `ConfigMap dbt-manifest` | Mount op `/opt/odap/dbt/manifest.json` — Cosmos-input, gerenderd door `dbt-manifest-render` Job. |
-| `Job dbt-manifest-render` | Eenmalige `dbt parse` + ConfigMap-write. Re-run bij dbt-model-wijziging. |
+| `Job dbt-manifest-render` | One-offe `dbt parse` + ConfigMap-write. Re-run bij dbt-model-wijziging. |
 
 ## Mapstructuur
 
@@ -25,7 +25,7 @@ platform/11-airflow/
 │   ├── transform_silver_per_domain.py     # genereert silver_<domain> × 8
 │   ├── transform_gold_per_usecase.py      # genereert gold_<uc>_<name> × 6
 │   ├── governance_om_ingest.py
-│   ├── bewaartermijn_enforcer.py
+│   ├── retention period_enforcer.py
 │   ├── lakehouse_maintenance.py
 │   └── synthetic_data_load.py
 ├── include/                     # importable factories + helpers
@@ -53,7 +53,7 @@ platform/11-airflow/
 | `silver_<domain>` (× 8) | bronze-Dataset van die bron | Cosmos rendert `dbt run+test --select tag:<domain> tag:staging`. Eén Airflow-task per dbt-model. Outlet: `Dataset("silver://<domain>/<entity>")`. |
 | `gold_<uc>_<name>` (× 6) | silver-Datasets van alle benodigde bronnen | Cosmos rendert `dbt run+test --select tag:uc<NN>`. UC-05 wacht op 6 silver-Datasets vóór run. |
 | `governance_om_ingest` | hourly | OpenMetadata: Trino-catalog → dbt-artifacts (sequentieel). |
-| `bewaartermijn_enforcer` | daily | R-AVG-08 enforcer (ongewijzigd). |
+| `retention period_enforcer` | daily | R-AVG-08 enforcer (ongewijzigd). |
 | `lakehouse_maintenance` | daily | OPTIMIZE/VACUUM per bronze-tabel (Delta of Iceberg afhankelijk van `TABLE_FORMAT`). |
 | `synthetic_data_load` | manueel | Past dezelfde Kubernetes Job toe als `make seed`. |
 
@@ -74,13 +74,13 @@ Om de bron in een gold-mart te gebruiken: voeg `<uc>` toe aan `used_by_use_cases
 Astronomer-Cosmos wordt door een initContainer `cosmos-init` (image `python:3.12-slim`) pip-geïnstalleerd in een emptyDir-volume `/cosmos-pkgs`. De Airflow-container heeft die op `PYTHONPATH`.
 
 - **Versie**: `astronomer-cosmos==1.12.0` (gepind in `airflowcluster.yaml`).
-- **Cold-start kost** ~5s per pod-start. Productie: bouw een custom image (zie `infrastructure/airflow/Dockerfile`, TODO).
-- **Modus**: `LoadMode.DBT_MANIFEST` + `ExecutionMode.KUBERNETES`. Geen DB-toegang nodig bij DAG-parse.
+- **Cold-start kost** ~5s per pod-start. Production: bouw een custom image (zie `infrastructure/airflow/Dockerfile`, TODO).
+- **Modus**: `LoadMode.DBT_MANIFEST` + `ExecutionMode.KUBERNETES`. Geen DB-access nodig bij DAG-parse.
 
 ## Apply
 
 ```bash
-# Eenmalig: render dbt manifest.json (vereist Airflow Variable repo_url
+# One-off: render dbt manifest.json (vereist Airflow Variable repo_url
 # of een ConfigMap odap-repo-url met key=url)
 kubectl apply -f platform/11-airflow/jobs/dbt-manifest-job.yaml
 kubectl -n odap-platform wait --for=condition=complete --timeout=5m job/dbt-manifest-render
@@ -127,7 +127,7 @@ SOURCES_DIR=$PWD/sources PYTHONPATH=$PWD/include \
 `dbt_run_per_domain.py`, `om_ingest_trino.py` en `om_ingest_dbt.py` zijn vervangen door
 de factory-DAGs en mogen worden verwijderd zodra alle 6 actieve gold-DAGs een groene run hebben.
 
-## Productie-aanbevelingen
+## Production-aanbevelingen
 
 - Custom Airflow-image met cosmos baked-in (vermijd 20s init-container).
 - `dagsGitSync` + branch-protection in plaats van ConfigMap-mounts.

@@ -11,7 +11,7 @@
 #
 # Manual-only — geen auto-trigger. Draai via Actions-tab → "aks-e2e".
 #
-# Vereiste secret: AZURE_CREDENTIALS.
+# Requirede secret: AZURE_CREDENTIALS.
 name: aks-e2e
 
 on:

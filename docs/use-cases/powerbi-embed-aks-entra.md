@@ -7,7 +7,7 @@ klikt links op **Dashboarding → Power BI**, en ziet het UC-12 FinOps-rapport
 
 Werkt door:
 - Microsoft's restrictieve `frame-ancestors`-CSP op `app.fabric.microsoft.com`
-  te **omzeilen** met de Power BI Embedded SDK (`powerbi-client-react`) —
+  te **omzeilen** with the Power BI Embedded SDK (`powerbi-client-react`) —
   die rendert tegen `app.powerbi.com/reportEmbed`, een surface die wél
   cross-origin embedden accepteert mits het een geldig embed-token krijgt.
 - De portal-backend te laten **server-mint** van dat embed-token via een
@@ -15,12 +15,12 @@ Werkt door:
   draagt de gefedereerde Entra-mail uit oauth2-proxy mee voor audit + RLS.
 
 Resultaat: échte SSO via Entra, géén per-user Power BI-licentie nodig,
-audit-spoor met de echte gebruikersnaam, en de rest van het portal-shell
+audit-spoor with the echte usersnaam, en de rest van het portal-shell
 (rail · top-bar · cmdk) blijft eromheen staan.
 
 ---
 
-## Architectuur
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -56,11 +56,11 @@ audit-spoor met de echte gebruikersnaam, en de rest van het portal-shell
 ```
 
 Twee belangrijke punten:
-- **Keycloak IdP-brokering is alleen voor de portal-login** (oauth2-proxy
+- **Keycloak IdP-brokering is alleen for the portal-login** (oauth2-proxy
   praat met Keycloak, Keycloak doet de OIDC-handshake met Entra). De
   user's Entra **access-token** wordt niet doorgegeven — Keycloak heeft
   z'n eigen sessie. De portal-backend kent alleen de e-mail van de
-  ge-federeerde Entra-identiteit (via `X-Auth-Request-Email`).
+  ge-federeerde Entra-identity (via `X-Auth-Request-Email`).
 - **De embed-token komt van de SP**, niet van de user. Dit is bewust:
   - pure User-Owns-Data (user → MSAL → Entra → eigen Power BI-token) zou
     elke viewer een Pro/PPU-licentie kosten;
@@ -69,14 +69,14 @@ Twee belangrijke punten:
 
 ---
 
-## Voorvereisten
+## Prerequisites
 
 | | Status | Notitie |
 |---|---|---|
 | AKS cluster up + bootstrap | ✓ in `scripts/azure/aks-up.sh` + `make aks-all` | Public DNS `*.example.com` + Let's Encrypt |
 | Keycloak realm `uwv` met Entra IdP | ✓ in deze branch (ADR-0008 cherry-picked) | Realm-import bevat IdP `entra` met `REPLACE_ME` placeholders |
-| Service Principal met Workspace-Contributor op de Fabric workspace | ✓ — UC-11/UC-12 reuse | Zelfde SP uit `secrets/local/uc11-multiplatform.env` |
-| Power BI API delegated permissions op de SP | ❌ **Te doen** (Entra portal) | Zie [§ Setup-stappen](#setup-stappen) |
+| Service Principal met Workspace-Contributor on the Fabric workspace | ✓ — UC-11/UC-12 reuse | Zelfde SP uit `secrets/local/uc11-multiplatform.env` |
+| Power BI API delegated permissions on the SP | ❌ **Te doen** (Entra portal) | Zie [§ Setup-stappen](#setup-stappen) |
 | K8s Secret `powerbi-embed-creds` in `odap-platform` namespace | ❌ **Te doen** (één `kubectl` commando) | Template in `platform/15-portal/powerbi-embed-creds-template.yaml` |
 | Power BI report om te embedden | ✓ — UC-12 dashboard `3f508254-…` | Default report-id in `PowerBIEmbed.tsx` |
 
@@ -125,7 +125,7 @@ Stel daarna de **Redirect URI** in de Entra app-registration in op:
 https://keycloak.example.com/realms/odap/broker/entra/endpoint
 ```
 
-### 3. K8s Secret voor de SP-creds
+### 3. K8s Secret for the SP-creds
 
 Vanuit repo-root, met je SP-creds in de shell:
 
@@ -170,7 +170,7 @@ open https://platform.example.com/embed/powerbi/
 Verwacht gedrag:
 1. Login-redirect naar Keycloak (eerste bezoek).
 2. Keycloak toont login-knop **"Microsoft Entra ID"** + lokale login-form.
-3. Klik op de Entra-knop → Entra login → terug naar Keycloak → terug naar
+3. Klik on the Entra-knop → Entra login → terug naar Keycloak → terug naar
    portal met cookie.
 4. `/embed/powerbi/` laadt; "Power BI rapport laden…" spinner verschijnt
    even, daarna het UC-12 FinOps-dashboard volledig ingebed.
@@ -183,12 +183,12 @@ Verwacht gedrag:
 |---|---|
 | [`portal/src/components/powerbi/PowerBIEmbed.tsx`](../../portal/src/components/powerbi/PowerBIEmbed.tsx) | React Island; fetch token → render `<PowerBIEmbedRC>` |
 | [`portal/src/layouts/PowerBIEmbedLayout.astro`](../../portal/src/layouts/PowerBIEmbedLayout.astro) | Sub-bar + viewport rond de Island |
-| [`portal/src/pages/embed/[id].astro`](../../portal/src/pages/embed/[id].astro) | Branch op `id === 'powerbi'` naar de Island-layout |
+| [`portal/src/pages/embed/[id].astro`](../../portal/src/pages/embed/[id].astro) | Branch op `id === 'powerbi'` to the Island-layout |
 | [`portal/scripts/portal-backend.py`](../../portal/scripts/portal-backend.py) | `/api/portal/powerbi/reports` + `.../embed/{report_id}` |
 | [`portal/nginx.conf`](../../portal/nginx.conf) | CSP — `app.powerbi.com` + `api.powerbi.com` toegevoegd |
-| [`platform/15-portal/portal-backend.yaml`](../../platform/15-portal/portal-backend.yaml) | 4 secretKeyRef-envs voor de SP-creds |
-| [`platform/15-portal/powerbi-embed-creds-template.yaml`](../../platform/15-portal/powerbi-embed-creds-template.yaml) | Template voor de `kubectl create secret`-stap |
-| [`docs/adr/0008-entra-broker-via-keycloak.md`](../adr/0008-entra-broker-via-keycloak.md) | Architectuur-beslissing IdP-brokering |
+| [`platform/15-portal/portal-backend.yaml`](../../platform/15-portal/portal-backend.yaml) | 4 secretKeyRef-envs for the SP-creds |
+| [`platform/15-portal/powerbi-embed-creds-template.yaml`](../../platform/15-portal/powerbi-embed-creds-template.yaml) | Template for the `kubectl create secret`-stap |
+| [`docs/adr/0008-entra-broker-via-keycloak.md`](../adr/0008-entra-broker-via-keycloak.md) | Architecture-beslissing IdP-brokering |
 | [`infrastructure/helm/keycloak/realm.json`](../../infrastructure/helm/keycloak/realm.json) | Entra als IdP in het `uwv` realm |
 | [`tests/smoke/10-entra-broker.sh`](../../tests/smoke/10-entra-broker.sh) | Structuur-check van de realm-import |
 
@@ -198,13 +198,13 @@ Verwacht gedrag:
 
 | Item | Status | Notitie |
 |---|---|---|
-| Pure User-Owns-Data | Niet geïmplementeerd | Vereist per-user PBI-licentie + MSAL.js flow apart van Keycloak. Hybride is bewust gekozen — zie architectuur §. |
+| Pure User-Owns-Data | Niet geïmplementeerd | Required per-user PBI-licentie + MSAL.js flow apart van Keycloak. Hybride is bewust gekozen — zie architecture §. |
 | Token-refresh tijdens lange sessies | Werkt | React Island refresht 5min voor expiry zonder remount via `setAccessToken`. |
 | Listing reports in de UI | Wel endpoint (`/api/portal/powerbi/reports`), nog geen dropdown | UC-12 is hardcoded als default. Volgende slice: dropdown + URL-param `?report=<id>`. |
-| RLS per role / effectiveIdentity | Endpoint accepteert `{effectiveIdentity, roles, customData}` in de POST-body — **vereist eerst "fixed identity"-cloud-connection op de semantic model** | Zonder fixed identity geeft Power BI 403 "Creating embed token with effective identity is not supported for this datasource" voor Direct Lake. Configureer in Fabric UI: dataset → *Gateway and cloud connections* → fixed identity = de UC-11 SP. |
+| RLS per role / effectiveIdentity | Endpoint accepteert `{effectiveIdentity, roles, customData}` in de POST-body — **vereist eerst "fixed identity"-cloud-connection on the semantic model** | Zonder fixed identity geeft Power BI 403 "Creating embed token with effective identity is not supported for this datasource" voor Direct Lake. Configureer in Fabric UI: dataset → *Gateway and cloud connections* → fixed identity = de UC-11 SP. |
 | ADR-0008 nummer-collision | Twee files met `0008-` prefix: `entra-broker-via-keycloak.md` (deze branch) + `self-service-data-access.md` (main) | Hernoemen bij merge naar `0011-entra-broker-via-keycloak.md`. |
 | Power BI tenant-setting "SP can use APIs" | Handmatige Fabric Admin-actie | Niet automatiseerbaar via Terraform. |
-| K8s Secret is een dev-pattern | Werkt | Productie: Azure Key Vault + Workload Identity (zie infrastructure/azure/README.md). |
+| K8s Secret is een dev-pattern | Werkt | Production: Azure Key Vault + Workload Identity (zie infrastructure/azure/README.md). |
 
 ---
 
@@ -213,7 +213,7 @@ Verwacht gedrag:
 De default-flow stuurt **geen** `effectiveIdentity` mee — Direct Lake-
 datasets weigeren dat zonder een fixed-identity-cloud-connection op het
 semantic model (403 "Creating embed token with effective identity is not
-supported for this datasource"). Eenmalige setup om RLS aan te zetten:
+supported for this datasource"). One-offe setup om RLS aan te zetten:
 
 1. Open **Fabric portal** → `uc12_focus_finops` (workspace **freshminds-platform**
    / vergelijkbaar) → semantic model `uc12_focus_finops` → ⚙ **Settings**.
@@ -222,7 +222,7 @@ supported for this datasource"). Eenmalige setup om RLS aan te zetten:
 3. Klik **Add to OneLake** of het bewerk-icoon. Bij *Authentication method*
    kies **OAuth2** of **Service Principal** en bind aan de UC-11 SP
    (`a1777b3a-9f6f-4eb9-9f12-bc9e7b6c8e8f` = `fabric-dbt-app-reg`). De SP
-   heeft al *OneLake Data Reader*-rechten op het lakehouse via z'n
+   heeft al *OneLake Data Reader*-rechten on the lakehouse via z'n
    workspace-Contributor-rol.
 4. Save. Power BI markeert het semantic model nu als *Direct Lake — Fixed
    identity*.
@@ -240,7 +240,7 @@ voeg een UI-veld toe — endpoint accepteert beide al.
 
 ## Report-picker dropdown
 
-Bovenaan de embed staat een dropdown met alle reports uit de Fabric
+Bovenaan de embed staat een dropdown met alle reports from the Fabric
 workspace (gehaald via `GET /api/portal/powerbi/reports`). Wisselen van
 report:
 - **In de dropdown**: kies een ander rapport → embed token wordt opnieuw
@@ -252,14 +252,14 @@ report:
 
 Default-volgorde: prop-override → URL `?report=` → localStorage → UC-12
 hardcoded fallback. Als de stored ID niet meer bestaat in de workspace
-(report deleted), val terug op het eerste item in de lijst.
+(report deleted), val terug on the eerste item in de lijst.
 
 ---
 
 ## Lessons learned — wat tijdens k3d-verify scheef ging (en werd gefixt)
 
 1. **`X-Auth-Request-Email` arriveert niet aan upstream.** oauth2-proxy met
-   `set_xauthrequest=true` zet die header alleen op de `/oauth2/auth`-RESPONSE
+   `set_xauthrequest=true` zet die header alleen on the `/oauth2/auth`-RESPONSE
    (voor nginx `auth_request`-flow); upstream POST/GET-requests krijgen
    `X-Forwarded-Email` (door `pass_user_headers=true`). De portal-backend
    las alleen `X-Auth-Request-Email` en gaf dus 401 op álle endpoints —
@@ -276,6 +276,6 @@ hardcoded fallback. Als de stored ID niet meer bestaat in de workspace
    backend stuurt `identities` alleen mee als de caller expliciet
    `effectiveIdentity=true` (of `roles`/`customData`) doorgeeft. Audit-only
    doorgifte van de user-email blijft via de log-regel werken. Volgende stap
-   is de "fixed identity"-cloud-connection configureren op het semantic
+   is de "fixed identity"-cloud-connection configureren on the semantic
    model (zie open issues hierboven), dan kan RLS terug aan via een POST-body
    met `effectiveIdentity: true`.

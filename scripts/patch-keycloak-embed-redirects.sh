@@ -4,7 +4,7 @@
 # (https://platform.odap.local:8443/<service>/...).
 #
 # De realm.json configmap is de bron voor verse Keycloak-installs;
-# voor een lopende cluster moeten we via de admin API patchen want
+# for a lopende cluster moeten we via de admin API patchen want
 # Keycloak importeert de realm alleen op first-start.
 #
 # Idempotent: voegt URIs alleen toe als ze nog niet in de lijst staan.

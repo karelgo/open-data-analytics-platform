@@ -1,4 +1,4 @@
-// Astro Content Collections schema voor het certificeringsplatform.
+// Astro Content Collections schema for the certificeringsplatform.
 // Eén entry = één module. Eén directory onder content/learn/<rol-id>/ = één track.
 //
 // We dwingen een schema af zodat alle modules dezelfde structuur hebben en
@@ -61,7 +61,7 @@ const learn = defineCollection({
     quiz: z.array(quizQuestionSchema).default([]),
     checks: z.array(checkSchema).default([]),
     // Welk certificaat verleen je bij voltooiing van dit level?
-    // Alleen ingevuld op de laatste module van een level.
+    // Alleen ingevuld on the laatste module van een level.
     certifies: z.boolean().default(false),
   }),
 });

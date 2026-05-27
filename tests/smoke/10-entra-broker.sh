@@ -9,7 +9,7 @@
 #      'entra'-IdP bevat (declaratieve evidence).
 #   3. De Secret keycloak-entra-broker bestaat in odap-auth (placeholders OK).
 #   4. Of de placeholders nog REPLACE_ME_* zijn — als ze ingevuld zijn,
-#      additioneel: de Keycloak-loginpagina voor de portal-client toont
+#      additioneel: de Keycloak-loginpagina for the portal-client toont
 #      een knop "Microsoft Entra ID".
 #
 # Skipt elegant als Keycloak nog niet gedeployd is.
@@ -76,7 +76,7 @@ PLACEHOLDER_COUNT=$(echo "$CM" | grep -c 'REPLACE_ME_' || true)
 if [[ "$PLACEHOLDER_COUNT" -gt 0 ]]; then
   warn "realm-import bevat nog $PLACEHOLDER_COUNT REPLACE_ME_* placeholders"
   warn "Entra-login werkt pas na invullen van tenantId, clientId, clientSecret en 11 group-GUIDs"
-  warn "Zie platform/02-authentication/README.md → 'Entra ID brokering' voor de stappen"
+  warn "Zie platform/02-authentication/README.md → 'Entra ID brokering' for the stappen"
   echo
   pass "smoke 10-entra-broker: structuur OK, configuratie nog onvolledig (verwacht in dev)"
   exit 0

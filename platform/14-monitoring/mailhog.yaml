@@ -2,9 +2,9 @@
 #
 # MailHog accepteert SMTP op poort 1025 zonder auth/TLS en serveert een
 # web-UI op 8025 waar je alle alerts ziet die Alertmanager zou versturen.
-# In productie (AKS) wordt deze namespace-resource verwijderd door de
+# In production (AKS) wordt deze namespace-resource verwijderd door de
 # platform-overlays/aks/14-monitoring/ overlay en wijst Alertmanager
-# naar de echte Platform SMTP relay.
+# to the echte Platform SMTP relay.
 ---
 apiVersion: apps/v1
 kind: Deployment

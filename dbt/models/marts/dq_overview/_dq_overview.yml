@@ -13,9 +13,9 @@ models:
     meta:
       domain: governance
       legal_basis: AVG_art_5_1d_juistheid
-      doelbinding: ["kwaliteitscontrole"]
+      purpose-limitation: ["kwaliteitscontrole"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: data_steward_platform
       pii_kolommen: []
       risk_tier: laag
@@ -52,9 +52,9 @@ models:
     meta:
       domain: governance
       legal_basis: AVG_art_5_1d_juistheid
-      doelbinding: ["kwaliteitscontrole"]
+      purpose-limitation: ["kwaliteitscontrole"]
       bio_classificatie: intern
-      bewaartermijn_jaren: 7
+      retention period_jaren: 7
       eigenaar: data_steward_platform
       pii_kolommen: []
       risk_tier: laag

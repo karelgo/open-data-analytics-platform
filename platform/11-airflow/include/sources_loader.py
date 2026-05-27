@@ -38,7 +38,7 @@ class StreamSpec:
 
     `name` is de logische stream (bv. 'customers.created'); de Spark-job
     leidt het S3-pad af door punten te vervangen door slashes. `key` is het
-    natuurlijke partition-key voor downstream silver-modellen (geen invloed
+    natuurlijke partition-key voor downstream silver-models (geen invloed
     op file-layout).
     """
     name: str
@@ -72,9 +72,9 @@ class SilverSpec:
 @dataclass(frozen=True)
 class GovernanceSpec:
     legal_basis: str
-    doelbinding: tuple[str, ...]
+    purpose-limitation: tuple[str, ...]
     bio_classificatie: str
-    bewaartermijn_jaren: int
+    retention period_jaren: int
     eigenaar: str
     pii_kolommen: tuple[str, ...]
     risk_tier: str
@@ -124,7 +124,7 @@ class SourceSpec:
     stream: StreamSpec | None = None
     csv_ingest: CsvIngestSpec | None = None
 
-    # Voor Airflow tags op de gegenereerde DAGs.
+    # Voor Airflow tags on the gegenereerde DAGs.
     @property
     def airflow_tags(self) -> list[str]:
         return [
@@ -192,9 +192,9 @@ def _coerce(d: dict) -> SourceSpec:
         silver=SilverSpec(**d["silver"]),
         governance=GovernanceSpec(
             legal_basis=d["governance"]["legal_basis"],
-            doelbinding=tuple(d["governance"]["doelbinding"]),
+            purpose-limitation=tuple(d["governance"]["purpose-limitation"]),
             bio_classificatie=d["governance"]["bio_classificatie"],
-            bewaartermijn_jaren=int(d["governance"]["bewaartermijn_jaren"]),
+            retention period_jaren=int(d["governance"]["retention period_jaren"]),
             eigenaar=d["governance"]["eigenaar"],
             pii_kolommen=tuple(d["governance"].get("pii_kolommen") or []),
             risk_tier=d["governance"]["risk_tier"],

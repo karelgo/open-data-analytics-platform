@@ -1,6 +1,6 @@
 # 00-namespaces
 
-Declaratieve namespaces voor het ODAP platform. Ook door
+Declaratieve namespaces for the ODAP platform. Ook door
 `scripts/bootstrap.sh` (Helm) idempotent aangemaakt; dit bestand is canonical.
 
 | Namespace | Inhoud |

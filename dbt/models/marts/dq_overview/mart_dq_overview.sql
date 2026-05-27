@@ -4,7 +4,7 @@
 ) }}
 
 -- Cross-UC DQ-overzicht: 1 rij per use-case met aggregate-cijfers.
--- Bron voor de top-tiles van het Superset DQ-dashboard.
+-- Bron for the top-tiles van het Superset DQ-dashboard.
 --
 -- dq_score_pct = 100 - (n_violations / max(n_check_evaluations, 1) * 100)
 -- waarbij n_check_evaluations = aantal records × aantal checks

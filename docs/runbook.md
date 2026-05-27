@@ -1,6 +1,6 @@
 # Runbook
 
-Operationele handleiding voor het draaien, monitoren, herstellen en uitbreiden
+Operationele handbook for the draaien, monitoren, herstellen en uitbreiden
 van het Open Data & Analytics Platform. Dekt cluster-lifecycle, component-
 healthchecks, 6 incident-scenario's, backup & restore (Postgres + MinIO +
 Keycloak), upgrade-procedures (operators, Helm-charts, dbt-packages,
@@ -9,15 +9,15 @@ alert-tuning en compliance-evidence-collectie.
 
 ---
 
-## 1. Snelstart
+## 1. Quick start
 
-Zie [`README.md`](../README.md) voor de happy-path commands.
+Zie [`README.md`](../README.md) for the happy-path commands.
 
 ---
 
 ## 2. Cluster lifecycle
 
-### 2.1 Cluster opzetten
+### 2.1 Set up cluster
 
 ```bash
 # Lokaal (k3d):
@@ -68,12 +68,12 @@ TODO (fase 2+): vul per component de specifieke "is-het-gezond?" probes in.
 
 ---
 
-## 4. Veelvoorkomende incidenten
+## 4. Common incidents
 
 ### 4.1 Trino weigert query met "Access Denied"
 - Eerst: log inspecteren — `kubectl logs -n odap-platform <trino-coordinator-pod> -c trino`.
 - OPA-decision-log bekijken in OpenSearch.
-- Verifieer rol-toekenning in Keycloak voor de gebruiker.
+- Verifieer rol-toekenning in Keycloak for the gebruiker.
 - TODO (fase 9): voorbeeldqueries per rol.
 
 ### 4.2 dbt-run faalt met "table not found"
@@ -224,7 +224,7 @@ kubectl -n odap-auth exec -it sts/keycloak -- /opt/keycloak/bin/kc.sh \
 kubectl -n odap-auth cp keycloak-0:/tmp/odap-realm.json ./odap-realm-$(date -u +%Y%m%d).json
 ```
 
-Restore: drop de bestaande realm in UI, dan import met de UI-file-uploader of:
+Restore: drop de bestaande realm in UI, dan import with the UI-file-uploader of:
 
 ```bash
 kubectl -n odap-auth cp ./odap-realm-20260520.json keycloak-0:/tmp/
@@ -243,7 +243,7 @@ strategieën:
   mc mirror --remove --watch local/odap-bronze backup/odap-bronze
   ```
 - **Velero + restic** voor volledige cluster-volume backup (zie §5.4).
-- **Productie**: switch MinIO naar distributed mode (`replicas: 4`,
+- **Production**: switch MinIO naar distributed mode (`replicas: 4`,
   erasure coding) en pas Object Lock toe voor immutable retention —
   dat lost backup ÉN audit-onveranderbaarheid op (R-AVG-15).
 
@@ -343,7 +343,7 @@ terraform plan
 terraform apply
 ```
 
-Bij een minor-bump ALTIJD eerst in `dev-stackable-rg`, dan productie.
+Bij een minor-bump ALTIJD eerst in `dev-stackable-rg`, dan production.
 
 ---
 
@@ -493,19 +493,19 @@ Verwacht resultaat:
 - Vector detecteert `"result":false` in OPA-logs (zie `detect_alert_events` in helm-values).
 - Tellt counter `vector_alert_event_total{event="opa_deny"}`.
 - PrometheusRule `log-events` vuurt op `rate(...) > 0.2/s` over 5m.
-- Onderzoek: query OpenSearch op `logs-audit-*` met `result: false` filter, of zoek in Trino coordinator-logs welke gebruiker / catalog gewerd.
+- Research: query OpenSearch op `logs-audit-*` met `result: false` filter, of zoek in Trino coordinator-logs welke gebruiker / catalog gewerd.
 
 ### 9.5 Log-based alert: JvmOutOfMemory
 
 - Vector matcht `java.lang.OutOfMemoryError` ongeacht container.
 - Critical-severity (geen `for:`-window) — vuurt direct na 1e OOM-event in 10m.
-- Onderzoek: `kubectl -n {{namespace}} describe pod {{container}}` voor restart-count, vraag heap-size verhogen in de Stackable-CR (`spec.coordinator.config.resources.memory.limit` etc.).
+- Research: `kubectl -n {{namespace}} describe pod {{container}}` voor restart-count, vraag heap-size verhogen in de Stackable-CR (`spec.coordinator.config.resources.memory.limit` etc.).
 
 ### 9.6 Log-based alert: KeycloakLoginErrorSpike
 
 - Vector matcht event-type `LOGIN_ERROR` in Keycloak-logs.
 - Verwacht: doorgaans < 5 fails per minuut.
-- Onderzoek: Keycloak admin-console → Events → filter op `LOGIN_ERROR`. Bij brute-force: zet rate-limit aan op ingress-nginx (`nginx.ingress.kubernetes.io/limit-rpm: "60"`).
+- Research: Keycloak admin-console → Events → filter op `LOGIN_ERROR`. Bij brute-force: zet rate-limit aan op ingress-nginx (`nginx.ingress.kubernetes.io/limit-rpm: "60"`).
 
 ### 9.7 Alert-pipeline end-to-end test
 
@@ -516,14 +516,14 @@ Zie §9.3. Zelfreferentie zodat alert-template-links niet 404 geven.
 ## 10. Compliance-evidence verzamelen
 
 Zie [`compliance-mapping.md`](compliance-mapping.md). Elk R-* code heeft daar
-een verwijzing naar het YAML-bestand of de configuratie waar de maatregel
+een verwijzing to the YAML-bestand of de configuratie waar de maatregel
 landt.
 
 ### 10.1 Standaard-evidence per audit (R-* codes)
 
 | Requirement | Hoe te bewijzen | Bestand / commando |
 |---|---|---|
-| R-AVG-06 (doelbinding) | OPA-policy + tests draaien | `make opa-test` → 35 assertions GREEN |
+| R-AVG-06 (purpose-limitation) | OPA-policy + tests draaien | `make opa-test` → 35 assertions GREEN |
 | R-AVG-07 (pseudonimisering) | Macro toepast op alle persoon-attributen | `grep -rn 'pseudonymize()' dbt/models/` |
 | R-AVG-15 (breach-detection) | Audit-logs ≥ 7 jaar in OpenSearch | `kubectl -n odap-meta get opensearchilmpolicy audit-7y` |
 | R-BIO-05 (strong auth) | Keycloak password policy | `realm.json::passwordPolicy` |
@@ -543,7 +543,7 @@ landt.
 !!! todo "Audit-bundle-script nog niet aanwezig"
     Een wrapper-script `scripts/compliance-evidence.sh` dat alle commando's
     uit §10.1 draait en de output in een ge-timestampte tarball bundelt staat
-    op de roadmap. Voor nu: draai de tabel-commands handmatig en bundel zelf,
+    on the roadmap. Voor nu: draai de tabel-commands handmatig en bundel zelf,
     bijvoorbeeld:
     ```bash
     mkdir -p evidence-$(date -u +%Y-%m-%d) && cd $_

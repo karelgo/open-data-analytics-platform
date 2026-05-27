@@ -1,6 +1,6 @@
 """Seed-script: vult bronze.claims.application met N synthetische rijen.
 
-Bedoeld als one-shot voorbereiding voor de Spark-bronze→silver→gold demo
+Bedoeld als one-shot voorbereiding for the Spark-bronze→silver→gold demo
 (parallel aan dbt). De reguliere streaming-bronze SparkApplication staat
 uit (zie incident 2026-05-15 in platform/08-spark/kustomization.yaml),
 dus we vullen bronze direct vanuit een batch-job.
