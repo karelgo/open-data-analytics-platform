@@ -98,7 +98,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install kubectl (carries kustomize 5.x)
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
         with:
           version: "v1.32.2"
 
