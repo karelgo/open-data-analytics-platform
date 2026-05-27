@@ -35,7 +35,7 @@ Direct: `https://platform.odap.local:8443/access-request`.
 Het ODAP platform gebruikt **default-deny** met doelbinding (R-AVG-06). Jouw
 primaire rol (`claims_analyst`, `marketing_analyst`, `researcher`, …)
 bepaalt welke catalogs/schemas je *standaard* mag zien. Als je daarnaast
-toegang nodig hebt tot een andere zone — bv. `gold.uc05_client_360` —
+toegang nodig hebt tot een andere zone — bv. `gold.uc05_customer_360` —
 loopt dat via deze flow:
 
 1. Jij maakt een Task op het asset in OpenMetadata.
@@ -60,7 +60,7 @@ toegang aan"**. Of direct: <https://platform.odap.local:8443/access-request>.
 
 | Veld | Wat je invult |
 |---|---|
-| **Welke dataset?** | OM-FQN — bv. `trino.gold.uc11_klantreis.mart_uc11_klantreis_events`. Vind 'm via OpenMetadata → Explore → klik op het asset → kopieer de FQN onder de titel. |
+| **Welke dataset?** | OM-FQN — bv. `trino.gold.uc11_customer_journey.mart_uc11_journey_events`. Vind 'm via OpenMetadata → Explore → klik op het asset → kopieer de FQN onder de titel. |
 | **Wie ben je?** | Je Keycloak-gebruikersnaam (eerste deel van je e-mail, bv. `researcher`, `finance.analyst`). |
 | **Voor welk doel?** | Kies een doelbinding (AVG art. 5 lid 1b). |
 | **Hoe lang?** | Optioneel — bv. "2 maanden, t/m 2026-08-01". |
@@ -93,7 +93,7 @@ De Owner/Reviewer:
 ### Voorbeeld 1 — Researcher wil naar UC-11 klantreis-mart
 
 ```
-Asset:      trino.gold.uc11_klantreis.mart_uc11_klantreis_events
+Asset:      trino.gold.uc11_customer_journey.mart_uc11_journey_events
 Requester:  researcher
 Purpose:    onderzoek
 Duration:   2 maanden, t/m 2026-08-01
@@ -101,7 +101,7 @@ Motivation: UC-11 funnel-analyse — afsluitratio per kanaal. Synthetische
             cohort + aggregaten, geen individuele BSN's.
 ```
 
-Grant na approval: realm-role `data_access:gold.uc11_klantreis`.
+Grant na approval: realm-role `data_access:gold.uc11_customer_journey`.
 
 > ⚠️ **Heads-up:** deze specifieke `mart_*` tabel heeft lineage geregistreerd
 > in OM en raakt op OM 1.12 momenteel de OpenSearch lineage-script bug —
@@ -113,7 +113,7 @@ Grant na approval: realm-role `data_access:gold.uc11_klantreis`.
 ### Voorbeeld 2 — Finance Analyst wil bronze-data voor reconciliatie
 
 ```
-Asset:      trino.bronze.uwv.polisadm_ikv
+Asset:      trino.bronze.policies.holders
 Requester:  finance.analyst
 Purpose:    kwaliteitscontrole
 Duration:   2 weken

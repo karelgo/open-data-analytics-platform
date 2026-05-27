@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_customer_interaction
+    description: "Klantcontact (kanaal, onderwerp, duur)."
+    config:
+      tags: ["staging", "customers"]
+    meta:
+      domain: crm
+      legal_basis: WIA+WW+Wajong+TW
+      doelbinding: ["klantcontact", "behandeling"]
+      bio_classificatie: vertrouwelijk
+      bewaartermijn_jaren: 2
+      eigenaar: divisie_crm
+      pii_kolommen: [bsn]
+      risk_tier: laag
+    columns:
+      - name: contact_id
+        tests: [not_null, unique]
+      - name: bsn
+        tests: [not_null, bsn_valid]
+      - name: kanaal
+        tests:
+          - accepted_values:
+              values: [telefoon, balie, beeldbellen, werkmap_bericht, mail]
+      - name: onderwerp
+        tests:
+          - accepted_values:
+              values: [WW, WIA, Wajong, algemeen]

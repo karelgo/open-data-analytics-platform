@@ -9,7 +9,7 @@ where exists (
     select column_name
     from information_schema.columns
     where table_catalog = 'silver'
-      and table_schema  = 'ww'
+      and table_schema  = 'service_requests'
       and lower(column_name) in ('etniciteit', 'wijk', 'wijkcode', 'wijk_code',
                                  'religie', 'land_van_herkomst')
 )

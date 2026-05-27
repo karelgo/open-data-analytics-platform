@@ -95,9 +95,9 @@ discovery=$(kubectl -n odap-auth run kc-test-$RANDOM \
     "http://keycloak.odap-auth.svc.cluster.local/realms/odap/.well-known/openid-configuration" \
   2>/dev/null | head -c 200 || true)
 if echo "$discovery" | grep -q '"issuer"'; then
-  pass "Keycloak realm 'uwv' beantwoordt OIDC-discovery"
+  pass "Keycloak realm 'demo' beantwoordt OIDC-discovery"
 else
-  fail "Keycloak realm 'uwv' beantwoordt geen OIDC-discovery"
+  fail "Keycloak realm 'demo' beantwoordt geen OIDC-discovery"
 fi
 
 # ----------------------------------------------------------------------

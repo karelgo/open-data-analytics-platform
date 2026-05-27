@@ -56,7 +56,7 @@ code=$(kubectl -n "$NS" run om-bridge-smoke-$RANDOM \
   curl -s -o /dev/null -w '%{http_code}' --max-time 10 \
     -X POST "http://om-access-bridge.${NS}.svc.cluster.local/webhooks/om" \
     -H 'Content-Type: application/json' \
-    -d '{"entityType":"task","eventType":"taskResolved","task":{"id":"smoke","resolution":"approved","createdBy":"alice","about":"trino.gold.uc05_client_360.mart_uc05_client_360"}}' 2>/dev/null || echo "000")
+    -d '{"entityType":"task","eventType":"taskResolved","task":{"id":"smoke","resolution":"approved","createdBy":"alice","about":"trino.gold.uc05_customer_360.mart_uc05_customer_360"}}' 2>/dev/null || echo "000")
 if [[ "$code" != "401" ]]; then
   fail "Verwachtte 401 zonder HMAC; kreeg $code (security-default kapot)"
 fi

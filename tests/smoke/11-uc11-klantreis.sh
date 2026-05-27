@@ -62,7 +62,7 @@ done
 
 echo
 if [[ "$failed" -eq 0 ]]; then
-  pass "smoke 11-uc11-klantreis: alle UC-11 rego-tests groen"
+  pass "smoke 11-uc11-customer-journey: alle UC-11 rego-tests groen"
 else
-  fail "smoke 11-uc11-klantreis: $failed UC-11 test(s) gefaald"
+  fail "smoke 11-uc11-customer-journey: $failed UC-11 test(s) gefaald"
 fi

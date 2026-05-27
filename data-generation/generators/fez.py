@@ -1,6 +1,6 @@
 """FEZ-aggregaten stub. SYNTHETIC — NOT FOR REAL USE.
 
-Geaggregeerde uitkeringslast per wet x maand x regio. Geen PII.
+Geaggregeerde claim_cost per wet x maand x regio. Geen PII.
 """
 
 from __future__ import annotations
@@ -55,4 +55,4 @@ def generate_fez_aggregaten(seed: int | None = None) -> Iterator[UitkeringslastA
 
 
 def to_kafka_envelope(a: UitkeringslastAggregaat) -> dict[str, Any]:
-    return envelope(a.to_dict(), event_type="fez.uitkeringslast.maand")
+    return envelope(a.to_dict(), event_type="fez.claim_cost.maand")

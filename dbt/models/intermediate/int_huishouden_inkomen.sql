@@ -7,7 +7,7 @@ with ikv as (
     select
         bsn,
         sum(loon_bruto_jaar) as totaal_jaar
-    from {{ ref('stg_polisadm_ikv') }}
+    from {{ ref('stg_policy_holders') }}
     where is_lopend = true
     group by bsn
 )

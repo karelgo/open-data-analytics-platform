@@ -104,7 +104,7 @@
           "gold"
         ],
         "schemas": [
-          "uc06_lastprognose"
+          "uc06_cost_forecast"
         ],
         "purposes": [
           "actuarie",
@@ -123,7 +123,7 @@
           "silver"
         ],
         "schemas": [
-          "uc08_smz_capaciteit",
+          "uc08_capacity_planning",
           "smz"
         ],
         "purposes": [
@@ -191,63 +191,63 @@
       }
     },
     "resource_purposes": {
-      "gold.uc01_wia_funnel.*": [
+      "gold.uc01_claims_funnel.*": [
         "sturingsinfo"
       ],
-      "gold.uc04_tw_eligibility.*": [
+      "gold.uc04_eligibility_outreach.*": [
         "proactieve_dienstverlening"
       ],
-      "gold.uc05_client_360.*": [
+      "gold.uc05_customer_360.*": [
         "klantcontact",
         "behandeling"
       ],
-      "gold.uc06_lastprognose.*": [
+      "gold.uc06_cost_forecast.*": [
         "actuarie",
         "beleid"
       ],
-      "gold.uc07_dq_polisadm.*": [
+      "gold.uc07_dq_policies.*": [
         "primair_proces",
         "kwaliteitscontrole"
       ],
-      "gold.uc08_smz_capaciteit.*": [
+      "gold.uc08_capacity_planning.*": [
         "planning"
       ],
-      "silver.wia.*": [
+      "silver.claims.*": [
         "uitkering",
         "behandeling",
         "reintegratie"
       ],
-      "silver.ww.*": [
+      "silver.service_requests.*": [
         "uitkering",
         "handhaving"
       ],
-      "silver.wajong.*": [
+      "silver.eligibility_cases.*": [
         "reintegratie",
         "behandeling"
       ],
-      "silver.crm.*": [
+      "silver.customers.*": [
         "klantcontact",
         "behandeling"
       ],
-      "silver.fez.*": [
+      "silver.finance.*": [
         "actuarie",
         "beleid"
       ],
-      "silver.polisadm.*": [
+      "silver.policies.*": [
         "primair_proces",
         "kwaliteitscontrole"
       ],
-      "silver.persoon.*": [
+      "silver.persons.*": [
         "primair_proces",
         "kwaliteitscontrole"
       ],
-      "silver.zw.*": [
+      "silver.incidents.*": [
         "uitkering"
       ],
-      "bronze.uwv.*": [
+      "bronze.*": [
         "primair_proces"
       ],
-      "sensitive.wajong.*": [
+      "sensitive.eligibility_cases.*": [
         "reintegratie",
         "behandeling"
       ]
@@ -268,7 +268,7 @@
         "medical": false,
         "bankrekening": false
       },
-      "geboortedatum": {
+      "birth_date": {
         "pii": true,
         "medical": false,
         "bankrekening": false
@@ -305,5 +305,5 @@
       }
     }
   },
-  "_comment": "UWV-rol \u2192 catalogs / schemas / purposes / capability-mapping. Brondata voor opa-policies-src/trino/*.rego. Wordt door build-opa-bundle.sh meegebakken in de OPA-bundle ConfigMap (key: data.json)."
+  "_comment": "Role \u2192 catalogs / schemas / purposes / capability-mapping. Brondata voor opa-policies-src/trino/*.rego. Wordt door build-opa-bundle.sh meegebakken in de OPA-bundle ConfigMap (key: data.json)."
 }

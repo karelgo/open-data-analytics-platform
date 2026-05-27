@@ -1,4 +1,4 @@
-# Source registry — FEZ uitkeringslast (geaggregeerd).
+# Source registry — FEZ claim_cost (geaggregeerd).
 #
 # Afwijkend: geen BSN, mode=batch (maandelijks).
 schema_version: 1
@@ -7,19 +7,19 @@ name: fez
 domain: fez
 
 stream:
-  name: uwv.fez.uitkeringslast
+  name: finance.expense
   key: jaar_maand_wet_regio   # composite, niet per persoon
 
 bronze:
   catalog: bronze
-  schema: uwv
-  table: fez_uitkeringslast
+  schema: demo
+  table: finance_expense
   partition_by: event_date
 
 silver:
   catalog: silver
-  schema: fez
-  staging_model: stg_fez_uitkeringslast
+  schema: finance
+  staging_model: stg_finance_expense
   dbt_tag: fez
 
 governance:

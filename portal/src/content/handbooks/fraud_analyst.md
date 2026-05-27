@@ -59,24 +59,24 @@ goede gewoonte is een korte notitie in je eigen onderzoeksysteem.
 | Catalog | Schema | Wat zit erin? | Zie jij het? |
 |---|---|---|---|
 | `silver` | `ww` | WW-aanvragen, betalingen, status-historie | **Ja** |
-| `gold` | `uc03_ww_risk` | Risico-indicatoren per dossier | **Ja** |
+| `gold` | `uc03_fraud_risk` | Risico-indicatoren per dossier | **Ja** |
 | `silver` | `wia`, `wajong`, `crm` | Andere domeinen | **Nee** |
 | `sensitive` | `wajong.*` | Bijzondere persoonsgegevens | **Nee** |
 
 ### 3.2 Welke kolommen zie je?
 
-Voor `silver.ww.*` en `gold.uc03_ww_risk.*`:
+Voor `silver.service_requests.*` en `gold.uc03_fraud_risk.*`:
 
 | Kolom | Wat zie je? | Bijzonderheid |
 |---|---|---|
-| `bsn`, naam, geboortedatum, adres | **Volledig** | Doel "handhaving" |
+| `bsn`, naam, birth_date, adres | **Volledig** | Doel "handhaving" |
 | `iban`, `bankrekening` | **Volledig** | Uniek voor jouw rol — anderen zien `NL**********1234` |
 | `diagnose`, `icd10` | **Niet** (kolom-mask returnt NULL) | Medisch is niet jouw doel |
 | `regio` | Geen filter — landelijk | Handhaving is niet regio-gebonden |
 
 ### 3.3 Voorbeeld — onderscheid met andere rollen
 
-Op `silver.persoon.persoon` zien:
+Op `silver.persons.persoon` zien:
 
 | Veld | jij (`fraud_analyst`) | `marketing_analyst` | `finance_analyst` |
 |---|---|---|---|
@@ -111,9 +111,9 @@ SELECT
   b.betaal_datum,
   r.score,
   r.top_drivers
-FROM silver.ww.aanvraag a
-LEFT JOIN silver.ww.betaling b USING (bsn)
-LEFT JOIN gold.uc03_ww_risk.score r USING (bsn)
+FROM silver.service_requests.application a
+LEFT JOIN silver.service_requests.betaling b USING (bsn)
+LEFT JOIN gold.uc03_fraud_risk.score r USING (bsn)
 WHERE a.bsn = '999000456'
 ORDER BY b.betaal_datum DESC;
 ```
@@ -126,7 +126,7 @@ SELECT
   COUNT(*)               AS aantal_open,
   AVG(score)             AS gem_score,
   MIN(aanmaak_datum)     AS oudste_signaal
-FROM gold.uc03_ww_risk.actuele_signalen
+FROM gold.uc03_fraud_risk.actuele_signalen
 WHERE status = 'in_onderzoek'
 GROUP BY team_handhaver
 ORDER BY aantal_open DESC;
@@ -152,7 +152,7 @@ SELECT
   date_trunc('week', score_datum) AS week,
   AVG(score) AS gem_score,
   PERCENTILE_DISC(score, 0.95) WITHIN GROUP (ORDER BY score) AS p95
-FROM gold.uc03_ww_risk.score
+FROM gold.uc03_fraud_risk.score
 WHERE score_datum >= CURRENT_DATE - INTERVAL '90' DAY
 GROUP BY 1
 ORDER BY 1;
@@ -167,7 +167,7 @@ ORDER BY 1;
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
 | `Access Denied: column 'diagnose' returns NULL` | Medische velden zijn voor jou gemaskeerd | Niet nodig voor handhaving |
-| `Access Denied: silver.wia.*` | WIA is niet jouw doel | Vraag een Claims Analyst voor cross-domein vragen |
+| `Access Denied: silver.claims.*` | WIA is niet jouw doel | Vraag een Claims Analyst voor cross-domein vragen |
 | `Access Denied: sensitive.*` | Sensitive Vault is afgeschermd | Niet beschikbaar — Wajong-route via collega |
 | `Bias / fairness warning op model` | Het UC-03 model heeft een waarschuwing afgegeven | Stop het automatisch gebruik; meld bij data-steward |
 

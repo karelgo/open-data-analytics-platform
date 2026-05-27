@@ -16,7 +16,7 @@ labs:
     href: "/go/openmetadata/"
 checks:
   - id: "wia_practitioner_query"
-    title: "Detail-query op silver.wia.aanvraag uitgevoerd"
+    title: "Detail-query op silver.claims.application uitgevoerd"
     hint: "Met regio-filter, met geldige PII-doel-comment"
 quiz:
   - q: "Wat is een correcte SQL-comment voor een ad-hoc detail-query?"
@@ -29,10 +29,10 @@ quiz:
     explain: "Comment koppelt query aan dossier en doel. Audit-log gebruikt dit veld."
   - q: "Welk SQL-voorbeeld is correct voor jouw rol?"
     options:
-      - "SELECT * FROM bronze.uwv.wia_aanvraag"
-      - "SELECT bsn, status, datum_ingediend FROM silver.wia.aanvraag WHERE regio_code='UWV-NH' AND status='open'"
-      - "SELECT * FROM sensitive.wajong.dossier"
-      - "DROP TABLE silver.wia.aanvraag"
+      - "SELECT * FROM bronze.claims.application"
+      - "SELECT bsn, status, datum_ingediend FROM silver.claims.application WHERE regio_code='UWV-NH' AND status='open'"
+      - "SELECT * FROM sensitive.eligibility_cases.dossier"
+      - "DROP TABLE silver.claims.application"
     correct: 1
   - q: "De funnel toont 12 dossiers > 8 weken open. Wat doe je eerst?"
     options:
@@ -70,15 +70,15 @@ Niet alle velden staan in de funnel. Voor het dossier-detail open je
 ```sql
 -- WIA-2024-7782 (dossier) — doel: beoordeling/uitkering
 SELECT
-    aanvraag_id,
+    application_id,
     bsn,
-    voornaam, achternaam, geboortedatum,
+    voornaam, achternaam, birth_date,
     datum_ingediend,
     datum_laatste_actie,
     status_reden,
     arbeidsongeschiktheidsklasse_voorlopig
-FROM silver.wia.aanvraag
-WHERE aanvraag_id = 'WIA-2024-7782'
+FROM silver.claims.application
+WHERE application_id = 'WIA-2024-7782'
   AND regio_code = 'UWV-NH';
 ```
 
@@ -110,5 +110,5 @@ onrechte een foute KPI tonen.
 
 ## Verificatie
 
-De auto-check controleert dat je een query op `silver.wia.aanvraag` hebt
+De auto-check controleert dat je een query op `silver.claims.application` hebt
 gedraaid mét regio-filter én een SQL-comment met doel-vermelding.

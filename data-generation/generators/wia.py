@@ -12,7 +12,7 @@ from ._common import envelope, make_rng
 
 @dataclass
 class WIAAanvraag:
-    aanvraag_id: str
+    application_id: str
     bsn: str
     aanvraag_datum: str
     eerste_ziektedag: str
@@ -28,11 +28,11 @@ class WIAAanvraag:
 _REGIOS = ["AMS", "RTM", "DHN", "UTR", "EHV", "GRO", "ZWO", "ARN", "BRD"]
 
 
-def generate_wia_aanvraag(rng: random.Random, bsn: str) -> WIAAanvraag:
+def generate_claim_application(rng: random.Random, bsn: str) -> WIAAanvraag:
     pct = rng.choices([0, 35, 45, 60, 80, 100], weights=[5, 15, 20, 25, 20, 15])[0]
     onderdeel = "IVA" if pct >= 80 else "WGA"
     return WIAAanvraag(
-        aanvraag_id=f"WIA-{rng.randint(10**8, 10**9 - 1)}",
+        application_id=f"WIA-{rng.randint(10**8, 10**9 - 1)}",
         bsn=bsn,
         aanvraag_datum=f"2025-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
         eerste_ziektedag=f"2023-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
@@ -52,7 +52,7 @@ def generate_wia_aanvragen(
     rng = make_rng(seed)
     for bsn in persona_bsns:
         if rng.random() < rate:
-            yield generate_wia_aanvraag(rng, bsn)
+            yield generate_claim_application(rng, bsn)
 
 
 def to_kafka_envelope(a: WIAAanvraag) -> dict[str, Any]:

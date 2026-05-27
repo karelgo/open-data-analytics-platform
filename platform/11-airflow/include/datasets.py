@@ -1,7 +1,7 @@
-"""Airflow Dataset URI-conventies voor de UWV-pijplijn.
+"""Airflow Dataset URI-conventies voor de platform pipeline.
 
 Conventie:
-    bronze://uwv/<table>                 # bronze.uwv.<table>
+    bronze://demo/<table>                 # bronze.demo.<table>
     silver://<domain>/<entity>           # silver.<domain>.stg_<entity>
     gold://<usecase>/<table>             # gold.<usecase>.<table>
 

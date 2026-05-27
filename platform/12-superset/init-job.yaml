@@ -20,7 +20,7 @@ data:
       1. Wacht tot Superset webserver health-endpoint OK.
       2. Login als admin → CSRF + access token.
       3. Trino registreren als database (idempotent).
-      4. Datasets aanmaken voor gold.uc01_wia_funnel.* en gold.uc06_lastprognose.*.
+      4. Datasets aanmaken voor gold.uc01_claims_funnel.* en gold.uc06_cost_forecast.*.
     """
     import os
     import sys
@@ -278,14 +278,14 @@ data:
         # Datasets — gold.uc0x_*.mart_uc0x_* (UC-mart-tabellen voor BI).
         # Naam komt uit dbt-modellen in dbt/models/marts/uc0x_*.
         gold_targets = [
-            ("uc01_wia_funnel", "mart_uc01_wia_funnel_daily"),
-            ("uc04_tw_eligibility", "mart_uc04_tw_eligibility"),
-            ("uc05_client_360", "mart_uc05_client_360"),
-            ("uc06_lastprognose", "mart_uc06_uitkeringslast_5y"),
-            ("uc06_lastprognose", "mart_uc06_scenario_results"),
-            ("uc07_dq_polisadm", "mart_uc07_dq_dagrapport"),
-            ("uc11_klantreis", "mart_uc11_klantreis_events"),
-            ("uc11_klantreis", "mart_uc11_klantreis_phases"),
+            ("uc01_claims_funnel", "mart_uc01_claims_funnel_daily"),
+            ("uc04_eligibility_outreach", "mart_uc04_eligibility_outreach"),
+            ("uc05_customer_360", "mart_uc05_customer_360"),
+            ("uc06_cost_forecast", "mart_uc06_cost_5y"),
+            ("uc06_cost_forecast", "mart_uc06_scenario_results"),
+            ("uc07_dq_policies", "mart_uc07_dq_dagrapport"),
+            ("uc11_customer_journey", "mart_uc11_journey_events"),
+            ("uc11_customer_journey", "mart_uc11_journey_phases"),
             ("uc12_focus_finops", "mart_uc12_focus_spend_monthly"),
             ("uc12_focus_finops", "mart_uc12_focus_service_breakdown"),
             ("uc12_focus_finops", "mart_uc12_focus_commitment_utilization"),
@@ -426,23 +426,23 @@ data:
 
         # Hardcoded kolomlijst per UC-mart.
         DATASET_COLS = {
-            "mart_uc01_wia_funnel_daily": [
+            "mart_uc01_claims_funnel_daily": [
                 ("aanvraag_datum", "DATE", True),
                 ("regio_code", "VARCHAR", False), ("onderdeel", "VARCHAR", False),
                 ("status", "VARCHAR", False), ("n_aanvragen", "BIGINT", False),
                 ("gemid_ao_pct", "DOUBLE", False), ("n_in_behandeling", "BIGINT", False),
                 ("n_toegekend", "BIGINT", False), ("n_afgewezen", "BIGINT", False),
             ],
-            "mart_uc04_tw_eligibility": [
+            "mart_uc04_eligibility_outreach": [
                 ("bsn", "VARCHAR", False), ("inkomen_maand_eur", "DECIMAL", False),
                 ("norm_per_maand_eur", "INTEGER", False), ("gat_per_maand", "DECIMAL", False),
                 ("huishoud_type_aanname", "VARCHAR", False),
                 ("toelichting", "VARCHAR", False), ("opt_out", "BOOLEAN", False),
             ],
-            "mart_uc05_client_360": [
+            "mart_uc05_customer_360": [
                 ("bsn", "VARCHAR", False), ("voornaam", "VARCHAR", False),
                 ("achternaam", "VARCHAR", False), ("geslacht", "VARCHAR", False),
-                ("geboortedatum", "DATE", True), ("straat", "VARCHAR", False),
+                ("birth_date", "DATE", True), ("straat", "VARCHAR", False),
                 ("huisnummer", "INTEGER", False), ("postcode", "VARCHAR", False),
                 ("woonplaats", "VARCHAR", False),
                 ("n_dienstverbanden_lopend", "BIGINT", False),
@@ -450,7 +450,7 @@ data:
                 ("n_lopende_wia", "BIGINT", False), ("max_ao_pct", "INTEGER", False),
                 ("n_klantcontacten_30d", "BIGINT", False),
             ],
-            "mart_uc06_uitkeringslast_5y": [
+            "mart_uc06_cost_5y": [
                 ("jaar", "BIGINT", False), ("maand", "BIGINT", False),
                 ("wet", "VARCHAR", False), ("regio_code", "VARCHAR", False),
                 ("uitbetaald_bruto_eur_projection", "INTEGER", False),
@@ -480,7 +480,7 @@ data:
                 ("loon_jaar_lopend", "BIGINT", False),
                 ("huidige_status", "VARCHAR", False),
             ],
-            "mart_uc11_klantreis_events": [
+            "mart_uc11_journey_events": [
                 ("bsn", "VARCHAR", False),
                 ("event_seq", "BIGINT", False),
                 ("event_ts", "TIMESTAMP", True),
@@ -493,7 +493,7 @@ data:
                 ("numeric_value", "DOUBLE", False),
                 ("source_ref_id", "VARCHAR", False),
             ],
-            "mart_uc11_klantreis_phases": [
+            "mart_uc11_journey_phases": [
                 ("bsn", "VARCHAR", False),
                 ("fase_volgnr", "BIGINT", False),
                 ("fase", "VARCHAR", False),

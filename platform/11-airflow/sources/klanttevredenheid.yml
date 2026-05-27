@@ -1,4 +1,4 @@
-# Source registry — klanttevredenheid (CSV-upload demo).
+# Source registry — customer_satisfaction (CSV-upload demo).
 #
 # Afwijkend t.o.v. Kafka-bronnen:
 #   - geen `kafka:` blok (mode = csv_batch)
@@ -6,7 +6,7 @@
 #   - bronze-tabel krijgt native kolommen i.p.v. JSON-envelope
 schema_version: 1
 
-name: klanttevredenheid
+name: customer_satisfaction
 domain: klantcontact
 
 # Geen kafka-blok — deze bron komt via handmatige CSV-upload.
@@ -15,8 +15,8 @@ ingest:
   kind: csv
   staging:
     bucket: odap-staging
-    prefix: incoming/klanttevredenheid
-    processed_prefix: processed/klanttevredenheid
+    prefix: incoming/customer_satisfaction
+    processed_prefix: processed/customer_satisfaction
   csv:
     delimiter: ","
     has_header: true
@@ -33,14 +33,14 @@ ingest:
 
 bronze:
   catalog: bronze
-  schema: uwv
-  table: klanttevredenheid
+  schema: demo
+  table: customer_satisfaction
   partition_by: event_date
 
 silver:
   catalog: silver
-  schema: klantcontact
-  staging_model: stg_klanttevredenheid
+  schema: customer_interactions
+  staging_model: stg_customer_satisfaction
   dbt_tag: klantcontact
 
 governance:
@@ -58,5 +58,5 @@ sla:
   max_acceptable_lag_seconds: 86400      # 1 dag — bij CSV-upload niet relevant
   alert_threshold_seconds: 2592000       # 30 dagen — ruime drempel voor manuele bron
 
-used_by_use_cases: [uc_klant_tev]
+used_by_use_cases: [uc_customer_satisfaction]
 anchor: false

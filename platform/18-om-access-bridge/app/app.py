@@ -30,7 +30,7 @@ Event-shape (subset van OM's webhook payload):
         "resolution":  "approved" | "rejected",
         "assignees":   [{"name": "data.steward", ...}],
         "createdBy":   "claims.analyst",
-        "about":       "trino.gold.uc05_client_360.mart_uc05_client_360"
+        "about":       "trino.gold.uc05_customer_360.mart_uc05_customer_360"
       }
     }
 
@@ -66,7 +66,7 @@ LOG = logging.getLogger("om-access-bridge")
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 
 KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL", "http://keycloak.odap-auth.svc.cluster.local:80")
-KEYCLOAK_REALM = os.environ.get("KEYCLOAK_REALM", "uwv")
+KEYCLOAK_REALM = os.environ.get("KEYCLOAK_REALM", "demo")
 KEYCLOAK_CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID", "om-access-bridge")
 KEYCLOAK_CLIENT_SECRET = os.environ.get("KEYCLOAK_CLIENT_SECRET", "")
 OM_WEBHOOK_SECRET = os.environ.get("OM_WEBHOOK_SECRET", "")

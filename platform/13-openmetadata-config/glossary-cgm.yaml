@@ -1,4 +1,4 @@
-# CGM (Canoniek Gegevensmodel UWV) glossary voor OpenMetadata.
+# CGM (Canonical Data Model) glossary voor OpenMetadata.
 #
 # Termen uit referentiearchitectuur Bijlage B + use-case-secties.
 # Wordt via init-Job met POST /api/v1/glossaries en /api/v1/glossaryTerms toegepast.
@@ -12,9 +12,9 @@
 
 glossary:
   name: CGM
-  displayName: "Canoniek Gegevensmodel UWV"
+  displayName: "Canonical Data Model"
   description: |
-    Canoniek Gegevensmodel — UWV-breed conceptueel datamodel. Elke gold-tabel
+    Canoniek Gegevensmodel — enterprise-wide conceptual data model. Elke gold-tabel
     mapt 1-op-1 naar één of meer CGM-entiteiten; afwijking vereist explicit
     waiver van Data Office.
   reviewers:
@@ -27,11 +27,11 @@ terms:
   # Cliënt-domein
   - name: Client
     displayName: "Cliënt"
-    description: "Natuurlijke persoon waarvoor UWV een dienst uitvoert."
+    description: "Natuurlijke persoon waarvoor the platform performs a service."
     relatedTerms: [Aanvraag, Uitkering, Contact]
   - name: Persona
     displayName: "Persoon"
-    description: "Persoonsgegeven-deel van een Cliënt (NAW + geboortedatum)."
+    description: "Persoonsgegeven-deel van een Cliënt (NAW + birth_date)."
 
   # Aanvraag- en beoordelings-domein
   - name: Aanvraag
@@ -42,7 +42,7 @@ terms:
     description: "Inhoudelijke toetsing van een Aanvraag door beoordelaar."
   - name: Beoordelaar
     displayName: "Beoordelaar"
-    description: "UWV-medewerker die Beoordeling uitvoert (verzekeringsarts of arbeidsdeskundige)."
+    description: "Platform user performing the assessment (verzekeringsarts of arbeidsdeskundige)."
   - name: Capaciteit
     displayName: "Capaciteit"
     description: "Beschikbare uren per Beoordelaar (UC-08)."
@@ -99,13 +99,13 @@ terms:
     description: "Huishoudsamenstelling (uit BRP-spiegel) voor TW-toets."
   - name: Aggregaat
     displayName: "Aggregaat"
-    description: "Geanonimiseerde geaggregeerde uitkeringslast per wet × regio × periode (UC-06)."
+    description: "Geanonimiseerde geaggregeerde claim_cost per wet × regio × periode (UC-06)."
     dataOwner: finance.analyst
 
   # CRM
   - name: Contact
     displayName: "Klantcontact"
-    description: "Contactgebeurtenis tussen Cliënt en UWV (telefoon, balie, beeldbellen, mail)."
+    description: "Contactgebeurtenis between Client and the platform (telefoon, balie, beeldbellen, mail)."
     dataOwner: marketing.analyst
   - name: Kanaal
     displayName: "Kanaal"
@@ -122,7 +122,7 @@ terms:
     displayName: "Integrale Klantreis"
     description: |
       Cross-domein aggregaat: chronologische reeks van fase-overgangen van een
-      cliënt door UWV-wetten heen (werknemer → ziek → WIA → re-integratie → ...).
+      cliënt across applicable laws (werknemer → ziek → WIA → re-integratie → ...).
       Afgeleid uit events in IKV, WW, ZW, WIA, Wajong en Contact. Eigenaar is
       divisie_klantcontact; OPA filtert per rol op kolom + rij.
     relatedTerms: [Client, IKV, Aanvraag, Beoordeling, Uitkering, Contact, Traject, Werkhervatting]
@@ -134,7 +134,7 @@ terms:
     displayName: "Klantreis-fase"
     description: |
       Periode in de klantreis waarin de cliënt in een bepaalde status
-      verkeert (werknemer, ziek, ww_aanvraag, ww_uitkering, wia_in_behandeling,
+      verkeert (werknemer, ziek, service_request_application, ww_uitkering, wia_in_behandeling,
       wga, iva, wajong_actief, tussen_dienstverband).
     relatedTerms: [Klantreis]
   - name: EventStream

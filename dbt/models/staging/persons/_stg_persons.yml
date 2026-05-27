@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: stg_persons
+    description: |
+      Geconformeerde personen — getypte kolommen uit `bronze.persons.created.payload`.
+      BSN's zijn synthetisch (test-bereik 9XXXXXXXX), valideer met `bsn_valid`.
+    config:
+      tags: ["staging", "persons"]
+    meta:
+      domain: persoon
+      legal_basis: Wet_SUWI_art_56
+      doelbinding: ["primair_proces"]
+      bio_classificatie: vertrouwelijk
+      bewaartermijn_jaren: 7
+      eigenaar: data_office
+      pii_kolommen: [bsn, voornaam, achternaam, birth_date, straat, huisnummer, postcode]
+      risk_tier: laag
+
+    columns:
+      - name: bsn
+        description: "Test-BSN (9-prefix), 11-proef-valide."
+        tests:
+          - not_null
+          - unique
+          - bsn_valid
+      - name: voornaam
+        description: "Voornaam (Faker NL-locale)."
+      - name: achternaam
+        description: "Achternaam."
+      - name: geslacht
+        description: "M | V | X."
+        tests:
+          - accepted_values:
+              values: ["M", "V", "X"]
+      - name: birth_date
+        description: "Geboortedatum (date)."
+        tests:
+          - not_null
+      - name: postcode
+        description: "Postcode (synthetisch)."
+      - name: woonplaats
+        description: "Woonplaats."
+      - name: nationaliteit
+        description: "Nationaliteit-code (NL voor referentie)."

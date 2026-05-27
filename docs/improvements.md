@@ -26,7 +26,7 @@ voor opvolg-werk.
 
 | # | Item | Locatie | Prio | Effort |
 |---|---|---|---|---|
-| 1.1 | **4 mart-directories leeg**: UC-02, UC-03, UC-08, UC-10 (UC-09 is opgeleverd als `uc09_reint_effect`) | `dbt/models/marts/uc{02,03,08,10}*/` | 🟠 | M |
+| 1.1 | **4 mart-directories leeg**: UC-02, UC-03, UC-08, UC-10 (UC-09 is opgeleverd als `uc09_reintegration_effect`) | `dbt/models/marts/uc{02,03,08,10}*/` | 🟠 | M |
 | 1.2 | **`gdpr_request` DAG ontbreekt** ondanks referentie in [compliance-mapping R-AVG-10](compliance-mapping.md) — inzage- en wisrecht-flow. (Self-service *access-request* is sinds ADR-0008 wél aanwezig — andere R-AVG-10-aspect.) | `platform/11-airflow/dags/` | 🔴 | M |
 | 1.3 | **Geen NetworkPolicies** — pods kunnen vrij cross-namespace praten | `platform/00-namespaces/` | 🔴 | M |
 | 1.4 | **Geen HPA** — PDBs voor Stackable-producten (kafka/hive/zk/trino/nifi/airflow/superset) worden door de operators zelf gemaakt; resterende gap is HPA + PDBs voor niet-Stackable componenten | `platform/*/` | 🟠 | S |
@@ -37,7 +37,7 @@ voor opvolg-werk.
 | 1.9 | **Geen Grafana-dashboards UWV-specifiek** — alleen de defaults uit kube-prometheus-stack | `infrastructure/helm/prometheus-stack/` | 🟡 | M |
 | 1.10 | **Geen KafkaTopic CRDs** — `auto.create.topics=true` in dev | `platform/06-kafka/` | 🟠 | S |
 | 1.11 | **`pseudonymize.sql` macro nergens gebruikt** in de dbt-models | `dbt/models/` | 🟡 | S |
-| 1.12 | **UC-02 placeholder-mart absent** ondanks vermelding in [`docs/use-cases/uc02-wajong-ai.md`](use-cases/uc02-wajong-ai.md) | `dbt/models/marts/uc02_wajong/` | 🟡 | S |
+| 1.12 | **UC-02 placeholder-mart absent** ondanks vermelding in [`docs/use-cases/uc02-complex-cases-ai.md`](use-cases/uc02-complex-cases-ai.md) | `dbt/models/marts/uc02_complex_cases/` | 🟡 | S |
 | 1.13 | **`tests/integration/` is leeg** — alleen smoke + e2e | `tests/integration/` | 🟡 | M |
 | 1.14 | **`platform/13-openmetadata-config/ingestion-pipelines/` is leeg** — directory aangemaakt, geen content | — | 🟡 | S |
 | 1.15 | **Geen pre-commit hooks** ondanks vermelding in master-prompt §4 (`pre-commit-config.yaml`) | repo-root | 🟡 | S |
@@ -116,7 +116,7 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 2.7.1 | **Pseudonymize-macro daadwerkelijk gebruiken** — in `mart_uc09_*` (sandbox) en `silver.crm.*` waar PII niet primair-proces is | 🔴 | M |
+| 2.7.1 | **Pseudonymize-macro daadwerkelijk gebruiken** — in `mart_uc09_*` (sandbox) en `silver.customers.*` waar PII niet primair-proces is | 🔴 | M |
 | 2.7.2 | **Trino event-listener naar Kafka** voor query-history → audit-log naar OpenSearch | 🟠 | M |
 | 2.7.3 | **MinIO Object-Lock** voor immutable backups (R-BIO-23) | 🟠 | S |
 | 2.7.4 | **Sensitive Vault aparte encryption-key** — nu zelfde KMS/MinIO-credentials als bronze | 🔴 | L |
@@ -205,7 +205,7 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 6.1 | **DPIA template** in `docs/dpia/uc02-wajong.md` — nu enkel placeholder-link | 🔴 | M |
+| 6.1 | **DPIA template** in `docs/dpia/uc02-complex-cases.md` — nu enkel placeholder-link | 🔴 | M |
 | 6.2 | **IAMA template** in `docs/iama/` voor UC-02/UC-03 | 🔴 | M |
 | 6.3 | **`gdpr_request` DAG** — geautomatiseerde inzage/correctie/verwijdering per BSN | 🔴 | L |
 | 6.4 | **Bewaartermijn-DAG** — drop records ouder dan `meta.bewaartermijn_jaren` | 🔴 | M |

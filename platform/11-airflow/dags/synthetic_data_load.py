@@ -114,7 +114,7 @@ with DAG(
     schedule=None,
     start_date=datetime(2026, 5, 1),
     catchup=False,
-    tags=["seed", "uwv"],
+    tags=["seed", "demo"],
 ) as dag:
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")

@@ -33,7 +33,7 @@ het bestand of de setting".
 |---|---|---|---|
 | R-AVG-01 | Rechtsgrond per verwerking (art. 6/9) | 5, 9 | dbt `meta.legal_basis`; OPA-policy `trino-doelbinding.rego` |
 | R-AVG-02 | Verwerkingsregister (art. 30) | 8, 10 | OM Custom Properties op data products; export naar CSV |
-| R-AVG-03 | DPIA voor hoog risico | 0, 5 | `docs/use-cases/uc02-wajong-ai.md` placeholder; UC-04, UC-09 |
+| R-AVG-03 | DPIA voor hoog risico | 0, 5 | `docs/use-cases/uc02-complex-cases-ai.md` placeholder; UC-04, UC-09 |
 | R-AVG-04 | Verwerkersovereenkomsten | n/a | Buiten platform-scope (organisatorisch) |
 | R-AVG-05 | Dataminimalisatie (selectie als config) | 5, 9 | dbt-models projecteren expliciet; OPA column masks via `opa-policies-src/trino/trino-column-masks.rego` |
 | R-AVG-06 | Doelbinding per dataset | 5, 8, 9 | dbt `meta.doelbinding`; OM tag `Doelbinding.*`; **`opa-policies-src/trino/trino-doelbinding.rego` + `data/role_mappings.json::resource_purposes`** (tests dekken DoD: data_steward zonder purpose op `gold.uc05_*` → deny) |
@@ -61,7 +61,7 @@ het bestand of de setting".
 | R-BIO-08 | Service-accounts via secrets manager | 1, 2 | [Stackable secret-operator](../infrastructure/stackablectl/release.yaml) + cert-manager + [`platform/01-secrets/secretclasses.yaml`](../platform/01-secrets/secretclasses.yaml). Productie: External Secrets Operator + Vault. |
 | R-BIO-09 | Encryption at rest + TLS 1.2+ | 1, 2 | [MinIO TLS-config](../infrastructure/helm/minio/values.yaml); cert-manager `platform-issuer` voor alle `*.odap.local`; Stackable internal-mTLS via `tls-internal` SecretClass |
 | R-BIO-10 | Sleutelbeheer (HSM/KMS, BYOK) | n/a | Buiten scope dev-cluster (productie: KMS) |
-| R-BIO-11 | Column-/row-level security + masking | 9 | `opa-policies-src/trino/trino-row-filters.rego` (regio-filter WIA, opt-out UC-04, sandbox-pseudo) + `trino-column-masks.rego` (BSN/IBAN/bankrekening/diagnose/geboortedatum per rol). Tests in `*_test.rego` (23/23 PASS). Smoke `tests/smoke/08-opa-decisions.sh`. |
+| R-BIO-11 | Column-/row-level security + masking | 9 | `opa-policies-src/trino/trino-row-filters.rego` (regio-filter WIA, opt-out UC-04, sandbox-pseudo) + `trino-column-masks.rego` (BSN/IBAN/bankrekening/diagnose/birth_date per rol). Tests in `*_test.rego` (23/23 PASS). Smoke `tests/smoke/08-opa-decisions.sh`. |
 | R-BIO-12 | Verplichte dataclassificatie | 4, 8 | [`classifications.yaml`](../platform/13-openmetadata-config/classifications.yaml) (7 categorieën, ~50 tags); dbt-models hebben `meta.bio_classificatie` (publiek/intern/vertrouwelijk/geheim) |
 | R-BIO-13 | Netwerksegmentatie + zero-trust | 1, 2, 11 | Namespaces per zone + Pod-Security baseline + **[ResourceQuota + LimitRange](../platform/00-namespaces/resourcequota-limitrange.yaml)** per ns. NetworkPolicies (`TBD` productie). |
 | R-BIO-14 | Hardening + IaC + policy-as-code | 0, 1, 9 | Alle Stackable workloads via Helm/Kustomize; [OPA-bundle](../platform/10-opa/) voor data-laag policy-as-code |
@@ -98,8 +98,8 @@ het bestand of de setting".
 | R-GOV-01 | Eigenaarschap per data product | 5, 8 | Elk dbt-model heeft `meta.eigenaar` (zie 16 schema.yml in [`dbt/models/`](../dbt/models/)); OM service-owner per ingestion-pipeline |
 | R-GOV-02 | Catalog incl. classificatie/lineage/SLA | 8 | OM service-configs in [`platform/13-openmetadata-config/services/`](../platform/13-openmetadata-config/services/) + 7 classifications + CGM-glossary |
 | R-GOV-03 | OpenLineage end-to-end | 8 | [`om_ingest_trino.py`](../platform/11-airflow/dags/om_ingest_trino.py) (lineage uit query-history); [`om_ingest_dbt.py`](../platform/11-airflow/dags/om_ingest_dbt.py) (lineage uit dbt manifest); Superset + Airflow services in OM |
-| R-GOV-04 | Datakwaliteits-SLO's + tests | 5, 8 | dbt-tests in 16 schema.yml + 3 custom generic tests (`bsn_valid`, `iban_valid`, `lh_nummer_valid`) + 2 singular tests; OM Profiler op silver-schemas; [UC-07 dagrapport](../dbt/models/marts/uc07_dq_polisadm/) |
-| R-GOV-05 | Master data management | 5 | [Mart UC-05 client_360](../dbt/models/marts/uc05_client_360/mart_uc05_client_360.sql) joint per BSN; CGM-seeds (uitkering_typen / wet_codes / regio_codes) |
+| R-GOV-04 | Datakwaliteits-SLO's + tests | 5, 8 | dbt-tests in 16 schema.yml + 3 custom generic tests (`bsn_valid`, `iban_valid`, `lh_nummer_valid`) + 2 singular tests; OM Profiler op silver-schemas; [UC-07 dagrapport](../dbt/models/marts/uc07_dq_policies/) |
+| R-GOV-05 | Master data management | 5 | [Mart UC-05 client_360](../dbt/models/marts/uc05_customer_360/mart_uc05_customer_360.sql) joint per BSN; CGM-seeds (uitkering_typen / wet_codes / regio_codes) |
 | R-GOV-06 | Policy-as-code | 9 | OPA Rego bundle (5 policy-files + 4 test-files in `opa-policies-src/`); `make opa-test` (23/23 lokaal); `scripts/build-opa-bundle.sh` rendert ConfigMap; kustomize `configMapGenerator` met label `opa.stackable.tech/bundle: "true"` |
 | R-GOV-07 | Data contracts | 5 | dbt schema.yml + tests; expliciete `meta` |
 
@@ -114,8 +114,8 @@ het bestand of de setting".
 | R-FUN-05 | Compute/storage gescheiden | 0 | Stackable Trino (compute) + MinIO (storage) onafhankelijk schaalbaar; [ADR-0001](adr/0001-stackable-as-base.md) |
 | R-FUN-06 | Time travel / versionering | 4, 6 | Delta `VERSION AS OF` + [`lakehouse_maintenance.py`](../platform/11-airflow/dags/lakehouse_maintenance.py) format-aware OPTIMIZE/VACUUM |
 | R-FUN-07 | Self-service BI met semantische laag | 5, 7 | Superset + dbt-marts (16 datasets in [`dbt/models/marts/`](../dbt/models/marts/)) — semantische laag via dbt schema.yml `meta` |
-| R-FUN-08 | MLOps (registry, feature store, monitoring) | 5 (placeholder) | [UC-02 spec](use-cases/uc02-wajong-ai.md) — placeholder; volledig MLOps in aparte repo |
-| R-FUN-09 | Verklaarbaarheid + bias-toetsing | 5 (placeholder) | [UC-02 spec](use-cases/uc02-wajong-ai.md) (model-card + IAMA + bias-toets verplicht); [UC-03 spec](use-cases/uc03-ww-risk.md) (`test_no_protected_attributes_uc03`) |
+| R-FUN-08 | MLOps (registry, feature store, monitoring) | 5 (placeholder) | [UC-02 spec](use-cases/uc02-complex-cases-ai.md) — placeholder; volledig MLOps in aparte repo |
+| R-FUN-09 | Verklaarbaarheid + bias-toetsing | 5 (placeholder) | [UC-02 spec](use-cases/uc02-complex-cases-ai.md) (model-card + IAMA + bias-toets verplicht); [UC-03 spec](use-cases/uc03-fraud-risk.md) (`test_no_protected_attributes_uc03`) |
 | R-FUN-10 | AI Act-aansluiting | 8 | OM Classification [`AI.Risk-{Laag,Midden,Hoog,Verboden}`](../platform/13-openmetadata-config/classifications.yaml) + `AI.HumanInTheLoop` + `AI.Algoritmeregister-Geregistreerd` |
 | R-FUN-11 | API-management | 10 | [UC-10 spec](use-cases/uc10-gegevensdiensten.md); productie-gateway uitwerking in MyGegevensdiensten 2.0 (out-of-scope referentie) |
 | R-FUN-12 | Event-gedreven + schema registry + DLQ | 4, 11 | [KafkaCluster](../platform/06-kafka/kafkacluster.yaml) + **[declaratieve KafkaTopic-Job](../platform/06-kafka/kafkatopics-job.yaml)** met 14 topics (incl. `.dlq`-suffix per domein); `auto.create.topics.enable=false` |
@@ -139,5 +139,5 @@ het bestand of de setting".
 | R-COMP-01 | GRC-mapping actueel | 0–10 | Dit document — werkt-in-uitvoering, bijgewerkt per fase ([WORKLOG.md](../WORKLOG.md)) |
 | R-COMP-02 | Pentests / red-team | n/a | Organisatorisch (productie: ≥1×/jaar via externe partij) |
 | R-COMP-03 | Externe assurance (ISO/SOC2) | n/a | Organisatorisch — referentie levert technische bouwstenen |
-| R-COMP-04 | DPIA/ISMS/risico onderhoud | 0, 5 | DPIA-placeholders in [UC-02](use-cases/uc02-wajong-ai.md) + [UC-04](use-cases/uc04-proactieve-tw.md) + [UC-09](use-cases/uc09-reint-effect.md); dbt-models met `meta.dpia_required: true` |
+| R-COMP-04 | DPIA/ISMS/risico onderhoud | 0, 5 | DPIA-placeholders in [UC-02](use-cases/uc02-complex-cases-ai.md) + [UC-04](use-cases/uc04-proactieve-tw.md) + [UC-09](use-cases/uc09-reintegration-effect.md); dbt-models met `meta.dpia_required: true` |
 | R-COMP-05 | Toezichthouder-readiness | 10 | [`docs/runbook.md` § 10](runbook.md#10-compliance-evidence-verzamelen) — `make opa-test` + OM-classifications-export + dbt-test-resultaten als evidence-pakket |

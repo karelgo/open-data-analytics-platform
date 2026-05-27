@@ -19,7 +19,7 @@ metadata:
     odap.io/component: openmetadata-init
 data:
   init_openmetadata.py: |
-    """Bootstrap OpenMetadata met UWV-specifieke classifications + glossary.
+    """Bootstrap OpenMetadata met platform-specific classifications + glossary.
 
     Idempotent — bestaande items worden overgeslagen (200/409/422 → ok).
     """

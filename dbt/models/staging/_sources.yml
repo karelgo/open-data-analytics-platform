@@ -1,16 +1,16 @@
 version: 2
 
 # Bronze sources — geschreven door spark-jobs/streaming_files_to_lakehouse.py.
-# Eén tabel per stream-identifier (uwv.<domain>.<entity>); payload is raw JSON envelope.
+# Eén tabel per stream-identifier (<domain>.<entity>); payload is raw JSON envelope.
 #
 # De `silver`-source verderop is Fabric-only: bedoeld als input voor
-# int_klantreis_events wanneer dbt-fabricspark draait. Op Trino blijft int
+# int_customer_journey_events wanneer dbt-fabricspark draait. Op Trino blijft int
 # refereren naar stg_* views (JSON-extractie uit bronze).
 
 sources:
   - name: bronze
     database: bronze
-    schema: uwv
+    schema: demo
     description: |
       Raw JSONL envelopes uit s3a://odap-raw/<domain>/<entity>/. Per stream
       één Delta-tabel.
@@ -21,23 +21,23 @@ sources:
       bewaartermijn_jaren: 7
 
     tables:
-      - name: persona_created
-        description: "Synthetische personas (BSN, naam, geboortedatum, adres)."
-      - name: polisadm_ikv
+      - name: person_created
+        description: "Synthetische personas (BSN, naam, birth_date, adres)."
+      - name: policy_holders
         description: "Inkomstenverhoudingen — kerneenheid polisadministratie."
-      - name: ww_aanvraag
+      - name: service_request_application
         description: "WW-aanvragen incl. reden einde dienstverband."
-      - name: wia_aanvraag
-        description: "WIA-aanvragen + arbeidsongeschiktheidspercentage."
-      - name: wajong_dossier
+      - name: claim_application
+        description: "WIA-aanvragen + incapacity_percentage."
+      - name: eligibility_case
         description: "Wajong-dossiers (UC-02 placeholder; minimaal veld-niveau)."
-      - name: zw_melding
+      - name: incident_report
         description: "Ziektewet-meldingen."
-      - name: crm_contact
+      - name: customer_interaction
         description: "Klantcontact-events (kanaal, onderwerp)."
-      - name: fez_uitkeringslast
-        description: "Geaggregeerde uitkeringslast per wet × maand × regio."
-      - name: klanttevredenheid
+      - name: finance_expense
+        description: "Geaggregeerde claim_cost per wet × maand × regio."
+      - name: customer_satisfaction
         description: |
           Klanttevredenheid-meting (CSV-batch upload). Geen JSON-envelope —
           native kolommen (meting_datum, kanaal, doelgroep, score,
@@ -61,9 +61,9 @@ sources:
   # ─────────────────────────────────────────────────────────────────
   # Silver source — alleen voor Fabric (uc11 multi-platform demo).
   #
-  # Op Trino wordt deze source niet gerefereerd: int_klantreis_events
+  # Op Trino wordt deze source niet gerefereerd: int_customer_journey_events
   # gebruikt {{ ref('stg_*') }} (views op bronze met JSON-extractie).
-  # Op Fabric (target.type == 'fabricspark') schakelt int_klantreis_events
+  # Op Fabric (target.type == 'fabricspark') schakelt int_customer_journey_events
   # over op {{ source('silver', X) }} omdat het seed_bronze + silver
   # notebook al flat tabellen schrijft (geen JSON payload).
   #
@@ -81,25 +81,25 @@ sources:
     tables:
       - name: persona
         identifier: silver_persona
-        description: "Persoon-records (BSN, naam, geboorte, adres). Equivalent van stg_persona."
-      - name: polisadm_ikv
-        identifier: silver_polisadm_ikv
-        description: "Inkomstenverhoudingen. Equivalent van stg_polisadm_ikv."
-      - name: ww_aanvraag
-        identifier: silver_ww_aanvraag
-        description: "WW-aanvragen. Equivalent van stg_ww_aanvraag."
-      - name: zw_melding
-        identifier: silver_zw_melding
-        description: "Ziektewet-meldingen. Equivalent van stg_zw_melding."
-      - name: wia_aanvraag
-        identifier: silver_wia_aanvraag
-        description: "WIA-aanvragen. Equivalent van stg_wia_aanvraag."
-      - name: wajong_dossier
-        identifier: silver_wajong_dossier
-        description: "Wajong-dossiers. Equivalent van stg_wajong_dossier."
-      - name: crm_contact
-        identifier: silver_crm_contact
-        description: "Klantcontact-events. Equivalent van stg_crm_contact."
+        description: "Persoon-records (BSN, naam, geboorte, adres). Equivalent van stg_persons."
+      - name: policy_holders
+        identifier: silver_policy_holders
+        description: "Inkomstenverhoudingen. Equivalent van stg_policy_holders."
+      - name: service_request_application
+        identifier: silver_service_request_application
+        description: "WW-aanvragen. Equivalent van stg_service_request_application."
+      - name: incident_report
+        identifier: silver_incident_report
+        description: "Ziektewet-meldingen. Equivalent van stg_incident_report."
+      - name: claim_application
+        identifier: silver_claim_application
+        description: "WIA-aanvragen. Equivalent van stg_claim_application."
+      - name: eligibility_case
+        identifier: silver_eligibility_case
+        description: "Wajong-dossiers. Equivalent van stg_eligibility_case."
+      - name: customer_interaction
+        identifier: silver_customer_interaction
+        description: "Klantcontact-events. Equivalent van stg_customer_interaction."
 
   # ─────────────────────────────────────────────────────────────────
   # Silver source voor Databricks (Unity Catalog).
@@ -108,7 +108,7 @@ sources:
   # workspace → databricks.silver.<name>. Schema is dezelfde als de
   # `silver` source voor Fabric, alleen ander adres.
   #
-  # int_klantreis_events.sql schakelt naar deze source als target.type ==
+  # int_customer_journey_events.sql schakelt naar deze source als target.type ==
   # 'databricks' (zie macro klantreis_entity).
   # ─────────────────────────────────────────────────────────────────
   - name: silver_uc
@@ -121,16 +121,16 @@ sources:
 
     tables:
       - name: persona
-        description: "Persoon-records. Equivalent van stg_persona."
-      - name: polisadm_ikv
-        description: "Inkomstenverhoudingen. Equivalent van stg_polisadm_ikv."
-      - name: ww_aanvraag
-        description: "WW-aanvragen. Equivalent van stg_ww_aanvraag."
-      - name: zw_melding
-        description: "Ziektewet-meldingen. Equivalent van stg_zw_melding."
-      - name: wia_aanvraag
-        description: "WIA-aanvragen. Equivalent van stg_wia_aanvraag."
-      - name: wajong_dossier
-        description: "Wajong-dossiers. Equivalent van stg_wajong_dossier."
-      - name: crm_contact
-        description: "Klantcontact-events. Equivalent van stg_crm_contact."
+        description: "Persoon-records. Equivalent van stg_persons."
+      - name: policy_holders
+        description: "Inkomstenverhoudingen. Equivalent van stg_policy_holders."
+      - name: service_request_application
+        description: "WW-aanvragen. Equivalent van stg_service_request_application."
+      - name: incident_report
+        description: "Ziektewet-meldingen. Equivalent van stg_incident_report."
+      - name: claim_application
+        description: "WIA-aanvragen. Equivalent van stg_claim_application."
+      - name: eligibility_case
+        description: "Wajong-dossiers. Equivalent van stg_eligibility_case."
+      - name: customer_interaction
+        description: "Klantcontact-events. Equivalent van stg_customer_interaction."

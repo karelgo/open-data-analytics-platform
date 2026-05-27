@@ -9,7 +9,7 @@ OM zodra ze inloggen. Dat breekt:
 Dit script:
   1. Logt in op Keycloak admin-API met password-flow (kcadmin service-account
      uit Bitnami Keycloak chart).
-  2. Lijst alle users in realm `uwv` (paginated).
+  2. Lijst alle users in realm odap (paginated).
   3. POSTet elke user naar OM /api/v1/users (idempotent — 409 = bestaat al).
   4. PATCH /users/{id} update voor display-name/email wijzigingen.
 
@@ -40,7 +40,7 @@ OM_TOKEN = os.environ["OM_JWT_TOKEN"]
 KC_URL = os.environ.get(
     "KEYCLOAK_URL", "http://keycloak.odap-auth.svc.cluster.local"
 ).rstrip("/")
-KC_REALM = os.environ.get("KEYCLOAK_REALM", "uwv")
+KC_REALM = os.environ.get("KEYCLOAK_REALM", "demo")
 KC_CLIENT = os.environ.get("KEYCLOAK_CLIENT_ID", "admin-cli")
 KC_USER = os.environ["KEYCLOAK_ADMIN_USER"]
 KC_PASS = os.environ["KEYCLOAK_ADMIN_PW"]

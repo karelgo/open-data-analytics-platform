@@ -60,7 +60,7 @@ platform om:
 
 ### 3.3 Welke kolommen?
 
-In `bronze.uwv.*`: alles ruw — inclusief BSN, naam, IBAN. Wees uiterst
+In `bronze.*`: alles ruw — inclusief BSN, naam, IBAN. Wees uiterst
 zuinig: **kijk niet meer dan nodig**.
 
 ---
@@ -75,7 +75,7 @@ zuinig: **kijk niet meer dan nodig**.
 2. **NiFi-flow**: kopieer template `nifi-flows/templates/delta/source-xyz/` aan, pas processors aan.
 3. **Kafka-topic**: definieer `uwv.xyz.event` in `platform/06-kafka/topics.yaml`.
 4. **Spark-job**: voeg `streaming-bronze-xyz.yaml` toe; gebruik helper `lakehouse_io.write_delta()`.
-5. **Schema in HMS**: `CREATE TABLE bronze.uwv.xyz_events (...) USING DELTA LOCATION 's3a://odap-bronze/xyz/'`.
+5. **Schema in HMS**: `CREATE TABLE bronze.demo.xyz_events (...) USING DELTA LOCATION 's3a://odap-bronze/xyz/'`.
 6. **dbt-stg**: `dbt/models/staging/stg_xyz.sql` met basisvalidatie.
 7. **OPA-update**: voeg purpose toe in `data/role_mappings.json::resource_purposes`.
 8. **OpenMetadata**: voeg service-config toe (auto-discovery).
@@ -171,7 +171,7 @@ ruwe IBAN binnenkomt vanuit bronze.
    ```sql
    -- TICKET-1234
    SELECT iban, COUNT(*)
-   FROM   bronze.uwv.wia_aanvraag_raw
+   FROM   bronze.claims.application_raw
    WHERE  ingest_dag = CURRENT_DATE
    GROUP  BY iban
    LIMIT  20;

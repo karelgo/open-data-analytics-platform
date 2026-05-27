@@ -11,7 +11,7 @@ from ._common import envelope, make_rng
 
 @dataclass
 class ZWMelding:
-    melding_id: str
+    incident_id: str
     bsn: str
     eerste_ziektedag: str
     duur_dagen: int
@@ -20,14 +20,14 @@ class ZWMelding:
         return asdict(self)
 
 
-def generate_zw_meldingen(
+def generate_incident_reporten(
     persona_bsns: list[str], rate: float = 0.2, seed: int | None = None
 ) -> Iterator[ZWMelding]:
     rng = make_rng(seed)
     for bsn in persona_bsns:
         if rng.random() < rate:
             yield ZWMelding(
-                melding_id=f"ZW-{rng.randint(10**8, 10**9 - 1)}",
+                incident_id=f"ZW-{rng.randint(10**8, 10**9 - 1)}",
                 bsn=bsn,
                 eerste_ziektedag=f"2025-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
                 duur_dagen=rng.randint(1, 730),

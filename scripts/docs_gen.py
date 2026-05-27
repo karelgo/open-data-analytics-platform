@@ -652,7 +652,7 @@ sequenceDiagram
 
 ## Identity provider — Keycloak
 
-- **Realm:** `uwv` in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
+- **Realm:** `odap` in [`infrastructure/helm/keycloak/realm.json`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/infrastructure/helm/keycloak/realm.json)
 - **Mock-rollen** in deze referentie:
     - Business: `claims_analyst`, `fraud_analyst`, `claims_analyst`,
       `marketing_analyst`, `finance_analyst`, `operations_manager`, `marketing_analyst`,
@@ -683,7 +683,7 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 | `trino-doelbinding.rego` | Doelbinding (purpose) afdwingen op gold-tabellen |
 | `trino-row-filters.rego` | Rij-filters per rol (bijv. Fraud Analyst ziet alleen WW-claims) |
 | `trino-column-masks.rego` | Kolom-maskering (PII, gezondheid → hash of `***`) |
-| `trino-platform-roles.rego` | UWV-rol-definities (single source) |
+| `trino-platform-roles.rego` | Role-definities (single source) |
 
 Build van de bundle: `scripts/build-opa-bundle.sh`, geïntegreerd in
 `make deploy-platform`.
@@ -786,9 +786,9 @@ en logs een stuk eenvoudiger. Alle componenten houden zich hieraan.
 
 | Pattern | Voorbeelden |
 |---|---|
-| `bronze.uwv.<entity>` | `bronze.uwv.wia_aanvraag`, `bronze.uwv.ww_uitkering` |
-| `silver.<domain>.<entity>` | `silver.wia.aanvraag_pseudo`, `silver.crm.contact` |
-| `gold.<uc_id>.<artifact>` | `gold.uc01_wia_funnel.daily_kpi`, `gold.uc05_client_360.profile` |
+| `bronze.demo.<entity>` | `bronze.claims.application`, `bronze.demo.ww_uitkering` |
+| `silver.<domain>.<entity>` | `silver.claims.application_pseudo`, `silver.customers.interaction` |
+| `gold.<uc_id>.<artifact>` | `gold.uc01_claims_funnel.daily_kpi`, `gold.uc05_customer_360.profile` |
 | `sensitive.<domain>.<entity>` | `sensitive.medisch.diagnose` |
 
 Domein-codes: `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`, `smz`.
@@ -801,9 +801,9 @@ Domein-codes: `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`, `smz`.
 
 Voorbeelden:
 
-- `stg_wia_aanvraag.sql` — staging-laag
+- `stg_claim_application.sql` — staging-laag
 - `int_wia_funnel_daily.sql` — intermediate
-- `mart_uc01_wia_funnel_daily.sql` — mart (gold)
+- `mart_uc01_claims_funnel_daily.sql` — mart (gold)
 
 ## Kafka-topics
 
@@ -813,7 +813,7 @@ uwv.<domain>.<event>
 
 Voorbeelden:
 
-- `uwv.wia.aanvraag`
+- `claims.application`
 - `uwv.wia.beoordeling`
 - `uwv.ww.uitkering`
 
@@ -960,22 +960,22 @@ Definition-of-Done-anchors.
 
 | ID | Titel | Status | Domein | AI-Act |
 |---|---|---|---|---|
-| [UC-01](uc01-wia-funnel.md) | WIA-funnel-dashboard (DoD-anchor) | Mart aanwezig | AG/WIA | Laag |
-| [UC-02](uc02-wajong-ai.md) | Wajong AI-ondersteuning (hoog-risico) | Placeholder | AG/Wajong | **Hoog** |
-| [UC-03](uc03-ww-risk.md) | WW-risico-screening (verboden-grens) | Placeholder + guard-test | WW | Verboden-grens |
+| [UC-01](uc01-claims-funnel.md) | WIA-funnel-dashboard (DoD-anchor) | Mart aanwezig | AG/WIA | Laag |
+| [UC-02](uc02-complex-cases-ai.md) | Wajong AI-ondersteuning (hoog-risico) | Placeholder | AG/Wajong | **Hoog** |
+| [UC-03](uc03-fraud-risk.md) | WW-risico-screening (verboden-grens) | Placeholder + guard-test | WW | Verboden-grens |
 | [UC-04](uc04-proactieve-tw.md) | Proactieve TW-eligibility | Mart aanwezig | TW | Beperkt |
-| [UC-05](uc05-client-360.md) | Klant-360 (gepseudonimiseerd) | Mart aanwezig | CRM | Laag |
+| [UC-05](uc05-customer-360.md) | Klant-360 (gepseudonimiseerd) | Mart aanwezig | CRM | Laag |
 | [UC-06](uc06-schadelast.md) | Schadelast-prognose 5 jaar | Mart aanwezig | FEZ | Laag |
-| [UC-07](uc07-dq-polisadm.md) | DQ-dagrapport polisadministratie | Mart aanwezig | Polisadm | n.v.t. |
-| [UC-08](uc08-smz-planning.md) | SMZ-capaciteitsplanning | Placeholder | SMZ | Beperkt |
-| [UC-09](uc09-reint-effect.md) | Re-integratie-effectmeting | Mart aanwezig | Re-integratie | Beperkt |
+| [UC-07](uc07-dq-policies.md) | DQ-dagrapport polisadministratie | Mart aanwezig | Polisadm | n.v.t. |
+| [UC-08](uc08-capacity-planning-planning.md) | SMZ-capaciteitsplanning | Placeholder | SMZ | Beperkt |
+| [UC-09](uc09-reintegration-effect.md) | Re-integratie-effectmeting | Mart aanwezig | Re-integratie | Beperkt |
 | [UC-10](uc10-gegevensdiensten.md) | Gegevensdiensten-API | Placeholder | Cross-domein | n.v.t. |
-| [UC-11](uc11-klantreis.md) | Integrale Klantreis (event-stream + fasen) | Mart aanwezig · [walkthrough](uc11-klantreis-walkthrough.md) | Cross-domein | Beperkt |
+| [UC-11](uc11-customer-journey.md) | Integrale Klantreis (event-stream + fasen) | Mart aanwezig · [walkthrough](uc11-customer-journey-walkthrough.md) | Cross-domein | Beperkt |
 
 ## UC-11 — speciale walkthrough
 
 UC-11 heeft een aparte **demo-walkthrough** in
-[uc11-klantreis-walkthrough](uc11-klantreis-walkthrough.md) —
+[uc11-customer-journey-walkthrough](uc11-customer-journey-walkthrough.md) —
 stap-voor-stap rondleiding door alle platform-onderdelen, met directe
 links naar de live UI's (portal, dbt-docs, OpenMetadata, Trino, Airflow,
 Superset). Handig als presentatie-script of als onboarding-tour.

@@ -11,7 +11,7 @@ Python-package met synthetische data-generators voor het UWV-referentie-platform
 
 | Module | Inhoud |
 |---|---|
-| `generators.persona` | Persoon (BSN+11-proef, naam, geboortedatum, adres, geslacht). |
+| `generators.persona` | Persoon (BSN+11-proef, naam, birth_date, adres, geslacht). |
 | `generators.polisadministratie` | IKV's per persoon, dienstverbanden, lonen (placeholder, fase 5). |
 | `generators.ww` | WW-aanvragen (placeholder, fase 5). |
 | `generators.wia` | WIA-aanvragen + beoordelingen (placeholder, fase 5). |

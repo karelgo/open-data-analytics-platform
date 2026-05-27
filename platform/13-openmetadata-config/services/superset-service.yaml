@@ -21,7 +21,7 @@ source:
       dashboardFilterPattern:
         includes: [".*"]
       # Resolve Superset-datasets → echte Trino-tabellen zodat charts in OM
-      # lineage krijgen naar `gold.uc11_klantreis.*` (en andere UC-marts).
+      # lineage krijgen naar `gold.uc11_customer_journey.*` (en andere UC-marts).
       # In OM 1.5+ is dit een GENEST veld onder `lineageInformation` — niet
       # direct onder `config` (anders: "Extra parameter 'dbServiceNames'").
       lineageInformation:

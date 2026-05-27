@@ -13,7 +13,7 @@ data:
   # to :80 — :8080 would hit the headless metrics Service instead and
   # times out on the admin REST API. See bug surfaced in E2E test 2026-05-25.
   KEYCLOAK_URL: "http://keycloak.odap-auth.svc.cluster.local:80"
-  KEYCLOAK_REALM: "uwv"
+  KEYCLOAK_REALM: "demo"
   KEYCLOAK_CLIENT_ID: "om-access-bridge"
   REPLAY_WINDOW_SECONDS: "300"
   LOG_LEVEL: "INFO"

@@ -5,19 +5,19 @@ name: wia
 domain: wia
 
 stream:
-  name: uwv.wia.aanvraag
+  name: claims.application
   key: bsn
 
 bronze:
   catalog: bronze
-  schema: uwv
-  table: wia_aanvraag
+  schema: demo
+  table: claim_application
   partition_by: event_date
 
 silver:
   catalog: silver
-  schema: wia
-  staging_model: stg_wia_aanvraag
+  schema: claims
+  staging_model: stg_claim_application
   dbt_tag: wia
 
 governance:

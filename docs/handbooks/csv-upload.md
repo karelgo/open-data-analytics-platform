@@ -2,7 +2,7 @@
 
 Er zijn twee paden naast elkaar: een generieke **any-file → Delta** flow voor
 ad-hoc + sandbox uploads (portal), en het oorspronkelijke **structured
-csv_batch** pad voor bronnen met een vaste schema-spec (klanttevredenheid,
+csv_batch** pad voor bronnen met een vaste schema-spec (customer_satisfaction,
 FOCUS billing). Beide schrijven uiteindelijk Delta in bronze; het verschil zit
 in de schema-validatie en de downstream-keten.
 
@@ -56,14 +56,14 @@ gebruiker  ─▶ POST /api/auth/token              (oauth2-proxy access-token)
 - Geen automatische silver/gold-trigger; daarvoor moet je een dbt-model toevoegen
   dat naar deze tabel verwijst.
 - Default target_catalog = `bronze`, target_schema = `sandbox` — zorgt dat je
-  curated `bronze.uwv.*` data niet vervuilt.
+  curated `bronze.*` data niet vervuilt.
 
 ---
 
 ## Pad B — Structured csv_batch (mc CLI of klassieke flow)
 
 Oorspronkelijk pad voor bronnen met vaste schema-spec en silver/gold-keten.
-Gebruikt de `klanttevredenheid`-bron als demo; pattern is generiek voor elke
+Gebruikt de `customer_satisfaction`-bron als demo; pattern is generiek voor elke
 bron met `sla.mode: csv_batch` in [`platform/11-airflow/sources/`](../../platform/11-airflow/sources/).
 
 **Wanneer kies je dit?**
@@ -117,7 +117,7 @@ Een nieuwe CSV-bron vereist één YAML in
 - `ingest:` blok met staging-bucket en CSV-schema
 - géén `kafka:` blok
 
-Voorbeeld: [`klanttevredenheid.yml`](../../platform/11-airflow/sources/klanttevredenheid.yml).
+Voorbeeld: [`customer_satisfaction.yml`](../../platform/11-airflow/sources/customer_satisfaction.yml).
 
 Na een wijziging:
 
@@ -144,7 +144,7 @@ Vereist een `odap-platform` alias in `~/.mc/config.json`:
 
 ```bash
 mc cp ./mijn-meting.csv \
-  odap/odap-staging/incoming/klanttevredenheid/$(date -u +%Y%m%dT%H%M%S).csv
+  odap/odap-staging/incoming/customer_satisfaction/$(date -u +%Y%m%dT%H%M%S).csv
 ```
 
 ### Optie C — Portal (generic flow)
@@ -152,7 +152,7 @@ mc cp ./mijn-meting.csv \
 Open [/csv-upload](https://platform.odap.local:8443/csv-upload/) — deze
 pagina is sinds 2026-05 generiek (zie **Pad A** boven). Het accepteert elk
 bestandstype, maar **schrijft naar `odap-staging/uploads/<email>/<ts>/`**, niet
-naar `incoming/<bron>/`. Voor `csv_batch`-bronnen (klanttevredenheid, FOCUS)
+naar `incoming/<bron>/`. Voor `csv_batch`-bronnen (customer_satisfaction, FOCUS)
 upload je naar `incoming/<bron>/` via optie A of B en trigger je daarna de
 ingest-DAG handmatig (zie Stap 3).
 
@@ -161,11 +161,11 @@ ingest-DAG handmatig (zie Stap 3).
 ## Stap 3 — Airflow-DAG triggeren
 
 1. Open [Airflow](https://airflow.odap.local:8443).
-2. Zoek de DAG `ingest_csv_<bron>` (bv. `ingest_csv_klanttevredenheid`).
+2. Zoek de DAG `ingest_csv_<bron>` (bv. `ingest_csv_customer_satisfaction`).
 3. Klik **Trigger DAG w/ config** en geef:
 
    ```json
-   {"object_key": "incoming/klanttevredenheid/2026-05-01.csv"}
+   {"object_key": "incoming/customer_satisfaction/2026-05-01.csv"}
    ```
 
 4. De DAG heeft één task `csv_to_bronze` die ~30–60s duurt:
@@ -193,14 +193,14 @@ mogelijk is. Bij succes verplaatst de loader 'm naar
 ```sql
 -- In Trino (smoketest of via OIDC):
 SELECT count(*), max(ingestion_ts)
-FROM bronze.uwv.klanttevredenheid;
+FROM bronze.customer_satisfaction.score;
 
 -- Silver (auto getriggerd):
-SELECT * FROM silver.klantcontact.stg_klanttevredenheid LIMIT 10;
+SELECT * FROM silver.klantcontact.stg_customer_satisfaction LIMIT 10;
 
 -- Gold (auto getriggerd):
 SELECT *
-FROM gold.uc_klant_tev.mart_uc_klant_tev_kanaal_maand
+FROM gold.uc_customer_satisfaction.mart_uc_customer_satisfaction_kanaal_maand
 ORDER BY maand DESC, kanaal;
 ```
 

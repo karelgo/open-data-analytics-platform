@@ -6,7 +6,7 @@ package trino
 # Trino verwacht: data.trino.rowFilters → [ { "expression": "..." }, ... ]
 #
 # Implementaties:
-#   - Claims Analyst in `silver.wia.*` of `gold.uc01_wia_funnel.*`:
+#   - Claims Analyst in `silver.claims.*` of `gold.uc01_claims_funnel.*`:
 #       regio_code = '<eigen regio uit extraCredentials.regio>'
 #   - UC-04 mart: opt_out = false  (verberg cliënten die zich hebben afgemeld)
 
@@ -16,7 +16,7 @@ import rego.v1
 rowFilters := [{"expression": expr}] if {
 	some r in user_roles
 	r == "claims_analyst"
-	resource_schema in {"wia", "uc01_wia_funnel"}
+	resource_schema in {"claims", "uc01_claims_funnel"}
 	regio := lower(input.context.identity.extraCredentials.regio)
 	regio != ""
 
@@ -27,7 +27,7 @@ rowFilters := [{"expression": expr}] if {
 
 # UC-04 opt-out filter — verbergt opt-out cliënten voor de werklijst.
 rowFilters := [{"expression": "opt_out = false"}] if {
-	resource_schema == "uc04_tw_eligibility"
+	resource_schema == "uc04_eligibility_outreach"
 }
 
 # Sandbox UC-09: alleen records met pseudo-IDs (defensief; in productie
@@ -42,7 +42,7 @@ rowFilters := [{"expression": "bsn_pseudo IS NOT NULL"}] if {
 rowFilters := [{"expression": expr}] if {
 	some r in user_roles
 	r == "claims_analyst"
-	resource_schema == "uc11_klantreis"
+	resource_schema == "uc11_customer_journey"
 	regio := lower(input.context.identity.extraCredentials.regio)
 	regio != ""
 	regex.match("^[a-z]{3}$", regio)
@@ -54,6 +54,6 @@ rowFilters := [{"expression": expr}] if {
 rowFilters := [{"expression": expr}] if {
 	some r in user_roles
 	r == "fraud_analyst"
-	resource_schema == "uc11_klantreis"
-	expr := "NOT (domein = 'wia' AND event_status IN ('TOEGEKEND_WGA', 'TOEGEKEND_IVA'))"
+	resource_schema == "uc11_customer_journey"
+	expr := "NOT (domein = 'claims' AND event_status IN ('TOEGEKEND_WGA', 'TOEGEKEND_IVA'))"
 }

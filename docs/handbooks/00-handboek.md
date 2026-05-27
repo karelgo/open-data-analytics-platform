@@ -70,10 +70,10 @@ rollen achter elkaar:
 | Term | Uitleg |
 |---|---|
 | **Catalog** | Trino-namespace die overeenkomt met een datazone: `bronze`, `silver`, `gold`, `sensitive`, `sandbox`. |
-| **Schema** | Domein binnen een catalog, bv. `silver.wia` of `gold.uc01_wia_funnel`. |
+| **Schema** | Domein binnen een catalog, bv. `silver.wia` of `gold.uc01_claims_funnel`. |
 | **OPA** | Open Policy Agent — bepaalt bij elke query wie wat mag zien. |
 | **Doelbinding** | De wettelijke taak waarvoor data verwerkt mag worden. Toegang vereist een geldig doel. |
-| **PII** | Persoonlijk Identificeerbare Informatie (BSN, naam, geboortedatum, adres). |
+| **PII** | Persoonlijk Identificeerbare Informatie (BSN, naam, birth_date, adres). |
 | **Pseudonimisering** | Vervangen van BSN door een hash + zout — niet herleidbaar zonder sleutel. |
 | **Sensitive Vault** | Aparte catalog voor bijzondere persoonsgegevens (art. 9 AVG). |
 | **Mart** | Eindproduct van dbt: een tabel/view klaar voor consumptie in `gold.*`. |
@@ -174,20 +174,20 @@ configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Passwo
 | Catalog | Schema | Wat zit erin? | Zie jij het? |
 |---|---|---|---|
 | `silver` | `wia` | Geconformeerde WIA-aanvragen, beoordelingen, status-historie | **Ja** (jouw regio) |
-| `gold` | `uc01_wia_funnel` | Sturingsmart: voorraad, doorlooptijden, voorspelling | **Ja** |
+| `gold` | `uc01_claims_funnel` | Sturingsmart: voorraad, doorlooptijden, voorspelling | **Ja** |
 | `silver` | `ww`, `wajong`, `crm`, ... | Andere domeinen | **Nee** |
 | `sensitive` | `wajong.*` | Sociaal-medisch dossier Wajong | **Nee** |
 | `bronze` | alles | Ruwe brondata | **Nee** |
 
 ### 3.2 Welke kolommen zie je?
 
-Voor `silver.wia.aanvraag` en `gold.uc01_wia_funnel.*`:
+Voor `silver.claims.application` en `gold.uc01_claims_funnel.*`:
 
 | Kolom | Wat zie je? | Waarom? |
 |---|---|---|
 | `bsn` | **Volledig** | Je hebt PII-doel "uitkering/behandeling/reintegratie" |
 | `voornaam`, `achternaam` | Volledig | Idem |
-| `geboortedatum` | Volledig | Idem |
+| `birth_date` | Volledig | Idem |
 | `straat`, `huisnummer` | Volledig | Idem |
 | `iban`, `bankrekening` | **GEMASKEERD** (bv. `NL**********1234`) | Jij beoordeelt geen betalingen — die staat bij FEZ |
 | `diagnose`, `icd10` | Volledig (alleen voor je eigen regio) | Medisch noodzakelijk voor WIA-beoordeling |
@@ -199,8 +199,8 @@ Voor `silver.wia.aanvraag` en `gold.uc01_wia_funnel.*`:
 
 ### 3.3 Wat zie je echt **niet**?
 
-- WW-data (`silver.ww.*`) — andere doelbinding (handhaving, niet WIA)
-- Wajong sensitive (`sensitive.wajong.*`) — alleen Claims Analystn
+- WW-data (`silver.service_requests.*`) — andere doelbinding (handhaving, niet WIA)
+- Wajong sensitive (`sensitive.eligibility_cases.*`) — alleen Claims Analystn
 - Bankrekening- en IBAN-velden onmasked — niet nodig voor WIA-beoordeling
 - Bronze-laag (`bronze.*`) — alleen voor data-engineers met JIT-toegang
 - Andere regio's dan die jou zijn toegewezen
@@ -236,12 +236,12 @@ SELECT
   bsn,
   voornaam,
   achternaam,
-  geboortedatum,
+  birth_date,
   aanvraag_datum,
   status,
   diagnose,
   regio
-FROM silver.wia.aanvraag
+FROM silver.claims.application
 WHERE bsn = '999000123';
 ```
 
@@ -258,7 +258,7 @@ SELECT
   team,
   AVG(doorlooptijd_dagen) AS gem_doorlooptijd,
   COUNT(*)               AS aantal_aanvragen
-FROM gold.uc01_wia_funnel.afgehandeld
+FROM gold.uc01_claims_funnel.afgehandeld
 WHERE afhandel_datum >= DATE '2026-04-01'
 GROUP BY team
 ORDER BY gem_doorlooptijd DESC;
@@ -284,7 +284,7 @@ ORDER BY gem_doorlooptijd DESC;
 **Scenario.** Wat is precies "datum_aanvraag" versus "datum_eerste_dag"? Welke is leidend?
 
 1. Open https://openmetadata.odap.local:8443
-2. Zoek op `mart_uc01_wia_funnel_daily` of op kolomnaam
+2. Zoek op `mart_uc01_claims_funnel_daily` of op kolomnaam
 3. Bij elke kolom zie je: **definitie**, **eigenaar** (data-steward), **bron-tabel**,
    **bewaartermijn**, **classificatie**
 4. Klik **Lineage** om de keten van bron → mart te zien
@@ -295,17 +295,17 @@ ORDER BY gem_doorlooptijd DESC;
 
 ```sql
 -- Aantal aanvragen per status, jouw regio's automatisch
-SELECT status, COUNT(*) FROM silver.wia.aanvraag GROUP BY status;
+SELECT status, COUNT(*) FROM silver.claims.application GROUP BY status;
 
 -- Dossiers > 8 weken open
 SELECT bsn, aanvraag_datum, status
-FROM   silver.wia.aanvraag
+FROM   silver.claims.application
 WHERE  status = 'open'
   AND  aanvraag_datum < CURRENT_DATE - INTERVAL '56' DAY;
 
 -- Top-10 ICD-10 categorieën
 SELECT icd10, COUNT(*) AS n
-FROM   silver.wia.beoordeling
+FROM   silver.claims.beoordeling
 GROUP  BY icd10
 ORDER  BY n DESC LIMIT 10;
 ```
@@ -318,11 +318,11 @@ ORDER  BY n DESC LIMIT 10;
 
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
-| `Access Denied: cannot select from gold.uc02_wajong.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Claims Analyst |
+| `Access Denied: cannot select from gold.uc02_complex_cases.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Claims Analyst |
 | `Access Denied: regio = 'Zuid' niet toegestaan` | Je rij-filter blokkeert dit, BSN valt buiten je regio | Vraag een collega in de juiste regio |
 | `Access Denied: column 'iban' is masked` | Je probeert IBAN onmasked te zien — niet voor WIA | Leef met de mask, of vraag FEZ |
 | `Authentication failed: token expired` | OIDC-token is verlopen | Log opnieuw in via Keycloak |
-| `Error: schema 'wia' not found` | Trino-catalog niet bereikbaar | Vraag platform-admin (zie 6.3) |
+| `Error: schema 'claims' not found` | Trino-catalog niet bereikbaar | Vraag platform-admin (zie 6.3) |
 
 ### 6.2 Wat doe je bij een vermoede inbreuk?
 
@@ -430,24 +430,24 @@ goede gewoonte is een korte notitie in je eigen onderzoeksysteem.
 | Catalog | Schema | Wat zit erin? | Zie jij het? |
 |---|---|---|---|
 | `silver` | `ww` | WW-aanvragen, betalingen, status-historie | **Ja** |
-| `gold` | `uc03_ww_risk` | Risico-indicatoren per dossier | **Ja** |
+| `gold` | `uc03_fraud_risk` | Risico-indicatoren per dossier | **Ja** |
 | `silver` | `wia`, `wajong`, `crm` | Andere domeinen | **Nee** |
 | `sensitive` | `wajong.*` | Bijzondere persoonsgegevens | **Nee** |
 
 ### 3.2 Welke kolommen zie je?
 
-Voor `silver.ww.*` en `gold.uc03_ww_risk.*`:
+Voor `silver.service_requests.*` en `gold.uc03_fraud_risk.*`:
 
 | Kolom | Wat zie je? | Bijzonderheid |
 |---|---|---|
-| `bsn`, naam, geboortedatum, adres | **Volledig** | Doel "handhaving" |
+| `bsn`, naam, birth_date, adres | **Volledig** | Doel "handhaving" |
 | `iban`, `bankrekening` | **Volledig** | Uniek voor jouw rol — anderen zien `NL**********1234` |
 | `diagnose`, `icd10` | **Niet** (kolom-mask returnt NULL) | Medisch is niet jouw doel |
 | `regio` | Geen filter — landelijk | Handhaving is niet regio-gebonden |
 
 ### 3.3 Voorbeeld — onderscheid met andere rollen
 
-Op `silver.persoon.persoon` zien:
+Op `silver.persons.persoon` zien:
 
 | Veld | jij (`fraud_analyst`) | `marketing_analyst` | `finance_analyst` |
 |---|---|---|---|
@@ -482,9 +482,9 @@ SELECT
   b.betaal_datum,
   r.score,
   r.top_drivers
-FROM silver.ww.aanvraag a
-LEFT JOIN silver.ww.betaling b USING (bsn)
-LEFT JOIN gold.uc03_ww_risk.score r USING (bsn)
+FROM silver.service_requests.application a
+LEFT JOIN silver.service_requests.betaling b USING (bsn)
+LEFT JOIN gold.uc03_fraud_risk.score r USING (bsn)
 WHERE a.bsn = '999000456'
 ORDER BY b.betaal_datum DESC;
 ```
@@ -497,7 +497,7 @@ SELECT
   COUNT(*)               AS aantal_open,
   AVG(score)             AS gem_score,
   MIN(aanmaak_datum)     AS oudste_signaal
-FROM gold.uc03_ww_risk.actuele_signalen
+FROM gold.uc03_fraud_risk.actuele_signalen
 WHERE status = 'in_onderzoek'
 GROUP BY team_handhaver
 ORDER BY aantal_open DESC;
@@ -523,7 +523,7 @@ SELECT
   date_trunc('week', score_datum) AS week,
   AVG(score) AS gem_score,
   PERCENTILE_DISC(score, 0.95) WITHIN GROUP (ORDER BY score) AS p95
-FROM gold.uc03_ww_risk.score
+FROM gold.uc03_fraud_risk.score
 WHERE score_datum >= CURRENT_DATE - INTERVAL '90' DAY
 GROUP BY 1
 ORDER BY 1;
@@ -538,7 +538,7 @@ ORDER BY 1;
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
 | `Access Denied: column 'diagnose' returns NULL` | Medische velden zijn voor jou gemaskeerd | Niet nodig voor handhaving |
-| `Access Denied: silver.wia.*` | WIA is niet jouw doel | Vraag een Claims Analyst voor cross-domein vragen |
+| `Access Denied: silver.claims.*` | WIA is niet jouw doel | Vraag een Claims Analyst voor cross-domein vragen |
 | `Access Denied: sensitive.*` | Sensitive Vault is afgeschermd | Niet beschikbaar — Wajong-route via collega |
 | `Bias / fairness warning op model` | Het UC-03 model heeft een waarschuwing afgegeven | Stop het automatisch gebruik; meld bij data-steward |
 
@@ -603,7 +603,7 @@ Je beoordeelt re-integratiekansen voor Wajongers en stelt trajecten op
 - Geanonimiseerde teamoverzichten te genereren
 
 **Belangrijk.** Het UC-02 AI-model is in deze referentie een **placeholder**
-(zie [docs/use-cases/uc02-wajong-ai.md](../use-cases/uc02-wajong-ai.md)). Een
+(zie [docs/use-cases/uc02-complex-cases-ai.md](../use-cases/uc02-complex-cases-ai.md)). Een
 echt werkend hoog-risico AI-systeem voor Wajong vereist DPIA, IAMA, bias-toets,
 model-card, EU-registratie en externe audit. Dat is geen referentie-werk.
 
@@ -626,7 +626,7 @@ gelogd en periodiek gereviewd."
 
 ### 2.3 Vier-ogen-principe
 
-Voor toegang tot `sensitive.wajong.*` geldt: **bepaalde queries vereisen een
+Voor toegang tot `sensitive.eligibility_cases.*` geldt: **bepaalde queries vereisen een
 co-signer**. In de huidige referentie wordt dit gemodelleerd door:
 
 - Audit-log met automatische dagelijkse review door data-steward
@@ -645,7 +645,7 @@ de volgende ochtend.
 | Catalog | Schema | Inhoud | Toegang |
 |---|---|---|---|
 | `silver` | `wajong` | Geconformeerd Wajong-dossier (gepseudonimiseerd waar mogelijk) | **Ja** |
-| `gold` | `uc02_wajong` | Adviezen (placeholder mart) | **Ja** |
+| `gold` | `uc02_complex_cases` | Adviezen (placeholder mart) | **Ja** |
 | `sensitive` | `wajong` | Sociaal-medisch dossier, diagnoses (art. 9 AVG) | **Ja** (4-eyes) |
 | `silver` | `wia`, `ww`, `crm` | Andere domeinen | **Nee** |
 
@@ -653,17 +653,17 @@ de volgende ochtend.
 
 | Kolom | Wat zie je? |
 |---|---|
-| `bsn`, naam, geboortedatum, adres | Volledig — doel "reintegratie/behandeling" |
+| `bsn`, naam, birth_date, adres | Volledig — doel "reintegratie/behandeling" |
 | `diagnose`, `icd10` | **Volledig** — uniek aan jouw rol (samen met platform-admin) |
 | `iban`, `bankrekening` | Gemaskeerd — geen financieel doel |
 | `regio` | Geen regio-filter — Wajong-traject mag landelijk |
 
 ### 3.3 Pseudonimisering — wanneer wel en niet?
 
-In `silver.wajong.dossier_pseudonymised` is de BSN vervangen door een
+In `silver.eligibility_cases.case_pseudonymised` is de BSN vervangen door een
 pseudoniem (`bsn_pseudo`). Voor analyse over trajecten heen werk je vaak
 op de gepseudonimiseerde tabel. Alleen bij dossier-specifiek werk
-(de-anonimiseren voor één cliënt) gebruik je `sensitive.wajong.*`.
+(de-anonimiseren voor één cliënt) gebruik je `sensitive.eligibility_cases.*`.
 
 > **Vuistregel:** wat kan op `silver`, doe je op `silver`. Sensitive Vault is
 > de uitzondering, niet de regel.
@@ -679,7 +679,7 @@ SELECT
   trajectsoort,
   COUNT(*)         AS lopend,
   AVG(duur_dagen)  AS gem_duur
-FROM gold.uc02_wajong.trajecten_actueel
+FROM gold.uc02_complex_cases.trajecten_actueel
 WHERE arbeidsdeskundige_team = 'team-noord'
 GROUP BY trajectsoort
 ORDER BY lopend DESC;
@@ -698,12 +698,12 @@ SELECT
   bsn,
   voornaam,
   achternaam,
-  geboortedatum,
+  birth_date,
   diagnose,
   icd10,
   beoordeling_datum,
   participatieplan
-FROM sensitive.wajong.dossier
+FROM sensitive.eligibility_cases.dossier
 WHERE bsn = '999000789';
 ```
 
@@ -719,7 +719,7 @@ SELECT
   diagnose_categorie,
   COUNT(*)                                                   AS aantal,
   AVG(CASE WHEN werkhervatting_6mnd THEN 1.0 ELSE 0.0 END)   AS slaag_pct
-FROM gold.uc02_wajong.trajecten_uitkomst
+FROM gold.uc02_complex_cases.trajecten_uitkomst
 WHERE start_jaar IN (2024, 2025)
 GROUP BY trajectsoort, diagnose_categorie
 HAVING COUNT(*) >= 30           -- privacy: geen kleine groepen
@@ -738,7 +738,7 @@ SELECT
   advies_traject,
   score,
   top_drivers          -- SHAP-achtige verklaring
-FROM gold.uc02_wajong.advies_placeholder
+FROM gold.uc02_complex_cases.advies_placeholder
 WHERE advies_datum = CURRENT_DATE
 ORDER BY score DESC
 LIMIT 50;
@@ -751,7 +751,7 @@ LIMIT 50;
 
 **Scenario.** Een cliënt vraagt "Welke gegevens gebruiken jullie over mij?"
 
-1. Open OpenMetadata → zoek `sensitive.wajong.dossier`
+1. Open OpenMetadata → zoek `sensitive.eligibility_cases.dossier`
 2. Klik **Lineage** — zie alle bronnen die naar dit dossier leiden
 3. Klik elke bron aan → zie eigenaar, classificatie, doelbinding
 4. Antwoord de cliënt op basis van wat je daar ziet (gestructureerd, niet uit het hoofd)
@@ -765,7 +765,7 @@ LIMIT 50;
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
 | `Access Denied: column 'iban' is masked` | IBAN niet voor jouw doel | Doorgaan, niet nodig voor reintegratie |
-| `Access Denied: silver.wia.*` | WIA-domein niet toegankelijk | Vraag Claims Analyst |
+| `Access Denied: silver.claims.*` | WIA-domein niet toegankelijk | Vraag Claims Analyst |
 | `Audit-flag: review required` | Sensitive-query staat klaar voor review | Niets doen — review verloopt automatisch |
 | `Authentication failed: token expired` | Sessie verlopen | Opnieuw inloggen via Keycloak |
 
@@ -866,20 +866,20 @@ referentie laat zien wat erachter zit.
 
 | Catalog | Schema | Inhoud | Toegang |
 |---|---|---|---|
-| `gold` | `uc05_client_360` | 360°-cliëntbeeld | **Ja** |
+| `gold` | `uc05_customer_360` | 360°-cliëntbeeld | **Ja** |
 | `silver` | `crm` | Klantcontact-historie | **Indirect** (alleen via UC-05) |
 | `silver` | `wia`, `ww`, `wajong` | Domein-data | **Nee** |
 | `sensitive` | * | (geen) | **Nee** |
 
 ### 3.2 Welke kolommen?
 
-In `gold.uc05_client_360.client_overview`:
+In `gold.uc05_customer_360.client_overview`:
 
 | Kolom | Wat zie je? |
 |---|---|
 | `bsn` | **GEMASKEERD** — `'XXXXXXX' || substring(bsn, 8)` (laatste 2 cijfers zichtbaar) |
 | `voornaam`, `achternaam` | Volledig — voor herkenning aan de telefoon |
-| `geboortedatum` | Volledig — voor identificatie |
+| `birth_date` | Volledig — voor identificatie |
 | `straat`, `huisnummer` | Volledig — adres voor balie |
 | `iban`, `bankrekening` | **GEMASKEERD** — niet nodig voor klantcontact |
 | `diagnose`, `icd10` | NULL (kolom-mask) — geen medisch |
@@ -901,8 +901,8 @@ die data uit een andere zone aanspreekt zonder geldig doel wordt geweigerd.
 **Scenario.** Mevrouw Jansen belt: "Ik krijg geen brief, maar wel een
 betaling. Klopt dat?"
 
-1. Vraag haar geboortedatum + de laatste 2 cijfers van haar BSN voor identificatie.
-2. Open **Superset → dashboard "Cliënt 360°"**, zoek op gemaskeerde BSN of geboortedatum + naam.
+1. Vraag haar birth_date + de laatste 2 cijfers van haar BSN voor identificatie.
+2. Open **Superset → dashboard "Cliënt 360°"**, zoek op gemaskeerde BSN of birth_date + naam.
 3. Bekijk de tegels: Lopende uitkering, Laatste contact, Kanaalvoorkeur.
 4. Beantwoord de vraag of route je haar naar de juiste afdeling.
 
@@ -916,7 +916,7 @@ SELECT
   oude_kanaalvoorkeur,
   nieuwe_kanaalvoorkeur,
   COUNT(*) AS aantal
-FROM gold.uc05_client_360.kanaalwijzigingen
+FROM gold.uc05_customer_360.kanaalwijzigingen
 WHERE wijzig_datum >= CURRENT_DATE - INTERVAL '30' DAY
 GROUP BY oude_kanaalvoorkeur, nieuwe_kanaalvoorkeur
 ORDER BY aantal DESC;
@@ -929,7 +929,7 @@ SELECT
   date_trunc('day', contact_datum) AS dag,
   COUNT(*) AS contacten,
   AVG(behandel_duur_min) AS gem_duur
-FROM gold.uc05_client_360.contact_log
+FROM gold.uc05_customer_360.contact_log
 WHERE contact_datum >= CURRENT_DATE - INTERVAL '14' DAY
 GROUP BY 1
 ORDER BY 1;
@@ -958,9 +958,9 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `bsn = NULL` of "uitgegrijsd" | Kolom gemaskeerd, niet gewist | Voor klantidentificatie volstaat naam + geboortedatum |
-| `Access Denied: silver.wia.*` | Andere domeinen niet zichtbaar | Verwijs cliënt door naar WIA-team |
-| `Cliënt niet gevonden` | Mogelijk synthesedata-mismatch (referentie-omgeving) | Check spelling, gebruik geboortedatum |
+| `bsn = NULL` of "uitgegrijsd" | Kolom gemaskeerd, niet gewist | Voor klantidentificatie volstaat naam + birth_date |
+| `Access Denied: silver.claims.*` | Andere domeinen niet zichtbaar | Verwijs cliënt door naar WIA-team |
+| `Cliënt niet gevonden` | Mogelijk synthesedata-mismatch (referentie-omgeving) | Check spelling, gebruik birth_date |
 
 ### 5.2 Wie helpt?
 
@@ -994,7 +994,7 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 Deze handleiding is voor **financieel-economische analisten** die werken
 aan schadelast, prognoses en beleidsanalyses. Je werkt op **geaggregeerde
-data**: geen ruwe BSN, geen individuele uitkeringsbedragen.
+data**: geen ruwe BSN, geen individuele claim_amounten.
 
 ---
 
@@ -1025,7 +1025,7 @@ input voor begrotingen. Je gebruikt het platform om:
 
 | Catalog | Schema | Inhoud | Toegang |
 |---|---|---|---|
-| `gold` | `uc06_lastprognose` | Schadelast-aggregaten en prognoses | **Ja** |
+| `gold` | `uc06_cost_forecast` | Schadelast-aggregaten en prognoses | **Ja** |
 | `silver` | * | PII en domein-data | **Nee** |
 | `bronze`, `sensitive` | * | (geen) | **Nee** |
 
@@ -1045,7 +1045,7 @@ Je werkt op aggregaten:
 | `prognose_komende_12_mnd` | Prognose-getallen |
 
 > **Geen ruwe BSN.** Het platform weigert je rauwe persoons-queries
-> (`silver.persoon.*`) — niet jouw doel.
+> (`silver.persons.*`) — niet jouw doel.
 
 ### 3.3 Doelbinding
 
@@ -1064,7 +1064,7 @@ SELECT
   regeling,
   date_trunc('month', maand) AS maand,
   SUM(totale_last_eur)       AS last
-FROM   gold.uc06_lastprognose.maandlast
+FROM   gold.uc06_cost_forecast.maandlast
 WHERE  jaar = YEAR(CURRENT_DATE)
 GROUP  BY regeling, date_trunc('month', maand)
 ORDER  BY regeling, maand;
@@ -1075,7 +1075,7 @@ ORDER  BY regeling, maand;
 ```sql
 WITH base AS (
   SELECT regeling, prognose_komende_12_mnd
-  FROM   gold.uc06_lastprognose.prognose_basis
+  FROM   gold.uc06_cost_forecast.prognose_basis
   WHERE  prognose_datum = CURRENT_DATE
 )
 SELECT
@@ -1094,7 +1094,7 @@ SELECT
   leeftijdsgroep,
   jaar,
   SUM(instroom_aantal) AS instroom
-FROM   gold.uc06_lastprognose.instroom_per_groep
+FROM   gold.uc06_cost_forecast.instroom_per_groep
 WHERE  jaar BETWEEN 2022 AND 2025
 GROUP  BY leeftijdsgroep, jaar
 ORDER  BY leeftijdsgroep, jaar;
@@ -1116,7 +1116,7 @@ SELECT
   prognose                AS p,
   realisatie              AS r,
   realisatie - prognose   AS afwijking
-FROM gold.uc06_lastprognose.prognose_validatie
+FROM gold.uc06_cost_forecast.prognose_validatie
 WHERE peilkwartaal = '2026-Q1';
 ```
 
@@ -1126,8 +1126,8 @@ WHERE peilkwartaal = '2026-Q1';
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `Access Denied: silver.persoon.*` | Geen PII voor jouw rol | Werk op aggregaat-marts |
-| `Access Denied: gold.uc05_client_360` | Andere doelbinding | Niet jouw scope |
+| `Access Denied: silver.persons.*` | Geen PII voor jouw rol | Werk op aggregaat-marts |
+| `Access Denied: gold.uc05_customer_360` | Andere doelbinding | Niet jouw scope |
 | `Result has only 8 rows` | Te kleine groep, mogelijk privacy-onderdrukking | Aggregeer ruwer |
 
 | Probleem | Contact |
@@ -1141,7 +1141,7 @@ WHERE peilkwartaal = '2026-Q1';
 ## 6. Wat je nooit doet
 
 - Aggregaten op kleine groepen (< 10) extern delen — herleidbaarheid.
-- Querys op `silver.persoon.*` proberen "om het toch te zien".
+- Querys op `silver.persons.*` proberen "om het toch te zien".
 - CSV-exports met cliënt-detail laten — jij ziet die niet, maar valideer altijd.
 
 ---
@@ -1191,14 +1191,14 @@ waar je op werkt. Je gebruikt het platform om:
 
 | Catalog | Schema | Inhoud | Toegang |
 |---|---|---|---|
-| `gold` | `uc08_smz_capaciteit` | Capaciteits-aggregaten | **Ja** |
+| `gold` | `uc08_capacity_planning` | Capaciteits-aggregaten | **Ja** |
 | `silver` | `smz` | SMZ-rooster en case-counts | **Ja** |
 | `silver` | `wia`, `ww`, `wajong`, `crm` | Cliënt-dossiers | **Nee** |
 | `sensitive` | * | (geen) | **Nee** |
 
 ### 3.2 Welke kolommen?
 
-In `gold.uc08_smz_capaciteit.*` en `silver.smz.*`:
+In `gold.uc08_capacity_planning.*` en `silver.smz.*`:
 
 | Kolom | Wat zie je? |
 |---|---|
@@ -1227,7 +1227,7 @@ SELECT
   PERCENTILE_DISC(wachttijd_dagen, 0.5) WITHIN GROUP (ORDER BY wachttijd_dagen) AS p50,
   PERCENTILE_DISC(wachttijd_dagen, 0.95) WITHIN GROUP (ORDER BY wachttijd_dagen) AS p95,
   COUNT(*)                               AS aantal_cases
-FROM   gold.uc08_smz_capaciteit.wachttijd
+FROM   gold.uc08_capacity_planning.wachttijd
 WHERE  peildatum = CURRENT_DATE
 GROUP  BY regio, specialisme
 ORDER  BY p95 DESC;
@@ -1256,7 +1256,7 @@ zakt de p95-wachttijd?
 ```sql
 WITH huidige AS (
   SELECT specialisme, AVG(wachttijd_dagen) AS gem
-  FROM   gold.uc08_smz_capaciteit.wachttijd
+  FROM   gold.uc08_capacity_planning.wachttijd
   WHERE  specialisme = 'verzekeringsarts'
   GROUP  BY specialisme
 ),
@@ -1285,7 +1285,7 @@ teamleider — geen BSN's, alleen aggregaten.
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `Access Denied: silver.wia.aanvraag` | Cliënt-data niet voor planning | Werk op aggregaat-mart |
+| `Access Denied: silver.claims.application` | Cliënt-data niet voor planning | Werk op aggregaat-mart |
 | `bsn IS NULL` | Kolom gemaskeerd | Niet nodig voor planning |
 
 | Probleem | Contact |
@@ -1351,17 +1351,17 @@ case en initieert proactief contact. Je gebruikt het platform om:
 
 | Catalog | Schema | Inhoud | Toegang |
 |---|---|---|---|
-| `gold` | `uc04_tw_eligibility` | Werklijst proactief TW | **Ja** |
+| `gold` | `uc04_eligibility_outreach` | Werklijst proactief TW | **Ja** |
 | `silver` | * | Niet voor jouw rol | **Nee** |
 | `sensitive` | * | (geen) | **Nee** |
 
 ### 3.2 Welke kolommen?
 
-In `gold.uc04_tw_eligibility.werklijst`:
+In `gold.uc04_eligibility_outreach.werklijst`:
 
 | Kolom | Wat zie je? |
 |---|---|
-| `bsn`, naam, geboortedatum | Volledig — nodig voor klantcontact |
+| `bsn`, naam, birth_date | Volledig — nodig voor klantcontact |
 | `adres`, kanaalvoorkeur | Volledig |
 | `iban`, `bankrekening` | Gemaskeerd |
 | `diagnose`, `icd10` | NULL — niet jouw doel |
@@ -1391,12 +1391,12 @@ SELECT
   bsn,
   voornaam,
   achternaam,
-  geboortedatum,
+  birth_date,
   kanaalvoorkeur,
   eligibility_score,
   top_drivers,
   laatste_benadering
-FROM gold.uc04_tw_eligibility.werklijst
+FROM gold.uc04_eligibility_outreach.werklijst
 WHERE voor_datum = CURRENT_DATE
 ORDER BY eligibility_score DESC
 LIMIT 50;
@@ -1429,7 +1429,7 @@ SELECT
   COUNT(*)                                               AS contacten,
   SUM(CASE WHEN aanvraag_binnen_30d THEN 1 ELSE 0 END)   AS leidde_tot_aanvraag,
   100.0 * SUM(CASE WHEN aanvraag_binnen_30d THEN 1 ELSE 0 END) / COUNT(*) AS conversie_pct
-FROM   gold.uc04_tw_eligibility.benadering_uitkomst
+FROM   gold.uc04_eligibility_outreach.benadering_uitkomst
 WHERE  benadering_datum >= CURRENT_DATE - INTERVAL '90' DAY
 GROUP  BY benadering_kanaal
 ORDER  BY conversie_pct DESC;
@@ -1735,14 +1735,14 @@ SELECT
   test_name,
   failures,
   last_run
-FROM   gold.uc07_dq_polisadm.test_resultaten_daily
+FROM   gold.uc07_dq_policies.test_resultaten_daily
 WHERE  status = 'failed'
 ORDER  BY last_run DESC;
 ```
 
 ### 4.2 Workflow B — Profiler-vlag uitzoeken
 
-**Scenario.** OpenMetadata toont rood vlag op `silver.wia.aanvraag.regio`:
+**Scenario.** OpenMetadata toont rood vlag op `silver.claims.application.regio`:
 "5% NULL, vorige week 0.2%". Je gaat onderzoeken.
 
 ```sql
@@ -1750,7 +1750,7 @@ ORDER  BY last_run DESC;
 SELECT
   date_trunc('day', aanvraag_datum) AS dag,
   100.0 * SUM(CASE WHEN regio IS NULL THEN 1 ELSE 0 END) / COUNT(*) AS null_pct
-FROM   silver.wia.aanvraag
+FROM   silver.claims.application
 WHERE  aanvraag_datum >= CURRENT_DATE - INTERVAL '14' DAY
 GROUP  BY 1
 ORDER  BY 1;
@@ -1783,19 +1783,19 @@ de arbeidsdeskundige om context. Anomalieën meld je bij platform-admin.
 
 1. Open OpenMetadata → **Glossary** → **CGM**.
 2. Voeg term toe: definitie, eigenaar, gerelateerd aan welke kolommen.
-3. Koppel de term aan `silver.wia.voorschot.bedrag`.
+3. Koppel de term aan `silver.claims.voorschot.bedrag`.
 4. Communiceer naar gebruikers (e-mail of dashboard-update).
 
 ### 4.6 Workflow F — Lineage valideren
 
 ```sql
--- Welke marts hangen van silver.wia.aanvraag?
+-- Welke marts hangen van silver.claims.application?
 SELECT downstream_table
 FROM   metadata.lineage
-WHERE  upstream_table = 'silver.wia.aanvraag';
+WHERE  upstream_table = 'silver.claims.application';
 ```
 
-Of in OpenMetadata: klik **Lineage** op `silver.wia.aanvraag` en zie alle
+Of in OpenMetadata: klik **Lineage** op `silver.claims.application` en zie alle
 downstream-marts en dashboards.
 
 ### 4.7 Workflow G — DPIA-evidence verzamelen
@@ -1915,7 +1915,7 @@ platform om:
 
 ### 3.3 Welke kolommen?
 
-In `bronze.uwv.*`: alles ruw — inclusief BSN, naam, IBAN. Wees uiterst
+In `bronze.*`: alles ruw — inclusief BSN, naam, IBAN. Wees uiterst
 zuinig: **kijk niet meer dan nodig**.
 
 ---
@@ -1930,7 +1930,7 @@ zuinig: **kijk niet meer dan nodig**.
 2. **NiFi-flow**: kopieer template `nifi-flows/templates/delta/source-xyz/` aan, pas processors aan.
 3. **Kafka-topic**: definieer `uwv.xyz.event` in `platform/06-kafka/topics.yaml`.
 4. **Spark-job**: voeg `streaming-bronze-xyz.yaml` toe; gebruik helper `lakehouse_io.write_delta()`.
-5. **Schema in HMS**: `CREATE TABLE bronze.uwv.xyz_events (...) USING DELTA LOCATION 's3a://odap-bronze/xyz/'`.
+5. **Schema in HMS**: `CREATE TABLE bronze.demo.xyz_events (...) USING DELTA LOCATION 's3a://odap-bronze/xyz/'`.
 6. **dbt-stg**: `dbt/models/staging/stg_xyz.sql` met basisvalidatie.
 7. **OPA-update**: voeg purpose toe in `data/role_mappings.json::resource_purposes`.
 8. **OpenMetadata**: voeg service-config toe (auto-discovery).
@@ -2026,7 +2026,7 @@ ruwe IBAN binnenkomt vanuit bronze.
    ```sql
    -- TICKET-1234
    SELECT iban, COUNT(*)
-   FROM   bronze.uwv.wia_aanvraag_raw
+   FROM   bronze.claims.application_raw
    WHERE  ingest_dag = CURRENT_DATE
    GROUP  BY iban
    LIMIT  20;
@@ -2146,7 +2146,7 @@ Elke break-glass-query begint met een comment:
 
 ```sql
 -- BREAK-GLASS REASON: incident INC-2026-04-30 / cliënt 999000123 / data corruptie review
-SELECT ... FROM sensitive.wajong.dossier WHERE bsn = '999000123';
+SELECT ... FROM sensitive.eligibility_cases.dossier WHERE bsn = '999000123';
 ```
 
 De data-steward valideert de volgende ochtend dat deze comments er zijn.
@@ -2400,7 +2400,7 @@ Het `profiles.yml` haalt credentials uit env-vars (mounted via secret-operator).
 trino --user smoketest --catalog gold --execute "SELECT 1"
 
 # tests/smoke/05-dbt-runs.sh
-dbt build --select +mart_uc01_wia_funnel_daily
+dbt build --select +mart_uc01_claims_funnel_daily
 
 # tests/smoke/08-opa-decisions.sh
 # verifieert dat OPA accept/deny correct werkt

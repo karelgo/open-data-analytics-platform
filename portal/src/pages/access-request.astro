@@ -27,9 +27,9 @@ const purposes = [
 // OM registreert de Trino-service als 'trino' — dat is de eerste
 // FQN-segment.
 const sampleAssets = [
-  'trino.gold.uc11_klantreis.mart_uc11_klantreis_events',
-  'trino.gold.uwv.polisadm_ikv',
-  'trino.bronze.uwv.crm_contact',
+  'trino.gold.uc11_customer_journey.mart_uc11_journey_events',
+  'trino.gold.uwv.policy_holders',
+  'trino.bronze.customers.interaction',
 ];
 ---
 <ShellLayout title="Request access" activeSection="workspace">
@@ -60,7 +60,7 @@ const sampleAssets = [
           name="asset_fqn"
           type="text"
           required
-          placeholder="trino.gold.uc11_klantreis.mart_uc11_klantreis_events"
+          placeholder="trino.gold.uc11_customer_journey.mart_uc11_journey_events"
           list="ar-asset-suggestions"
         />
         <datalist id="ar-asset-suggestions">

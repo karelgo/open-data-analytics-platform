@@ -31,7 +31,7 @@ configMapGenerator:
       - starter-notebooks/05_openmetadata_catalog.ipynb
       - starter-notebooks/06_git_workflow.ipynb
       - starter-notebooks/07_minio_regression.ipynb
-      - starter-notebooks/08_trino_uc11_klantreis.ipynb
+      - starter-notebooks/08_trino_uc11_customer_journey.ipynb
     options:
       disableNameSuffixHash: true
 

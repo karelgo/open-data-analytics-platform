@@ -14,21 +14,21 @@ domain: persoon
 
 # Stream — JSONL-bestanden geproduceerd door data-generation/load_to_s3.py
 stream:
-  name: uwv.persona.created
+  name: customers.created
   key: bsn
 
 # Bronze — Spark Structured Streaming (file source) schrijft hier
 bronze:
   catalog: bronze
-  schema: uwv
-  table: persona_created
+  schema: demo
+  table: person_created
   partition_by: event_date
 
 # Silver — dbt staging
 silver:
   catalog: silver
-  schema: persoon
-  staging_model: stg_persona
+  schema: persons
+  staging_model: stg_persons
   dbt_tag: persoon
 
 # Compliance / governance
@@ -38,7 +38,7 @@ governance:
   bio_classificatie: vertrouwelijk
   bewaartermijn_jaren: 7
   eigenaar: data_office
-  pii_kolommen: [bsn, voornaam, achternaam, geboortedatum, straat, huisnummer, postcode]
+  pii_kolommen: [bsn, voornaam, achternaam, birth_date, straat, huisnummer, postcode]
   risk_tier: laag
 
 # SLA — bron-typering

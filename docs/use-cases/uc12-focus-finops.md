@@ -2,7 +2,7 @@
 
 **Doel**: maandelijkse cloud-billing-export (FOCUS-formaat) van OCI/AWS/Azure/GCP omzetten in een end-to-end FinOps-dashboard met spend-trends, service-breakdowns, commitment-utilization en top-resource-analyse.
 
-**Volgt het CSV-upload-patroon** dat klanttevredenheid (UC11-naburig) introduceerde. Geen Kafka, geen streaming — gebruiker uploadt een CSV via de portal en de pipeline draait automatisch tot Superset.
+**Volgt het CSV-upload-patroon** dat customer_satisfaction (UC11-naburig) introduceerde. Geen Kafka, geen streaming — gebruiker uploadt een CSV via de portal en de pipeline draait automatisch tot Superset.
 
 ---
 
@@ -31,7 +31,7 @@ MinIO  s3://odap-staging/incoming/focus/<ts>-<file>.csv
 ingest_csv_focus DAG (auto-generated door csv_ingest_factory)
    │  csv_to_bronze.py — pyarrow type-cast + validatie tegen sources/focus.yml
    ▼
-bronze.uwv.focus_billing  (Delta, partitioned by event_date)
+bronze.finops.focus_billing  (Delta, partitioned by event_date)
    │  Airflow Dataset trigger
    ▼
 silver_finops DAG (Cosmos dbt run --select tag:finops,tag:staging)
@@ -53,7 +53,7 @@ Superset dashboard "uc12-focus-finops"
 
 ## 3. Datamodel
 
-### Bronze — `bronze.uwv.focus_billing`
+### Bronze — `bronze.finops.focus_billing`
 
 Native FOCUS-kolommen (PascalCase) + 3 audit-kolommen (`ingestion_ts`, `source_file`, `event_date`). Partitionering op `event_date` = upload-datum. Delta-formaat (Iceberg via `TABLE_FORMAT=iceberg`).
 
@@ -197,5 +197,5 @@ Aanpassingen via flags: `--months 6 --seed 99 --end-year 2026 --end-month 4`.
 ## 8. Verder lezen
 
 - [FOCUS Specification 1.x](https://focus.finops.org/) — kolom-semantiek, accepted values, vendor-extensies
-- [docs/use-cases/uc11-klantreis-walkthrough.md](uc11-klantreis-walkthrough.md) — platform-rondleiding (zelfde patroon, ander domein)
+- [docs/use-cases/uc11-customer-journey-walkthrough.md](uc11-customer-journey-walkthrough.md) — platform-rondleiding (zelfde patroon, ander domein)
 - [platform/11-airflow/include/csv_ingest_factory.py](../../platform/11-airflow/include/csv_ingest_factory.py) — hoe `ingest_csv_focus` DAG automatisch wordt gegenereerd

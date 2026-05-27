@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: stg_incident_report
+    description: "Ziektewet-meldingen."
+    config:
+      tags: ["staging", "incidents", "ag"]
+    meta:
+      domain: ag
+      subdomain: zw
+      legal_basis: ZW_art_29
+      doelbinding: ["uitkering"]
+      bio_classificatie: vertrouwelijk
+      bewaartermijn_jaren: 7
+      eigenaar: divisie_ag
+      pii_kolommen: [bsn]
+      risk_tier: laag
+    columns:
+      - name: incident_id
+        tests: [not_null, unique]
+      - name: bsn
+        tests: [not_null, bsn_valid]
+      - name: duur_dagen
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 730

@@ -24,8 +24,8 @@ test_researcher_without_grant_denied if {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "gold",
-				"schemaName": "uc05_client_360",
-				"tableName": "mart_uc05_client_360",
+				"schemaName": "uc05_customer_360",
+				"tableName": "mart_uc05_customer_360",
 			}},
 		},
 	}
@@ -35,15 +35,15 @@ test_researcher_with_grant_and_purpose_allowed if {
 	allow with input as {
 		"context": {"identity": {
 			"user": "alice.researcher",
-			"groups": ["researcher", "data_access:gold.uc05_client_360"],
+			"groups": ["researcher", "data_access:gold.uc05_customer_360"],
 			"extraCredentials": {"purpose": "klantcontact"},
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "gold",
-				"schemaName": "uc05_client_360",
-				"tableName": "mart_uc05_client_360",
+				"schemaName": "uc05_customer_360",
+				"tableName": "mart_uc05_customer_360",
 			}},
 		},
 	}
@@ -57,20 +57,20 @@ test_grant_does_not_bypass_doelbinding if {
 	not purpose_allows_resource with input as {
 		"context": {"identity": {
 			"user": "alice.researcher",
-			"groups": ["researcher", "data_access:gold.uc05_client_360"],
+			"groups": ["researcher", "data_access:gold.uc05_customer_360"],
 			"extraCredentials": {"purpose": "handhaving"},
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "gold",
-				"schemaName": "uc05_client_360",
-				"tableName": "mart_uc05_client_360",
+				"schemaName": "uc05_customer_360",
+				"tableName": "mart_uc05_customer_360",
 			}},
 		},
 	}
 		with data.configmap as {"opa-trino-bundle": {"odap-platform": {"role_mappings": {
-			"resource_purposes": {"gold.uc05_client_360.*": ["klantcontact", "behandeling"]},
+			"resource_purposes": {"gold.uc05_customer_360.*": ["klantcontact", "behandeling"]},
 			"roles": {"researcher": {
 				"purposes": ["statistisch_onderzoek"],
 				"catalogs": ["sandbox"],
@@ -84,20 +84,20 @@ test_grant_with_matching_purpose_permits_doelbinding if {
 	purpose_allows_resource with input as {
 		"context": {"identity": {
 			"user": "alice.researcher",
-			"groups": ["researcher", "data_access:gold.uc05_client_360"],
+			"groups": ["researcher", "data_access:gold.uc05_customer_360"],
 			"extraCredentials": {"purpose": "klantcontact"},
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "gold",
-				"schemaName": "uc05_client_360",
-				"tableName": "mart_uc05_client_360",
+				"schemaName": "uc05_customer_360",
+				"tableName": "mart_uc05_customer_360",
 			}},
 		},
 	}
 		with data.configmap as {"opa-trino-bundle": {"odap-platform": {"role_mappings": {
-			"resource_purposes": {"gold.uc05_client_360.*": ["klantcontact", "behandeling"]},
+			"resource_purposes": {"gold.uc05_customer_360.*": ["klantcontact", "behandeling"]},
 			"roles": {"researcher": {
 				"purposes": ["statistisch_onderzoek"],
 				"catalogs": ["sandbox"],
@@ -125,15 +125,15 @@ test_grant_on_other_schema_does_not_apply if {
 	not allow with input as {
 		"context": {"identity": {
 			"user": "alice.researcher",
-			"groups": ["researcher", "data_access:gold.uc04_tw_eligibility"],
+			"groups": ["researcher", "data_access:gold.uc04_eligibility_outreach"],
 			"extraCredentials": {"purpose": "klantcontact"},
 		}},
 		"action": {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "gold",
-				"schemaName": "uc05_client_360",
-				"tableName": "mart_uc05_client_360",
+				"schemaName": "uc05_customer_360",
+				"tableName": "mart_uc05_customer_360",
 			}},
 		},
 	}

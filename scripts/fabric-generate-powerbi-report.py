@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Genereer PBIR-bestanden voor uc11_klantreis Power BI rapport.
+"""Genereer PBIR-bestanden voor uc11_customer_journey Power BI rapport.
 
-Mirror van het Superset uc11_klantreis dashboard (12 visuals in 5 rijen).
+Mirror van het Superset uc11_customer_journey dashboard (12 visuals in 5 rijen).
 Gebruikt DAX measures (gedefinieerd in model.bim) i.p.v. inline aggregations,
 en `cardVisual` i.p.v. `card` — beide nodig om visuals te laten renderen.
 
-Output: platform/12-powerbi/uc11_klantreis/Report/...
+Output: platform/12-powerbi/uc11_customer_journey/Report/...
 """
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-OUT_DIR = REPO_ROOT / "platform" / "12-powerbi" / "uc11_klantreis" / "Report"
+OUT_DIR = REPO_ROOT / "platform" / "12-powerbi" / "uc11_customer_journey" / "Report"
 
 PAGE_ID = "uc11dashpage1"
 PAGE_W, PAGE_H = 1280, 1040
@@ -297,9 +297,9 @@ if __name__ == "__main__":
         if not os.environ.get("FABRIC_TENANT_ID"):
             print("Geef SemanticModel-ID als argument of zet Fabric env-vars.", file=sys.stderr)
             sys.exit(1)
-        models = [m for m in list_items(get_token(), "SemanticModel") if m["displayName"] == "uc11_klantreis"]
+        models = [m for m in list_items(get_token(), "SemanticModel") if m["displayName"] == "uc11_customer_journey"]
         if not models:
-            print("SemanticModel 'uc11_klantreis' niet gevonden in workspace.", file=sys.stderr)
+            print("SemanticModel 'uc11_customer_journey' niet gevonden in workspace.", file=sys.stderr)
             sys.exit(1)
         sid = models[0]["id"]
         print(f"Auto-discovered SemanticModel ID: {sid}")

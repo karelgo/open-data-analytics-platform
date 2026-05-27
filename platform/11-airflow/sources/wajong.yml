@@ -5,19 +5,19 @@ name: wajong
 domain: wajong
 
 stream:
-  name: uwv.wajong.dossier
+  name: eligibility_cases.case
   key: bsn
 
 bronze:
   catalog: bronze
-  schema: uwv
-  table: wajong_dossier
+  schema: demo
+  table: eligibility_case
   partition_by: event_date
 
 silver:
   catalog: silver
-  schema: wajong
-  staging_model: stg_wajong_dossier
+  schema: eligibility_cases
+  staging_model: stg_eligibility_case
   dbt_tag: wajong
 
 governance:
@@ -26,7 +26,7 @@ governance:
   bio_classificatie: vertrouwelijk
   bewaartermijn_jaren: 10
   eigenaar: divisie_ag
-  pii_kolommen: [bsn, geboortedatum, woonadres]
+  pii_kolommen: [bsn, birth_date, woonadres]
   risk_tier: hoog
 
 sla:

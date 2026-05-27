@@ -28,9 +28,9 @@ mkdir -p "$ROOT/platform/08-spark/scripts"
 cp "$ROOT/spark-jobs/streaming_files_to_lakehouse.py" "$ROOT/platform/08-spark/scripts/"
 cp "$ROOT/spark-jobs/lib/lakehouse_io.py"             "$ROOT/platform/08-spark/scripts/"
 # WIA bronze→silver→gold demo (parallel-Spark-pad naast dbt).
-cp "$ROOT/spark-jobs/seed_bronze_wia.py"              "$ROOT/platform/08-spark/scripts/"
-cp "$ROOT/spark-jobs/batch_silver_wia.py"             "$ROOT/platform/08-spark/scripts/"
-cp "$ROOT/spark-jobs/batch_gold_wia.py"               "$ROOT/platform/08-spark/scripts/"
+cp "$ROOT/spark-jobs/seed_bronze_claims.py"              "$ROOT/platform/08-spark/scripts/"
+cp "$ROOT/spark-jobs/batch_silver_claims.py"             "$ROOT/platform/08-spark/scripts/"
+cp "$ROOT/spark-jobs/batch_gold_claims.py"               "$ROOT/platform/08-spark/scripts/"
 
 # Bootstrap dev-placeholder secrets for layers that need them. Same pattern
 # as the om-bridge target in the Makefile: only generate if missing, so a
@@ -424,9 +424,9 @@ if kubectl -n odap-platform wait --for=condition=Ready pod/airflow-scheduler-def
 for dag in bronze_watch \
            silver_persoon silver_polisadm silver_ww silver_wia \
            silver_wajong silver_zw silver_crm silver_fez silver_klantcontact \
-           gold_uc01_wia_funnel gold_uc04_tw_eligibility gold_uc05_client_360 \
-           gold_uc06_lastprognose gold_uc07_dq_polisadm gold_uc09_reint_effect \
-           gold_uc_klant_tev_klanttevredenheid \
+           gold_uc01_claims_funnel gold_uc04_eligibility_outreach gold_uc05_customer_360 \
+           gold_uc06_cost_forecast gold_uc07_dq_policies gold_uc09_reintegration_effect \
+           gold_uc_customer_satisfaction_customer_satisfaction \
            governance_om_ingest bewaartermijn_enforcer lakehouse_maintenance; do
   airflow dags unpause "$dag" >/dev/null 2>&1 || true
 done

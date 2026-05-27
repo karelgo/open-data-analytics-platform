@@ -6,13 +6,13 @@ Quick start in a notebook cell::
 
     # SQL against the Bronze / Silver / Gold / Sensitive Trino catalogs
     # (OPA evaluates row filters and column masks for your Keycloak role).
-    df = trino.query("SELECT * FROM silver.wia.aanvraag LIMIT 100")
+    df = trino.query("SELECT * FROM silver.claims.application LIMIT 100")
 
     # Browse raw objects in MinIO.
     s3.ls("odap-bronze/")
 
     # Inspect the Hive Metastore catalog directly.
-    hms.list_tables("uwv")
+    hms.list_tables("demo")
 
     # Hit the OpenMetadata API.
     om.tables(catalog="silver")

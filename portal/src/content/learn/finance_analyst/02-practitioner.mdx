@@ -21,7 +21,7 @@ quiz:
   - q: "Een lastprognose voor regio Noord ligt 8% onder gemiddelde. Welke check is verstandig?"
     options:
       - "Direct in de notitie zetten"
-      - "Eerst dbt-tests op `gold.uc06_lastprognose` checken — als de `not_null` op `bedrag_eur` rood staat is de aggregatie onbetrouwbaar"
+      - "Eerst dbt-tests op `gold.uc06_cost_forecast` checken — als de `not_null` op `bedrag_eur` rood staat is de aggregatie onbetrouwbaar"
       - "Negeren"
       - "Naar de data-steward voor advies — zonder zelf gekeken te hebben"
     correct: 1
@@ -58,7 +58,7 @@ zijn van data-issues. Volgende stap.
 
 ## Stap 2 — DQ-status checken
 
-Open [dbt-docs](/dbt-docs/) → model `gold.uc06_lastprognose` → tab `Tests`.
+Open [dbt-docs](/dbt-docs/) → model `gold.uc06_cost_forecast` → tab `Tests`.
 
 Drie tests die er nu toe doen:
 
@@ -76,7 +76,7 @@ in de glossary staat — die kan voor december juist het verschil maken.
 Open [lineage UC-06](/go/openmetadata/). Volg `bedrag_eur` terug naar de bron:
 
 ```
-bronze.fin.betaling.bedrag → silver.fin.uitkering_betaling.bedrag_eur → gold.uc06_lastprognose.bedrag_eur
+bronze.fin.betaling.bedrag → silver.fin.uitkering_betaling.bedrag_eur → gold.uc06_cost_forecast.bedrag_eur
 ```
 
 Op silver staat sinds vorige week een nieuwe `uitkeringsoort` die nog niet
@@ -88,7 +88,7 @@ verklaart de 8%.
 ```
 SUBJECT: Lastprognose Noord december — afwijking verklaard
 
-Cijfer: -8% t.o.v. trend (gold.uc06_lastprognose, snapshot 2025-09-01)
+Cijfer: -8% t.o.v. trend (gold.uc06_cost_forecast, snapshot 2025-09-01)
 
 Onderbouwing:
 - Niet een werkelijke daling in uitkeringen.

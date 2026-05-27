@@ -37,12 +37,12 @@ worden via `kubectl port-forward` geïmporteerd, niet via een UI.
 
 | Flow | Bron-mock | Topic |
 |---|---|---|
-| `wia-ingest` | SyntheticHTTPSource (data-generation/k8s/seed-job) | `uwv.wia.aanvraag` |
-| `ww-ingest` | idem | `uwv.ww.aanvraag` |
-| `wajong-ingest` | idem | `uwv.wajong.dossier` |
-| `polisadm-ingest` | idem | `uwv.polisadm.ikv` |
-| `crm-ingest` | idem | `uwv.crm.contact` |
-| `fez-ingest` | idem | `uwv.fez.uitkeringslast` |
+| `wia-ingest` | SyntheticHTTPSource (data-generation/k8s/seed-job) | `claims.application` |
+| `ww-ingest` | idem | `service_requests.application` |
+| `wajong-ingest` | idem | `eligibility_cases.case` |
+| `polisadm-ingest` | idem | `customers.policy` |
+| `crm-ingest` | idem | `customers.interaction` |
+| `fez-ingest` | idem | `finance.expense` |
 
 ## Delta-schrijven? Nee — Spark doet dat
 

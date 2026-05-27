@@ -142,14 +142,14 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
   - `pyproject.toml` (Python 3.11+, hatch, faker/kafka-python/click/pydantic).
   - `generators/__init__.py` met `SYNTHETIC_HEADER` constante.
   - `generators/_common.py` — `make_rng`, `make_faker(locale='nl_NL')`, `envelope()` event-wrapper.
-  - **`generators/persona.py` volledig** — 11-proef-validatie (`is_valid_bsn`, `calculate_bsn_check_digit`), `generate_test_bsn` (BSN-prefix `9` per BRP-conventie), `generate_personas`, dataclass `Persona` (bsn, voornaam, achternaam, geslacht, geboortedatum, adres, postcode, woonplaats).
-  - Stubs voor `polisadministratie.py` (IKV's, lonen log-normal), `ww.py`, `wia.py`, `wajong.py`, `zw.py`, `crm.py`, `fez.py` (geaggregeerde uitkeringslast).
+  - **`generators/persona.py` volledig** — 11-proef-validatie (`is_valid_bsn`, `calculate_bsn_check_digit`), `generate_test_bsn` (BSN-prefix `9` per BRP-conventie), `generate_personas`, dataclass `Persona` (bsn, voornaam, achternaam, geslacht, birth_date, adres, postcode, woonplaats).
+  - Stubs voor `polisadministratie.py` (IKV's, lonen log-normal), `ww.py`, `wia.py`, `wajong.py`, `zw.py`, `crm.py`, `fez.py` (geaggregeerde claim_cost).
 - `data-generation/load_to_kafka.py` — Click CLI met `--count/--seed/--bootstrap/--include-domains/--dry-run`. Pakt persona-anchor BSN's en propageert naar alle domeinen. Gzip-compressie, batched producer.
 - `data-generation/load_to_minio_staging.py` — stub (fase 5).
 - `data-generation/tests/{test_bsn_checksum.py,test_persona.py}` — **19/19 tests groen**, incl. 1000 generated BSN's allemaal valid + start met 9.
 - `data-generation/k8s/seed-job.yaml` — Kubernetes Job die python:3.11-slim image gebruikt, deps pip-installeert, ConfigMaps mount op /app, en `load_to_kafka.py` runt tegen in-cluster Kafka-bootstrap. Idempotent via TTL + scripts/seed.sh delete-before-apply.
 - `spark-jobs/lib/lakehouse_io.py` — format-agnostische helper (`get_spark_with_lakehouse_config`, `write_table`, `write_stream_to_table`, `ensure_bronze_schema`). Leest `TABLE_FORMAT` env, configureert Delta- of Iceberg-extensions + S3A + HMS.
-- `spark-jobs/streaming_kafka_to_lakehouse.py` — Subscribet `uwv\..*\..*` Kafka topics; `foreachBatch` dispatcher schrijft per topic naar `bronze.uwv.<domain>_<entity>`. Schema: `payload (string), topic, kafka_partition, kafka_offset, kafka_ts, ingestion_ts, event_date`.
+- `spark-jobs/streaming_kafka_to_lakehouse.py` — Subscribet `uwv\..*\..*` Kafka topics; `foreachBatch` dispatcher schrijft per topic naar `bronze.demo.<domain>_<entity>`. Schema: `payload (string), topic, kafka_partition, kafka_offset, kafka_ts, ingestion_ts, event_date`.
 - `platform/07-nifi/` — `NiFiCluster nifi` (NiFi 2.0.0, OIDC via keycloak) + `ZookeeperZnode zookeeper-znode-nifi`. Documenteert in README dat fase-4-flows via Python-loader gevuld worden; NiFi-flow-import is fase 5+.
 - `platform/08-spark/apps/streaming-bronze.yaml` — `SparkApplication streaming-bronze` (Spark 3.5.5, deps.packages: spark-sql-kafka-0-10, delta-spark, hadoop-aws). PodOverrides mounten ConfigMap `spark-streaming-jobs` op `/stackable/spark/jobs`. Driver+executor environment: `TABLE_FORMAT=delta`, `S3_ACCESS/SECRET_KEY` uit `minio-s3-credentials` Secret.
 - `platform/08-spark/kustomization.yaml` — `configMapGenerator` bouwt `spark-streaming-jobs` ConfigMap uit `platform/08-spark/scripts/` (gitignored sync target).
@@ -157,7 +157,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `scripts/seed.sh` — vol uitgewerkt: ConfigMaps maken, oude Job verwijderen, Job apply, wait completion, logs.
 - `scripts/deploy-platform.sh` — sync `spark-jobs/*.py` → `platform/08-spark/scripts/` voor kustomize pickup.
 - `.gitignore` — `platform/08-spark/scripts/` toegevoegd.
-- `tests/smoke/03-bronze-data.sh` — checks: SparkApplication phase, schema `bronze.uwv` aanwezig in Trino, tabel `bronze.uwv.persona_created` aanwezig, row-count >= 10000, BSN-format begint met 9 (test-bereik).
+- `tests/smoke/03-bronze-data.sh` — checks: SparkApplication phase, schema `bronze.uwv` aanwezig in Trino, tabel `bronze.persons.created` aanwezig, row-count >= 10000, BSN-format begint met 9 (test-bereik).
 
 ### Verificatie (host, geen cluster)
 - 19/19 pytest-tests groen (incl. 1000 generated BSN's all valid).
@@ -198,7 +198,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - Custom generic tests: `test_bsn_valid.sql` (11-proef in pure Trino-SQL met regexp + 9-cijfer-kolommen + mod 11), `test_iban_valid.sql` (regex), `test_lh_nummer_valid.sql` (regex).
 
 **Sources**
-- `models/staging/_sources.yml` — `bronze.uwv.{persona_created, polisadm_ikv, ww_aanvraag, wia_aanvraag, wajong_dossier, zw_melding, crm_contact, fez_uitkeringslast}` met per-source description + meta.
+- `models/staging/_sources.yml` — `bronze.demo.{person_created, policy_holders, service_request_application, claim_application, eligibility_case, incident_report, customer_interaction, finance_expense}` met per-source description + meta.
 
 **Staging models (8)**
 - Per domein: `stg_<entity>.sql` parseerd `payload` JSON met `json_extract_scalar(...$.payload.<field>)` + casts naar typed kolommen + behoudt `event_date` partition-key.
@@ -208,12 +208,12 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `int_huishouden_inkomen.sql` — som van `loon_bruto_jaar` per BSN voor lopende IKV's; helper voor UC-04.
 
 **Marts (6 SQL-files in 5 UC's)**
-- `uc01_wia_funnel/mart_uc01_wia_funnel_daily.sql` — dag/regio/onderdeel/status aggregaat (sturingsinfo, geen PII), partitioned op `aanvraag_datum`.
-- `uc04_tw_eligibility/mart_uc04_tw_eligibility.sql` — regel-gebaseerd (inkomen < TW-norm), geen profilering, opt-out flag in meta.
-- `uc05_client_360/mart_uc05_client_360.sql` — denormalized cliëntbeeld via 5 LEFT JOINs (persona + ikv + ww + wia + crm 30d), alle kolommen aanwezig — OPA-policies maskeren in fase 9.
-- `uc06_lastprognose/mart_uc06_uitkeringslast_5y.sql` — baseline-projectie 2026-2030 per wet × regio.
-- `uc06_lastprognose/mart_uc06_scenario_results.sql` — `iva_afschaf_2027` + `ww_versoberen` scenario-toepassing.
-- `uc07_dq_polisadm/mart_uc07_dq_dagrapport.sql` — DQ-tellertjes per ingestiedag (n_ikvs, n_unieke_bsns, n_loon_null, n_lh_format_fout, n_bsn_buiten_test_bereik).
+- `uc01_claims_funnel/mart_uc01_claims_funnel_daily.sql` — dag/regio/onderdeel/status aggregaat (sturingsinfo, geen PII), partitioned op `aanvraag_datum`.
+- `uc04_eligibility_outreach/mart_uc04_eligibility_outreach.sql` — regel-gebaseerd (inkomen < TW-norm), geen profilering, opt-out flag in meta.
+- `uc05_customer_360/mart_uc05_customer_360.sql` — denormalized cliëntbeeld via 5 LEFT JOINs (persona + ikv + ww + wia + crm 30d), alle kolommen aanwezig — OPA-policies maskeren in fase 9.
+- `uc06_cost_forecast/mart_uc06_cost_5y.sql` — baseline-projectie 2026-2030 per wet × regio.
+- `uc06_cost_forecast/mart_uc06_scenario_results.sql` — `iva_afschaf_2027` + `ww_versoberen` scenario-toepassing.
+- `uc07_dq_policies/mart_uc07_dq_dagrapport.sql` — DQ-tellertjes per ingestiedag (n_ikvs, n_unieke_bsns, n_loon_null, n_lh_format_fout, n_bsn_buiten_test_bereik).
 - Per UC een `_uc0x.yml` met meta-velden + tests (relationships naar seeds, accepted_range, accepted_values).
 
 **Seeds (5 + properties.yml)**
@@ -225,8 +225,8 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `_seeds.yml` — schema-tests + descriptions.
 
 **Singular tests (2)**
-- `tests/test_no_protected_attributes_uc03.sql` — UC-03 hoog-risico-AI guard: faalt als kolommen met `etniciteit`/`wijk`/`religie`/etc. namen verschijnen in silver.ww.
-- `tests/test_persona_bsn_count.sql` — sanity: stg_persona moet ≥1 record hebben.
+- `tests/test_no_protected_attributes_uc03.sql` — UC-03 hoog-risico-AI guard: faalt als kolommen met `etniciteit`/`wijk`/`religie`/etc. namen verschijnen in silver.service_requests.
+- `tests/test_persona_bsn_count.sql` — sanity: stg_persons moet ≥1 record hebben.
 
 **Smoke**
 - `tests/smoke/04-dbt-parse.sh` — gebruikt lokale `dbt` of valt terug op docker `ghcr.io/dbt-labs/dbt-trino:1.9.0`. Stappen: `deps`, `parse`, `compile` (best-effort).
@@ -239,7 +239,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 
 ### Beslissingen
 - **`generate_schema_name` + `generate_database_name` overrides** zodat `+database: silver` letterlijk de Trino-catalog wordt. Default dbt-gedrag prefixt `target.schema_<custom>`, wat onleesbare schema-namen geeft in de catalog.
-- **Bronze-naar-silver via JSON-parse in staging** — bronze.uwv.<entity>.payload is raw JSON envelope. dbt's staging-laag is verantwoordelijk voor schema-on-read. Nieuwe brontypen vergen een nieuw staging-model maar geen Spark-wijziging.
+- **Bronze-naar-silver via JSON-parse in staging** — bronze.demo.<entity>.payload is raw JSON envelope. dbt's staging-laag is verantwoordelijk voor schema-on-read. Nieuwe brontypen vergen een nieuw staging-model maar geen Spark-wijziging.
 - **One row per Wet × Regio × Maand voor UC-06 baseline** — eenvoudige projection (gem. uit historie); productie zou Prophet/statsforecast gebruiken in een Spark-job (zie `spark-jobs/`).
 - **UC-05 client-360 alle kolommen aanwezig** — OPA-policies (fase 9) maskeren BSN voor `marketing_analyst`; default-deny op medische velden. Mart zelf is een wide-table; access-control is laag-9-verantwoordelijkheid.
 - **Singular test op UC-03 protected attributes** — defensieve guard tegen accidenteel toevoegen van etniciteit/wijk-features in WW-domein. Faalt CI direct.
@@ -379,7 +379,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `trino-platform-roles.rego` — `role_allows_resource` met **twee paden**: (1) `schemas == null` → catalog-only, (2) `schemas != null` → catalog + schema-membership. Helpers `role_has_capability` + `any_role_has_capability` voor capability-driven masks.
 - `trino-doelbinding.rego` — `purpose_allows_resource` (R-AVG-06). Wildcard-resolver matcht `<catalog>.<schema>.<table>` of `<catalog>.<schema>.*`. `user_allowed_purposes` is union over rollen. `*` wildcard voor platform_admin.
 - `trino-row-filters.rego` — WIA regio-filter `regio_code = '<UPPER>'` met regex-injection-validatie (`^[a-z]{3}$`); UC-04 opt-out filter; sandbox `bsn_pseudo IS NOT NULL`.
-- `trino-column-masks.rego` — BSN-mask `concat('XXXXX', substr(bsn, 6, 4))` voor marketing_analyst; BSN-hard-mask voor rollen zonder `can_see_pii`; IBAN/bankrekening masked voor rollen zonder `can_see_bankrekening`; diagnose/icd10 → NULL voor rollen zonder `can_see_medical`; geboortedatum bucket-per-jaar voor data_steward.
+- `trino-column-masks.rego` — BSN-mask `concat('XXXXX', substr(bsn, 6, 4))` voor marketing_analyst; BSN-hard-mask voor rollen zonder `can_see_pii`; IBAN/bankrekening masked voor rollen zonder `can_see_bankrekening`; diagnose/icd10 → NULL voor rollen zonder `can_see_medical`; birth_date bucket-per-jaar voor data_steward.
 
 **Vier test-files (23 tests, allemaal PASS)**
 - `trino-base_test.rego` — anonymous deny + authenticated meta allow + no-role deny.
@@ -423,7 +423,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 ### Gedaan
 
 **E2E**
-- `tests/e2e/full-flow-uc01.sh` — 7 stages (cluster → bootstrap → deploy → seed → wait-for-stream → smoke 01–08 → UC-01 verificatie). Skip-flags `SKIP_CLUSTER`/`BOOTSTRAP`/`DEPLOY`/`SEED` voor partial reruns. Verificatie-checks: silver.wia row-count, bronze.uwv.wia_aanvraag rij-aanwezigheid, BSN-prefix-9 anomaliedetectie. Verwachte runtime: 25-35 min op MBP M1/M2 (16 GB).
+- `tests/e2e/full-flow-uc01.sh` — 7 stages (cluster → bootstrap → deploy → seed → wait-for-stream → smoke 01–08 → UC-01 verificatie). Skip-flags `SKIP_CLUSTER`/`BOOTSTRAP`/`DEPLOY`/`SEED` voor partial reruns. Verificatie-checks: silver.wia row-count, bronze.claims.application rij-aanwezigheid, BSN-prefix-9 anomaliedetectie. Verwachte runtime: 25-35 min op MBP M1/M2 (16 GB).
 
 **Runbook** (`docs/runbook.md`, complete herstructurering)
 - 11 secties uitgewerkt met concrete commands: snelstart, lifecycle, component-status (12 componenten met `kubectl`-checks), 5 incident-runbooks (Trino access-denied, dbt table-not-found, streaming-hang, Airflow import-error, OM-init-faal), backup & restore (MinIO + Postgres + Keycloak + Trino), upgrade-procedure (operators + dbt-deps + Helm), seed-herladen, OPA-policy-update-flow, observability-endpoints + OpenSearch-queries, compliance-evidence-verzamelen.
@@ -528,7 +528,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - #6 Realm odap.json uitgebreid met `passwordPolicy: length(12) and digits(1) and upperCase(1) and specialChars(1) and notUsername and passwordHistory(5)`, sessie-timeouts (1u idle, 8u max), TOTP-policy + `requiredActions: ["CONFIGURE_TOTP"]` op `platform.admin`, `data.engineer`, `case.manager`.
 
 **Pseudonymize-macro daadwerkelijk gebruikt**:
-- #7 `dbt/models/intermediate/int_persona_pseudonymized.sql` — pseudo-identifier helper. `dbt/models/marts/uc09_reint_effect/mart_uc09_effect_panel.sql` — sandbox-panel met **alleen** `bsn_pseudo`, geen ruwe BSN. Vult ook gap #1.1 (UC-09 mart leeg).
+- #7 `dbt/models/intermediate/int_persona_pseudonymized.sql` — pseudo-identifier helper. `dbt/models/marts/uc09_reintegration_effect/mart_uc09_effect_panel.sql` — sandbox-panel met **alleen** `bsn_pseudo`, geen ruwe BSN. Vult ook gap #1.1 (UC-09 mart leeg).
 
 **Audit-log-routering**:
 - #12 `platform/10-opa/opacluster.yaml` configOverride `decision_logs.console: true`. Vector `route_audit_logs` transform splitst OPA-decisions + Trino-queryId-logs naar `logs-audit-*` index met 7-jaar-retentie.
@@ -551,7 +551,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 
 **Glue**:
 - `scripts/deploy-platform.sh` — `platform/14-monitoring` toegevoegd aan layer-volgorde.
-- `dbt/dbt_project.yml` — `uc09_reint_effect` model-config (database silver, schema sandbox_uc09).
+- `dbt/dbt_project.yml` — `uc09_reintegration_effect` model-config (database silver, schema sandbox_uc09).
 - `infrastructure/helm/vector/values.yaml` — audit-route + dual-sink (`opensearch_app` + `opensearch_audit`).
 - `platform/11-airflow/kustomization.yaml` — `bewaartermijn_enforcer.py` toegevoegd aan DAG-ConfigMap (totaal 7 DAGs).
 - `ci/github-actions/dbt-parse.yml` — meta-check in plaats van eerdere grep.

@@ -22,14 +22,14 @@ from airflow.providers.trino.operators.trino import TrinoOperator
 # Welke tabellen onderhouden? Voor de smoke houden we het bij de bronze-laag.
 # Productie: dynamisch via SHOW TABLES of een meta-tabel die OM voorziet.
 MAINTAIN_TABLES = [
-    ("bronze", "uwv", "persona_created"),
-    ("bronze", "uwv", "polisadm_ikv"),
-    ("bronze", "uwv", "ww_aanvraag"),
-    ("bronze", "uwv", "wia_aanvraag"),
-    ("bronze", "uwv", "wajong_dossier"),
-    ("bronze", "uwv", "zw_melding"),
-    ("bronze", "uwv", "crm_contact"),
-    ("bronze", "uwv", "fez_uitkeringslast"),
+    ("bronze", "demo", "person_created"),
+    ("bronze", "demo", "policy_holders"),
+    ("bronze", "demo", "service_request_application"),
+    ("bronze", "demo", "claim_application"),
+    ("bronze", "demo", "eligibility_case"),
+    ("bronze", "demo", "incident_report"),
+    ("bronze", "demo", "customer_interaction"),
+    ("bronze", "demo", "finance_expense"),
 ]
 
 DEFAULT_ARGS = {
@@ -67,7 +67,7 @@ with DAG(
     start_date=datetime(2026, 5, 1),
     catchup=False,
     max_active_runs=1,
-    tags=["maintenance", "uwv", "fase-6"],
+    tags=["maintenance", "demo", "fase-6"],
 ) as dag:
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")

@@ -35,6 +35,6 @@ def test_persona_fields_present() -> None:
         assert d.get("voornaam")
         assert d.get("achternaam")
         assert d["geslacht"] in ("M", "V", "X")
-        assert d["geboortedatum"].count("-") == 2
+        assert d["birth_date"].count("-") == 2
         assert isinstance(d["huisnummer"], int)
         assert d["nationaliteit"] == "NL"

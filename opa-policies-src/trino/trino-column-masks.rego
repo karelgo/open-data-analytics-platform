@@ -11,7 +11,7 @@ package trino
 #   - BSN:          show last 4 (`'XXXXX' || substr(bsn, 6, 4)`)  voor marketing_analyst
 #   - IBAN/bankrekening:  fully masked  (`'NLxx XXXX XXXX XXXX'`) voor wie geen `can_see_bankrekening`
 #   - diagnose/icd10: NULL  voor wie geen `can_see_medical`
-#   - geboortedatum: bucket-per-jaar  (`date_trunc('year', geboortedatum)`) voor data_steward
+#   - birth_date: bucket-per-jaar  (`date_trunc('year', birth_date)`) voor data_steward
 #   - default voor andere PII bij rollen zonder `can_see_pii`: NULL
 
 import rego.v1
@@ -44,9 +44,9 @@ columnMask := {"expression": "NULL"} if {
 	not any_role_has_capability("break_glass")
 }
 
-# --- geboortedatum: bucket-per-jaar voor data_steward -----------------
-columnMask := {"expression": "date_trunc('year', geboortedatum)"} if {
-	column_lower == "geboortedatum"
+# --- birth_date: bucket-per-jaar voor data_steward -----------------
+columnMask := {"expression": "date_trunc('year', birth_date)"} if {
+	column_lower == "birth_date"
 	"data_steward" in user_roles
 	count(user_roles) == 1 # alleen als data_steward de enige rol is
 }
@@ -57,7 +57,7 @@ columnMask := {"expression": "date_trunc('year', geboortedatum)"} if {
 # een generiek "WIA-procedure"-label.
 columnMask := {"expression": "concat(domein, '.', event_type)"} if {
 	column_lower == "event_label"
-	resource_schema_lower == "uc11_klantreis"
+	resource_schema_lower == "uc11_customer_journey"
 	not any_role_has_capability("can_see_medical")
 	not any_role_has_capability("break_glass")
 }
@@ -65,7 +65,7 @@ columnMask := {"expression": "concat(domein, '.', event_type)"} if {
 # UC-11 — source_ref_id (orig. primary key) gemaskeerd voor non-supervisor.
 columnMask := {"expression": "'***'"} if {
 	column_lower == "source_ref_id"
-	resource_schema_lower == "uc11_klantreis"
+	resource_schema_lower == "uc11_customer_journey"
 	not any_role_has_capability("can_see_pii")
 	not "marketing_analyst" in user_roles
 }

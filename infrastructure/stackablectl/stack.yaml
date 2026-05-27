@@ -18,7 +18,7 @@ stacks:
       i.p.v. een message bus.
     stackableRelease: odap-platform-26.3
     labels:
-      - uwv
+      - demo
       - lakehouse
       - delta
       - reference

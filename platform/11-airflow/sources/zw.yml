@@ -5,19 +5,19 @@ name: zw
 domain: zw
 
 stream:
-  name: uwv.zw.melding
+  name: incidents.report
   key: bsn
 
 bronze:
   catalog: bronze
-  schema: uwv
-  table: zw_melding
+  schema: demo
+  table: incident_report
   partition_by: event_date
 
 silver:
   catalog: silver
-  schema: zw
-  staging_model: stg_zw_melding
+  schema: incidents
+  staging_model: stg_incident_report
   dbt_tag: zw
 
 governance:

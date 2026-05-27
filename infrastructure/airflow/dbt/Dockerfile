@@ -1,4 +1,4 @@
-# UWV dbt-trino image — bakt het hele dbt-project + dbt_packages in.
+# ODAP dbt-trino image — bakt het hele dbt-project + dbt_packages in.
 #
 # Cosmos's ExecutionMode.KUBERNETES draait elke dbt-task in een verse pod.
 # Mounten via ConfigMap is geen optie omdat dbt_packages > 1 MiB. Daarom

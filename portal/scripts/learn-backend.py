@@ -41,7 +41,7 @@ logging.basicConfig(level=logging.INFO)
 app = FastAPI(title="UDP Academy backend", version="0.1.0")
 
 KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL")
-KEYCLOAK_REALM = os.environ.get("KEYCLOAK_REALM", "uwv")
+KEYCLOAK_REALM = os.environ.get("KEYCLOAK_REALM", "demo")
 ATTR_KEY = "udp_progress"
 
 PROGRESS_KEY_RE = re.compile(r"^[a-z_]+/(foundation|practitioner|expert)/\d+$")
@@ -138,7 +138,7 @@ async def put_progress(req: Request) -> JSONResponse:
 
 def _check_wia_practitioner_query(user: str) -> dict[str, Any]:
     # Probeer Trino audit-log: is er query met "doel: beoordeling/uitkering"
-    # in de laatste 24u door deze user, op silver.wia.aanvraag, met regio_code-filter?
+    # in de laatste 24u door deze user, op silver.claims.application, met regio_code-filter?
     # Zie tests/smoke/test_audit_query.py voor patroon.
     return {"ok": False, "msg": "audit-log koppeling niet geconfigureerd"}
 

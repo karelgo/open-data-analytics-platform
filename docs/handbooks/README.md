@@ -65,10 +65,10 @@ rollen achter elkaar:
 | Term | Uitleg |
 |---|---|
 | **Catalog** | Trino-namespace die overeenkomt met een datazone: `bronze`, `silver`, `gold`, `sensitive`, `sandbox`. |
-| **Schema** | Domein binnen een catalog, bv. `silver.wia` of `gold.uc01_wia_funnel`. |
+| **Schema** | Domein binnen een catalog, bv. `silver.wia` of `gold.uc01_claims_funnel`. |
 | **OPA** | Open Policy Agent — bepaalt bij elke query wie wat mag zien. |
 | **Doelbinding** | De wettelijke taak waarvoor data verwerkt mag worden. Toegang vereist een geldig doel. |
-| **PII** | Persoonlijk Identificeerbare Informatie (BSN, naam, geboortedatum, adres). |
+| **PII** | Persoonlijk Identificeerbare Informatie (BSN, naam, birth_date, adres). |
 | **Pseudonimisering** | Vervangen van BSN door een hash + zout — niet herleidbaar zonder sleutel. |
 | **Sensitive Vault** | Aparte catalog voor bijzondere persoonsgegevens (art. 9 AVG). |
 | **Mart** | Eindproduct van dbt: een tabel/view klaar voor consumptie in `gold.*`. |

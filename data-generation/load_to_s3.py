@@ -48,7 +48,7 @@ from generators import (
 
 
 def _stream_to_path(stream: str) -> str:
-    """`uwv.persona.created` → `uwv/persona/created`."""
+    """`customers.created` → `customers/created`."""
     return stream.replace(".", "/")
 
 
@@ -191,60 +191,60 @@ def main(
     personas = list(persona_mod.generate_personas(count, seed=seed))
     bsns = [p.bsn for p in personas]
     if "persona" in domains:
-        _emit(writer, "uwv.persona.created", personas, persona_mod.to_kafka_envelope)
+        _emit(writer, "customers.created", personas, persona_mod.to_kafka_envelope)
 
-    if "polisadm" in domains:
+    if "policies" in domains:
         _emit(
             writer,
-            "uwv.polisadm.ikv",
+            "customers.policy",
             polisadministratie.generate_ikvs(bsns, seed=seed),
             polisadministratie.to_kafka_envelope,
         )
 
-    if "ww" in domains:
+    if "service_requests" in domains:
         _emit(
             writer,
-            "uwv.ww.aanvraag",
+            "service_requests.application",
             ww.generate_ww_aanvragen(bsns, seed=seed),
             ww.to_kafka_envelope,
         )
 
-    if "wia" in domains:
+    if "claims" in domains:
         _emit(
             writer,
-            "uwv.wia.aanvraag",
+            "claims.application",
             wia.generate_wia_aanvragen(bsns, seed=seed),
             wia.to_kafka_envelope,
         )
 
-    if "wajong" in domains:
+    if "eligibility_cases" in domains:
         _emit(
             writer,
-            "uwv.wajong.dossier",
-            wajong.generate_wajong_dossiers(bsns, seed=seed),
+            "eligibility_cases.case",
+            wajong.generate_eligibility_cases(bsns, seed=seed),
             wajong.to_kafka_envelope,
         )
 
-    if "zw" in domains:
+    if "incidents" in domains:
         _emit(
             writer,
-            "uwv.zw.melding",
-            zw.generate_zw_meldingen(bsns, seed=seed),
+            "incidents.report",
+            zw.generate_incident_reporten(bsns, seed=seed),
             zw.to_kafka_envelope,
         )
 
-    if "crm" in domains:
+    if "customers" in domains:
         _emit(
             writer,
-            "uwv.crm.contact",
+            "customers.interaction",
             crm.generate_klantcontacten(bsns, seed=seed),
             crm.to_kafka_envelope,
         )
 
-    if "fez" in domains:
+    if "finance" in domains:
         _emit(
             writer,
-            "uwv.fez.uitkeringslast",
+            "finance.expense",
             fez.generate_fez_aggregaten(seed=seed),
             fez.to_kafka_envelope,
         )

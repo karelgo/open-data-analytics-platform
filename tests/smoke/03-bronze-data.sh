@@ -50,7 +50,7 @@ trino_exec() {
 }
 
 schemas=$(trino_exec "SHOW SCHEMAS FROM bronze" 2>&1 || true)
-if echo "$schemas" | grep -qx 'uwv'; then
+if echo "$schemas" | grep -qx 'demo'; then
   pass "schema bronze.uwv aanwezig"
 else
   fail "schema bronze.uwv ontbreekt — output:\n$schemas"
@@ -62,29 +62,29 @@ tables=$(trino_exec "SHOW TABLES FROM bronze.uwv" 2>&1 || true)
 echo "  Tabellen gevonden:"
 echo "$tables" | sed 's/^/    /'
 
-# Minimaal: persona_created (uit 10k personas)
-if echo "$tables" | grep -qE 'persona_created'; then
-  pass "tabel bronze.uwv.persona_created aanwezig"
+# Minimaal: person_created (uit 10k personas)
+if echo "$tables" | grep -qE 'person_created'; then
+  pass "tabel bronze.persons.created aanwezig"
 else
-  fail "tabel bronze.uwv.persona_created ontbreekt"
+  fail "tabel bronze.persons.created ontbreekt"
 fi
 
 # 4. Row-count
-log "Row-count bronze.uwv.persona_created"
-count_out=$(trino_exec "SELECT count(*) FROM bronze.uwv.persona_created" 2>&1 || true)
+log "Row-count bronze.persons.created"
+count_out=$(trino_exec "SELECT count(*) FROM bronze.persons.created" 2>&1 || true)
 # Parse output: helper geeft tab-separated rijen, eerste regel = count
 n=$(echo "$count_out" | head -1 | tr -d ' ')
 if [[ "$n" =~ ^[0-9]+$ ]] && [[ "$n" -ge "$EXPECTED_COUNT" ]]; then
-  pass "persona_created bevat $n records (>= $EXPECTED_COUNT)"
+  pass "person_created bevat $n records (>= $EXPECTED_COUNT)"
 elif [[ "$n" =~ ^[0-9]+$ ]] && [[ "$n" -gt 0 ]]; then
-  pass "persona_created bevat $n records (verwacht ~$EXPECTED_COUNT — micro-batch nog niet compleet?)"
+  pass "person_created bevat $n records (verwacht ~$EXPECTED_COUNT — micro-batch nog niet compleet?)"
 else
-  fail "persona_created count parse-error: '$count_out'"
+  fail "person_created count parse-error: '$count_out'"
 fi
 
 # 5. BSN-format check (eerste 5 records)
 log "BSN-format check (sample 5 rijen)"
-sample=$(trino_exec "SELECT json_extract_scalar(payload, '\$.payload.bsn') AS bsn FROM bronze.uwv.persona_created LIMIT 5" 2>&1 || true)
+sample=$(trino_exec "SELECT json_extract_scalar(payload, '\$.payload.bsn') AS bsn FROM bronze.persons.created LIMIT 5" 2>&1 || true)
 echo "$sample" | grep -E '^"?9[0-9]{8}"?$' >/dev/null \
   && pass "BSN's beginnen met 9 (test-bereik) — sample:\n$sample" \
   || fail "BSN-format afwijkend; sample:\n$sample"

@@ -44,7 +44,7 @@ ACTIVE_USE_CASES: list[dict] = [
      "description": "Integrale Klantreis — event-stream + fase-reconstructie."},
     {"id": "uc12", "name": "focus_finops", "owner": "divisie_finance",
      "description": "Cloud-cost FinOps (FOCUS) — spend, savings, commitment-utilization."},
-    {"id": "uc_klant_tev", "name": "klanttevredenheid", "owner": "divisie_klantcontact",
+    {"id": "uc_customer_satisfaction", "name": "customer_satisfaction", "owner": "divisie_klantcontact",
      "description": "Klanttevredenheid per kanaal × maand (CSV-batch demo)."},
 ]
 
@@ -89,7 +89,7 @@ def build_gold_dag(uc: dict) -> DAG:
         # mogen onpaused starten — gold runt alleen als hun silver-deps
         # binnenkomen, dus geen automatische scheduler-runs op cold start.
         is_paused_upon_creation=False,
-        tags=["uwv", "gold", "cosmos", f"usecase:{uc['id']}", f"owner:{uc['owner']}"],
+        tags=["demo", "gold", "cosmos", f"usecase:{uc['id']}", f"owner:{uc['owner']}"],
     )
 
 
@@ -104,7 +104,7 @@ def _no_triggers_dag(uc: dict) -> DAG:
         schedule=None,
         start_date=datetime(2026, 5, 1),
         catchup=False,
-        tags=["uwv", "gold", "inactive", f"usecase:{uc['id']}"],
+        tags=["demo", "gold", "inactive", f"usecase:{uc['id']}"],
     ) as dag:
         EmptyOperator(task_id="no_triggers_configured")
     return dag
@@ -121,7 +121,7 @@ def _fallback_dag(uc: dict, triggers) -> DAG:
         schedule=triggers,
         start_date=datetime(2026, 5, 1),
         catchup=False,
-        tags=["uwv", "gold", "fallback", f"usecase:{uc['id']}"],
+        tags=["demo", "gold", "fallback", f"usecase:{uc['id']}"],
     ) as dag:
         EmptyOperator(task_id="cosmos_unavailable")
     return dag

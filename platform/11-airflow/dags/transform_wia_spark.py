@@ -16,11 +16,11 @@
 
 ---
 
-PARALLEL aan het bestaande dbt-pad (silver_wia + gold_uc01_wia_funnel via
+PARALLEL aan het bestaande dbt-pad (silver_wia + gold_uc01_claims_funnel via
 transform_silver_per_domain / transform_gold_per_usecase). Schrijft naar
 aparte HMS-schemas zodat dbt-tabellen onaangeraakt blijven:
 
-  dbt:    silver.wia.stg_wia_aanvraag         gold.uc01_wia_funnel.mart_*
+  dbt:    silver.claims.stg_claim_application         gold.uc01_claims_funnel.mart_*
   spark:  silver.wia_spark.aanvraag           gold.uc01_wia_spark.funnel_daily
 
 Het werk gebeurt in Stackable SparkApplications. Deze DAG creëert per run
@@ -33,7 +33,7 @@ create/get/delete in odap-platform — zie platform/11-airflow/rbac-spark.yaml.
 
 Schedule:
   None (alleen handmatige trigger of via TriggerDagRunOperator). Reden:
-  bronze.uwv.wia_aanvraag wordt nu handmatig geseed (zie seed-bronze-wia
+  bronze.claims.application wordt nu handmatig geseed (zie seed-bronze-claims
   SparkApplication), niet door een streaming-DAG. Voor productie: vervang
   door schedule=[bronze_wia_dataset].
 
@@ -65,8 +65,8 @@ JOBS_MOUNT = "/opt/odap/airflow/jobs"
 NAMESPACE = "odap-platform"
 
 # Datasets — downstream DAGs kunnen hierop schedulen.
-SILVER_DATASET = Dataset("uwv://silver/wia_spark/aanvraag")
-GOLD_DATASET = Dataset("uwv://gold/uc01_wia_spark/funnel_daily")
+SILVER_DATASET = Dataset("odap://silver/wia_spark/aanvraag")
+GOLD_DATASET = Dataset("odap://gold/uc01_wia_spark/funnel_daily")
 
 DEFAULT_ARGS = {
     "owner": "data-engineer",
@@ -169,7 +169,7 @@ with DAG(
     description=(
         "Spark-pad voor WIA bronze→silver→gold (parallel aan dbt). "
         "Tasks roepen SparkApplications aan in odap-platform namespace. "
-        "Vereist seed-bronze-wia te zijn gedraaid (zie platform/08-spark/README.md)."
+        "Vereist seed-bronze-claims te zijn gedraaid (zie platform/08-spark/README.md)."
     ),
     default_args=DEFAULT_ARGS,
     schedule=None,
@@ -177,7 +177,7 @@ with DAG(
     catchup=False,
     max_active_runs=1,
     is_paused_upon_creation=False,
-    tags=["spark", "delta", "wia", "demo", "parallel-to-dbt"],
+    tags=["spark", "delta", "claims", "demo", "parallel-to-dbt"],
 ) as dag:
     silver = KubernetesPodOperator(
         task_id="silver_wia",

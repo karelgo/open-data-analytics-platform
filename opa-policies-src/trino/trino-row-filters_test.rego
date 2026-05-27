@@ -14,7 +14,7 @@ test_claims_analyst_regio_filter if {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "silver",
-				"schemaName": "wia",
+				"schemaName": "claims",
 				"tableName": "aanvraag",
 			}},
 		},
@@ -34,7 +34,7 @@ test_no_regio_filter_for_data_steward if {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "silver",
-				"schemaName": "wia",
+				"schemaName": "claims",
 				"tableName": "aanvraag",
 			}},
 		},
@@ -52,8 +52,8 @@ test_uc04_opt_out_filter if {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "gold",
-				"schemaName": "uc04_tw_eligibility",
-				"tableName": "mart_uc04_tw_eligibility",
+				"schemaName": "uc04_eligibility_outreach",
+				"tableName": "mart_uc04_eligibility_outreach",
 			}},
 		},
 	}
@@ -73,14 +73,14 @@ test_invalid_regio_no_filter if {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "silver",
-				"schemaName": "wia",
+				"schemaName": "claims",
 				"tableName": "aanvraag",
 			}},
 		},
 	}
 }
 
-# UC-11 — claims_analyst in regio AMS op gold.uc11_klantreis → regio-filter
+# UC-11 — claims_analyst in regio AMS op gold.uc11_customer_journey → regio-filter
 # met fallback "OR regio_code IS NULL" zodat non-WIA events zichtbaar blijven.
 test_uc11_claims_analyst_regio_filter if {
 	filters := rowFilters with input as {
@@ -93,8 +93,8 @@ test_uc11_claims_analyst_regio_filter if {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "gold",
-				"schemaName": "uc11_klantreis",
-				"tableName": "mart_uc11_klantreis_events",
+				"schemaName": "uc11_customer_journey",
+				"tableName": "mart_uc11_journey_events",
 			}},
 		},
 	}
@@ -113,11 +113,11 @@ test_uc11_fraud_analyst_medical_filter if {
 			"operation": "SelectFromColumns",
 			"resource": {"table": {
 				"catalogName": "gold",
-				"schemaName": "uc11_klantreis",
-				"tableName": "mart_uc11_klantreis_events",
+				"schemaName": "uc11_customer_journey",
+				"tableName": "mart_uc11_journey_events",
 			}},
 		},
 	}
 	count(filters) == 1
-	filters[0].expression == "NOT (domein = 'wia' AND event_status IN ('TOEGEKEND_WGA', 'TOEGEKEND_IVA'))"
+	filters[0].expression == "NOT (domein = 'claims' AND event_status IN ('TOEGEKEND_WGA', 'TOEGEKEND_IVA'))"
 }

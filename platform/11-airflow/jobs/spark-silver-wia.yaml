@@ -20,7 +20,7 @@ spec:
   sparkImage:
     productVersion: "3.5.8"
   mode: cluster
-  mainApplicationFile: "local:///stackable/spark/jobs/batch_silver_wia.py"
+  mainApplicationFile: "local:///stackable/spark/jobs/batch_silver_claims.py"
   s3connection:
     reference: s3-minio
   deps:

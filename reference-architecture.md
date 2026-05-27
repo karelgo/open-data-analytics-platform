@@ -103,11 +103,11 @@ Per wet gelden specifieke verwerkingsgrondslagen, doelen, bewaartermijnen en geg
 - **Bijzonderheden**: ketenproces met externe partners (re-integratiebedrijven, GGZ); medische én sociaal-economische data verweven.
 
 ### 3.5 CRM-data UWV
-- **Bronnen**: klantcontacten (telefoon, balie, beeldbellen), Werkmap-correspondentie, klacht- en bezwaarprocedures, klanttevredenheidsonderzoeken, kanaalvoorkeuren.
+- **Bronnen**: klantcontacten (telefoon, balie, beeldbellen), Werkmap-correspondentie, klacht- en bezwaarprocedures, customer_satisfactionsonderzoeken, kanaalvoorkeuren.
 - **Bijzonderheden**: 360°-beeld vereist samenvoeging van uitkeringsadministratie, contactdata en re-integratiestatus → strenge doelbinding.
 
 ### 3.6 Financieel-Economische Zaken (FEZ)
-- **Bronnen**: uitkeringslasten per wet, uitvoeringskosten, premies (Aof, Awf, Whk, Ufo), schadelast-prognoses, begroting/realisatie, treasury, leveranciers- en contractdata.
+- **Bronnen**: claim_costen per wet, uitvoeringskosten, premies (Aof, Awf, Whk, Ufo), schadelast-prognoses, begroting/realisatie, treasury, leveranciers- en contractdata.
 - **Bijzonderheden**: data overwegend geaggregeerd; koppeling met cliëntdata alleen voor actuariële doeleinden, gepseudonimiseerd.
 
 ### 3.7 Overige relevante domeinen
@@ -206,7 +206,7 @@ AI Governance & Algoritmeregister • Compliance & Audit • DataOps/MLOps
 ┌──────────────┐      ┌──────────────────┐             ┌───────────────────┐
 │ Domein WW    │      │ Domein AG        │             │ Domein FEZ        │
 │ Data products│      │ (WIA/Wajong/ZW)  │             │ Data products     │
-│ • dagloon    │      │ • claimbeoordeel │             │ • uitkeringslast  │
+│ • dagloon    │      │ • claimbeoordeel │             │ • claim_cost  │
 │ • verwijtb.  │      │ • re-integratie  │             │ • premieinning    │
 │ • sollic.    │      │ • soc.med.cap    │             │ • schadelast      │
 └──────────────┘      └──────────────────┘             └───────────────────┘
@@ -476,11 +476,11 @@ Iedere domein-zone publiceert "data products" met:
 
 ---
 
-### UC-06 — Schadelast- en uitkeringslastprognose (FEZ)
+### UC-06 — Schadelast- en claim_costprognose (FEZ)
 
-**Probleem.** Begrotingscyclus en raming uitkeringslasten vereist actuele en goed onderbouwde prognoses. WIA-volume stijgt, afschaffing IVA staat ter discussie — beleidsscenario's moeten doorgerekend kunnen worden.
+**Probleem.** Begrotingscyclus en raming claim_costen vereist actuele en goed onderbouwde prognoses. WIA-volume stijgt, afschaffing IVA staat ter discussie — beleidsscenario's moeten doorgerekend kunnen worden.
 
-**Doel.** Actuariele modellen voor 5-jaars uitkeringslastprognose per wet, met scenario-analyse.
+**Doel.** Actuariele modellen voor 5-jaars claim_costprognose per wet, met scenario-analyse.
 
 **Data**:
 - Geaggregeerde uitkeringsdata per wet (WW, WIA, Wajong, ZW, WAO, TW), instroom/uitstroom-volumes, demografische trends (CBS), economische indicatoren (CPB), historische schadelast.

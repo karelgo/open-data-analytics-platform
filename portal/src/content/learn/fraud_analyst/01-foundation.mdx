@@ -33,7 +33,7 @@ quiz:
     options:
       - "bronze.uwv"
       - "silver.ww"
-      - "gold.uc03_ww_risk"
+      - "gold.uc03_fraud_risk"
       - "sandbox.research"
     correct: 2
 ---
@@ -44,13 +44,13 @@ platform ingaat.
 
 ## Wat doet UC-03?
 
-Use case 03 (`gold.uc03_ww_risk`) combineert WW-aanvraagdata, polisadministratie
+Use case 03 (`gold.uc03_fraud_risk`) combineert WW-aanvraagdata, polisadministratie
 en historie tot een **risk-score per dossier**. Hoog = aanleiding voor extra
 controle. Het model wijst geen sancties toe — dat doe jij, en je teamleider.
 
 ## Wat zie jij dat anderen niet zien?
 
-Op exact dezelfde tabel `silver.ww.aanvraag` zien rollen verschillende dingen.
+Op exact dezelfde tabel `silver.service_requests.application` zien rollen verschillende dingen.
 Dat regelt OPA op kolomniveau:
 
 | Kolom | Jij (handhaving) | Marketing Analyst |
@@ -71,7 +71,7 @@ tot data die voor klantcontact niet relevant is.
    menselijke regie bij dergelijke modellen — die *ben jij*.
 2. **Doelregistratie.** Bij elke ad-hoc query zet je de ticket-id of dossier-id
    als comment in de SQL: `-- HANDH-1234`. Dat is je papieren spoor.
-3. **Geen vermenging.** Data uit `gold.uc03_ww_risk` deel je niet met collega's
+3. **Geen vermenging.** Data uit `gold.uc03_fraud_risk` deel je niet met collega's
    buiten handhaving — ook niet "even" via een Excel-export.
 
 ## Drie applicaties
@@ -79,7 +79,7 @@ tot data die voor klantcontact niet relevant is.
 | Applicatie | Waarvoor? |
 |---|---|
 | **Superset** | Het WW-risk dashboard, dossier-overzicht per regio |
-| **Trino** | Detail-queries op `silver.ww.*` met ongelinkt IBAN |
+| **Trino** | Detail-queries op `silver.service_requests.*` met ongelinkt IBAN |
 | **OpenMetadata** | Lineage — *waar* komt deze score precies vandaan? |
 
 ## Volgende stap

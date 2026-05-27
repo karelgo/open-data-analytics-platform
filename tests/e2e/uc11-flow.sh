@@ -6,16 +6,16 @@
 #
 # Stappen:
 #   1. dbt parse + compile valideren met UC-11 modellen geselecteerd
-#   2. (cluster) dbt run -s tag:uc11 — bouwt mart_uc11_klantreis_{events,phases}
+#   2. (cluster) dbt run -s tag:uc11 — bouwt mart_uc11_customer_journey_{events,phases}
 #   3. (cluster) dbt test -s tag:uc11 — kolom/relationship-tests groen
-#   4. (cluster) Trino SELECT op gold.uc11_klantreis.* — n_rows > 0
+#   4. (cluster) Trino SELECT op gold.uc11_customer_journey.* — n_rows > 0
 #   5. (cluster) Trino SELECT met `marketing_analyst`-rol + purpose=klantcontact
-#                op gold.uc11_klantreis.mart_uc11_klantreis_events met BSN-mask
+#                op gold.uc11_customer_journey.mart_uc11_journey_events met BSN-mask
 #   6. (cluster) Trino SELECT met `claims_analyst` + regio=AMS — row-filter werkt
 #
 # DoD-anchors die deze test dekt:
-#   - mart_uc11_klantreis_events bevat events voor ≥7 domeinen
-#   - mart_uc11_klantreis_phases bevat ≥1 fase per cliënt met events
+#   - mart_uc11_journey_events bevat events voor ≥7 domeinen
+#   - mart_uc11_journey_phases bevat ≥1 fase per cliënt met events
 #   - OPA row-filter `regio_code = 'AMS' OR regio_code IS NULL` werkt op uc11
 #   - OPA column-mask op event_label voor marketing_analyst werkt op uc11
 
@@ -42,7 +42,7 @@ MANIFEST="$ROOT/dbt/target/manifest.json"
 if [[ ! -f "$MANIFEST" ]]; then
   warn "Manifest niet gevonden — skip UC-11 model-check"
 else
-  for m in mart_uc11_klantreis_events mart_uc11_klantreis_phases int_klantreis_events; do
+  for m in mart_uc11_journey_events mart_uc11_journey_phases int_customer_journey_events; do
     if grep -q "\"name\": \"$m\"" "$MANIFEST"; then
       pass "model $m geregistreerd in dbt-manifest"
     else
@@ -67,16 +67,16 @@ pass "namespace $NS bereikbaar"
 
 # ─── Stage 3: smoke 11 — UC-11 OPA-decisions ──────────────────────────
 section "Stage 3/5: OPA decision-calls voor UC-11"
-bash tests/smoke/11-uc11-klantreis.sh || fail "smoke 11 (UC-11 OPA) faalde"
+bash tests/smoke/11-uc11-customer-journey.sh || fail "smoke 11 (UC-11 OPA) faalde"
 
 # ─── Stage 4: dbt run + test voor UC-11 (via Airflow gold-DAG) ────────
-section "Stage 4/5: trigger gold_uc11_klantreis DAG via Airflow"
+section "Stage 4/5: trigger gold_uc11_customer_journey DAG via Airflow"
 if kubectl -n "$NS" exec deploy/airflow-webserver -c webserver -- \
-     airflow dags trigger gold_uc11_klantreis 2>&1 | grep -q "Created"; then
-  pass "DAG gold_uc11_klantreis getriggerd — wacht op completion (max 5 min)"
+     airflow dags trigger gold_uc11_customer_journey 2>&1 | grep -q "Created"; then
+  pass "DAG gold_uc11_customer_journey getriggerd — wacht op completion (max 5 min)"
   for i in {1..30}; do
     state=$(kubectl -n "$NS" exec deploy/airflow-webserver -c webserver -- \
-             airflow dags state gold_uc11_klantreis "$(date -u +%Y-%m-%d)" 2>/dev/null \
+             airflow dags state gold_uc11_customer_journey "$(date -u +%Y-%m-%d)" 2>/dev/null \
              | tail -1 | awk '{print $1}' || echo "")
     if [[ "$state" == "success" ]]; then
       pass "DAG groen"
@@ -91,7 +91,7 @@ else
   warn "Airflow webserver niet beschikbaar of DAG niet geregistreerd — skip stage 4"
 fi
 
-# ─── Stage 5: Trino-queries op gold.uc11_klantreis.* ──────────────────
+# ─── Stage 5: Trino-queries op gold.uc11_customer_journey.* ──────────────────
 section "Stage 5/5: Trino-query-verificatie"
 trino_query() {
   local user="$1" extra="$2" sql="$3"
@@ -100,9 +100,9 @@ trino_query() {
 }
 
 # 5a — basis count
-log "SELECT count(*) FROM gold.uc11_klantreis.mart_uc11_klantreis_events"
+log "SELECT count(*) FROM gold.uc11_customer_journey.mart_uc11_journey_events"
 r=$(trino_query "smoketest" "" \
-    "SELECT count(*) FROM gold.uc11_klantreis.mart_uc11_klantreis_events" \
+    "SELECT count(*) FROM gold.uc11_customer_journey.mart_uc11_journey_events" \
     || warn "Trino-query faalde — cluster mogelijk niet klaar")
 if echo "$r" | grep -Eq '"?[1-9][0-9]*"?'; then
   pass "events-mart bevat rows"
@@ -113,7 +113,7 @@ fi
 # 5b — domeinen aanwezig
 log "SELECT DISTINCT domein"
 r=$(trino_query "smoketest" "" \
-    "SELECT DISTINCT domein FROM gold.uc11_klantreis.mart_uc11_klantreis_events ORDER BY 1" \
+    "SELECT DISTINCT domein FROM gold.uc11_customer_journey.mart_uc11_journey_events ORDER BY 1" \
     || true)
 n_domains=$(echo "$r" | grep -cE '^"?(persoon|polisadm|ww|zw|wia|wajong|crm)"?' || echo "0")
 if [[ "$n_domains" -ge 3 ]]; then
@@ -123,9 +123,9 @@ else
 fi
 
 # 5c — phases-mart heeft data
-log "SELECT count(*) FROM gold.uc11_klantreis.mart_uc11_klantreis_phases"
+log "SELECT count(*) FROM gold.uc11_customer_journey.mart_uc11_journey_phases"
 r=$(trino_query "smoketest" "" \
-    "SELECT count(*) FROM gold.uc11_klantreis.mart_uc11_klantreis_phases" \
+    "SELECT count(*) FROM gold.uc11_customer_journey.mart_uc11_journey_phases" \
     || true)
 if echo "$r" | grep -Eq '"?[1-9][0-9]*"?'; then
   pass "phases-mart bevat rows"

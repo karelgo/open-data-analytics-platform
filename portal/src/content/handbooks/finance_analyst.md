@@ -7,7 +7,7 @@ role: finance_analyst
 
 Deze handleiding is voor **financieel-economische analisten** die werken
 aan schadelast, prognoses en beleidsanalyses. Je werkt op **geaggregeerde
-data**: geen ruwe BSN, geen individuele uitkeringsbedragen.
+data**: geen ruwe BSN, geen individuele claim_amounten.
 
 ---
 
@@ -38,7 +38,7 @@ input voor begrotingen. Je gebruikt het platform om:
 
 | Catalog | Schema | Inhoud | Toegang |
 |---|---|---|---|
-| `gold` | `uc06_lastprognose` | Schadelast-aggregaten en prognoses | **Ja** |
+| `gold` | `uc06_cost_forecast` | Schadelast-aggregaten en prognoses | **Ja** |
 | `silver` | * | PII en domein-data | **Nee** |
 | `bronze`, `sensitive` | * | (geen) | **Nee** |
 
@@ -58,7 +58,7 @@ Je werkt op aggregaten:
 | `prognose_komende_12_mnd` | Prognose-getallen |
 
 > **Geen ruwe BSN.** Het platform weigert je rauwe persoons-queries
-> (`silver.persoon.*`) — niet jouw doel.
+> (`silver.persons.*`) — niet jouw doel.
 
 ### 3.3 Doelbinding
 
@@ -77,7 +77,7 @@ SELECT
   regeling,
   date_trunc('month', maand) AS maand,
   SUM(totale_last_eur)       AS last
-FROM   gold.uc06_lastprognose.maandlast
+FROM   gold.uc06_cost_forecast.maandlast
 WHERE  jaar = YEAR(CURRENT_DATE)
 GROUP  BY regeling, date_trunc('month', maand)
 ORDER  BY regeling, maand;
@@ -88,7 +88,7 @@ ORDER  BY regeling, maand;
 ```sql
 WITH base AS (
   SELECT regeling, prognose_komende_12_mnd
-  FROM   gold.uc06_lastprognose.prognose_basis
+  FROM   gold.uc06_cost_forecast.prognose_basis
   WHERE  prognose_datum = CURRENT_DATE
 )
 SELECT
@@ -107,7 +107,7 @@ SELECT
   leeftijdsgroep,
   jaar,
   SUM(instroom_aantal) AS instroom
-FROM   gold.uc06_lastprognose.instroom_per_groep
+FROM   gold.uc06_cost_forecast.instroom_per_groep
 WHERE  jaar BETWEEN 2022 AND 2025
 GROUP  BY leeftijdsgroep, jaar
 ORDER  BY leeftijdsgroep, jaar;
@@ -129,7 +129,7 @@ SELECT
   prognose                AS p,
   realisatie              AS r,
   realisatie - prognose   AS afwijking
-FROM gold.uc06_lastprognose.prognose_validatie
+FROM gold.uc06_cost_forecast.prognose_validatie
 WHERE peilkwartaal = '2026-Q1';
 ```
 
@@ -139,8 +139,8 @@ WHERE peilkwartaal = '2026-Q1';
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `Access Denied: silver.persoon.*` | Geen PII voor jouw rol | Werk op aggregaat-marts |
-| `Access Denied: gold.uc05_client_360` | Andere doelbinding | Niet jouw scope |
+| `Access Denied: silver.persons.*` | Geen PII voor jouw rol | Werk op aggregaat-marts |
+| `Access Denied: gold.uc05_customer_360` | Andere doelbinding | Niet jouw scope |
 | `Result has only 8 rows` | Te kleine groep, mogelijk privacy-onderdrukking | Aggregeer ruwer |
 
 | Probleem | Contact |
@@ -154,7 +154,7 @@ WHERE peilkwartaal = '2026-Q1';
 ## 6. Wat je nooit doet
 
 - Aggregaten op kleine groepen (< 10) extern delen — herleidbaarheid.
-- Querys op `silver.persoon.*` proberen "om het toch te zien".
+- Querys op `silver.persons.*` proberen "om het toch te zien".
 - CSV-exports met cliënt-detail laten — jij ziet die niet, maar valideer altijd.
 
 ---

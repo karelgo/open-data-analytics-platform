@@ -1,4 +1,4 @@
-# Public-DNS Ingresses for the UWV reference platform on StackIT SKE.
+# Public-DNS Ingresses for the ODAP reference platform on StackIT SKE.
 #
 # Domain: example.com (Azure DNS in dev-stackable-rg).
 # Apex A record points at the StackIT Floating IP 188.34.84.39 (reserved

@@ -8,7 +8,7 @@
 #
 #   Op een verse cluster of na een Trino-reset zijn alleen de UC-11 marts
 #   gematerialiseerd (door uc11_full_setup-DAG). De andere UC-marts
-#   (uc01/uc04/uc05/uc06/uc07/uc09/uc_klant_tev/dq_overview) staan wel
+#   (uc01/uc04/uc05/uc06/uc07/uc09/uc_customer_satisfaction/dq_overview) staan wel
 #   gedefinieerd in dbt/ maar zijn nog niet gebouwd → komen ook niet in OM.
 #
 #   Deze Job creëert die tabel-entities rechtstreeks via de OM REST-API
@@ -31,7 +31,7 @@
 #   - databaseSchemas onder trino (bronze + gold per UC)
 #   - Teams (divisie_*, knowledge_center, data_steward_*)
 #   - Domains (AG, WW, CRM, FEZ, Polisadm, Klantcontact, Governance)
-#   - DataProducts (uc01_wia_funnel, uc04_..., ...)
+#   - DataProducts (uc01_claims_funnel, uc04_..., ...)
 #   - Classifications + Glossary CGM
 #   - Custom-property types geregistreerd op Table-entity
 #
@@ -76,23 +76,23 @@ data:
     # spiegelen dbt meta + dbt-meta-mapping.yaml.
     MARTS = [
       {
-        "schema": "uc01_wia_funnel", "name": "mart_uc01_wia_funnel_daily",
+        "schema": "uc01_claims_funnel", "name": "mart_uc01_claims_funnel_daily",
         "description": "UC-01 — Dagelijks aggregaat WIA-aanvragen × regio × onderdeel × status. Sturingsinformatie, geen PII.",
         "columns": [
           col("aanvraag_datum", DT, "Datum waarop aanvraag is ingediend."),
-          col("regio_code", V(8), "UWV-regio (NO/NW/ZO/ZW/MN)."),
+          col("regio_code", V(8), "region (NO/NW/ZO/ZW/MN)."),
           col("onderdeel", V(32), "WIA-onderdeel (IVA/WGA/looncomp)."),
           col("status", V(32), "Aanvraag-status (INGEDIEND/IN_BEHANDELING/TOEGEKEND/AFGEWEZEN)."),
           col("n_aanvragen", INT, "Aantal aanvragen voor deze rij."),
         ],
-        "domain": "AG", "owner": "divisie_ag", "dataProduct": "uc01_wia_funnel",
+        "domain": "AG", "owner": "divisie_ag", "dataProduct": "uc01_claims_funnel",
         "tags": ["Tier.Tier1","Doelbinding.Sturingsinfo","LegalBasis.Art6_1c","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": ["Aanvraag","Beoordeling"],
         "ext": {"bewaartermijn_jaren": 7, "legal_basis_text": "WIA_art_64", "dbt_domain": "ag"},
         "pii_cols": {},
       },
       {
-        "schema": "uc04_tw_eligibility", "name": "mart_uc04_tw_eligibility",
+        "schema": "uc04_eligibility_outreach", "name": "mart_uc04_eligibility_outreach",
         "description": "UC-04 — Cliënten potentieel rechthebbend op TW-aanvulling. Regel-gebaseerd, geen profilering.",
         "columns": [
           col("bsn", V(9), "BSN van de cliënt — OPA-masking per rol."),
@@ -101,20 +101,20 @@ data:
           col("gat_per_maand", DBL, "Verschil (norm − inkomen)."),
           col("aanvraag_geadviseerd", BOOL, "True als TW-aanvulling wordt geadviseerd."),
         ],
-        "domain": "WW", "owner": "divisie_ww", "dataProduct": "uc04_tw_eligibility",
+        "domain": "WW", "owner": "divisie_ww", "dataProduct": "uc04_eligibility_outreach",
         "tags": ["Tier.Tier1","Doelbinding.Proactieve_Dienstverlening","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Laag"],
         "glossary": ["Uitkering"],
-        "ext": {"bewaartermijn_jaren": 7, "legal_basis_text": "Wet_proactieve_dienstverlening_SZW_2025", "dbt_domain": "ww", "opt_out_supported": ["true"]},
+        "ext": {"bewaartermijn_jaren": 7, "legal_basis_text": "Wet_proactieve_dienstverlening_SZW_2025", "dbt_domain": "service_requests", "opt_out_supported": ["true"]},
         "pii_cols": {"bsn": "PII.BSN"},
       },
       {
-        "schema": "uc05_client_360", "name": "mart_uc05_client_360",
+        "schema": "uc05_customer_360", "name": "mart_uc05_customer_360",
         "description": "UC-05 — 360°-cliëntbeeld voor klantcontact. Volledig schema; OPA-policies maskeren BSN/PII per rol.",
         "columns": [
           col("bsn", V(9), "BSN — OPA-masking."),
           col("voornaam", V(64)),
           col("achternaam", V(64)),
-          col("geboortedatum", DT),
+          col("birth_date", DT),
           col("geslacht", V(16)),
           col("straat", V(128)),
           col("huisnummer", V(16)),
@@ -122,15 +122,15 @@ data:
           col("n_lopende_ww", INT, "Aantal lopende WW-uitkeringen."),
           col("n_lopende_wia", INT, "Aantal lopende WIA-uitkeringen."),
         ],
-        "domain": "CRM", "owner": "divisie_crm", "dataProduct": "uc05_client_360",
+        "domain": "CRM", "owner": "divisie_crm", "dataProduct": "uc05_customer_360",
         "tags": ["Tier.Tier1","Doelbinding.Klantcontact","Doelbinding.Behandeling","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Midden"],
         "glossary": ["Client","Uitkering","Contact","Kanaal"],
-        "ext": {"bewaartermijn_jaren": 7, "legal_basis_text": "WIA+WW+Wajong+TW", "dbt_domain": "crm", "toegang_via_OPA_policies": ["true"]},
-        "pii_cols": {"bsn":"PII.BSN","voornaam":"PII.Naam","achternaam":"PII.Naam","geboortedatum":"PII.Geboortedatum","straat":"PII.Adres","huisnummer":"PII.Adres","postcode":"PII.Adres"},
+        "ext": {"bewaartermijn_jaren": 7, "legal_basis_text": "WIA+WW+Wajong+TW", "dbt_domain": "customers", "toegang_via_OPA_policies": ["true"]},
+        "pii_cols": {"bsn":"PII.BSN","voornaam":"PII.Naam","achternaam":"PII.Naam","birth_date":"PII.Geboortedatum","straat":"PII.Adres","huisnummer":"PII.Adres","postcode":"PII.Adres"},
       },
       {
-        "schema": "uc06_lastprognose", "name": "mart_uc06_uitkeringslast_5y",
-        "description": "UC-06 — 5-jaars baseline-projectie uitkeringslast per wet × regio.",
+        "schema": "uc06_cost_forecast", "name": "mart_uc06_cost_5y",
+        "description": "UC-06 — 5-jaars baseline-projectie claim_cost per wet × regio.",
         "columns": [
           col("jaar", INT),
           col("maand", INT),
@@ -138,14 +138,14 @@ data:
           col("regio_code", V(8)),
           col("verwachte_last_eur", DBL),
         ],
-        "domain": "FEZ", "owner": "divisie_fez", "dataProduct": "uc06_lastprognose",
+        "domain": "FEZ", "owner": "divisie_fez", "dataProduct": "uc06_cost_forecast",
         "tags": ["Tier.Tier2","Doelbinding.Actuarie","Doelbinding.Beleid","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": ["Uitkering"],
-        "ext": {"bewaartermijn_jaren": 10, "dbt_domain": "fez"},
+        "ext": {"bewaartermijn_jaren": 10, "dbt_domain": "finance"},
         "pii_cols": {},
       },
       {
-        "schema": "uc06_lastprognose", "name": "mart_uc06_scenario_results",
+        "schema": "uc06_cost_forecast", "name": "mart_uc06_scenario_results",
         "description": "UC-06 — Scenario-prognoses (baseline + iva_afschaf_2027 + ww_versoberen).",
         "columns": [
           col("scenario_id", V(64), "Naam scenario (baseline/iva_afschaf_2027/ww_versoberen)."),
@@ -154,14 +154,14 @@ data:
           col("totale_last_eur", DBL),
           col("delta_t_o_v_baseline_eur", DBL),
         ],
-        "domain": "FEZ", "owner": "divisie_fez", "dataProduct": "uc06_lastprognose",
+        "domain": "FEZ", "owner": "divisie_fez", "dataProduct": "uc06_cost_forecast",
         "tags": ["Tier.Tier2","Doelbinding.Actuarie","Doelbinding.Beleid","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": [],
-        "ext": {"bewaartermijn_jaren": 10, "dbt_domain": "fez"},
+        "ext": {"bewaartermijn_jaren": 10, "dbt_domain": "finance"},
         "pii_cols": {},
       },
       {
-        "schema": "uc07_dq_polisadm", "name": "mart_uc07_dq_dagrapport",
+        "schema": "uc07_dq_policies", "name": "mart_uc07_dq_dagrapport",
         "description": "UC-07 — Datakwaliteits-dagrapport polisadministratie.",
         "columns": [
           col("rapport_datum", DT),
@@ -171,14 +171,14 @@ data:
           col("pct_geldige_postcode", DBL),
           col("pct_complete_naam", DBL),
         ],
-        "domain": "Polisadm", "owner": "data_steward_polisadm", "dataProduct": "uc07_dq_polisadm",
+        "domain": "Polisadm", "owner": "data_steward_polisadm", "dataProduct": "uc07_dq_policies",
         "tags": ["Tier.Tier1","Doelbinding.Kwaliteitscontrole","Doelbinding.Uitkering","LegalBasis.Art6_1c","Confidentiality.Confidential","AI.Risk-Laag"],
         "glossary": ["IKV"],
-        "ext": {"bewaartermijn_jaren": 30, "legal_basis_text": "Wet_SUWI+Wfsv", "dbt_domain": "polisadm", "juistheid_AVG_art_5_1d": ["true"]},
+        "ext": {"bewaartermijn_jaren": 30, "legal_basis_text": "Wet_SUWI+Wfsv", "dbt_domain": "policies", "juistheid_AVG_art_5_1d": ["true"]},
         "pii_cols": {},
       },
       {
-        "schema": "uc09_reint_effect", "name": "mart_uc09_effect_panel",
+        "schema": "uc09_reintegration_effect", "name": "mart_uc09_effect_panel",
         "description": "UC-09 — Gepseudonimiseerd onderzoekspanel re-integratie. Alleen pseudo-IDs, geen ruwe BSN.",
         "columns": [
           col("bsn_pseudo", V(64), "SHA-256 hash van BSN — niet herleidbaar."),
@@ -188,14 +188,14 @@ data:
           col("huidige_status", V(32)),
           col("traject_start_dt", DT),
         ],
-        "domain": "AG", "owner": "knowledge_center", "dataProduct": "uc09_reint_effect",
+        "domain": "AG", "owner": "knowledge_center", "dataProduct": "uc09_reintegration_effect",
         "tags": ["Tier.Tier3","Doelbinding.Statistisch_Onderzoek","LegalBasis.Art5_1b_VerenigbaarGebruik","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": ["Traject"],
         "ext": {"bewaartermijn_jaren": 10, "legal_basis_text": "art_5_1b_verenigbaar_gebruik", "dbt_domain": "ag", "sandbox_only": ["true"], "pseudonymized": ["true"]},
         "pii_cols": {},
       },
       {
-        "schema": "uc_klant_tev", "name": "mart_uc_klant_tev_kanaal_maand",
+        "schema": "uc_customer_satisfaction", "name": "mart_uc_customer_satisfaction_kanaal_maand",
         "description": "Klanttevredenheid per kanaal × maand — gewogen gemiddelde + volume.",
         "columns": [
           col("maand", DT),
@@ -203,7 +203,7 @@ data:
           col("n_respondenten", INT),
           col("gemid_score_gewogen", DBL, "Score 1-5, gewogen op aantal contacten."),
         ],
-        "domain": "Klantcontact", "owner": "divisie_klantcontact", "dataProduct": "uc_klant_tev",
+        "domain": "Klantcontact", "owner": "divisie_klantcontact", "dataProduct": "uc_customer_satisfaction",
         "tags": ["Tier.Tier2","Doelbinding.Sturingsinfo","LegalBasis.Art6_1e","Confidentiality.Internal","AI.Risk-Laag"],
         "glossary": ["Contact","Kanaal"],
         "ext": {"bewaartermijn_jaren": 5, "dbt_domain": "klantcontact"},
@@ -244,7 +244,7 @@ data:
         "pii_cols": {},
       },
       # UC-12 FinOps — FOCUS-spec cloud spend. 5 marts in dezelfde schema/
-      # dataProduct. Geen PII, geen CGM-glossary (FinOps-domein, niet UWV-CGM).
+      # dataProduct. Geen PII, geen CGM-glossary (FinOps-domein, niet enterprise CGM).
       {
         "schema": "uc12_focus_finops", "name": "mart_uc12_focus_spend_monthly",
         "description": "UC-12 — FinOps spend per maand × provider × service-categorie × charge-categorie. Primaire trend-mart.",

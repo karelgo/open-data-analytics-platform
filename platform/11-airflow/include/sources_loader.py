@@ -36,7 +36,7 @@ MODE_CSV_BATCH = "csv_batch"
 class StreamSpec:
     """Stream-identifier voor JSONL-bestanden in s3://odap-raw/<path>/.
 
-    `name` is de logische stream (bv. 'uwv.persona.created'); de Spark-job
+    `name` is de logische stream (bv. 'customers.created'); de Spark-job
     leidt het S3-pad af door punten te vervangen door slashes. `key` is het
     natuurlijke partition-key voor downstream silver-modellen (geen invloed
     op file-layout).
@@ -128,7 +128,7 @@ class SourceSpec:
     @property
     def airflow_tags(self) -> list[str]:
         return [
-            "uwv",
+            "demo",
             f"domain:{self.domain}",
             f"classificatie:{self.governance.bio_classificatie}",
             f"risk:{self.governance.risk_tier}",

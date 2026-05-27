@@ -14,7 +14,7 @@ import rego.v1
 
 # --- helpers -----------------------------------------------------------
 
-# Wildcard-match `gold.uc05_client_360.*` matched een tabel `mart_uc05_client_360`.
+# Wildcard-match `gold.uc05_customer_360.*` matched een tabel `mart_uc05_customer_360`.
 # We bouwen een sleutel `<catalog>.<schema>.*` en `<catalog>.<schema>.<table>`,
 # en pakken de eerste matchende waarde.
 resource_required_purposes := purposes if {

@@ -13,8 +13,8 @@ test_bsn_masked_for_marketing_analyst if {
 			"operation": "SelectFromColumns",
 			"resource": {"column": {
 				"catalogName": "gold",
-				"schemaName": "uc05_client_360",
-				"tableName": "mart_uc05_client_360",
+				"schemaName": "uc05_customer_360",
+				"tableName": "mart_uc05_customer_360",
 				"columnName": "bsn",
 			}},
 		},
@@ -33,8 +33,8 @@ test_bsn_unmasked_for_claims_analyst if {
 			"operation": "SelectFromColumns",
 			"resource": {"column": {
 				"catalogName": "silver",
-				"schemaName": "wia",
-				"tableName": "stg_wia_aanvraag",
+				"schemaName": "claims",
+				"tableName": "stg_claim_application",
 				"columnName": "bsn",
 			}},
 		},
@@ -52,7 +52,7 @@ test_diagnose_nulled_for_marketing_analyst if {
 			"operation": "SelectFromColumns",
 			"resource": {"column": {
 				"catalogName": "sensitive",
-				"schemaName": "wajong",
+				"schemaName": "eligibility_cases",
 				"tableName": "dossier",
 				"columnName": "diagnose",
 			}},
@@ -72,7 +72,7 @@ test_diagnose_visible_for_claims_analyst if {
 			"operation": "SelectFromColumns",
 			"resource": {"column": {
 				"catalogName": "sensitive",
-				"schemaName": "wajong",
+				"schemaName": "eligibility_cases",
 				"tableName": "dossier",
 				"columnName": "diagnose",
 			}},
@@ -91,8 +91,8 @@ test_iban_masked_for_marketing_analyst if {
 			"operation": "SelectFromColumns",
 			"resource": {"column": {
 				"catalogName": "gold",
-				"schemaName": "uc05_client_360",
-				"tableName": "mart_uc05_client_360",
+				"schemaName": "uc05_customer_360",
+				"tableName": "mart_uc05_customer_360",
 				"columnName": "iban",
 			}},
 		},
@@ -111,7 +111,7 @@ test_iban_visible_for_fraud_analyst if {
 			"operation": "SelectFromColumns",
 			"resource": {"column": {
 				"catalogName": "silver",
-				"schemaName": "ww",
+				"schemaName": "service_requests",
 				"tableName": "aanvraag",
 				"columnName": "iban",
 			}},
@@ -130,8 +130,8 @@ test_uc11_event_label_sanitized_for_marketing_analyst if {
 			"operation": "SelectFromColumns",
 			"resource": {"column": {
 				"catalogName": "gold",
-				"schemaName": "uc11_klantreis",
-				"tableName": "mart_uc11_klantreis_events",
+				"schemaName": "uc11_customer_journey",
+				"tableName": "mart_uc11_journey_events",
 				"columnName": "event_label",
 			}},
 		},
@@ -150,8 +150,8 @@ test_uc11_event_label_visible_for_claims_analyst if {
 			"operation": "SelectFromColumns",
 			"resource": {"column": {
 				"catalogName": "gold",
-				"schemaName": "uc11_klantreis",
-				"tableName": "mart_uc11_klantreis_events",
+				"schemaName": "uc11_customer_journey",
+				"tableName": "mart_uc11_journey_events",
 				"columnName": "event_label",
 			}},
 		},

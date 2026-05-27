@@ -42,7 +42,7 @@ MinIO  s3://odap-staging/incoming/focus/<ts>-<file>.csv
 ingest_csv_focus DAG (Airflow)
    │  csv_to_bronze.py + pyarrow type-cast
    ▼
-bronze.uwv.focus_billing  (Delta op MinIO)
+bronze.finops.focus_billing  (Delta op MinIO)
    │
    ▼
 silver_finops DAG → silver.finops.stg_focus_billing
@@ -217,7 +217,7 @@ UC-11 draait z'n marts al via een `fabric_dev` dbt-target op Fabric Spark (zie
 2. `dbt run --target fabric_dev --select tag:uc12` (lokaal of via KPO).
 3. De `mart_uc12_focus_*` tabellen verschijnen onder `dbo` in het lakehouse.
 
-Caveat: de FOCUS-bron-tabel (`bronze.uwv.focus_billing`) leeft op MinIO/Trino,
+Caveat: de FOCUS-bron-tabel (`bronze.finops.focus_billing`) leeft op MinIO/Trino,
 dus dbt-fabricspark heeft een aparte source-mapping nodig of een synthetic-
 seed-stap. Zie het volgende blok.
 
@@ -313,7 +313,7 @@ Fase 4 voor de wiring.
 ## 11. Verder lezen
 
 - [UC-12 — Superset variant (de baseline)](uc12-focus-finops.md)
-- [UC-11 — Multi-platform demo (Trino + Databricks + Fabric)](uc11-klantreis-walkthrough.md) — zelfde Fabric-patroon, andere data
+- [UC-11 — Multi-platform demo (Trino + Databricks + Fabric)](uc11-customer-journey-walkthrough.md) — zelfde Fabric-patroon, andere data
 - [FreshLakehouse Power BI plan](https://github.com/FreshMinds_Programming/FreshDataPlatform/blob/main/FreshLakehouse/docs/research/powerbi-as-bi-and-self-service-layer.md) — de bredere keuze tussen Superset en Power BI
 - [Fabric REST — semantic models](https://learn.microsoft.com/en-us/rest/api/fabric/semanticmodel)
 - [Direct Lake overview — Microsoft Learn](https://learn.microsoft.com/en-us/fabric/fundamentals/direct-lake-overview)

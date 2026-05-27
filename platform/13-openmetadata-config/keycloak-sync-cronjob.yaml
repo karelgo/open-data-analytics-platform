@@ -54,7 +54,7 @@ spec:
                 - name: KEYCLOAK_URL
                   value: "http://keycloak.odap-auth.svc.cluster.local"
                 - name: KEYCLOAK_REALM
-                  value: "uwv"
+                  value: "demo"
                 - name: KEYCLOAK_ADMIN_USER
                   value: "kcadmin"
                 - name: KEYCLOAK_ADMIN_PW

@@ -39,14 +39,14 @@ waar je op werkt. Je gebruikt het platform om:
 
 | Catalog | Schema | Inhoud | Toegang |
 |---|---|---|---|
-| `gold` | `uc08_smz_capaciteit` | Capaciteits-aggregaten | **Ja** |
+| `gold` | `uc08_capacity_planning` | Capaciteits-aggregaten | **Ja** |
 | `silver` | `smz` | SMZ-rooster en case-counts | **Ja** |
 | `silver` | `wia`, `ww`, `wajong`, `crm` | Cliënt-dossiers | **Nee** |
 | `sensitive` | * | (geen) | **Nee** |
 
 ### 3.2 Welke kolommen?
 
-In `gold.uc08_smz_capaciteit.*` en `silver.smz.*`:
+In `gold.uc08_capacity_planning.*` en `silver.smz.*`:
 
 | Kolom | Wat zie je? |
 |---|---|
@@ -75,7 +75,7 @@ SELECT
   PERCENTILE_DISC(wachttijd_dagen, 0.5) WITHIN GROUP (ORDER BY wachttijd_dagen) AS p50,
   PERCENTILE_DISC(wachttijd_dagen, 0.95) WITHIN GROUP (ORDER BY wachttijd_dagen) AS p95,
   COUNT(*)                               AS aantal_cases
-FROM   gold.uc08_smz_capaciteit.wachttijd
+FROM   gold.uc08_capacity_planning.wachttijd
 WHERE  peildatum = CURRENT_DATE
 GROUP  BY regio, specialisme
 ORDER  BY p95 DESC;
@@ -104,7 +104,7 @@ zakt de p95-wachttijd?
 ```sql
 WITH huidige AS (
   SELECT specialisme, AVG(wachttijd_dagen) AS gem
-  FROM   gold.uc08_smz_capaciteit.wachttijd
+  FROM   gold.uc08_capacity_planning.wachttijd
   WHERE  specialisme = 'verzekeringsarts'
   GROUP  BY specialisme
 ),
@@ -133,7 +133,7 @@ teamleider — geen BSN's, alleen aggregaten.
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `Access Denied: silver.wia.aanvraag` | Cliënt-data niet voor planning | Werk op aggregaat-mart |
+| `Access Denied: silver.claims.application` | Cliënt-data niet voor planning | Werk op aggregaat-mart |
 | `bsn IS NULL` | Kolom gemaskeerd | Niet nodig voor planning |
 
 | Probleem | Contact |

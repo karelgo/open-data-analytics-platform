@@ -16,7 +16,7 @@ data-generation/load_to_s3.py  →  s3://odap-raw/<domain>/<entity>/dt=YYYY-MM-D
                                               ↓ (Spark file source)
                                   streaming_files_to_lakehouse.py
                                               ↓
-                                  bronze.uwv.<domain>_<entity>  (Delta)
+                                  bronze.demo.<domain>_<entity>  (Delta)
 ```
 
 Geen message bus tussen producer en consumer — MinIO IS de buffer + replay-laag.
@@ -57,14 +57,14 @@ In Spark UI: lijst van actieve streaming queries en batch-stats.
 
 | File-pad | Bronze-tabel |
 |---|---|
-| `s3a://odap-raw/uwv/persona/created/...` | `bronze.uwv.persona_created` |
-| `s3a://odap-raw/uwv/polisadm/ikv/...` | `bronze.uwv.polisadm_ikv` |
-| `s3a://odap-raw/uwv/ww/aanvraag/...` | `bronze.uwv.ww_aanvraag` |
-| `s3a://odap-raw/uwv/wia/aanvraag/...` | `bronze.uwv.wia_aanvraag` |
-| `s3a://odap-raw/uwv/wajong/dossier/...` | `bronze.uwv.wajong_dossier` |
-| `s3a://odap-raw/uwv/zw/melding/...` | `bronze.uwv.zw_melding` |
-| `s3a://odap-raw/uwv/crm/contact/...` | `bronze.uwv.crm_contact` |
-| `s3a://odap-raw/uwv/fez/uitkeringslast/...` | `bronze.uwv.fez_uitkeringslast` |
+| `s3a://odap-raw/demo/persona/created/...` | `bronze.persons.created` |
+| `s3a://odap-raw/demo/polisadm/ikv/...` | `bronze.policies.holders` |
+| `s3a://odap-raw/demo/ww/aanvraag/...` | `bronze.service_requests.application` |
+| `s3a://odap-raw/demo/wia/aanvraag/...` | `bronze.claims.application` |
+| `s3a://odap-raw/demo/wajong/dossier/...` | `bronze.eligibility_cases.case` |
+| `s3a://odap-raw/demo/zw/melding/...` | `bronze.incidents.report` |
+| `s3a://odap-raw/demo/crm/contact/...` | `bronze.customers.interaction` |
+| `s3a://odap-raw/demo/fez/claim_cost/...` | `bronze.finance.expense` |
 
 ## Format-switch
 
@@ -93,19 +93,19 @@ HMS-schemas, dus ze raken elkaar niet.
 
 | Laag    | dbt-pad (bestaand)                          | Spark-pad (demo)                          |
 |---------|---------------------------------------------|-------------------------------------------|
-| bronze  | `bronze.uwv.wia_aanvraag`                   | `bronze.uwv.wia_aanvraag` (gedeeld)       |
-| silver  | `silver.wia.stg_wia_aanvraag`               | `silver.wia_spark.aanvraag`               |
-| gold    | `gold.uc01_wia_funnel.mart_uc01_wia_funnel_daily` | `gold.uc01_wia_spark.funnel_daily` |
+| bronze  | `bronze.claims.application`                   | `bronze.claims.application` (gedeeld)       |
+| silver  | `silver.claims.stg_claim_application`               | `silver.wia_spark.aanvraag`               |
+| gold    | `gold.uc01_claims_funnel.mart_uc01_claims_funnel_daily` | `gold.uc01_wia_spark.funnel_daily` |
 | S3-pad  | `s3a://odap-silver/wia/...`                  | `s3a://odap-silver/wia_spark/...`          |
 
 ### Componenten
 
 | Bestand | Doel |
 |---|---|
-| [`spark-jobs/seed_bronze_wia.py`](../../spark-jobs/seed_bronze_wia.py) | Schrijft 200 synthetische WIA-rijen direct in bronze-Delta (omdat `streaming-bronze` uit staat). |
-| [`apps/seed-bronze-wia.yaml`](apps/seed-bronze-wia.yaml) | One-shot SparkApplication; bewust NIET in `kustomization.yaml`. |
-| [`spark-jobs/batch_silver_wia.py`](../../spark-jobs/batch_silver_wia.py) | Parse JSON-payload → typed Delta. Idempotent via Delta MERGE op `aanvraag_id`. |
-| [`spark-jobs/batch_gold_wia.py`](../../spark-jobs/batch_gold_wia.py) | Aggregeert silver tot daily funnel (count, avg %, distinct regios) per (datum, onderdeel, status). |
+| [`spark-jobs/seed_bronze_claims.py`](../../spark-jobs/seed_bronze_claims.py) | Schrijft 200 synthetische WIA-rijen direct in bronze-Delta (omdat `streaming-bronze` uit staat). |
+| [`apps/seed-bronze-claims.yaml`](apps/seed-bronze-claims.yaml) | One-shot SparkApplication; bewust NIET in `kustomization.yaml`. |
+| [`spark-jobs/batch_silver_claims.py`](../../spark-jobs/batch_silver_claims.py) | Parse JSON-payload → typed Delta. Idempotent via Delta MERGE op `application_id`. |
+| [`spark-jobs/batch_gold_claims.py`](../../spark-jobs/batch_gold_claims.py) | Aggregeert silver tot daily funnel (count, avg %, distinct regios) per (datum, onderdeel, status). |
 | [`platform/11-airflow/jobs/spark-silver-wia.yaml`](../11-airflow/jobs/spark-silver-wia.yaml) | SparkApplication-template, gemount in `airflow-jobs` CM. `${RUN_ID}` placeholder. |
 | [`platform/11-airflow/jobs/spark-gold-wia.yaml`](../11-airflow/jobs/spark-gold-wia.yaml) | Idem voor gold. |
 | [`platform/11-airflow/dags/transform_wia_spark.py`](../11-airflow/dags/transform_wia_spark.py) | DAG met 2 KPO-tasks die `sed | kubectl apply` doen + `.status.phase` pollen. |
@@ -154,7 +154,7 @@ de silver+gold DAG werkt onveranderd op de daadwerkelijke bronze-tabel.
 | `driver.memory.limit` | `1500Mi` | Onder ~1.2Gi crasht Spark met `INVALID_DRIVER_MEMORY` — System memory < 472MB minimum. |
 | `executor.memory.limit` | `1500Mi` | Idem voor executor (`INVALID_EXECUTOR_MEMORY`). |
 | `enableVectorAgent` | `false` | Vector aggregator ConfigMap bestaat niet op deze cluster; `true` blokkeert SparkApplication-reconcile met `VectorAggregatorConfigMapMissing`. |
-| `seed`-write | géén `partitionBy` | Bestaande `s3a://odap-bronze/uwv/wia_aanvraag/` Delta-tabel is niet-gepartitioneerd (streaming-bronze conventie); append met partitionering geeft `_LEGACY_ERROR_TEMP_DELTA_0007`. |
+| `seed`-write | géén `partitionBy` | Bestaande `s3a://odap-bronze/demo/claim_application/` Delta-tabel is niet-gepartitioneerd (streaming-bronze conventie); append met partitionering geeft `_LEGACY_ERROR_TEMP_DELTA_0007`. |
 
 Failure-debugging tip: Stackable-operator delete'd driver-pod direct bij
 `Failed` ongeacht `spark.kubernetes.driver.deleteOnTermination`. Voor logs:
@@ -163,7 +163,7 @@ polling, niet `-f` — die mist de laatste seconden bij delete).
 
 ### Waarom MERGE in silver maar OVERWRITE in gold?
 
-- **Silver** is een 1:1-projectie van bronze; `MERGE` op `aanvraag_id` toont
+- **Silver** is een 1:1-projectie van bronze; `MERGE` op `application_id` toont
   een Delta-superpower (upsert op object-id, niet beschikbaar in raw
   Parquet) en is correct voor incrementele runs.
 - **Gold** is een deterministische aggregatie; volledige overwrite is

@@ -8,15 +8,15 @@
 #   4. make seed           — synthetische data via Job → Kafka → Spark → Delta
 #   5. wait for streaming  — micro-batch tijd (max 90s)
 #   6. smoke 01–08         — alle smoke tests groen
-#   7. UC-01 verification  — query gold.uc01_wia_funnel.* via Trino
+#   7. UC-01 verification  — query gold.uc01_claims_funnel.* via Trino
 #
 # Eindresultaat — fail-safe:
 #   - exit 0 als alle stappen + DoD-checks groen zijn
 #   - exit 1 bij eerste failure (en logs op stdout)
 #
 # DoD-anchors die deze test dekt:
-#   - bronze.uwv.persona_created bevat ≥10k rijen met test-bereik BSN's   (smoke 03)
-#   - bronze.uwv.wia_aanvraag bestaat                                     (smoke 03 generic)
+#   - bronze.persons.created bevat ≥10k rijen met test-bereik BSN's   (smoke 03)
+#   - bronze.claims.application bestaat                                     (smoke 03 generic)
 #   - OPA weigert bsn-query op uc05 zonder purpose                        (smoke 08)
 #   - OPA maskeert BSN voor marketing_analyst                                (smoke 08)
 #   - Superset Trino-database geregistreerd                               (smoke 06)
@@ -108,30 +108,30 @@ trino_exec() {
             --execute \"$1\""
 }
 
-# Check 1: gold.uc01_wia_funnel schema bestaat (na dbt run via Airflow — kan
+# Check 1: gold.uc01_claims_funnel schema bestaat (na dbt run via Airflow — kan
 # nog niet zijn gedraaid in e2e). Doe een fallback-check op silver.
-log "Check 1: silver.wia.stg_wia_aanvraag query (na dbt-run vereist)"
-silver_count=$(trino_exec "SELECT count(*) FROM silver.wia.stg_wia_aanvraag" 2>&1 | tail -1 | tr -d '"' || echo 0)
+log "Check 1: silver.claims.stg_claim_application query (na dbt-run vereist)"
+silver_count=$(trino_exec "SELECT count(*) FROM silver.claims.stg_claim_application" 2>&1 | tail -1 | tr -d '"' || echo 0)
 if [[ "$silver_count" =~ ^[0-9]+$ ]] && [[ "$silver_count" -gt 0 ]]; then
-    pass "silver.wia.stg_wia_aanvraag: $silver_count records"
+    pass "silver.claims.stg_claim_application: $silver_count records"
 else
     log "  [SKIP] silver-tabel niet gevuld (dbt-run nog niet gedraaid; trigger via Airflow UI of:"
     log "  kubectl -n $NS exec deploy/airflow-webserver-default -c airflow -- airflow dags trigger dbt_run_per_domain"
     log "  Cooldown ~3 min daarna deze e2e opnieuw."
 fi
 
-# Check 2: bronze.uwv.wia_aanvraag bestaat (geseed door Spark)
-log "Check 2: bronze.uwv.wia_aanvraag rij-count"
-bronze_count=$(trino_exec "SELECT count(*) FROM bronze.uwv.wia_aanvraag" 2>&1 | tail -1 | tr -d '"' || echo 0)
+# Check 2: bronze.claims.application bestaat (geseed door Spark)
+log "Check 2: bronze.claims.application rij-count"
+bronze_count=$(trino_exec "SELECT count(*) FROM bronze.claims.application" 2>&1 | tail -1 | tr -d '"' || echo 0)
 if [[ "$bronze_count" =~ ^[0-9]+$ ]] && [[ "$bronze_count" -gt 0 ]]; then
-    pass "bronze.uwv.wia_aanvraag: $bronze_count records (uit ~15% van 10k personas)"
+    pass "bronze.claims.application: $bronze_count records (uit ~15% van 10k personas)"
 else
-    fail "bronze.uwv.wia_aanvraag bevat geen records — Spark streaming niet door?"
+    fail "bronze.claims.application bevat geen records — Spark streaming niet door?"
 fi
 
-# Check 3: BSN-format check op bronze.uwv.persona_created
+# Check 3: BSN-format check op bronze.persons.created
 log "Check 3: BSN-prefix-9 check (test-bereik)"
-bsn_anomalies=$(trino_exec "SELECT count(*) FROM bronze.uwv.persona_created \
+bsn_anomalies=$(trino_exec "SELECT count(*) FROM bronze.persons.created \
   WHERE NOT regexp_like(json_extract_scalar(payload, '\$.payload.bsn'), '^9[0-9]{8}\$')" 2>&1 | tail -1 | tr -d '"' || echo -1)
 if [[ "$bsn_anomalies" == "0" ]]; then
     pass "alle BSN's beginnen met 9 (test-bereik)"
@@ -144,4 +144,4 @@ echo
 pass "Compleet. UC-01 dashboard kan nu interactief gebouwd worden in Superset"
 echo "  https://superset.odap.local:8443"
 echo "  Login: odap / odap-dev-only-CHANGE-ME"
-echo "  Dataset: gold.uc01_wia_funnel.mart_uc01_wia_funnel_daily (na dbt-run)"
+echo "  Dataset: gold.uc01_claims_funnel.mart_uc01_claims_funnel_daily (na dbt-run)"

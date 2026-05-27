@@ -9,7 +9,7 @@ Tasks:
   2. fabric_seed_bronze — trigger 'uc11_seed_bronze' notebook (synthetic data)
   3. fabric_silver      — trigger 'uc11_silver' notebook (per-domein staging)
   4. fabric_dbt_gold    — KubernetesPodOperator: `dbt run --target fabric_dev`
-                          met dbt-fabricspark; runt int_klantreis_events +
+                          met dbt-fabricspark; runt int_customer_journey_events +
                           2 marts uit het échte dbt-project (zelfde SQL als
                           op Trino — portabiliteits-demo).
   5. fabric_verify      — controleer dat de gold-mart in het Lakehouse staat
@@ -65,7 +65,7 @@ DEFAULT_ARGS = {
 # Notebooks die we nog wél via REST triggeren. uc11_dbt_gold is bewust
 # weggehaald: gold-marts komen nu via dbt-fabricspark (fabric_dbt_gold KPO).
 NOTEBOOK_NAMES = ("uc11_seed_bronze", "uc11_silver")
-GOLD_MART = "mart_uc11_klantreis_events"
+GOLD_MART = "mart_uc11_journey_events"
 
 # Image die zowel dbt-trino als dbt-fabricspark heeft (zie
 # infrastructure/airflow/dbt/Dockerfile). Bevat het hele dbt-project op
@@ -149,7 +149,7 @@ def _verify_gold_mart(**_) -> None:
 
 # dbt-fabricspark run-script voor de KPO. Werkdir is /opt/odap/dbt (zie image);
 # profiles.yml zit op /root/.dbt/profiles.yml. `--no-partial-parse` voorkomt
-# stale manifest-issues in een verse pod. `--select int_klantreis_events+`
+# stale manifest-issues in een verse pod. `--select int_customer_journey_events+`
 # bouwt alleen wat we voor Fabric nodig hebben — staging blijft op Trino.
 DBT_RUN_SCRIPT = (
     "set -euo pipefail\n"
@@ -158,7 +158,7 @@ DBT_RUN_SCRIPT = (
     "dbt debug --target fabric_dev || echo '(debug-warning negeerd; ga door naar run)'\n"
     "echo '=== dbt run ==='\n"
     "dbt run --no-partial-parse --target fabric_dev "
-    "--select int_klantreis_events+\n"
+    "--select int_customer_journey_events+\n"
 )
 
 

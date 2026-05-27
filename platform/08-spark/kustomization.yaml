@@ -28,12 +28,12 @@ configMapGenerator:
       - scripts/lakehouse_io.py
       # WIA bronze→silver→gold demo (parallel-Spark-pad naast dbt).
       # Job-bestanden zijn door scripts/deploy-platform.sh gekopieerd uit
-      # spark-jobs/. seed_bronze_wia.py wordt aangeroepen door
-      # platform/08-spark/apps/seed-bronze-wia.yaml (handmatige apply);
-      # batch_silver_wia.py + batch_gold_wia.py door DAG transform_wia_spark.
-      - scripts/seed_bronze_wia.py
-      - scripts/batch_silver_wia.py
-      - scripts/batch_gold_wia.py
+      # spark-jobs/. seed_bronze_claims.py wordt aangeroepen door
+      # platform/08-spark/apps/seed-bronze-claims.yaml (handmatige apply);
+      # batch_silver_claims.py + batch_gold_claims.py door DAG transform_wia_spark.
+      - scripts/seed_bronze_claims.py
+      - scripts/batch_silver_claims.py
+      - scripts/batch_gold_claims.py
 
 generatorOptions:
   disableNameSuffixHash: true

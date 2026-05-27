@@ -50,20 +50,20 @@ referentie laat zien wat erachter zit.
 
 | Catalog | Schema | Inhoud | Toegang |
 |---|---|---|---|
-| `gold` | `uc05_client_360` | 360°-cliëntbeeld | **Ja** |
+| `gold` | `uc05_customer_360` | 360°-cliëntbeeld | **Ja** |
 | `silver` | `crm` | Klantcontact-historie | **Indirect** (alleen via UC-05) |
 | `silver` | `wia`, `ww`, `wajong` | Domein-data | **Nee** |
 | `sensitive` | * | (geen) | **Nee** |
 
 ### 3.2 Welke kolommen?
 
-In `gold.uc05_client_360.client_overview`:
+In `gold.uc05_customer_360.client_overview`:
 
 | Kolom | Wat zie je? |
 |---|---|
 | `bsn` | **GEMASKEERD** — `'XXXXXXX' || substring(bsn, 8)` (laatste 2 cijfers zichtbaar) |
 | `voornaam`, `achternaam` | Volledig — voor herkenning aan de telefoon |
-| `geboortedatum` | Volledig — voor identificatie |
+| `birth_date` | Volledig — voor identificatie |
 | `straat`, `huisnummer` | Volledig — adres voor balie |
 | `iban`, `bankrekening` | **GEMASKEERD** — niet nodig voor klantcontact |
 | `diagnose`, `icd10` | NULL (kolom-mask) — geen medisch |
@@ -85,8 +85,8 @@ die data uit een andere zone aanspreekt zonder geldig doel wordt geweigerd.
 **Scenario.** Mevrouw Jansen belt: "Ik krijg geen brief, maar wel een
 betaling. Klopt dat?"
 
-1. Vraag haar geboortedatum + de laatste 2 cijfers van haar BSN voor identificatie.
-2. Open **Superset → dashboard "Cliënt 360°"**, zoek op gemaskeerde BSN of geboortedatum + naam.
+1. Vraag haar birth_date + de laatste 2 cijfers van haar BSN voor identificatie.
+2. Open **Superset → dashboard "Cliënt 360°"**, zoek op gemaskeerde BSN of birth_date + naam.
 3. Bekijk de tegels: Lopende uitkering, Laatste contact, Kanaalvoorkeur.
 4. Beantwoord de vraag of route je haar naar de juiste afdeling.
 
@@ -100,7 +100,7 @@ SELECT
   oude_kanaalvoorkeur,
   nieuwe_kanaalvoorkeur,
   COUNT(*) AS aantal
-FROM gold.uc05_client_360.kanaalwijzigingen
+FROM gold.uc05_customer_360.kanaalwijzigingen
 WHERE wijzig_datum >= CURRENT_DATE - INTERVAL '30' DAY
 GROUP BY oude_kanaalvoorkeur, nieuwe_kanaalvoorkeur
 ORDER BY aantal DESC;
@@ -113,7 +113,7 @@ SELECT
   date_trunc('day', contact_datum) AS dag,
   COUNT(*) AS contacten,
   AVG(behandel_duur_min) AS gem_duur
-FROM gold.uc05_client_360.contact_log
+FROM gold.uc05_customer_360.contact_log
 WHERE contact_datum >= CURRENT_DATE - INTERVAL '14' DAY
 GROUP BY 1
 ORDER BY 1;
@@ -142,9 +142,9 @@ Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
 
 | Foutmelding | Betekenis | Actie |
 |---|---|---|
-| `bsn = NULL` of "uitgegrijsd" | Kolom gemaskeerd, niet gewist | Voor klantidentificatie volstaat naam + geboortedatum |
-| `Access Denied: silver.wia.*` | Andere domeinen niet zichtbaar | Verwijs cliënt door naar WIA-team |
-| `Cliënt niet gevonden` | Mogelijk synthesedata-mismatch (referentie-omgeving) | Check spelling, gebruik geboortedatum |
+| `bsn = NULL` of "uitgegrijsd" | Kolom gemaskeerd, niet gewist | Voor klantidentificatie volstaat naam + birth_date |
+| `Access Denied: silver.claims.*` | Andere domeinen niet zichtbaar | Verwijs cliënt door naar WIA-team |
+| `Cliënt niet gevonden` | Mogelijk synthesedata-mismatch (referentie-omgeving) | Check spelling, gebruik birth_date |
 
 ### 5.2 Wie helpt?
 

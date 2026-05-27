@@ -147,12 +147,12 @@ function subtitle(slide, text) {
   // Timeline horizontal
   const yT = 4.0;
   const stages = [
-    { x: 0.7, label: "Werknemer", domain: "polisadm" },
+    { x: 0.7, label: "Werknemer", domain: "policies" },
     { x: 2.7, label: "Ziek", domain: "ZW" },
     { x: 4.7, label: "WIA-aanvraag", domain: "WIA" },
     { x: 6.7, label: "WGA toegekend", domain: "WIA" },
     { x: 8.7, label: "Re-integratie", domain: "AG · CRM" },
-    { x: 10.7, label: "Werkhervatter", domain: "polisadm" },
+    { x: 10.7, label: "Werkhervatter", domain: "policies" },
   ];
 
   // Timeline base line — stops at the last dot (x = 10.7).
@@ -502,13 +502,13 @@ function subtitle(slide, text) {
 
   // Left column: 7 staging models
   const staging = [
-    "stg_persona",
-    "stg_polisadm_ikv",
-    "stg_ww_aanvraag",
-    "stg_zw_melding",
-    "stg_wia_aanvraag",
-    "stg_wajong_dossier",
-    "stg_crm_contact",
+    "stg_persons",
+    "stg_policy_holders",
+    "stg_service_request_application",
+    "stg_incident_report",
+    "stg_claim_application",
+    "stg_eligibility_case",
+    "stg_customer_interaction",
   ];
 
   const stagX = 0.7;
@@ -549,7 +549,7 @@ function subtitle(slide, text) {
     x: intX, y: intY, w: 3.0, h: 0.5,
     fill: { color: BG_ELEV }, line: { color: AMBER, width: 1.2 },
   });
-  s.addText("int_klantreis_events", {
+  s.addText("int_customer_journey_events", {
     x: intX + 0.15, y: intY, w: 2.7, h: 0.5,
     fontFace: F_MONO, fontSize: 11.5, color: INK_1, valign: "middle",
     bold: true, margin: 0,
@@ -569,15 +569,15 @@ function subtitle(slide, text) {
   const martsX = 9.3;
   const martsW = 3.5;
   const martsH = 0.95;
-  s.addText("gold.uc11_klantreis", {
+  s.addText("gold.uc11_customer_journey", {
     x: martsX, y: stagYStart - 0.4, w: martsW, h: 0.3,
     fontFace: F_BODY, fontSize: 9, color: AMBER,
     bold: true, charSpacing: 3, margin: 0,
   });
 
   const marts = [
-    { name: "mart_uc11_klantreis_events", sub: "één rij per gebeurtenis" },
-    { name: "mart_uc11_klantreis_phases", sub: "gaps-and-islands fase-reconstructie" },
+    { name: "mart_uc11_journey_events", sub: "één rij per gebeurtenis" },
+    { name: "mart_uc11_journey_phases", sub: "gaps-and-islands fase-reconstructie" },
   ];
   const martsY0 = 3.0;
   const martsGap = 1.4;
@@ -886,7 +886,7 @@ function subtitle(slide, text) {
   const s = pres.addSlide();
   chrome(s, "SLIDE 09");
   title(s, "Self-service toegang — zonder ticket, zonder shell.");
-  subtitle(s, "Nieuwe verzekeringsarts wil toegang tot gold.uc11_klantreis.");
+  subtitle(s, "Nieuwe verzekeringsarts wil toegang tot gold.uc11_customer_journey.");
 
   const flow = [
     {
@@ -902,7 +902,7 @@ function subtitle(slide, text) {
     {
       role: "3 — OM-access-bridge",
       action: "Realm-role",
-      detail: "Service consumeert webhook.\nZet realm-role\ndata_access:gold.uc11_klantreis.",
+      detail: "Service consumeert webhook.\nZet realm-role\ndata_access:gold.uc11_customer_journey.",
     },
     {
       role: "4 — Arts",
@@ -1058,11 +1058,11 @@ function subtitle(slide, text) {
   const links = [
     {
       label: "UC-spec",
-      path: "docs/use-cases/uc11-klantreis.md",
+      path: "docs/use-cases/uc11-customer-journey.md",
     },
     {
       label: "Demo-tour (walkthrough)",
-      path: "docs/use-cases/uc11-klantreis-walkthrough.md",
+      path: "docs/use-cases/uc11-customer-journey-walkthrough.md",
     },
     {
       label: "Live lineage",
@@ -1096,7 +1096,7 @@ function subtitle(slide, text) {
   });
 }
 
-const OUT = "/Users/karelgoense/Documents/programming/UWV/UDP_Stackable/docs/use-cases/uc11-klantreis-deck.pptx";
+const OUT = "/Users/karelgoense/Documents/programming/UWV/UDP_Stackable/docs/use-cases/uc11-customer-journey-deck.pptx";
 pres.writeFile({ fileName: OUT })
   .then((f) => console.log(`[uc11-deck] ${f}`))
   .catch((e) => { console.error(e); process.exit(1); });

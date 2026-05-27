@@ -4,14 +4,14 @@ SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE.
 """
 
 __all__ = [
-    "crm",
-    "fez",
+    "customers",
+    "finance",
     "persona",
     "polisadministratie",
-    "wajong",
-    "wia",
-    "ww",
-    "zw",
+    "eligibility_cases",
+    "claims",
+    "service_requests",
+    "incidents",
 ]
 
 SYNTHETIC_HEADER = (

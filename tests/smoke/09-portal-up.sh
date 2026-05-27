@@ -13,7 +13,7 @@
 #   3. oauth2-proxy /ping
 #   4. Service routes :80 → :4180
 #   5. Ingress platform.${PLATFORM_DOMAIN} exists with TLS-secret
-#   6. Keycloak realm 'uwv' knows a client with clientId=portal
+#   6. Keycloak realm 'demo' knows a client with clientId=portal
 set -euo pipefail
 
 pass() { printf '\033[1;32m  OK\033[0m  %s\n' "$*"; }
@@ -111,19 +111,19 @@ else
 fi
 
 # 6. Keycloak realm bevat client 'portal'
-log "Keycloak realm 'uwv' kent client 'portal'"
+log "Keycloak realm 'demo' kent client 'portal'"
 KC_RESP=$(kubectl -n odap-auth run kc-portal-check-$RANDOM \
             --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
             curl -fsSL --max-time 10 \
               "http://keycloak.odap-auth.svc.cluster.local/realms/odap/.well-known/openid-configuration" \
             2>/dev/null || true)
 if echo "$KC_RESP" | grep -q '"issuer"'; then
-  pass "Keycloak realm 'uwv' beantwoordt OIDC-discovery"
+  pass "Keycloak realm 'demo' beantwoordt OIDC-discovery"
   # NB: zonder admin-API kunnen we client-list niet enumereren; dat is OK,
   # de realm-import bevat 'portal' (zie infrastructure/helm/keycloak/realm.json).
   skip "client-enumeration vereist Keycloak admin-API; vertrouw op realm-import"
 else
-  fail "Keycloak realm 'uwv' beantwoordt geen OIDC-discovery"
+  fail "Keycloak realm 'demo' beantwoordt geen OIDC-discovery"
 fi
 
 echo

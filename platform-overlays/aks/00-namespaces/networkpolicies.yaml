@@ -2,7 +2,7 @@
 # Addresses enterprise-readiness-audit.md §3.1.
 #
 # Strategy:
-#   1. Default-deny ingress + egress in every UWV namespace.
+#   1. Default-deny ingress + egress in every platform namespace.
 #   2. Always allow egress to kube-dns (CoreDNS).
 #   3. Per-namespace allow rules that mirror the architecture: which other
 #      namespace is expected to call this namespace, and which egresses go out.

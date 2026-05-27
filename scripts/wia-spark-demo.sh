@@ -7,7 +7,7 @@
 # DAG kan task-pods registreren tot die infra-bug gefixt is.
 #
 # Dit script:
-#   1. Apply seed-bronze-wia (one-shot SparkApplication, vult bronze)
+#   1. Apply seed-bronze-claims (one-shot SparkApplication, vult bronze)
 #   2. Render + apply silver-wia template met unieke RUN_ID
 #   3. Render + apply gold-wia template met unieke RUN_ID
 #   4. Print Trino-verificatiequery
@@ -82,13 +82,13 @@ apply_template() {
 
 # === Stap 1: bronze seed ===
 if [ "${SKIP_SEED:-0}" = "1" ]; then
-  log "SKIP_SEED=1 — gebruik bestaande bronze.uwv.wia_aanvraag"
+  log "SKIP_SEED=1 — gebruik bestaande bronze.claims.application"
 else
-  log "=== Stap 1/3: seed-bronze-wia ==="
-  kubectl -n "$NS" delete sparkapplication seed-bronze-wia \
+  log "=== Stap 1/3: seed-bronze-claims ==="
+  kubectl -n "$NS" delete sparkapplication seed-bronze-claims \
     --ignore-not-found >/dev/null
-  kubectl apply -f platform/08-spark/apps/seed-bronze-wia.yaml
-  wait_for_sparkapp seed-bronze-wia
+  kubectl apply -f platform/08-spark/apps/seed-bronze-claims.yaml
+  wait_for_sparkapp seed-bronze-claims
 fi
 
 # === Stap 2: silver ===
@@ -116,7 +116,7 @@ Verifieer eindresultaat via Trino:
       port=8443, user='smoketest', http_scheme='https', verify=False,
   ).cursor()
   for sql in [
-      \"SELECT 'bronze' AS layer, COUNT(*) FROM bronze.uwv.wia_aanvraag\",
+      \"SELECT 'bronze' AS layer, COUNT(*) FROM bronze.claims.application\",
       \"SELECT 'silver-spark', COUNT(*) FROM silver.wia_spark.aanvraag\",
       \"SELECT 'gold-spark', COUNT(*) FROM gold.uc01_wia_spark.funnel_daily\",
   ]:

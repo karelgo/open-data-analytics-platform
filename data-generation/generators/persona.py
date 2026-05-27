@@ -76,7 +76,7 @@ class Persona:
     voornaam: str
     achternaam: str
     geslacht: str  # 'M' | 'V' | 'X'
-    geboortedatum: str  # ISO-8601: YYYY-MM-DD
+    birth_date: str  # ISO-8601: YYYY-MM-DD
     straat: str
     huisnummer: int
     postcode: str
@@ -104,14 +104,14 @@ def generate_persona(rng: random.Random, fake) -> Persona:
     else:
         voornaam = fake.first_name_nonbinary()
     achternaam = fake.last_name()
-    geboortedatum = _random_birthdate(rng)
+    birth_date = _random_birthdate(rng)
 
     return Persona(
         bsn=bsn,
         voornaam=voornaam,
         achternaam=achternaam,
         geslacht=geslacht,
-        geboortedatum=geboortedatum.isoformat(),
+        birth_date=birth_date.isoformat(),
         straat=fake.street_name(),
         huisnummer=rng.randint(1, 999),
         postcode=fake.postcode(),
@@ -129,7 +129,7 @@ def generate_personas(count: int, seed: int | None = None) -> Iterator[Persona]:
 
 
 def to_kafka_envelope(persona: Persona) -> dict[str, Any]:
-    """Wrap persoon in event-envelope voor Kafka topic `uwv.persona.created`."""
+    """Wrap persoon in event-envelope voor Kafka topic `customers.created`."""
     return envelope(persona.to_dict(), event_type="persona.created")
 
 

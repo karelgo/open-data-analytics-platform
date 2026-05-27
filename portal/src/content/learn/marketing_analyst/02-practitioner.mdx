@@ -16,7 +16,7 @@ checks:
   - id: "crm_practitioner_todo"
     title: "To-do aangemaakt zonder onnodige PII-blootstelling"
 quiz:
-  - q: "De cliënt geeft naam, geboortedatum en de laatste 4 BSN-cijfers. Welke filtersamenstelling gebruik je?"
+  - q: "De cliënt geeft naam, birth_date en de laatste 4 BSN-cijfers. Welke filtersamenstelling gebruik je?"
     options:
       - "Alleen BSN-deel"
       - "Combineer alle drie als filter — meer dan één treffer = vraag een extra kenmerk; geen treffer = excuus en doorverwijzen"
@@ -54,12 +54,12 @@ Inkomende telefoon. Cliënt zegt:
 Open [Klant 360](/go/superset/) → zoekvenster bovenaan → vul in:
 
 - naam = `Bakker`
-- geboortedatum = `1978-05-04`
+- birth_date = `1978-05-04`
 - bsn-laatste-4 = `7741`
 
 Eén treffer? Open dat profiel. Twee of meer? Vraag de cliënt een extra
 kenmerk (bijv. eerste 2 letters voornaam) — niet meer dan nodig. Geen
-treffer? Verifieer geboortedatum, dan doorverwijzen.
+treffer? Verifieer birth_date, dan doorverwijzen.
 
 ## Stap 2 — context lezen
 

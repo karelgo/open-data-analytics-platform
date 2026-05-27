@@ -49,7 +49,7 @@ platform/11-airflow/
 
 | DAG | Trigger | Wat |
 |---|---|---|
-| `bronze_watch` | every 5 min | Per bron: SELECT count + max(kafka_ts) op `bronze.uwv.<table>` afgelopen 24u. Bij niet-leeg en streaming-mode binnen drempel: outlet `Dataset("bronze://uwv/<table>")`. |
+| `bronze_watch` | every 5 min | Per bron: SELECT count + max(kafka_ts) op `bronze.demo.<table>` afgelopen 24u. Bij niet-leeg en streaming-mode binnen drempel: outlet `Dataset("bronze://uwv/<table>")`. |
 | `silver_<domain>` (× 8) | bronze-Dataset van die bron | Cosmos rendert `dbt run+test --select tag:<domain> tag:staging`. Eén Airflow-task per dbt-model. Outlet: `Dataset("silver://<domain>/<entity>")`. |
 | `gold_<uc>_<name>` (× 6) | silver-Datasets van alle benodigde bronnen | Cosmos rendert `dbt run+test --select tag:uc<NN>`. UC-05 wacht op 6 silver-Datasets vóór run. |
 | `governance_om_ingest` | hourly | OpenMetadata: Trino-catalog → dbt-artifacts (sequentieel). |

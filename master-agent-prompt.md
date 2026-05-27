@@ -223,15 +223,15 @@ odap-data-platform/
 │   │   ├── 0004-openmetadata-as-catalog.md
 │   │   └── 0005-dbt-trino-as-transform.md
 │   └── use-cases/                      ← per UC een spec, leunend op referentiearchitectuur
-│       ├── uc01-wia-funnel.md
-│       ├── uc02-wajong-ai.md
-│       ├── uc03-ww-risk.md
+│       ├── uc01-claims-funnel.md
+│       ├── uc02-complex-cases-ai.md
+│       ├── uc03-fraud-risk.md
 │       ├── uc04-proactieve-tw.md
-│       ├── uc05-client-360.md
+│       ├── uc05-customer-360.md
 │       ├── uc06-schadelast.md
-│       ├── uc07-dq-polisadm.md
-│       ├── uc08-smz-planning.md
-│       ├── uc09-reint-effect.md
+│       ├── uc07-dq-policies.md
+│       ├── uc08-capacity-planning-planning.md
+│       ├── uc09-reintegration-effect.md
 │       └── uc10-gegevensdiensten.md
 ├── infrastructure/
 │   ├── helm/
@@ -301,15 +301,15 @@ odap-data-platform/
 │   │   ├── staging/
 │   │   ├── intermediate/
 │   │   └── marts/
-│   │       ├── uc01_wia_funnel/
-│   │       ├── uc02_wajong/
-│   │       ├── uc03_ww_risk/
-│   │       ├── uc04_tw_eligibility/
-│   │       ├── uc05_client_360/
-│   │       ├── uc06_lastprognose/
-│   │       ├── uc07_dq_polisadm/
-│   │       ├── uc08_smz_capaciteit/
-│   │       ├── uc09_reint_effect/
+│   │       ├── uc01_claims_funnel/
+│   │       ├── uc02_complex_cases/
+│   │       ├── uc03_fraud_risk/
+│   │       ├── uc04_eligibility_outreach/
+│   │       ├── uc05_customer_360/
+│   │       ├── uc06_cost_forecast/
+│   │       ├── uc07_dq_policies/
+│   │       ├── uc08_capacity_planning/
+│   │       ├── uc09_reintegration_effect/
 │   │       └── uc10_gegevensdiensten/
 │   ├── tests/
 │   └── snapshots/
@@ -446,7 +446,7 @@ Pin **alle** image tags in YAML; geen `latest`.
 ### §6.2 Naming conventions
 - K8s namespaces: `odap-platform`, `odap-data`, `odap-meta`, `odap-monitoring`.
 - Trino-schemas:
-  - Bronze: `bronze.uwv.<entity>`
+  - Bronze: `bronze.demo.<entity>`
   - Silver: `silver.<domain>.<entity>` (domain = `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`)
   - Gold: `gold.<uc_id>.<artifact>`
   - Sensitive: `sensitive.<domain>.<entity>` (apart catalog)
@@ -454,7 +454,7 @@ Pin **alle** image tags in YAML; geen `latest`.
   De catalog-naam is **niet** format-specifiek (geen `iceberg_bronze`); het catalog
   heet gewoon `bronze`. Het achterliggende formaat is een implementatie-detail.
 
-- dbt models: `<layer>_<domain>_<entity>.sql` (`stg_wia_aanvraag.sql`, `mart_uc01_wia_funnel_daily.sql`).
+- dbt models: `<layer>_<domain>_<entity>.sql` (`stg_claim_application.sql`, `mart_uc01_claims_funnel_daily.sql`).
 - Kafka topics: `uwv.<domain>.<event>`.
 
 ### §6.3 Doelbinding-vlaggen op data (verplicht)
@@ -469,7 +469,7 @@ meta:
   bio_classificatie: vertrouwelijk
   bewaartermijn_jaren: 7
   eigenaar: divisie_ag
-  pii_kolommen: [bsn, geboortedatum]
+  pii_kolommen: [bsn, birth_date]
   risk_tier: laag           # laag | midden | hoog | verboden (AI Act)
 ```
 

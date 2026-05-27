@@ -47,16 +47,16 @@ trino_exec() {
             --execute \"$1\""
 }
 
-bronze_count=$(trino_exec "SELECT count(*) FROM bronze.uwv.persona_created" 2>&1 \
+bronze_count=$(trino_exec "SELECT count(*) FROM bronze.persons.created" 2>&1 \
                   | tail -1 | tr -d '"' || echo 0)
 
 if [[ "$bronze_count" =~ ^[0-9]+$ ]] && [[ "$bronze_count" -gt 0 ]]; then
-    pass "bronze.uwv.persona_created: $bronze_count records"
+    pass "bronze.persons.created: $bronze_count records"
 else
-    fail "geen records in bronze.uwv.persona_created"
+    fail "geen records in bronze.persons.created"
 fi
 
-bsn_anomalies=$(trino_exec "SELECT count(*) FROM bronze.uwv.persona_created \
+bsn_anomalies=$(trino_exec "SELECT count(*) FROM bronze.persons.created \
   WHERE NOT regexp_like(json_extract_scalar(payload, '\$.payload.bsn'), '^9[0-9]{8}\$')" 2>&1 \
                   | tail -1 | tr -d '"' || echo -1)
 [[ "$bsn_anomalies" == "0" ]] \

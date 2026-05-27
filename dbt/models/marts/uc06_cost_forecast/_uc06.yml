@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: mart_uc06_cost_5y
+    description: "5-jaars baseline-projectie van claim_cost per wet × regio."
+    config:
+      tags: ["marts", "uc06", "finance"]
+    meta:
+      domain: fez
+      legal_basis: n/a
+      doelbinding: ["actuarie", "beleid"]
+      bio_classificatie: intern
+      bewaartermijn_jaren: 10
+      eigenaar: divisie_fez
+      pii_kolommen: []
+      risk_tier: laag
+      publiek_te_publiceren: true
+      cgm_entiteiten: [Uitkering, Aggregaat]
+    columns:
+      - name: jaar
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 2026
+              max_value: 2030
+      - name: maand
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 12
+      - name: wet
+        tests:
+          - relationships:
+              to: ref('cgm_wet_codes')
+              field: code
+
+  - name: mart_uc06_scenario_results
+    description: "Scenario-prognoses (baseline + iva_afschaf_2027 + ww_versoberen)."
+    config:
+      tags: ["marts", "uc06", "finance", "scenarios"]
+    meta:
+      domain: fez
+      legal_basis: n/a
+      doelbinding: ["actuarie", "beleid"]
+      bio_classificatie: intern
+      bewaartermijn_jaren: 10
+      eigenaar: divisie_fez
+      pii_kolommen: []
+      risk_tier: laag
+      publiek_te_publiceren: true
+    columns:
+      - name: scenario_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('scenario_inputs')
+              field: scenario_id

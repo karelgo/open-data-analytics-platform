@@ -74,7 +74,7 @@ configMapGenerator:
       - sources/zw.yml
       - sources/crm.yml
       - sources/fez.yml
-      - sources/klanttevredenheid.yml
+      - sources/customer_satisfaction.yml
       - sources/focus_billing.yml
 
   # 4. Loader-scripts voor KubernetesPodOperator-tasks (csv_ingest_factory).

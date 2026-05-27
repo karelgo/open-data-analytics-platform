@@ -5,9 +5,9 @@ Vervangt streaming_kafka_to_lakehouse.py. Spark Structured Streaming leest
 Iedere regel is een raw event-envelope (JSON). De `stream`-identifier wordt
 uit het bestandspad afgeleid.
 
-Bronze schema (per tabel `bronze.uwv.<domain>_<entity>`):
+Bronze schema (per tabel `bronze.demo.<domain>_<entity>`):
   payload      (string)    raw JSON envelope, ongewijzigd
-  stream       (string)    bv. 'uwv.persona.created' — afgeleid uit pad
+  stream       (string)    bv. 'customers.created' — afgeleid uit pad
   source_file  (string)    volledige S3-URL van bron-bestand
   source_ts    (timestamp) event-tijd (vooralsnog = ingestion_ts)
   ingestion_ts (timestamp) Spark-schrijfmoment
@@ -39,18 +39,18 @@ CHECKPOINT_BASE = os.getenv("CHECKPOINT_BASE", "s3a://odap-checkpoints/streaming
 TRIGGER_SECONDS = int(os.getenv("TRIGGER_SECONDS", "20"))
 
 # Verwacht pad: s3a://odap-raw/<stream-segments>/dt=<date>/part-*.jsonl
-# bv. uwv/persona/created/dt=...  → stream 'uwv.persona.created'.
+# bv. customers/created/dt=...  → stream 'customers.created'.
 _STREAM_PATH_RE = re.compile(r"/odap-raw/(?P<path>.+?)/dt=")
 
 
 def stream_to_table(stream: str) -> str | None:
-    """`uwv.persona.created` → `uwv.persona_created` (Hive db=uwv, table=…).
+    """`customers.created` → `uwv.person_created` (Hive db=uwv, table=…).
 
-    Trino ziet deze als `bronze.uwv.<table>` via de bronze-catalog.
+    Trino ziet deze als `bronze.demo.<table>` via de bronze-catalog.
     Returnt None voor onverwachte stream-naming.
     """
     parts = stream.split(".")
-    if len(parts) < 3 or parts[0] != "uwv":
+    if len(parts) < 3 or parts[0] != "demo":
         return None
     domain, *entity_parts = parts[1:]
     entity = "_".join(entity_parts)
@@ -95,7 +95,7 @@ def process_batch(batch_df, batch_id: int) -> None:
                 flush=True,
             )
             continue
-        # `table` = "uwv.persona_created" -> entity = "persona_created"
+        # `table` = "uwv.person_created" -> entity = "person_created"
         entity = table.split(".", 1)[1]
         path = f"{BRONZE_BASE}/{entity}"
         stream_df = batch_df.filter(F.col("stream") == F.lit(stream))

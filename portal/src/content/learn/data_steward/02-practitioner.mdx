@@ -4,11 +4,11 @@ role: data_steward
 level: practitioner
 order: 2
 duration: "60 min"
-summary: "Een data-engineer voegt `werkgever_branchecode` toe aan silver.ww. Jouw taak: classificeren, glossary-term koppelen, lineage controleren, OPA-mapping bijwerken."
+summary: "Een data-engineer voegt `werkgever_branchecode` toe aan silver.service_requests. Jouw taak: classificeren, glossary-term koppelen, lineage controleren, OPA-mapping bijwerken."
 prereqs:
   - "data_steward/foundation/1"
 labs:
-  - title: "OpenMetadata — silver.ww.aanvraag"
+  - title: "OpenMetadata — silver.service_requests.application"
     href: "/go/openmetadata/"
   - title: "dbt-docs — staging model"
     href: "/dbt-docs/"
@@ -49,14 +49,14 @@ tot afgeronde classificatie.
 
 In de PR-queue staat:
 
-> #4271 — Add `werkgever_branchecode` to silver.ww.aanvraag
+> #4271 — Add `werkgever_branchecode` to silver.service_requests.application
 
 Engineer-comment: "Nieuwe kolom uit polisadm; SBI-code 4-cijferig. Heb
 schema.yml aangevuld; geen tag toegevoegd, vraag data-steward."
 
 ## Stap 1 — review aanvragen
 
-Open de [tabelpagina](/go/openmetadata/) op `silver.ww.aanvraag`. Klik
+Open de [tabelpagina](/go/openmetadata/) op `silver.service_requests.application`. Klik
 "Nieuwe kolom: branchecode" → tab "Tags". Leeg.
 
 Zonder tag heeft OPA geen reden om de kolom te beschermen — hij is dan
@@ -82,14 +82,14 @@ Maak een glossary-term aan — als die nog niet bestaat:
 Term: branchecode (SBI)
 Definitie: Vier-cijferige code volgens de Standaard Bedrijfsindeling van
    het CBS (2008-versie), aangeleverd door werkgever bij polisinschrijving.
-Bron: silver.ww.aanvraag.werkgever_branchecode
+Bron: silver.service_requests.application.werkgever_branchecode
 Eigenaar: data.steward@odap.local
 Use cases: UC-03 (handhaving), UC-06 (lastprognose) — branche-trends
 ```
 
 ## Stap 4 — DQ-tests checken
 
-In dbt-docs: open `stg_ww_aanvraag` → tab Tests. Engineer heeft toegevoegd:
+In dbt-docs: open `stg_service_request_application` → tab Tests. Engineer heeft toegevoegd:
 
 - `not_null` op `werkgever_branchecode` — goed
 - `relationships` naar `seed_sbi_codes` — goed (volledigheidscheck)
@@ -103,7 +103,7 @@ Open
 in vscode.dev. Onder `roles.fraud_analyst.unmasked_columns` voeg je:
 
 ```json
-"silver.ww.aanvraag.werkgever_branchecode"
+"silver.service_requests.application.werkgever_branchecode"
 ```
 
 Voor `marketing_analyst` is de kolom niet relevant — niet toevoegen. Default

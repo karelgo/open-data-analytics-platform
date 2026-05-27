@@ -75,7 +75,7 @@ Het `profiles.yml` haalt credentials uit env-vars (mounted via secret-operator).
 trino --user smoketest --catalog gold --execute "SELECT 1"
 
 # tests/smoke/05-dbt-runs.sh
-dbt build --select +mart_uc01_wia_funnel_daily
+dbt build --select +mart_uc01_claims_funnel_daily
 
 # tests/smoke/08-opa-decisions.sh
 # verifieert dat OPA accept/deny correct werkt

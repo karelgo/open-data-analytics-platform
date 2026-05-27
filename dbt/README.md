@@ -1,6 +1,6 @@
 # dbt — Open Data & Analytics Platform
 
-Transformatielaag van **bronze.uwv.\*** (raw event-envelopes) naar
+Transformatielaag van **bronze.demo.\*** (raw event-envelopes) naar
 **silver.\<domein\>.\***  (CGM-conform getypt) en **gold.\<uc\>.\***
 (business products).
 
@@ -8,7 +8,7 @@ Transformatielaag van **bronze.uwv.\*** (raw event-envelopes) naar
 
 | Laag | Catalog | Materialized | Doel |
 |---|---|---|---|
-| `staging` | `silver` | view | Parsen van `bronze.uwv.<entity>.payload` JSON naar typed kolommen |
+| `staging` | `silver` | view | Parsen van `bronze.demo.<entity>.payload` JSON naar typed kolommen |
 | `intermediate` | `silver` | view | Joins, aggregaties die door meerdere marts hergebruikt worden |
 | `marts` | `gold` | table | UC-specifieke business products (UC-01/04/05/06/07 in fase 5) |
 
@@ -60,7 +60,7 @@ meta:
   bio_classificatie: vertrouwelijk              # publiek|intern|vertrouwelijk|geheim
   bewaartermijn_jaren: 7
   eigenaar: divisie_ag
-  pii_kolommen: [bsn, geboortedatum]
+  pii_kolommen: [bsn, birth_date]
   risk_tier: laag                               # laag|midden|hoog|verboden
 ```
 

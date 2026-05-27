@@ -32,12 +32,12 @@ queries draaien. Productie: aparte connection per catalog (`bronze`, `silver`,
 ## Datasets
 
 De init-Job maakt 6 datasets aan:
-- `gold.uc01_wia_funnel.mart_uc01_wia_funnel_daily`
-- `gold.uc04_tw_eligibility.mart_uc04_tw_eligibility`
-- `gold.uc05_client_360.mart_uc05_client_360`
-- `gold.uc06_lastprognose.mart_uc06_uitkeringslast_5y`
-- `gold.uc06_lastprognose.mart_uc06_scenario_results`
-- `gold.uc07_dq_polisadm.mart_uc07_dq_dagrapport`
+- `gold.uc01_claims_funnel.mart_uc01_claims_funnel_daily`
+- `gold.uc04_eligibility_outreach.mart_uc04_eligibility_outreach`
+- `gold.uc05_customer_360.mart_uc05_customer_360`
+- `gold.uc06_cost_forecast.mart_uc06_cost_5y`
+- `gold.uc06_cost_forecast.mart_uc06_scenario_results`
+- `gold.uc07_dq_policies.mart_uc07_dq_dagrapport`
 
 > **Let op:** in fase 7 gebruikt de init-Job één Trino-database-connection met
 > default-catalog `bronze`. Voor `gold.*` queries moet ofwel (a) een aparte

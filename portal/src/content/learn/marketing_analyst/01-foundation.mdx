@@ -9,14 +9,14 @@ labs:
   - title: "Open Klant 360 (UC-05) in Superset"
     hint: "Cliëntbeeld, contactmomenten, status"
     href: "/go/superset/"
-  - title: "Tabelpagina gold.uc05_client_360 in OpenMetadata"
+  - title: "Tabelpagina gold.uc05_customer_360 in OpenMetadata"
     hint: "Welke kolommen je ziet en wat ze betekenen"
     href: "/go/openmetadata/"
 quiz:
   - q: "Een cliënt belt en geeft de laatste 4 cijfers van zijn BSN. Hoe vind je hem in Klant 360?"
     options:
       - "Je vraagt het volledige BSN — dat moet hij gewoon doorgeven"
-      - "Je zoekt op naam + geboortedatum + de laatste 4 BSN-cijfers; UC-05 ondersteunt deze samenstelling"
+      - "Je zoekt op naam + birth_date + de laatste 4 BSN-cijfers; UC-05 ondersteunt deze samenstelling"
       - "Je vraagt de IBAN"
       - "Je opent bronze.uwv en zoekt direct"
     correct: 1
@@ -45,9 +45,9 @@ platform voor.
 
 ## Wat is Klant 360?
 
-`gold.uc05_client_360` voegt per cliënt samen wat klantcontact nodig heeft:
+`gold.uc05_customer_360` voegt per cliënt samen wat klantcontact nodig heeft:
 
-- naam, geboortedatum, adres;
+- naam, birth_date, adres;
 - lopende uitkeringen (WW / WIA / Wajong) op hoog niveau;
 - recente contactmomenten (Salesforce → bronze → silver → gold);
 - openstaande to-do's voor de cliënt.
@@ -61,7 +61,7 @@ Zie het als één pagina per cliënt, opgebouwd uit acht bronsystemen.
 | `iban` | Niet nodig voor klantcontact — je krijgt een hash |
 | `medisch_dossier` | Sociaal-medisch is sensitive — geen toegang |
 | `risk_score` | UC-03 is voor handhaving |
-| `bsn_volledig` | Je krijgt de laatste 4 cijfers + check via naam/geboortedatum |
+| `bsn_volledig` | Je krijgt de laatste 4 cijfers + check via naam/birth_date |
 
 OPA filtert dat al voordat de query je antwoord teruggeeft. Probeer niet
 "creatief" te queryen om hier omheen te werken — elke poging staat in de

@@ -10,7 +10,7 @@ Stappen:
   4. Parse op basis van source_format → pyarrow.Table.
   5. Voeg ingestion_ts + source_file metadata-kolommen toe; als geen
      partition_col is opgegeven, voeg `event_date` toe en gebruik dat.
-  6. Schrijf Delta naar s3://uwv-<target_catalog>/<target_schema>/<target_table>/.
+  6. Schrijf Delta naar s3a://odap-<target_catalog>/<target_schema>/<target_table>/.
   7. Registreer Delta-tabel in Hive Metastore via Trino `system.register_table`.
   8. Verplaats bron-bestand naar processed/uploads/<oorspronkelijk-pad>.
 
@@ -86,7 +86,7 @@ def validate_inputs() -> None:
         fail(f"target_table {TARGET_TABLE!r} ongeldig (snake_case verwacht)")
     if PARTITION_COL and not IDENTIFIER_RE.match(PARTITION_COL):
         fail(f"partition_col {PARTITION_COL!r} ongeldig (snake_case verwacht)")
-    # Bescherming: alleen uploads/ — geen klanttevredenheid/focus paden.
+    # Bescherming: alleen uploads/ — geen customer_satisfaction/focus paden.
     if not OBJECT_KEY.startswith("uploads/"):
         fail(f"object_key {OBJECT_KEY!r} valt niet onder uploads/")
     if ".." in OBJECT_KEY or "//" in OBJECT_KEY:
@@ -180,7 +180,7 @@ def add_metadata(table: pa.Table, source_file: str, partition_col: str | None) -
 
 
 def write_to_delta(table: pa.Table, partition_col: str) -> str:
-    bucket = f"uwv-{TARGET_CATALOG}"
+    bucket = f"odap-{TARGET_CATALOG}"
     path = f"{TARGET_SCHEMA}/{TARGET_TABLE}"
     write_location    = f"s3://{bucket}/{path}"
     register_location = f"s3a://{bucket}/{path}"

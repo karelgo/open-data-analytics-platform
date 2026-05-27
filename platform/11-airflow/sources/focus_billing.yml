@@ -5,7 +5,7 @@
 #   - 10 oci_* vendor-extensies (alleen aanwezig in OCI-export; optioneel)
 #
 # Een typische upload bevat één factuurmaand (10k-1M rijen). csv_to_bronze.py
-# schrijft alles native naar bronze.uwv.focus_billing (Delta, partitioned by
+# schrijft alles native naar bronze.finops.focus_billing (Delta, partitioned by
 # event_date = upload-datum). Maand-/service-aggregatie gebeurt in silver+gold.
 schema_version: 1
 
@@ -81,7 +81,7 @@ ingest:
 
 bronze:
   catalog: bronze
-  schema: uwv
+  schema: demo
   table: focus_billing
   partition_by: event_date          # = upload-datum; maand-bucketing in silver
 

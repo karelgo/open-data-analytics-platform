@@ -58,7 +58,7 @@ in vscode.dev. Voeg toe:
 ```json
 "dq_inspector": {
   "catalogs": ["openmetadata", "gold"],
-  "schemas": ["dq", "uc01_wia_funnel", "uc06_lastprognose"],
+  "schemas": ["dq", "uc01_claims_funnel", "uc06_cost_forecast"],
   "purposes": ["dq_review"],
   "can_see_pii": false,
   "can_see_medical": false,
@@ -77,7 +77,7 @@ In `opa-policies-src/trino/policy_test.rego` voeg je toe:
 test_dq_inspector_no_pii {
   not allow_select with input as {
     "user": "dq.test", "groups": ["dq_inspector"],
-    "resource": "silver.wia.aanvraag.bsn"
+    "resource": "silver.claims.application.bsn"
   }
 }
 
@@ -110,7 +110,7 @@ moet hoger staan dan vóór de reload, op alle replicas.
 
 ## Stap 5 — Keycloak group + test-user
 
-In [Keycloak](/go/keycloak/) → realm `uwv` → Groups → "dq_inspector"
+In [Keycloak](/go/keycloak/) → realm `odap` → Groups → "dq_inspector"
 aanmaken. Daarna een test-user `dq.test` met deze group.
 
 > Test-user is geen permanente account. Doel: de rol werkend bewijzen op een
@@ -125,8 +125,8 @@ KEYCLOAK_USER=dq.test make test SUITE=role-smoke ROLE=dq_inspector
 Dit draait een set queries:
 
 - toegang tot `gold.dq.*` — moet werken;
-- toegang tot `silver.wia.aanvraag.bsn` — moet 0 rijen geven;
-- toegang tot `sensitive.wajong.*` — moet 0 rijen geven.
+- toegang tot `silver.claims.application.bsn` — moet 0 rijen geven;
+- toegang tot `sensitive.eligibility_cases.*` — moet 0 rijen geven.
 
 Alle drie groen? Verder. Een falend signaal? Revert (zie volgende stap).
 

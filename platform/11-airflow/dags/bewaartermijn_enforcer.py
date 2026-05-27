@@ -29,28 +29,28 @@ DEFAULT_ARGS = {
 # In productie zou dit dynamisch via OpenMetadata custom-properties komen.
 RETENTION_RULES = [
     # (catalog, schema, table, year_column, retention_years, dry_run_only)
-    ("silver", "crm", "stg_crm_contact", "event_date", 2, False),
-    ("bronze", "uwv", "crm_contact", "event_date", 2, False),
+    ("silver", "customers", "stg_customer_interaction", "event_date", 2, False),
+    ("bronze", "demo", "customer_interaction", "event_date", 2, False),
     (
         "silver",
-        "fez",
-        "stg_fez_uitkeringslast",
+        "finance",
+        "stg_finance_expense",
         "event_date",
         10,
         True,
     ),  # publiek-publiceerbaar; bewust dry-run
     (
         "gold",
-        "uc01_wia_funnel",
-        "mart_uc01_wia_funnel_daily",
+        "uc01_claims_funnel",
+        "mart_uc01_claims_funnel_daily",
         "aanvraag_datum",
         7,
         False,
     ),
     (
         "gold",
-        "uc05_client_360",
-        "mart_uc05_client_360",
+        "uc05_customer_360",
+        "mart_uc05_customer_360",
         None,
         7,
         True,
@@ -88,7 +88,7 @@ with DAG(
     start_date=datetime(2026, 5, 1),
     catchup=False,
     max_active_runs=1,
-    tags=["compliance", "avg", "uwv", "improvements-9"],
+    tags=["compliance", "avg", "demo", "improvements-9"],
 ) as dag:
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")

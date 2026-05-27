@@ -18,7 +18,7 @@ models:
       - name: inkomen_maand_eur
         tests: [not_null]
 
-  - name: int_klantreis_events
+  - name: int_customer_journey_events
     description: |
       UC-11 — Geünificeerde event-stream over alle cliënt-domeinen. Eén rij
       per gebeurtenis met velden (bsn, event_ts, domein, event_type,
@@ -28,7 +28,7 @@ models:
       tags: ["intermediate", "uc11"]
     meta:
       # `intermediate` mapt naar OM-domain Cross (zie dbt-meta-mapping.yaml).
-      # Domain MOET gezet zijn vóór de enricher de dataProduct (uc11_klantreis,
+      # Domain MOET gezet zijn vóór de enricher de dataProduct (uc11_customer_journey,
       # zelf in domain Cross) probeert te koppelen — anders trigger OM's
       # "Data Product Domain Validation" rule een 400 op de dataProduct-op.
       domain: intermediate

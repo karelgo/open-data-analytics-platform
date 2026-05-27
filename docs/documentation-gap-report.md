@@ -43,7 +43,7 @@ in elke `_*.yml`). Onderstaande items vormen de openstaande gaten.
 
 | # | Pad | Wat ontbreekt | Prio |
 |---|---|---|---|
-| B.1 ✅ | `dbt/dbt_project.yml` | ~~Config-gat~~ — `uc09_reint_effect` toegevoegd aan `models.odap_data_platform.marts.*`. | 🔴 blocker |
+| B.1 ✅ | `dbt/dbt_project.yml` | ~~Config-gat~~ — `uc09_reintegration_effect` toegevoegd aan `models.odap_data_platform.marts.*`. | 🔴 blocker |
 | B.2 | `dbt/macros/*.sql` | Geen enkele macro heeft een `{% docs %}` block. De 8 macros (`apply_doelbinding_tag`, `generate_database_name`, `generate_schema_name`, `pseudonymize`, `table_format`, `test_bsn_valid`, `test_iban_valid`, `test_lh_nummer_valid`) verschijnen daardoor leeg in `dbt docs generate`. | 🟠 hoog |
 | B.3 | `dbt/tests/*.sql` | De 2 singular tests hebben header-comments maar geen schema-beschrijving en geen referentie vanuit `compliance-mapping.md`. UC-03-test (R-AI Act-relevant) verdient een expliciete koppeling. | 🟡 polish |
 | B.4 | `dbt/snapshots/` | Lege map. Geen README of `.gitkeep`-uitleg of er bewust geen snapshots zijn (en zo ja, waarom — doelbinding? ARV-bewaartermijnen?). | 🟡 polish |
@@ -58,7 +58,7 @@ in elke `_*.yml`). Onderstaande items vormen de openstaande gaten.
 |---|---|---|---|
 | C.1 | `docs/runbook.md` | Zelf-aangegeven als "skeleton (fase 0)". Veel TODO-items. Acceptabel zolang het platform niet productie-rijp is, maar de TODO-secties in §2.2, §4.x verdienen tenminste verwijzing naar de bestaande `make`-targets en `scripts/doctor.sh`. | 🟠 hoog |
 | C.2 | `docs/data-contracts.md` (nieuw) | Bronze-sources zijn beschreven in `dbt/models/staging/_sources.yml` (8 topics) en in NiFi-templates. Een gecombineerd "data contract"-document per `uwv.<domain>.<entity>`-topic — schema-evolutie-regels, eigenaar, SLA, voorbeelddata — ontbreekt. | 🟡 polish |
-| C.3 | `docs/lineage.md` of diagram in `docs/architecture.md` | Lineage van Kafka-topic → bronze.uwv.* → silver.<domein>.* → gold.<uc>.* is impliciet (door dbt-refs), maar er is geen overzichtsdiagram. OpenMetadata genereert het runtime, maar een statisch fallback-diagram is handig voor lezers zonder cluster. | 🟡 polish |
+| C.3 | `docs/lineage.md` of diagram in `docs/architecture.md` | Lineage van Kafka-topic → bronze.* → silver.<domein>.* → gold.<uc>.* is impliciet (door dbt-refs), maar er is geen overzichtsdiagram. OpenMetadata genereert het runtime, maar een statisch fallback-diagram is handig voor lezers zonder cluster. | 🟡 polish |
 | C.4 | `platform/13-openmetadata-config/ingestion-pipelines/` | Lege map (improvements #1.14). Verwacht: voorbeeld-pipeline-yaml's. | 🟡 polish |
 | C.5 | Airflow DAGs (`platform/11-airflow/dags/`) | DAGs hebben docstrings ✓. Wat ontbreekt: een `README.md` in `dags/` met DAG-overzicht + schedule + eigenaar — handig voor data-stewards die de UI niet altijd open hebben. | 🟡 polish |
 | C.6 | `docs/onboarding.md` (nieuw) | Voor nieuwe ontwikkelaars: prerequisites, eerste-week-pad ("clone → make cluster → make seed → eerste UC bekijken"). Nu verspreid over README + handleidingen. | 🟡 polish |

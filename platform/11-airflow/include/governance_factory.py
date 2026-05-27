@@ -184,7 +184,7 @@ def build_om_ingest_dag() -> DAG:
         # is_paused_upon_creation=False blijft die call queued op een paused
         # DAG. catchup=False voorkomt backfill-explosie van het schema.
         is_paused_upon_creation=False,
-        tags=["uwv", "governance", "openmetadata"],
+        tags=["demo", "governance", "openmetadata"],
     ) as dag:
         ingest_trino = _om_ingest_task(
             task_id="ingest_trino_catalog",

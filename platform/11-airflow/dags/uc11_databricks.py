@@ -11,11 +11,11 @@ Tasks:
                               databricks.bronze.* en databricks.silver.*.
   2. databricks_dbt_gold    — KubernetesPodOperator: `dbt run --target
                               databricks_dev` met dbt-databricks. Bouwt
-                              int_klantreis_events + 2 marts uit het échte
+                              int_customer_journey_events + 2 marts uit het échte
                               dbt-project — zelfde SQL als Trino én Fabric
                               executeren (drie engines, één dbt-project).
   3. databricks_verify      — SQL-warehouse query: row-count > 0 op
-                              databricks.gold.mart_uc11_klantreis_events.
+                              databricks.gold.mart_uc11_journey_events.
 
 Voorvereisten (in-cluster):
   - Kubernetes Secret 'uc11-multiplatform-creds' gemount als envFrom (heeft
@@ -55,7 +55,7 @@ DEFAULT_ARGS = {
     "retry_delay": timedelta(minutes=2),
 }
 
-GOLD_TABLE_FQN = f"{DATABRICKS_CATALOG}.gold.mart_uc11_klantreis_events"
+GOLD_TABLE_FQN = f"{DATABRICKS_CATALOG}.gold.mart_uc11_journey_events"
 
 # Zelfde image als fabric_dbt_gold — bevat dbt-trino + dbt-fabricspark + dbt-databricks.
 # /opt/odap/dbt/ heeft het dbt-project; /root/.dbt/profiles.yml heeft alle drie de
@@ -103,7 +103,7 @@ dbt debug --profiles-dir /tmp/profiles --target databricks_dev || echo '(debug-w
 
 echo '=== dbt run ==='
 dbt run --no-partial-parse --profiles-dir /tmp/profiles --target databricks_dev \
-  --select int_klantreis_events+
+  --select int_customer_journey_events+
 """
 
 

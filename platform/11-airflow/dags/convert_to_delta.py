@@ -4,7 +4,7 @@ Wordt getriggerd door de portal /csv-upload pagina via de airflow-bridge
 sidecar (zie portal/scripts/airflow-bridge.py). Eén task: leest het
 bestand uit `odap-staging/uploads/...`, parseert op basis van
 `source_format` (csv/tsv/json/ndjson/parquet), schrijft Delta naar
-`uwv-{target_catalog}/{target_schema}/{target_table}/`, en registreert
+`odap-{target_catalog}/{target_schema}/{target_table}/`, en registreert
 de tabel in Hive Metastore via Trino.
 
 Trigger-conf (verplicht):
@@ -117,7 +117,7 @@ with DAG(
     description=(
         "Generieke any-file → Delta-conversie. Wordt getriggerd vanuit de portal "
         "/csv-upload pagina via de airflow-bridge sidecar; leest het bestand uit "
-        "odap-staging/uploads/, schrijft Delta naar uwv-<catalog>/<schema>/<table>/, "
+        "odap-staging/uploads/, schrijft Delta naar odap-<catalog>/<schema>/<table>/, "
         "en registreert in Hive Metastore via Trino."
     ),
     default_args=DEFAULT_ARGS,

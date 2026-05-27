@@ -55,95 +55,95 @@ data:
     LINKS = {
         # Klantreis-cluster — UC-11 + intermediate
         "Klantreis": [
-            ("uc11_klantreis", "mart_uc11_klantreis_events"),
-            ("uc11_klantreis", "mart_uc11_klantreis_phases"),
-            ("intermediate", "int_klantreis_events"),
+            ("uc11_customer_journey", "mart_uc11_journey_events"),
+            ("uc11_customer_journey", "mart_uc11_journey_phases"),
+            ("intermediate", "int_customer_journey_events"),
         ],
         "EventStream": [
-            ("uc11_klantreis", "mart_uc11_klantreis_events"),
-            ("intermediate", "int_klantreis_events"),
+            ("uc11_customer_journey", "mart_uc11_journey_events"),
+            ("intermediate", "int_customer_journey_events"),
         ],
         "Fase": [
-            ("uc11_klantreis", "mart_uc11_klantreis_phases"),
+            ("uc11_customer_journey", "mart_uc11_journey_phases"),
         ],
 
         # Cliënt-domein
         "Client": [
-            ("persoon", "stg_persona"),
+            ("persons", "stg_persons"),
         ],
         "Persona": [
-            ("persoon", "stg_persona"),
+            ("persons", "stg_persons"),
         ],
 
         # Polisadm / IKV (één bron-tabel dekt werknemer × werkgever × dienstverband)
         "IKV": [
-            ("polisadm", "stg_polisadm_ikv"),
+            ("policies", "stg_policy_holders"),
         ],
         "Werknemer": [
-            ("polisadm", "stg_polisadm_ikv"),
+            ("policies", "stg_policy_holders"),
         ],
         "Werkgever": [
-            ("polisadm", "stg_polisadm_ikv"),
+            ("policies", "stg_policy_holders"),
         ],
         "Dienstverband": [
-            ("polisadm", "stg_polisadm_ikv"),
+            ("policies", "stg_policy_holders"),
         ],
 
         # Aanvraag / Beoordeling — over wet-domeinen heen
         "Aanvraag": [
-            ("ww", "stg_ww_aanvraag"),
-            ("wia", "stg_wia_aanvraag"),
-            ("wajong", "stg_wajong_dossier"),
+            ("service_requests", "stg_service_request_application"),
+            ("claims", "stg_claim_application"),
+            ("eligibility_cases", "stg_eligibility_case"),
         ],
         "Beoordeling": [
-            ("wia", "stg_wia_aanvraag"),
-            ("wajong", "stg_wajong_dossier"),
+            ("claims", "stg_claim_application"),
+            ("eligibility_cases", "stg_eligibility_case"),
         ],
         "Ontslag": [
-            ("ww", "stg_ww_aanvraag"),
+            ("service_requests", "stg_service_request_application"),
         ],
 
         # Sociaal-medisch (sensitive — alleen op bron, niet op marts)
         "Diagnose": [
-            ("zw", "stg_zw_melding"),
-            ("wajong", "stg_wajong_dossier"),
+            ("incidents", "stg_incident_report"),
+            ("eligibility_cases", "stg_eligibility_case"),
         ],
 
         # CRM
         "Contact": [
-            ("crm", "stg_crm_contact"),
+            ("customers", "stg_customer_interaction"),
         ],
         "Kanaal": [
-            ("crm", "stg_crm_contact"),
+            ("customers", "stg_customer_interaction"),
         ],
 
         # FEZ / Uitkering
         "Uitkering": [
-            ("fez", "stg_fez_uitkeringslast"),
+            ("finance", "stg_finance_expense"),
         ],
         "Aggregaat": [
-            ("fez", "stg_fez_uitkeringslast"),
-            ("uc06_lastprognose", "mart_uc06_uitkeringslast_5y"),
-            ("uc06_lastprognose", "mart_uc06_scenario_results"),
+            ("finance", "stg_finance_expense"),
+            ("uc06_cost_forecast", "mart_uc06_cost_5y"),
+            ("uc06_cost_forecast", "mart_uc06_scenario_results"),
         ],
         "Inkomen": [
             ("intermediate", "int_huishouden_inkomen"),
-            ("uc04_tw_eligibility", "mart_uc04_tw_eligibility"),
+            ("uc04_eligibility_outreach", "mart_uc04_eligibility_outreach"),
         ],
         "Huishouden": [
             ("intermediate", "int_huishouden_inkomen"),
-            ("uc04_tw_eligibility", "mart_uc04_tw_eligibility"),
+            ("uc04_eligibility_outreach", "mart_uc04_eligibility_outreach"),
         ],
 
         # Re-integratie — UC-09
         "Traject": [
-            ("uc09_reint_effect", "mart_uc09_effect_panel"),
+            ("uc09_reintegration_effect", "mart_uc09_effect_panel"),
         ],
         "Werkhervatting": [
-            ("uc09_reint_effect", "mart_uc09_effect_panel"),
+            ("uc09_reintegration_effect", "mart_uc09_effect_panel"),
         ],
         "Uitkomst": [
-            ("uc09_reint_effect", "mart_uc09_effect_panel"),
+            ("uc09_reintegration_effect", "mart_uc09_effect_panel"),
         ],
     }
 

@@ -4,7 +4,7 @@
      on-run-start: "{{ ensure_schemas() }}"
 
    Per target:
-   - trino    → CREATE SCHEMA ... WITH (location = 's3a://uwv-<laag>/<naam>/')
+   - trino    → CREATE SCHEMA ... WITH (location = 's3a://odap-<layer>/<name>/')
                 voor elke silver/gold-schema (huidige Stackable-gedrag).
                 Stackable's Hive-Metastore heeft geen globale warehouse.dir,
                 dus elke schema MOET een expliciete S3-locatie hebben.
@@ -18,13 +18,13 @@
 #}
 {% macro ensure_schemas() %}
     {%- set silver_schemas = [
-        'persoon', 'polisadm', 'ww', 'wia', 'wajong', 'zw', 'crm',
-        'fez', 'klantcontact', 'finops', 'intermediate', 'sandbox_uc09', 'seed'
+        'persons', 'policies', 'service_requests', 'claims', 'eligibility_cases', 'incidents', 'customers',
+        'finance', 'klantcontact', 'finops', 'intermediate', 'sandbox_uc09', 'seed'
     ] -%}
     {%- set gold_schemas = [
-        'uc01_wia_funnel', 'uc04_tw_eligibility', 'uc05_client_360',
-        'uc06_lastprognose', 'uc07_dq_polisadm', 'uc09_reint_effect',
-        'uc11_klantreis', 'uc12_focus_finops', 'uc_klant_tev',
+        'uc01_claims_funnel', 'uc04_eligibility_outreach', 'uc05_customer_360',
+        'uc06_cost_forecast', 'uc07_dq_policies', 'uc09_reintegration_effect',
+        'uc11_customer_journey', 'uc12_focus_finops', 'uc_customer_satisfaction',
         'dq_overview', 'seed'
     ] -%}
 

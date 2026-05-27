@@ -72,7 +72,7 @@ trajecteffectiviteit.
 ## 3. Bronnen
 - silver.fin.uitgave (re-integratie subset)
 - silver.smz.traject (trajecten met type-classificatie)
-- silver.fez.budget (referentie-budget per regio)
+- silver.finance.budget (referentie-budget per regio)
 
 ## 4. Mart-definitie
 
@@ -81,7 +81,7 @@ Tabel: `gold.uc_xx_reintegratie_budget`
 | Kolom | Type | Toelichting |
 |---|---|---|
 | maand | DATE | Eerste van de maand |
-| regio_code | VARCHAR | UWV-regio |
+| regio_code | VARCHAR | region |
 | traject_type | VARCHAR | enum {opleiding, jobcoaching, ...} |
 | uitgaven_eur | DECIMAL | som uitgegeven |
 | budget_eur | DECIMAL | toegekend budget |

@@ -72,7 +72,7 @@ def get_spark_with_lakehouse_config(app_name: str) -> "SparkSession":
                 "spark.sql.extensions",
                 "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
             )
-            # spark_catalog upgraded zodat saveAsTable("bronze.uwv.x") correct werkt
+            # spark_catalog upgraded zodat saveAsTable("bronze.demo.x") correct werkt
             .config(
                 "spark.sql.catalog.spark_catalog",
                 "org.apache.iceberg.spark.SparkSessionCatalog",
@@ -93,7 +93,7 @@ def write_table(
 ) -> None:
     """Schrijf een batch DataFrame naar Delta of Iceberg.
 
-    `table_name` bv. 'bronze.uwv.persona_created'. Tabel wordt lazy gecreëerd.
+    `table_name` bv. 'bronze.persons.created'. Tabel wordt lazy gecreëerd.
     """
     writer = df.write.format(TABLE_FORMAT).mode(mode)
     if partition_by:
@@ -123,13 +123,13 @@ def write_stream_to_table(
 
 
 def ensure_bronze_schema(spark: "SparkSession") -> None:
-    """Maak Hive-database `uwv` aan voor bronze-Delta-tabellen (idempotent).
+    """Maak Hive-database `odap` aan voor bronze-Delta-tabellen (idempotent).
 
     Trino's `bronze` catalog mapt op deze Hive-metastore, dus Trino ziet
-    `bronze.uwv.<table>`. Spark spreekt 2-level (`uwv.<table>`); de
+    `bronze.demo.<table>`. Spark spreekt 2-level (`uwv.<table>`); de
     eerdere `CREATE SCHEMA bronze.uwv` faalde met
     `_LEGACY_ERROR_TEMP_1055` omdat Spark `bronze.uwv` als één
     database-naam met dot interpreteert (geen catalog-registratie voor
     `bronze` in spark_catalog).
     """
-    spark.sql("CREATE SCHEMA IF NOT EXISTS uwv " "LOCATION 's3a://odap-bronze/uwv/'")
+    spark.sql("CREATE SCHEMA IF NOT EXISTS uwv " "LOCATION 's3a://odap-bronze/demo/'")

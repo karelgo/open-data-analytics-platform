@@ -50,23 +50,23 @@ models:
       +database: silver
       +materialized: view
       persona:
-        +schema: persoon
+        +schema: persons
       polisadm:
-        +schema: polisadm
+        +schema: policies
       ww:
-        +schema: ww
+        +schema: service_requests
       wia:
-        +schema: wia
+        +schema: claims
       wajong:
-        +schema: wajong
+        +schema: eligibility_cases
       zw:
-        +schema: zw
+        +schema: incidents
       crm:
-        +schema: crm
+        +schema: customers
       fez:
-        +schema: fez
+        +schema: finance
       klantcontact:
-        +schema: klantcontact
+        +schema: customer_interactions
       finops:
         +schema: finops
 
@@ -78,24 +78,24 @@ models:
     marts:
       +database: gold
       +materialized: table
-      uc01_wia_funnel:
-        +schema: uc01_wia_funnel
-      uc04_tw_eligibility:
-        +schema: uc04_tw_eligibility
-      uc05_client_360:
-        +schema: uc05_client_360
-      uc06_lastprognose:
-        +schema: uc06_lastprognose
-      uc07_dq_polisadm:
-        +schema: uc07_dq_polisadm
-      uc09_reint_effect:
-        +schema: uc09_reint_effect
-      uc11_klantreis:
-        +schema: uc11_klantreis
+      uc01_claims_funnel:
+        +schema: uc01_claims_funnel
+      uc04_eligibility_outreach:
+        +schema: uc04_eligibility_outreach
+      uc05_customer_360:
+        +schema: uc05_customer_360
+      uc06_cost_forecast:
+        +schema: uc06_cost_forecast
+      uc07_dq_policies:
+        +schema: uc07_dq_policies
+      uc09_reintegration_effect:
+        +schema: uc09_reintegration_effect
+      uc11_customer_journey:
+        +schema: uc11_customer_journey
       uc12_focus_finops:
         +schema: uc12_focus_finops
-      uc_klant_tev:
-        +schema: uc_klant_tev
+      uc_customer_satisfaction:
+        +schema: uc_customer_satisfaction
       dq_overview:
         +schema: dq_overview
 

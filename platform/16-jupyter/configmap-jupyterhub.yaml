@@ -1,6 +1,6 @@
 # jupyterhub_config.py — the Hub's Python configuration.
 #
-# Auth     : oauthenticator.generic.GenericOAuthenticator against Keycloak `uwv`
+# Auth     : oauthenticator.generic.GenericOAuthenticator against Keycloak `odap`
 # Spawner  : kubespawner.KubeSpawner — every user gets a Pod with the kernel image
 # Storage  : per-user PVC `claim-{username}` (notebooks survive pod restarts)
 # Identity : X-Trino-User = Keycloak preferred_username, so OPA enforces RBAC

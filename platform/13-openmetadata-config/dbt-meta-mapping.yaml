@@ -20,7 +20,7 @@ doelbinding_to_tag:
   handhaving: Doelbinding.Handhaving
   externe_levering: Doelbinding.Externe_Levering
   planning: Doelbinding.Planning
-  # "primair_proces" = UWV-uitkeringsverlening (primaire taak).
+  # "primair_proces" = claim handling (primaire taak).
   primair_proces: Doelbinding.Uitkering
   # Klanttevredenheids- / UX-onderzoek = sturings-/beleidsinput.
   klantonderzoek: Doelbinding.Sturingsinfo
@@ -66,7 +66,7 @@ pii_column_to_tag:
   voornaam: PII.Naam
   achternaam: PII.Naam
   naam: PII.Naam
-  geboortedatum: PII.Geboortedatum
+  birth_date: PII.Geboortedatum
   straat: PII.Adres
   huisnummer: PII.Adres
   postcode: PII.Adres
@@ -127,13 +127,13 @@ custom_properties:
     description: "Referentie naar DPIA-document. Bron: dbt meta.dpia_id."
   - name: algoritmeregister_id
     propertyType: string
-    description: "Registratienummer in UWV-algoritmeregister. Bron: dbt meta.algoritmeregister_id."
+    description: "Registratienummer in algorithm register. Bron: dbt meta.algoritmeregister_id."
   - name: legal_basis_text
     propertyType: string
     description: "Rauwe wetsverwijzing voor mapping naar LegalBasis-tag."
   - name: dbt_domain
     propertyType: string
-    description: "dbt meta.domain — UWV-divisie / domein. Bron voor Domain-koppeling."
+    description: "dbt meta.domain — business division / domein. Bron voor Domain-koppeling."
   - name: human_in_the_loop
     propertyType: enum
     enumValues: ["true", "false"]
@@ -191,7 +191,7 @@ teams:
     displayName: "Divisie Klantcontact"
     teamType: Group
   - name: knowledge_center
-    displayName: "Kenniscentrum UWV"
+    displayName: "Knowledge Center"
     teamType: Group
   - name: data_steward_polisadm
     displayName: "Data Steward Polisadministratie"
@@ -200,13 +200,13 @@ teams:
     displayName: "Data Steward Platform"
     teamType: Group
   - name: data_office
-    displayName: "Data Office UWV"
+    displayName: "Data Office"
     teamType: Group
   - name: divisie_finance
     displayName: "Divisie Finance (FinOps)"
     teamType: Group
 
-# OM Domains — UWV mesh-model. dbt meta.domain → domain-name mapping.
+# OM Domains — mesh model. dbt meta.domain → domain-name mapping.
 # Source-aligned = de divisie 'bezit' het brondomein. Aggregate = cross-domein
 # product. OM 1.5 CreateDataProduct verwacht singular `domain` (string), niet
 # `domains` array — die switch zit in OM 1.7+.
@@ -238,7 +238,7 @@ domains:
     owner: divisie_crm
   - name: Klantcontact
     displayName: "Divisie Klantcontact"
-    description: "Klantcontact / klanttevredenheid. Cross-divisie."
+    description: "Klantcontact / customer_satisfaction. Cross-divisie."
     domainType: Source-aligned
     owner: divisie_klantcontact
   - name: Polisadm
@@ -287,54 +287,54 @@ dbt_domain_to_om:
 # Data Products — één per Use-Case / use-case-groep. Tabellen worden via
 # dbt-tag (uc01 / uc04 / etc.) gelinkt aan een DataProduct.
 data_products:
-  - name: uc01_wia_funnel
+  - name: uc01_claims_funnel
     displayName: "UC-01 — WIA Funnel"
     description: "Sturings-dashboard dagelijkse WIA-aanvragen (DoD-anchor)."
     domain: AG
     owner: divisie_ag
     dbt_tag: uc01
-  - name: uc04_tw_eligibility
+  - name: uc04_eligibility_outreach
     displayName: "UC-04 — TW Proactieve dienstverlening"
     description: "Cliënten potentieel rechthebbend op TW-aanvulling."
     domain: WW
     owner: divisie_ww
     dbt_tag: uc04
-  - name: uc05_client_360
+  - name: uc05_customer_360
     displayName: "UC-05 — Cliënt 360°"
     description: "360-graden cliëntbeeld voor klantcontact (OPA-masking)."
     domain: CRM
     owner: divisie_crm
     dbt_tag: uc05
-  - name: uc06_lastprognose
+  - name: uc06_cost_forecast
     displayName: "UC-06 — Lastprognose 5-jaars"
-    description: "Actuariële projectie uitkeringslast + scenario's."
+    description: "Actuariële projectie claim_cost + scenario's."
     domain: FEZ
     owner: divisie_fez
     dbt_tag: uc06
-  - name: uc07_dq_polisadm
+  - name: uc07_dq_policies
     displayName: "UC-07 — DQ Polisadministratie"
     description: "Datakwaliteits-dagrapport voor polisadm-zone."
     domain: Polisadm
     owner: data_steward_polisadm
     dbt_tag: uc07
-  - name: uc09_reint_effect
+  - name: uc09_reintegration_effect
     displayName: "UC-09 — Re-integratie effectmeting"
     description: "Onderzoekspanel re-integratie (sandbox, pseudonimisering)."
     domain: AG
     owner: knowledge_center
     dbt_tag: uc09
-  - name: uc11_klantreis
+  - name: uc11_customer_journey
     displayName: "UC-11 — Integrale Klantreis"
     description: "Cross-domein klantreis (Kafka → bronze → silver → gold)."
     domain: Cross
     owner: divisie_klantcontact
     dbt_tag: uc11
-  - name: uc_klant_tev
+  - name: uc_customer_satisfaction
     displayName: "UC — Klanttevredenheid"
     description: "Klanttevredenheids-trend per kanaal × maand."
     domain: Klantcontact
     owner: divisie_klantcontact
-    dbt_tag: uc_klant_tev
+    dbt_tag: uc_customer_satisfaction
   - name: dq_overview
     displayName: "DQ Overview (cross-UC)"
     description: "Cross-UC datakwaliteits-samenvatting + violations-tabel."

@@ -376,7 +376,7 @@ kubectl -n odap-platform exec sts/trino-coordinator-default -- \
 
 # 4. Heeft dbt de marts gebouwd?
 kubectl -n odap-platform exec sts/trino-coordinator-default -- \
-  trino --execute "SELECT count(*) FROM gold.uc01_wia_funnel.fct_funnel;"
+  trino --execute "SELECT count(*) FROM gold.uc01_claims_funnel.fct_funnel;"
 ```
 
 ### 7.2 Volledige data-wipe + reseed
@@ -536,7 +536,7 @@ landt.
 | R-BIO-23 (3-2-1 backup) | Postgres backup CronJob + off-cluster mirror | `kubectl -n odap-data get cronjob postgres-backup` |
 | R-NIS2-03 (supply chain) | SBOM per release | GitHub Actions: artifact `sbom-*.cdx.json` per build |
 | R-NIS2-04 (incident detect) | Alert-pipeline + runbook §9 | `make alert-test` |
-| AI Act art. 11 (DPIA) | Per UC met `risk_tier: hoog` | `docs/use-cases/uc02-wajong-ai.md` etc. — DPIA-link in frontmatter |
+| AI Act art. 11 (DPIA) | Per UC met `risk_tier: hoog` | `docs/use-cases/uc02-complex-cases-ai.md` etc. — DPIA-link in frontmatter |
 
 ### 10.2 Evidence-pakket genereren
 

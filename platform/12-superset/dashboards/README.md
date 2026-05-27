@@ -9,19 +9,19 @@ Dashboards bouwen we vervolgens **interactief** in Superset's UI; export via
 
 ## Dashboards die de DoD vereist
 
-- `uc01-wia-funnel.zip` — DoD: "Superset toont dashboard 'WIA Funnel' voor rol `data_steward` met 7 dagen synthetische data."
-- `uc06-lastprognose.zip` — Schadelast scenario-vergelijking.
+- `uc01-claims-funnel.zip` — DoD: "Superset toont dashboard 'WIA Funnel' voor rol `data_steward` met 7 dagen synthetische data."
+- `uc06-cost-forecast.zip` — Schadelast scenario-vergelijking.
 
 ## Workflow voor commits
 
 ```bash
 # Bouw in UI, exporteer naar zip
 # Plaats hier:
-cp ~/Downloads/dashboard_export.zip platform/12-superset/dashboards/uc01-wia-funnel.zip
+cp ~/Downloads/dashboard_export.zip platform/12-superset/dashboards/uc01-claims-funnel.zip
 
 # Re-import op een nieuw cluster:
 kubectl -n odap-platform exec deploy/superset-node-default -c superset -- \
-  superset import-dashboards -p /tmp/uc01-wia-funnel.zip
+  superset import-dashboards -p /tmp/uc01-claims-funnel.zip
 ```
 
 (Of via REST API `POST /api/v1/dashboard/import` met `multipart/form-data`.)

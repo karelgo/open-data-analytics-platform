@@ -2,7 +2,7 @@
 # Smoke test 10 — Entra ID brokering via Keycloak (feature/entra-id-broker).
 #
 # Checkt:
-#   1. Realm 'uwv' beantwoordt OIDC-discovery (Keycloak draait).
+#   1. Realm 'demo' beantwoordt OIDC-discovery (Keycloak draait).
 #   2. Identity Provider 'entra' is geregistreerd in het realm
 #      (zichtbaar via OIDC-discovery? nee — vereist admin-API of realm-export).
 #      We controleren in plaats daarvan dat de realm-import-ConfigMap een
@@ -31,16 +31,16 @@ if ! kubectl -n "$KC_NS" get statefulset keycloak >/dev/null 2>&1 \
 fi
 
 # 1. OIDC-discovery
-log "OIDC-discovery realm 'uwv'"
+log "OIDC-discovery realm 'demo'"
 KC_RESP=$(kubectl -n "$KC_NS" run kc-discovery-$RANDOM \
             --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
             curl -fsSL --max-time 10 \
               "http://keycloak.odap-auth.svc.cluster.local/realms/odap/.well-known/openid-configuration" \
             2>/dev/null || true)
 if echo "$KC_RESP" | grep -q '"issuer"'; then
-  pass "realm 'uwv' beantwoordt OIDC-discovery"
+  pass "realm 'demo' beantwoordt OIDC-discovery"
 else
-  fail "realm 'uwv' OIDC-discovery faalt"
+  fail "realm 'demo' OIDC-discovery faalt"
 fi
 
 # 2. ConfigMap keycloak-realm bevat IdP 'entra'

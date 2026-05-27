@@ -82,7 +82,7 @@ def build_bronze_watch_dag() -> DAG:
         start_date=datetime(2026, 5, 1),
         catchup=False,
         max_active_runs=1,
-        tags=["uwv", "bronze", "ingest"],
+        tags=["demo", "bronze", "ingest"],
     ) as dag:
         start = EmptyOperator(task_id="start")
         end = EmptyOperator(task_id="end")

@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: stg_customer_satisfaction
+    description: |
+      Klanttevredenheid-metingen — gepoold uit handmatig geüploade CSV's.
+      Geen PII; vrije opmerking is intern. Bron: csv_batch via
+      ingest_csv_customer_satisfaction DAG (zie airflow).
+    config:
+      tags: ["staging", "klantcontact"]
+    meta:
+      domain: klantcontact
+      legal_basis: AVG_art_6_1_e
+      doelbinding: ["sturingsinfo", "klantonderzoek"]
+      bio_classificatie: intern
+      bewaartermijn_jaren: 5
+      eigenaar: divisie_klantcontact
+      pii_kolommen: []
+      risk_tier: laag
+    columns:
+      - name: meting_datum
+        tests: [not_null]
+      - name: kanaal
+        description: "Contactkanaal — lowercase genormaliseerd."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [telefoon, email, balie, web, chat]
+      - name: doelgroep
+        tests: [not_null]
+      - name: score
+        description: "Tevredenheidscore 1–5 (Likert)."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 5
+      - name: n_respondenten
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+      - name: event_date
+        tests: [not_null]

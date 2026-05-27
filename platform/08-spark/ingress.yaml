@@ -9,7 +9,7 @@
 # Permanent beschikbaar, toont alle historische én actieve runs.
 #
 # Wat krijg je op https://spark.odap.local:8443/ ?
-#   - Lijst van completed applications (silver-wia-*, gold-wia-*, seed-bronze-wia)
+#   - Lijst van completed applications (silver-wia-*, gold-wia-*, seed-bronze-claims)
 #   - Per app: Jobs/Stages/Tasks/SQL/Environment tabs zoals een live UI
 #   - Geen SSO — Spark UI heeft geen native auth. Acceptabel voor dev/k3d.
 ---

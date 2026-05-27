@@ -67,20 +67,20 @@ configureer een TOTP-app (Google Authenticator, Microsoft Authenticator, 1Passwo
 | Catalog | Schema | Wat zit erin? | Zie jij het? |
 |---|---|---|---|
 | `silver` | `wia` | Geconformeerde WIA-aanvragen, beoordelingen, status-historie | **Ja** (jouw regio) |
-| `gold` | `uc01_wia_funnel` | Sturingsmart: voorraad, doorlooptijden, voorspelling | **Ja** |
+| `gold` | `uc01_claims_funnel` | Sturingsmart: voorraad, doorlooptijden, voorspelling | **Ja** |
 | `silver` | `ww`, `wajong`, `crm`, ... | Andere domeinen | **Nee** |
 | `sensitive` | `wajong.*` | Sociaal-medisch dossier Wajong | **Nee** |
 | `bronze` | alles | Ruwe brondata | **Nee** |
 
 ### 3.2 Welke kolommen zie je?
 
-Voor `silver.wia.aanvraag` en `gold.uc01_wia_funnel.*`:
+Voor `silver.claims.application` en `gold.uc01_claims_funnel.*`:
 
 | Kolom | Wat zie je? | Waarom? |
 |---|---|---|
 | `bsn` | **Volledig** | Je hebt PII-doel "uitkering/behandeling/reintegratie" |
 | `voornaam`, `achternaam` | Volledig | Idem |
-| `geboortedatum` | Volledig | Idem |
+| `birth_date` | Volledig | Idem |
 | `straat`, `huisnummer` | Volledig | Idem |
 | `iban`, `bankrekening` | **GEMASKEERD** (bv. `NL**********1234`) | Jij beoordeelt geen betalingen — die staat bij FEZ |
 | `diagnose`, `icd10` | Volledig (alleen voor je eigen regio) | Medisch noodzakelijk voor WIA-beoordeling |
@@ -92,8 +92,8 @@ Voor `silver.wia.aanvraag` en `gold.uc01_wia_funnel.*`:
 
 ### 3.3 Wat zie je echt **niet**?
 
-- WW-data (`silver.ww.*`) — andere doelbinding (handhaving, niet WIA)
-- Wajong sensitive (`sensitive.wajong.*`) — alleen Claims Analystn
+- WW-data (`silver.service_requests.*`) — andere doelbinding (handhaving, niet WIA)
+- Wajong sensitive (`sensitive.eligibility_cases.*`) — alleen Claims Analystn
 - Bankrekening- en IBAN-velden onmasked — niet nodig voor WIA-beoordeling
 - Bronze-laag (`bronze.*`) — alleen voor data-engineers met JIT-toegang
 - Andere regio's dan die jou zijn toegewezen
@@ -129,12 +129,12 @@ SELECT
   bsn,
   voornaam,
   achternaam,
-  geboortedatum,
+  birth_date,
   aanvraag_datum,
   status,
   diagnose,
   regio
-FROM silver.wia.aanvraag
+FROM silver.claims.application
 WHERE bsn = '999000123';
 ```
 
@@ -151,7 +151,7 @@ SELECT
   team,
   AVG(doorlooptijd_dagen) AS gem_doorlooptijd,
   COUNT(*)               AS aantal_aanvragen
-FROM gold.uc01_wia_funnel.afgehandeld
+FROM gold.uc01_claims_funnel.afgehandeld
 WHERE afhandel_datum >= DATE '2026-04-01'
 GROUP BY team
 ORDER BY gem_doorlooptijd DESC;
@@ -177,7 +177,7 @@ ORDER BY gem_doorlooptijd DESC;
 **Scenario.** Wat is precies "datum_aanvraag" versus "datum_eerste_dag"? Welke is leidend?
 
 1. Open https://openmetadata.odap.local
-2. Zoek op `mart_uc01_wia_funnel_daily` of op kolomnaam
+2. Zoek op `mart_uc01_claims_funnel_daily` of op kolomnaam
 3. Bij elke kolom zie je: **definitie**, **eigenaar** (data-steward), **bron-tabel**,
    **bewaartermijn**, **classificatie**
 4. Klik **Lineage** om de keten van bron → mart te zien
@@ -188,17 +188,17 @@ ORDER BY gem_doorlooptijd DESC;
 
 ```sql
 -- Aantal aanvragen per status, jouw regio's automatisch
-SELECT status, COUNT(*) FROM silver.wia.aanvraag GROUP BY status;
+SELECT status, COUNT(*) FROM silver.claims.application GROUP BY status;
 
 -- Dossiers > 8 weken open
 SELECT bsn, aanvraag_datum, status
-FROM   silver.wia.aanvraag
+FROM   silver.claims.application
 WHERE  status = 'open'
   AND  aanvraag_datum < CURRENT_DATE - INTERVAL '56' DAY;
 
 -- Top-10 ICD-10 categorieën
 SELECT icd10, COUNT(*) AS n
-FROM   silver.wia.beoordeling
+FROM   silver.claims.beoordeling
 GROUP  BY icd10
 ORDER  BY n DESC LIMIT 10;
 ```
@@ -211,11 +211,11 @@ ORDER  BY n DESC LIMIT 10;
 
 | Foutmelding | Wat betekent het? | Wat doe je? |
 |---|---|---|
-| `Access Denied: cannot select from gold.uc02_wajong.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Claims Analyst |
+| `Access Denied: cannot select from gold.uc02_complex_cases.*` | Je probeert Wajong te lezen — niet jouw rol | Niets — vraag een Claims Analyst |
 | `Access Denied: regio = 'Zuid' niet toegestaan` | Je rij-filter blokkeert dit, BSN valt buiten je regio | Vraag een collega in de juiste regio |
 | `Access Denied: column 'iban' is masked` | Je probeert IBAN onmasked te zien — niet voor WIA | Leef met de mask, of vraag FEZ |
 | `Authentication failed: token expired` | OIDC-token is verlopen | Log opnieuw in via Keycloak |
-| `Error: schema 'wia' not found` | Trino-catalog niet bereikbaar | Vraag platform-admin (zie 6.3) |
+| `Error: schema 'claims' not found` | Trino-catalog niet bereikbaar | Vraag platform-admin (zie 6.3) |
 
 ### 6.2 Wat doe je bij een vermoede inbreuk?
 

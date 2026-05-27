@@ -55,7 +55,7 @@ test_authenticated_meta_query_allowed if {
 test_user_with_no_role_denied if {
 	not allow with input as mock_input(
 		"alice", [], "SelectFromColumns",
-		"gold", "uc01_wia_funnel", "mart_uc01_wia_funnel_daily",
+		"gold", "uc01_claims_funnel", "mart_uc01_claims_funnel_daily",
 	)
 		with data.role_mappings as data.role_mappings
 }

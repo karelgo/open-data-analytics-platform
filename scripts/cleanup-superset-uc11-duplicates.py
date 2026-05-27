@@ -30,7 +30,7 @@ UC11_NAMES = [
 # Layout widths matching dashboards-init-job.yaml
 WIDTHS = [3, 3, 3, 3, 6, 6, 4, 4, 4, 6, 6, 12]
 HEIGHTS = [30, 30, 30, 30, 50, 50, 50, 50, 50, 55, 55, 60]
-DASHBOARD_SLUG = "uc11-klantreis"
+DASHBOARD_SLUG = "uc11-customer-journey"
 
 
 def login():

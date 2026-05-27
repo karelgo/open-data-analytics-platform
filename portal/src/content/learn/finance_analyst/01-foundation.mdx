@@ -13,7 +13,7 @@ labs:
     hint: "Welke tests draaien, welke sources voeden de mart"
     href: "/dbt-docs/"
 quiz:
-  - q: "Waarom zie jij geen BSN of IBAN in `gold.uc06_lastprognose`?"
+  - q: "Waarom zie jij geen BSN of IBAN in `gold.uc06_cost_forecast`?"
     options:
       - "Omdat het te veel ruimte zou kosten"
       - "Omdat een lastprognose een geaggregeerde sturingsmart is — PII is daarvoor niet nodig en wordt op modelniveau weggehaald"
@@ -28,7 +28,7 @@ quiz:
       - "Reset het dashboard"
     correct: 1
     explain: "dbt-tests zijn de eerste defensielinie. Een test op `bedrag_eur` die soms faalt is direct relevant voor je interpretatie."
-  - q: "Wat is de relatie tussen `silver.fin.uitkering_betaling` en `gold.uc06_lastprognose`?"
+  - q: "Wat is de relatie tussen `silver.fin.uitkering_betaling` en `gold.uc06_cost_forecast`?"
     options:
       - "Geen — verschillende systemen"
       - "silver is bron, gold is afgeleid via dbt; lineage zichtbaar in OpenMetadata of dbt-docs"
@@ -43,7 +43,7 @@ Het platform is daar precies op ingericht.
 
 ## Wat is een gold-mart?
 
-`gold.uc06_lastprognose` is een dbt-model: een afgeleide tabel die elke nacht
+`gold.uc06_cost_forecast` is een dbt-model: een afgeleide tabel die elke nacht
 opnieuw wordt opgebouwd uit `silver.fin.*`. De mart bevat:
 
 - per maand × regio × uitkeringsoort de uitgekeerde som;
@@ -72,10 +72,10 @@ tot fix.
 ## Lineage in een halve minuut
 
 OpenMetadata laat per kolom zien waar hij vandaan komt. Voor
-`gold.uc06_lastprognose.bedrag_eur` zie je:
+`gold.uc06_cost_forecast.bedrag_eur` zie je:
 
 ```
-bronze.fin.betaling.bedrag → silver.fin.uitkering_betaling.bedrag_eur → gold.uc06_lastprognose.bedrag_eur
+bronze.fin.betaling.bedrag → silver.fin.uitkering_betaling.bedrag_eur → gold.uc06_cost_forecast.bedrag_eur
 ```
 
 Bij elke pijl staat de transformatie (`SUM`, `*1.0`, etc). Voor je in een

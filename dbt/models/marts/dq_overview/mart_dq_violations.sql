@@ -19,19 +19,19 @@ with uc01_checks as (
            'aanvraag_datum_not_null' as check_name, 'high' as severity,
            count(*) filter (where aanvraag_datum is null) as n_violations,
            count(*) as n_records
-    from {{ ref('mart_uc01_wia_funnel_daily') }}
+    from {{ ref('mart_uc01_claims_funnel_daily') }}
     union all
     select 'uc01', 'WIA Funnel', 'status_not_null', 'high',
            count(*) filter (where status is null), count(*)
-    from {{ ref('mart_uc01_wia_funnel_daily') }}
+    from {{ ref('mart_uc01_claims_funnel_daily') }}
     union all
     select 'uc01', 'WIA Funnel', 'n_aanvragen_non_negative', 'high',
            count(*) filter (where n_aanvragen < 0), count(*)
-    from {{ ref('mart_uc01_wia_funnel_daily') }}
+    from {{ ref('mart_uc01_claims_funnel_daily') }}
     union all
     select 'uc01', 'WIA Funnel', 'onderdeel_in_WGA_IVA', 'medium',
            count(*) filter (where onderdeel not in ('WGA', 'IVA')), count(*)
-    from {{ ref('mart_uc01_wia_funnel_daily') }}
+    from {{ ref('mart_uc01_claims_funnel_daily') }}
 ),
 
 uc04_checks as (
@@ -39,15 +39,15 @@ uc04_checks as (
            'bsn_not_null' as check_name, 'critical' as severity,
            count(*) filter (where bsn is null) as n_violations,
            count(*) as n_records
-    from {{ ref('mart_uc04_tw_eligibility') }}
+    from {{ ref('mart_uc04_eligibility_outreach') }}
     union all
     select 'uc04', 'TW Eligibility', 'inkomen_not_null', 'high',
            count(*) filter (where inkomen_maand_eur is null), count(*)
-    from {{ ref('mart_uc04_tw_eligibility') }}
+    from {{ ref('mart_uc04_eligibility_outreach') }}
     union all
     select 'uc04', 'TW Eligibility', 'gat_per_maand_non_negative', 'high',
            count(*) filter (where gat_per_maand < 0), count(*)
-    from {{ ref('mart_uc04_tw_eligibility') }}
+    from {{ ref('mart_uc04_eligibility_outreach') }}
 ),
 
 uc05_checks as (
@@ -55,19 +55,19 @@ uc05_checks as (
            'bsn_not_null' as check_name, 'critical' as severity,
            count(*) filter (where bsn is null) as n_violations,
            count(*) as n_records
-    from {{ ref('mart_uc05_client_360') }}
+    from {{ ref('mart_uc05_customer_360') }}
     union all
     select 'uc05', 'Client 360', 'bsn_unique', 'critical',
            count(*) - count(distinct bsn), count(*)
-    from {{ ref('mart_uc05_client_360') }}
+    from {{ ref('mart_uc05_customer_360') }}
     union all
     select 'uc05', 'Client 360', 'voornaam_not_null', 'high',
            count(*) filter (where voornaam is null), count(*)
-    from {{ ref('mart_uc05_client_360') }}
+    from {{ ref('mart_uc05_customer_360') }}
     union all
     select 'uc05', 'Client 360', 'geslacht_in_M_V_X', 'medium',
            count(*) filter (where geslacht not in ('M', 'V', 'X')), count(*)
-    from {{ ref('mart_uc05_client_360') }}
+    from {{ ref('mart_uc05_customer_360') }}
 ),
 
 uc06_checks as (
@@ -75,11 +75,11 @@ uc06_checks as (
            'jaar_in_2026_2030' as check_name, 'high' as severity,
            count(*) filter (where jaar < 2026 or jaar > 2030) as n_violations,
            count(*) as n_records
-    from {{ ref('mart_uc06_uitkeringslast_5y') }}
+    from {{ ref('mart_uc06_cost_5y') }}
     union all
     select 'uc06', 'Lastprognose', 'maand_in_1_12', 'high',
            count(*) filter (where maand < 1 or maand > 12), count(*)
-    from {{ ref('mart_uc06_uitkeringslast_5y') }}
+    from {{ ref('mart_uc06_cost_5y') }}
 ),
 
 uc07_checks as (
@@ -127,24 +127,24 @@ uc09_checks as (
     from {{ ref('mart_uc09_effect_panel') }}
 ),
 
-uc_klant_tev_checks as (
-    select 'uc_klant_tev' as uc_code, 'Klanttevredenheid' as uc_name,
+uc_customer_satisfaction_checks as (
+    select 'uc_customer_satisfaction' as uc_code, 'Klanttevredenheid' as uc_name,
            'maand_not_null' as check_name, 'high' as severity,
            count(*) filter (where maand is null) as n_violations,
            count(*) as n_records
-    from {{ ref('mart_uc_klant_tev_kanaal_maand') }}
+    from {{ ref('mart_uc_customer_satisfaction_kanaal_maand') }}
     union all
-    select 'uc_klant_tev', 'Klanttevredenheid', 'kanaal_not_null', 'high',
+    select 'uc_customer_satisfaction', 'Klanttevredenheid', 'kanaal_not_null', 'high',
            count(*) filter (where kanaal is null), count(*)
-    from {{ ref('mart_uc_klant_tev_kanaal_maand') }}
+    from {{ ref('mart_uc_customer_satisfaction_kanaal_maand') }}
     union all
-    select 'uc_klant_tev', 'Klanttevredenheid', 'n_respondenten_min_1', 'high',
+    select 'uc_customer_satisfaction', 'Klanttevredenheid', 'n_respondenten_min_1', 'high',
            count(*) filter (where n_respondenten < 1), count(*)
-    from {{ ref('mart_uc_klant_tev_kanaal_maand') }}
+    from {{ ref('mart_uc_customer_satisfaction_kanaal_maand') }}
     union all
-    select 'uc_klant_tev', 'Klanttevredenheid', 'gemid_score_in_1_5', 'high',
+    select 'uc_customer_satisfaction', 'Klanttevredenheid', 'gemid_score_in_1_5', 'high',
            count(*) filter (where gemid_score_gewogen < 1 or gemid_score_gewogen > 5), count(*)
-    from {{ ref('mart_uc_klant_tev_kanaal_maand') }}
+    from {{ ref('mart_uc_customer_satisfaction_kanaal_maand') }}
 )
 
 select * from uc01_checks
@@ -153,4 +153,4 @@ union all select * from uc05_checks
 union all select * from uc06_checks
 union all select * from uc07_checks
 union all select * from uc09_checks
-union all select * from uc_klant_tev_checks
+union all select * from uc_customer_satisfaction_checks

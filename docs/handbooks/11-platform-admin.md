@@ -67,7 +67,7 @@ Elke break-glass-query begint met een comment:
 
 ```sql
 -- BREAK-GLASS REASON: incident INC-2026-04-30 / cliënt 999000123 / data corruptie review
-SELECT ... FROM sensitive.wajong.dossier WHERE bsn = '999000123';
+SELECT ... FROM sensitive.eligibility_cases.dossier WHERE bsn = '999000123';
 ```
 
 De data-steward valideert de volgende ochtend dat deze comments er zijn.

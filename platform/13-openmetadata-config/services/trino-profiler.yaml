@@ -33,8 +33,8 @@ source:
           - polisadm
           - intermediate
           # Gold UC marts (UC11 = primary klantreis-anchor; UC07 = DQ)
-          - uc11_klantreis
-          - uc07_dq_polisadm
+          - uc11_customer_journey
+          - uc07_dq_policies
 processor:
   type: orm-profiler
   config: {}

@@ -7,10 +7,10 @@
                    (uc11_silver notebook, schrijft naar databricks.silver.*).
 
    `name` is de entity-naam zonder prefix:
-     - persona, polisadm_ikv, ww_aanvraag, zw_melding,
-       wia_aanvraag, wajong_dossier, crm_contact
+     - persona, policy_holders, service_request_application, incident_report,
+       claim_application, eligibility_case, customer_interaction
 
-   Hierdoor blijft `int_klantreis_events.sql` één SQL-bestand dat
+   Hierdoor blijft `int_customer_journey_events.sql` één SQL-bestand dat
    onveranderd over engines portable is — de macro encapsuleert de
    engine-specifieke source/ref-keuze.
 #}

@@ -24,7 +24,7 @@ data:
     SUPERSET_URL = os.environ.get("SUPERSET_URL", "http://superset-node:8088")
     ADMIN_USER = os.environ.get("ADMIN_USER", "odap")
     ADMIN_PW   = os.environ["ADMIN_PASSWORD"]
-    DATASET_NAME = os.environ.get("WIA_DATASET", "mart_uc01_wia_funnel_daily")
+    DATASET_NAME = os.environ.get("WIA_DATASET", "mart_uc01_claims_funnel_daily")
 
 
     def log(m): print(f"[dash] {m}", flush=True)
@@ -359,7 +359,7 @@ data:
             {
                 "slug": "wia-funnel",
                 "title": "UC-01 — WIA Funnel",
-                "dataset": "mart_uc01_wia_funnel_daily",
+                "dataset": "mart_uc01_claims_funnel_daily",
                 "charts": [
                     ("Totaal WIA aanvragen", "big_number_total", {
                         "metric": metric("n_aanvragen", "SUM", "INTEGER", "Totaal"),
@@ -380,7 +380,7 @@ data:
             {
                 "slug": "tw-eligibility",
                 "title": "UC-04 — Toeslagenwet eligibility",
-                "dataset": "mart_uc04_tw_eligibility",
+                "dataset": "mart_uc04_eligibility_outreach",
                 "charts": [
                     ("Cliënten met TW-recht", "big_number_total", {
                         "metric": {"expressionType": "SIMPLE",
@@ -399,7 +399,7 @@ data:
             {
                 "slug": "client-360",
                 "title": "UC-05 — Cliënt 360",
-                "dataset": "mart_uc05_client_360",
+                "dataset": "mart_uc05_customer_360",
                 "charts": [
                     ("Totaal cliënten in 360", "big_number_total", {
                         "metric": {"expressionType": "SIMPLE",
@@ -421,9 +421,9 @@ data:
             {
                 "slug": "lastprognose",
                 "title": "UC-06 — Uitkeringslast 5-jaar prognose",
-                "dataset": "mart_uc06_uitkeringslast_5y",
+                "dataset": "mart_uc06_cost_5y",
                 "charts": [
-                    ("Totaal uitkeringslast 5-jaar (EUR)", "big_number_total", {
+                    ("Totaal claim_cost 5-jaar (EUR)", "big_number_total", {
                         "metric": metric("uitbetaald_bruto_eur_projection", "SUM",
                                          "DECIMAL", "Totaal EUR"),
                     }),
@@ -539,9 +539,9 @@ data:
             # per-chart override. Layout is 5 rijen: KPI-strip, temporal,
             # distribution, drill-down, detail-tabel.
             {
-                "slug": "uc11-klantreis",
+                "slug": "uc11-customer-journey",
                 "title": "UC-11 — Integrale Klantreis",
-                "dataset": "mart_uc11_klantreis_events",
+                "dataset": "mart_uc11_journey_events",
                 "charts": [
                     # ── Rij 1: KPI strip ── (4 × width 3)
                     ("Unieke cliënten in klantreis", "big_number_total", {
@@ -561,11 +561,11 @@ data:
                                    "column": {"column_name": "fase_volgnr", "type": "BIGINT"},
                                    "aggregate": "COUNT",
                                    "label": "Fases"},
-                    }, {"dataset": "mart_uc11_klantreis_phases",
+                    }, {"dataset": "mart_uc11_journey_phases",
                         "width": 3, "height": 30}),
                     ("Gem. fase-duur (dagen)", "big_number_total", {
                         "metric": metric("duur_dagen", "AVG", "BIGINT", "Avg dagen"),
-                    }, {"dataset": "mart_uc11_klantreis_phases",
+                    }, {"dataset": "mart_uc11_journey_phases",
                         "width": 3, "height": 30}),
 
                     # ── Rij 2: Temporal ── (2 × width 6)
@@ -593,7 +593,7 @@ data:
                         "groupby": ["fase"],
                         "color_scheme": "preset_ui_1",
                         "show_legend": True,
-                    }, {"dataset": "mart_uc11_klantreis_phases",
+                    }, {"dataset": "mart_uc11_journey_phases",
                         "width": 6, "height": 50}),
 
                     # ── Rij 3: Distributie ── (3 × width 4)
@@ -616,7 +616,7 @@ data:
                         "color_scheme": "preset_ui_1",
                         "show_legend": True,
                         "label_type": "key_percent",
-                    }, {"dataset": "mart_uc11_klantreis_phases",
+                    }, {"dataset": "mart_uc11_journey_phases",
                         "width": 4, "height": 50}),
                     ("Events per regio (WIA)", "pie", {
                         "metrics": [{"expressionType": "SIMPLE",
@@ -651,7 +651,7 @@ data:
                         "row_limit": 20,
                         "order_desc": True,
                         "color_scheme": "preset_ui_1",
-                    }, {"dataset": "mart_uc11_klantreis_phases",
+                    }, {"dataset": "mart_uc11_journey_phases",
                         "width": 6, "height": 55}),
 
                     # ── Rij 5: Detail-tabel ── (1 × width 12)
@@ -952,7 +952,7 @@ spec:
                   name: superset-postgres-credentials
                   key: adminUser.password
             - name: WIA_DATASET
-              value: "mart_uc01_wia_funnel_daily"
+              value: "mart_uc01_claims_funnel_daily"
           volumeMounts:
             - name: scripts
               mountPath: /scripts

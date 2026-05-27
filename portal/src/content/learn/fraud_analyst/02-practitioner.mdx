@@ -73,7 +73,7 @@ Open [Trino](/go/trino/) en draai:
 ```sql
 -- HANDH-2143 (zaak) — doel: handhaving
 SELECT
-    aanvraag_id,
+    application_id,
     bsn,
     iban,                             -- ongelinkt voor jouw rol
     iban_mutatiedatum,
@@ -81,8 +81,8 @@ SELECT
     werkgever_laatste,
     parttime_uren_opgave_aanvrager,
     parttime_uren_polisadm
-FROM silver.ww.aanvraag
-WHERE aanvraag_id = 'WW-2025-1142';
+FROM silver.service_requests.application
+WHERE application_id = 'WW-2025-1142';
 ```
 
 Andere rollen zien op exact deze tabel `iban` als hash. Niet jij.

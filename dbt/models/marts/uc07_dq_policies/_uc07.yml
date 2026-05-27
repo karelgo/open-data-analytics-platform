@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: mart_uc07_dq_dagrapport
+    description: "Datakwaliteits-dagrapport polisadministratie (UC-07)."
+    config:
+      tags: ["marts", "uc07", "policies", "dq"]
+    meta:
+      domain: polisadm
+      legal_basis: Wet_SUWI+Wfsv
+      doelbinding: ["primair_proces", "kwaliteitscontrole"]
+      bio_classificatie: vertrouwelijk
+      bewaartermijn_jaren: 30
+      eigenaar: data_steward_polisadm
+      pii_kolommen: []
+      risk_tier: laag
+      juistheid_AVG_art_5_1d: true
+      cgm_entiteiten: [IKV, Werknemer]
+    columns:
+      - name: rapport_datum
+        tests: [not_null]
+      - name: n_ikvs
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: n_bsn_buiten_test_bereik
+        description: "Verwacht 0 in deze referentie (alle BSNs zijn 9-prefix)."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 0

@@ -9,7 +9,7 @@ labs:
   - title: "Open de WIA-funnel in Superset"
     hint: "Voorraad en doorlooptijden in jouw regio"
     href: "/go/superset/"
-  - title: "Bekijk de tabel silver.wia.aanvraag in OpenMetadata"
+  - title: "Bekijk de tabel silver.claims.application in OpenMetadata"
     hint: "Wat betekent welke kolom, wie is eigenaar?"
     href: "/go/openmetadata/"
 quiz:
@@ -20,7 +20,7 @@ quiz:
       - "alle catalogs, mits met TICKET-id"
       - "alleen sensitive"
     correct: 1
-    explain: "Je werkt op silver.wia (geconformeerd) en gold.uc01_wia_funnel (sturing). Bronze is voor data-engineers; sensitive voor de Claims Analyst."
+    explain: "Je werkt op silver.wia (geconformeerd) en gold.uc01_claims_funnel (sturing). Bronze is voor data-engineers; sensitive voor de Claims Analyst."
   - q: "Wat doet de OPA-policy in Trino voor jouw rol?"
     options:
       - "Hij encrypt je query voor verzending"
@@ -52,7 +52,7 @@ Een Kubernetes-native data-stack die ruwe brondata in vier zones beheert:
 - **sensitive** — apart afgeschermd voor sociaal-medische dossiers (Wajong).
 
 Jij werkt nooit op bronze. Je werkt op `silver.wia` (de eigen aanvragen)
-en `gold.uc01_wia_funnel` (sturingsmart met voorraad, doorlooptijden,
+en `gold.uc01_claims_funnel` (sturingsmart met voorraad, doorlooptijden,
 voorspelling).
 
 ## Drie applicaties

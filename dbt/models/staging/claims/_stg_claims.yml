@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: stg_claim_application
+    description: "WIA-aanvragen + incapacity_percentage."
+    config:
+      tags: ["staging", "claims", "ag"]
+    meta:
+      domain: ag
+      legal_basis: WIA_art_64
+      doelbinding: ["uitkering", "reintegratie"]
+      bio_classificatie: vertrouwelijk
+      bewaartermijn_jaren: 7
+      eigenaar: divisie_ag
+      pii_kolommen: [bsn]
+      risk_tier: laag
+    columns:
+      - name: application_id
+        tests: [not_null, unique]
+      - name: bsn
+        tests: [not_null, bsn_valid]
+      - name: aanvraag_datum
+        tests: [not_null]
+      - name: onderdeel
+        tests:
+          - accepted_values:
+              values: [WGA, IVA]
+      - name: regio_code
+        description: "9 mock-regiocodes."
+        tests:
+          - accepted_values:
+              values: [AMS, RTM, DHN, UTR, EHV, GRO, ZWO, ARN, BRD]
+      - name: status
+        tests:
+          - accepted_values:
+              values: [INGEDIEND, IN_BEHANDELING, TOEGEKEND_WGA, TOEGEKEND_IVA, AFGEWEZEN]
+      - name: arbeidsongeschikt_pct
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100

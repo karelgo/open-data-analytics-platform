@@ -79,14 +79,14 @@ SELECT
   test_name,
   failures,
   last_run
-FROM   gold.uc07_dq_polisadm.test_resultaten_daily
+FROM   gold.uc07_dq_policies.test_resultaten_daily
 WHERE  status = 'failed'
 ORDER  BY last_run DESC;
 ```
 
 ### 4.2 Workflow B — Profiler-vlag uitzoeken
 
-**Scenario.** OpenMetadata toont rood vlag op `silver.wia.aanvraag.regio`:
+**Scenario.** OpenMetadata toont rood vlag op `silver.claims.application.regio`:
 "5% NULL, vorige week 0.2%". Je gaat onderzoeken.
 
 ```sql
@@ -94,7 +94,7 @@ ORDER  BY last_run DESC;
 SELECT
   date_trunc('day', aanvraag_datum) AS dag,
   100.0 * SUM(CASE WHEN regio IS NULL THEN 1 ELSE 0 END) / COUNT(*) AS null_pct
-FROM   silver.wia.aanvraag
+FROM   silver.claims.application
 WHERE  aanvraag_datum >= CURRENT_DATE - INTERVAL '14' DAY
 GROUP  BY 1
 ORDER  BY 1;
@@ -127,19 +127,19 @@ de arbeidsdeskundige om context. Anomalieën meld je bij platform-admin.
 
 1. Open OpenMetadata → **Glossary** → **CGM**.
 2. Voeg term toe: definitie, eigenaar, gerelateerd aan welke kolommen.
-3. Koppel de term aan `silver.wia.voorschot.bedrag`.
+3. Koppel de term aan `silver.claims.voorschot.bedrag`.
 4. Communiceer naar gebruikers (e-mail of dashboard-update).
 
 ### 4.6 Workflow F — Lineage valideren
 
 ```sql
--- Welke marts hangen van silver.wia.aanvraag?
+-- Welke marts hangen van silver.claims.application?
 SELECT downstream_table
 FROM   metadata.lineage
-WHERE  upstream_table = 'silver.wia.aanvraag';
+WHERE  upstream_table = 'silver.claims.application';
 ```
 
-Of in OpenMetadata: klik **Lineage** op `silver.wia.aanvraag` en zie alle
+Of in OpenMetadata: klik **Lineage** op `silver.claims.application` en zie alle
 downstream-marts en dashboards.
 
 ### 4.7 Workflow G — DPIA-evidence verzamelen

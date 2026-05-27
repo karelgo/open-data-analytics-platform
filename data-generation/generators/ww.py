@@ -16,7 +16,7 @@ from ._common import envelope, make_rng
 
 @dataclass
 class WWAanvraag:
-    aanvraag_id: str
+    application_id: str
     bsn: str
     aanvraag_datum: str
     laatste_werkdag: str
@@ -29,9 +29,9 @@ class WWAanvraag:
         return asdict(self)
 
 
-def generate_ww_aanvraag(rng: random.Random, bsn: str) -> WWAanvraag:
+def generate_service_request_application(rng: random.Random, bsn: str) -> WWAanvraag:
     return WWAanvraag(
-        aanvraag_id=f"WW-{rng.randint(10**8, 10**9 - 1)}",
+        application_id=f"WW-{rng.randint(10**8, 10**9 - 1)}",
         bsn=bsn,
         aanvraag_datum=f"2025-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
         laatste_werkdag=f"2025-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
@@ -52,7 +52,7 @@ def generate_ww_aanvragen(
     rng = make_rng(seed)
     for bsn in persona_bsns:
         if rng.random() < rate:
-            yield generate_ww_aanvraag(rng, bsn)
+            yield generate_service_request_application(rng, bsn)
 
 
 def to_kafka_envelope(a: WWAanvraag) -> dict[str, Any]:

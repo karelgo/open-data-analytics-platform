@@ -55,7 +55,7 @@ def test_all_source_yamls_parse():
     specs = load_all_sources()
     assert len(specs) == 8, f"Expected 8 sources, got {len(specs)}: {[s.name for s in specs]}"
     names = {s.name for s in specs}
-    assert names == {"persoon", "polisadm", "ww", "wia", "wajong", "zw", "crm", "fez"}
+    assert names == {"persons", "policies", "service_requests", "claims", "eligibility_cases", "incidents", "customers", "finance"}
 
 
 def test_exactly_one_anchor_source():
@@ -63,7 +63,7 @@ def test_exactly_one_anchor_source():
 
     anchors = [s for s in load_all_sources() if s.anchor]
     assert len(anchors) == 1, f"Expected exactly 1 anchor, got {len(anchors)}"
-    assert anchors[0].name == "persoon"
+    assert anchors[0].name == "persons"
 
 
 def test_no_duplicate_streams_or_tables():

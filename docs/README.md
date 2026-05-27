@@ -32,21 +32,21 @@ entiteiten, doelbinding, AI-Act-classificatie en Definition-of-Done-anchors.
 
 | ID | Titel | Status |
 |---|---|---|
-| [UC-01](use-cases/uc01-wia-funnel.md) | WIA-funnel-dashboard (DoD-anchor) | Mart aanwezig |
-| [UC-02](use-cases/uc02-wajong-ai.md) | Wajong AI-ondersteuning (hoog-risico) | Placeholder |
-| [UC-03](use-cases/uc03-ww-risk.md) | WW-risico-screening (verboden-grens) | Placeholder + guard-test |
+| [UC-01](use-cases/uc01-claims-funnel.md) | WIA-funnel-dashboard (DoD-anchor) | Mart aanwezig |
+| [UC-02](use-cases/uc02-complex-cases-ai.md) | Wajong AI-ondersteuning (hoog-risico) | Placeholder |
+| [UC-03](use-cases/uc03-fraud-risk.md) | WW-risico-screening (verboden-grens) | Placeholder + guard-test |
 | [UC-04](use-cases/uc04-proactieve-tw.md) | Proactieve TW-eligibility | Mart aanwezig |
-| [UC-05](use-cases/uc05-client-360.md) | Klant-360 (gepseudonimiseerd) | Mart aanwezig |
+| [UC-05](use-cases/uc05-customer-360.md) | Klant-360 (gepseudonimiseerd) | Mart aanwezig |
 | [UC-06](use-cases/uc06-schadelast.md) | Schadelast-prognose 5 jaar | Mart aanwezig |
-| [UC-07](use-cases/uc07-dq-polisadm.md) | DQ-dagrapport polisadministratie | Mart aanwezig |
-| [UC-08](use-cases/uc08-smz-planning.md) | SMZ-capaciteitsplanning | Placeholder |
-| [UC-09](use-cases/uc09-reint-effect.md) | Re-integratie-effectmeting | Mart aanwezig |
+| [UC-07](use-cases/uc07-dq-policies.md) | DQ-dagrapport polisadministratie | Mart aanwezig |
+| [UC-08](use-cases/uc08-capacity-planning-planning.md) | SMZ-capaciteitsplanning | Placeholder |
+| [UC-09](use-cases/uc09-reintegration-effect.md) | Re-integratie-effectmeting | Mart aanwezig |
 | [UC-10](use-cases/uc10-gegevensdiensten.md) | Gegevensdiensten-API | Placeholder |
-| [UC-11](use-cases/uc11-klantreis.md) | Integrale Klantreis (event-stream + fasen) | Mart aanwezig · [walkthrough](use-cases/uc11-klantreis-walkthrough.md) |
+| [UC-11](use-cases/uc11-customer-journey.md) | Integrale Klantreis (event-stream + fasen) | Mart aanwezig · [walkthrough](use-cases/uc11-customer-journey-walkthrough.md) |
 | [UC-12](use-cases/uc12-focus-finops.md) | FOCUS FinOps — kostenrapportage | Mart aanwezig |
 
 UC-11 heeft een aparte **demo-walkthrough** in
-[uc11-klantreis-walkthrough.md](use-cases/uc11-klantreis-walkthrough.md) —
+[uc11-customer-journey-walkthrough.md](use-cases/uc11-customer-journey-walkthrough.md) —
 stap-voor-stap rondleiding door alle platform-onderdelen, met directe
 links naar de live UI's (portal, dbt-docs, OpenMetadata, Trino, Airflow,
 Superset). Handig als presentatie-script of als onboarding-tour.
@@ -55,10 +55,10 @@ Superset). Handig als presentatie-script of als onboarding-tour.
 
 | Artefact | Pad | Regenereren |
 |---|---|---|
-| Demo-walkthrough (markdown) | [uc11-klantreis-walkthrough.md](use-cases/uc11-klantreis-walkthrough.md) | — |
-| Walkthrough als PDF | [uc11-klantreis-walkthrough.pdf](use-cases/uc11-klantreis-walkthrough.pdf) | `make pdf-uc11` |
-| UC-spec als PDF | [uc11-klantreis.pdf](use-cases/uc11-klantreis.pdf) | `make pdf-uc11` |
-| PowerPoint-deck (12 slides) | [uc11-klantreis-deck.pptx](use-cases/uc11-klantreis-deck.pptx) | `make deck-uc11` |
+| Demo-walkthrough (markdown) | [uc11-customer-journey-walkthrough.md](use-cases/uc11-customer-journey-walkthrough.md) | — |
+| Walkthrough als PDF | [uc11-customer-journey-walkthrough.pdf](use-cases/uc11-customer-journey-walkthrough.pdf) | `make pdf-uc11` |
+| UC-spec als PDF | [uc11-customer-journey.pdf](use-cases/uc11-customer-journey.pdf) | `make pdf-uc11` |
+| PowerPoint-deck (12 slides) | [uc11-customer-journey-deck.pptx](use-cases/uc11-customer-journey-deck.pptx) | `make deck-uc11` |
 
 De PDF-generator gebruikt Chrome headless (script
 [scripts/md-to-pdf.py](../scripts/md-to-pdf.py)). Het deck wordt gebouwd

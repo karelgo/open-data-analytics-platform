@@ -48,14 +48,14 @@ source:
           - fez
           - klantcontact
           - intermediate              # silver
-          - uc01_wia_funnel           # gold
-          - uc04_tw_eligibility
-          - uc05_client_360
-          - uc06_lastprognose
-          - uc07_dq_polisadm
-          - uc09_reint_effect
-          - uc11_klantreis
-          - uc_klant_tev
+          - uc01_claims_funnel           # gold
+          - uc04_eligibility_outreach
+          - uc05_customer_360
+          - uc06_cost_forecast
+          - uc07_dq_policies
+          - uc09_reintegration_effect
+          - uc11_customer_journey
+          - uc_customer_satisfaction
           - dq_overview
           - seed
       includeTables: true

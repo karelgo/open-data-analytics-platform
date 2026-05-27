@@ -5,19 +5,19 @@ name: polisadm
 domain: polisadm
 
 stream:
-  name: uwv.polisadm.ikv
+  name: customers.policy
   key: bsn
 
 bronze:
   catalog: bronze
-  schema: uwv
-  table: polisadm_ikv
+  schema: demo
+  table: policy_holders
   partition_by: event_date
 
 silver:
   catalog: silver
-  schema: polisadm
-  staging_model: stg_polisadm_ikv
+  schema: policies
+  staging_model: stg_policy_holders
   dbt_tag: polisadm
 
 governance:

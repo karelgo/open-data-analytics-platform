@@ -9,8 +9,8 @@ Pipeline:
   3. Chrome headless → PDF (Chrome zit standaard op macOS-dev-machines).
 
 Gebruik:
-  python3 scripts/md-to-pdf.py docs/use-cases/uc11-klantreis-walkthrough.md
-  → docs/use-cases/uc11-klantreis-walkthrough.pdf
+  python3 scripts/md-to-pdf.py docs/use-cases/uc11-customer-journey-walkthrough.md
+  → docs/use-cases/uc11-customer-journey-walkthrough.pdf
 
 Of expliciet:
   python3 scripts/md-to-pdf.py INPUT.md --output OUTPUT.pdf

@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: mart_uc_customer_satisfaction_kanaal_maand
+    description: |
+      Klanttevredenheid per kanaal × maand — gewogen gemiddelde + volume.
+      Bron: stg_customer_satisfaction (csv_batch upload). Voor Superset-dashboard
+      "Klanttevredenheid trend".
+    config:
+      tags: ["marts", "uc_customer_satisfaction", "klantcontact", "sturingsinfo"]
+    meta:
+      domain: klantcontact
+      legal_basis: AVG_art_6_1_e
+      doelbinding: ["sturingsinfo"]
+      bio_classificatie: intern
+      bewaartermijn_jaren: 5
+      eigenaar: divisie_klantcontact
+      pii_kolommen: []
+      risk_tier: laag
+    columns:
+      - name: maand
+        tests: [not_null]
+      - name: kanaal
+        tests: [not_null]
+      - name: n_respondenten
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+      - name: gemid_score_gewogen
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 5

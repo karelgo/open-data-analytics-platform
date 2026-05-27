@@ -5,19 +5,19 @@ name: ww
 domain: ww
 
 stream:
-  name: uwv.ww.aanvraag
+  name: service_requests.application
   key: bsn
 
 bronze:
   catalog: bronze
-  schema: uwv
-  table: ww_aanvraag
+  schema: demo
+  table: service_request_application
   partition_by: event_date
 
 silver:
   catalog: silver
-  schema: ww
-  staging_model: stg_ww_aanvraag
+  schema: service_requests
+  staging_model: stg_service_request_application
   dbt_tag: ww
 
 governance:

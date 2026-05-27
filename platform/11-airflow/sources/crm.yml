@@ -5,24 +5,24 @@ name: crm
 domain: crm
 
 stream:
-  name: uwv.crm.contact
+  name: customers.interaction
   key: bsn
 
 bronze:
   catalog: bronze
-  schema: uwv
-  table: crm_contact
+  schema: demo
+  table: customer_interaction
   partition_by: event_date
 
 silver:
   catalog: silver
-  schema: crm
-  staging_model: stg_crm_contact
+  schema: customers
+  staging_model: stg_customer_interaction
   dbt_tag: crm
 
 governance:
   legal_basis: AVG_art_6_1e
-  doelbinding: [klantcontact, klanttevredenheid]
+  doelbinding: [klantcontact, customer_satisfaction]
   bio_classificatie: vertrouwelijk
   bewaartermijn_jaren: 2
   eigenaar: divisie_klantcontact

@@ -2,7 +2,7 @@
 
 -- FOCUS billing — CSV-batch bron (FinOps Open Cost and Usage Specification).
 --
--- Normalisatie t.o.v. bronze.uwv.focus_billing:
+-- Normalisatie t.o.v. bronze.finops.focus_billing:
 --   - PascalCase kolommen → snake_case
 --   - Provider lowercased voor stabiele group-by
 --   - Afgeleide `billing_month` = date_trunc('month', BillingPeriodStart);

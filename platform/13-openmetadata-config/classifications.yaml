@@ -53,13 +53,13 @@ classifications:
         description: "Rapport arbeidsdeskundige."
 
   - name: Confidentiality
-    description: "Vertrouwelijkheidsklasse volgens UWV-classificatieschema."
+    description: "Vertrouwelijkheidsklasse volgens platform classification scheme."
     mutuallyExclusive: true
     tags:
       - name: Public
         description: "Publiek — geen restricties."
       - name: Internal
-        description: "Intern — alleen UWV-medewerkers."
+        description: "Intern — alleen platform users."
       - name: Confidential
         description: "Vertrouwelijk — beperkte rolgroep."
       - name: Secret
@@ -137,4 +137,4 @@ classifications:
       - name: HumanInTheLoop
         description: "Menselijke tussenkomst verplicht (art. 22 AVG)."
       - name: Algoritmeregister-Geregistreerd
-        description: "Geregistreerd in UWV-algoritmeregister."
+        description: "Geregistreerd in algorithm register."

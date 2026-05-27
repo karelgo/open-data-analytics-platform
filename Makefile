@@ -102,8 +102,8 @@ portal-publish-dbt-docs: dbt-docs-offline portal-image ## Genereer dbt-docs → 
 
 .PHONY: pdf-uc11
 pdf-uc11: ## Exporteer UC-11 docs (UC-spec + walkthrough) naar PDF (Chrome headless)
-	python3 scripts/md-to-pdf.py docs/use-cases/uc11-klantreis.md
-	python3 scripts/md-to-pdf.py docs/use-cases/uc11-klantreis-walkthrough.md
+	python3 scripts/md-to-pdf.py docs/use-cases/uc11-customer-journey.md
+	python3 scripts/md-to-pdf.py docs/use-cases/uc11-customer-journey-walkthrough.md
 	@echo "[pdf-uc11] PDFs naast de .md-bronnen in docs/use-cases/"
 
 .PHONY: deck-uc11
@@ -114,7 +114,7 @@ deck-uc11: ## Bouw UC-11 PowerPoint-deck (12 slides, donker platform-amber thema
 	  mkdir -p /tmp/uc11-deck && cd /tmp/uc11-deck && npm install pptxgenjs >/dev/null; \
 	fi
 	NODE_PATH=/tmp/uc11-deck/node_modules node scripts/build-uc11-deck.js
-	@echo "[deck-uc11] docs/use-cases/uc11-klantreis-deck.pptx bijgewerkt"
+	@echo "[deck-uc11] docs/use-cases/uc11-customer-journey-deck.pptx bijgewerkt"
 
 .PHONY: render-catalogs
 render-catalogs: ## Render Trino-catalog templates op basis van platform-config.yaml
@@ -230,7 +230,7 @@ dbt-build-uc11: ## Build alle UC-11 modellen (tag:uc11) — vereist Trino-bereik
 
 .PHONY: test-uc11
 test-uc11: ## UC-11 smoke (rego-tests + optionele OPA-decision-calls)
-	bash tests/smoke/11-uc11-klantreis.sh
+	bash tests/smoke/11-uc11-customer-journey.sh
 
 .PHONY: clean
 clean: ## Verwijder de k3d-cluster

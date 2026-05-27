@@ -75,8 +75,8 @@ COMPARTMENTS = [
 
 ENVIRONMENTS = ["prod", "acc", "test"]
 APPLICATIONS = [
-    "uc01-wia-funnel", "uc04-tw-eligibility", "uc05-client-360",
-    "uc11-klantreis", "platform-shared", "data-ingestion",
+    "uc01-claims-funnel", "uc04-eligibility-outreach", "uc05-customer-360",
+    "uc11-customer-journey", "platform-shared", "data-ingestion",
 ]
 COST_CENTERS = ["FIN-BI-001", "FIN-PLATFORM-002", "FIN-AI-003", "FIN-DATA-004"]
 

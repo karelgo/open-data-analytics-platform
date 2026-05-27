@@ -7,7 +7,7 @@
 -- Improvements #7: macro daadwerkelijk toepassen.
 
 with src as (
-    select * from {{ ref('stg_persona') }}
+    select * from {{ ref('stg_persons') }}
 )
 
 select
@@ -16,10 +16,10 @@ select
     voornaam,
     achternaam,
     geslacht,
-    geboortedatum,
+    birth_date,
     -- Voor rapportages die alleen leeftijdsbereik nodig hebben — geen exact dob.
-    date_diff('year', geboortedatum, current_date) as leeftijd,
-    cast(date_trunc('year', geboortedatum) as date) as geboortejaar,
+    date_diff('year', birth_date, current_date) as leeftijd,
+    cast(date_trunc('year', birth_date) as date) as geboortejaar,
     woonplaats,
     postcode,
     nationaliteit

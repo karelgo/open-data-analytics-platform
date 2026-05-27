@@ -128,7 +128,7 @@ environment:
   MINIO_IDENTITY_OPENID_CONFIG_URL: "https://keycloak.odap.local:8443/realms/odap/.well-known/openid-configuration"
   MINIO_IDENTITY_OPENID_CLIENT_ID: "minio"
   MINIO_IDENTITY_OPENID_CLIENT_SECRET: "odap-dev-only-CHANGE-ME-minio-secret"
-  MINIO_IDENTITY_OPENID_DISPLAY_NAME: "Keycloak (UWV)"
+  MINIO_IDENTITY_OPENID_DISPLAY_NAME: "Keycloak (ODAP)"
   MINIO_IDENTITY_OPENID_CLAIM_NAME: "policy"
   MINIO_IDENTITY_OPENID_REDIRECT_URI: "https://minio-console.odap.local:8443/oauth_callback"
   MINIO_IDENTITY_OPENID_SCOPES: "openid,profile,email,roles"
@@ -157,7 +157,7 @@ policies:
           - "s3:ListMultipartUploadParts"
       # 1b. WRITE — legacy bron-specifieke CSV-staging (mc CLI / Airflow watcher).
       # Behouden zodat `mc cp … incoming/<bron>/…` blijft werken voor
-      # bestaande klanttevredenheid/focus_billing flows.
+      # bestaande customer_satisfaction/focus_billing flows.
       - effect: Allow
         resources:
           - "arn:aws:s3:::odap-staging/incoming/*"

@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_finance_expense
+    description: "Geaggregeerde claim_cost per wet × maand × regio (geen PII)."
+    config:
+      tags: ["staging", "finance"]
+    meta:
+      domain: fez
+      legal_basis: n/a
+      doelbinding: ["actuarie", "beleid"]
+      bio_classificatie: intern
+      bewaartermijn_jaren: 10
+      eigenaar: divisie_fez
+      pii_kolommen: []
+      risk_tier: laag
+      publiek_te_publiceren: true
+    columns:
+      - name: jaar
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 2020
+              max_value: 2030
+      - name: maand
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 12
+      - name: wet
+        tests:
+          - accepted_values:
+              values: [WW, WIA, Wajong, ZW, TW, WAO]
+      - name: regio_code
+        tests:
+          - accepted_values:
+              values: [AMS, RTM, DHN, UTR, EHV, GRO, ZWO, ARN, BRD]
+      - name: uitbetaald_bruto_eur
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0

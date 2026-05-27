@@ -25,9 +25,9 @@ en logs een stuk eenvoudiger. Alle componenten houden zich hieraan.
 
 | Pattern | Voorbeelden |
 |---|---|
-| `bronze.uwv.<entity>` | `bronze.uwv.wia_aanvraag`, `bronze.uwv.ww_uitkering` |
-| `silver.<domain>.<entity>` | `silver.wia.aanvraag_pseudo`, `silver.crm.contact` |
-| `gold.<uc_id>.<artifact>` | `gold.uc01_wia_funnel.daily_kpi`, `gold.uc05_client_360.profile` |
+| `bronze.demo.<entity>` | `bronze.claims.application`, `bronze.demo.ww_uitkering` |
+| `silver.<domain>.<entity>` | `silver.claims.application_pseudo`, `silver.customers.interaction` |
+| `gold.<uc_id>.<artifact>` | `gold.uc01_claims_funnel.daily_kpi`, `gold.uc05_customer_360.profile` |
 | `sensitive.<domain>.<entity>` | `sensitive.medisch.diagnose` |
 
 Domein-codes: `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`, `smz`.
@@ -40,9 +40,9 @@ Domein-codes: `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`, `smz`.
 
 Voorbeelden:
 
-- `stg_wia_aanvraag.sql` — staging-laag
+- `stg_claim_application.sql` — staging-laag
 - `int_wia_funnel_daily.sql` — intermediate
-- `mart_uc01_wia_funnel_daily.sql` — mart (gold)
+- `mart_uc01_claims_funnel_daily.sql` — mart (gold)
 
 ## Kafka-topics
 
@@ -52,7 +52,7 @@ uwv.<domain>.<event>
 
 Voorbeelden:
 
-- `uwv.wia.aanvraag`
+- `claims.application`
 - `uwv.wia.beoordeling`
 - `uwv.ww.uitkering`
 

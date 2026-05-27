@@ -8,7 +8,7 @@ Stappen:
   2. Download CSV uit s3://<staging_bucket>/<object_key>
   3. Valideer schema + cast types via pyarrow
   4. Voeg metadata-kolommen toe (ingestion_ts, source_file, event_date)
-  5. Schrijf Delta naar s3://odap-bronze/uwv/<table>/ (append, partitioned by event_date)
+  5. Schrijf Delta naar s3a://odap-bronze/demo/<table>/ (append, partitioned by event_date)
   6. Registreer Delta-tabel in Hive Metastore via Trino `system.register_table`
      (idempotent — eerste run maakt entry, volgende runs no-op)
   7. Verplaats CSV naar processed/ prefix
@@ -233,15 +233,15 @@ def add_metadata_columns(table: pa.Table, source_file: str,
 
 
 def write_to_bronze(table: pa.Table, bronze_table: str, partition_col: str) -> tuple[str, str]:
-    """Append naar Delta. Pad: s3://odap-bronze/uwv/<table>/.
+    """Append naar Delta. Pad: s3a://odap-bronze/demo/<table>/.
 
     Returns (write_location_s3, register_location_s3a). De S3-bucket is
     fysiek hetzelfde — alleen de URL-scheme verschilt tussen deltalake-rs
     (s3://) en Hive Metastore (s3a://, want Trino+HMS gebruikt Hadoop S3A
     FileSystem; 's3' scheme is daar niet geregistreerd).
     """
-    write_location = f"s3://{BRONZE_BUCKET}/uwv/{bronze_table}"
-    register_location = f"s3a://{BRONZE_BUCKET}/uwv/{bronze_table}"
+    write_location = f"s3://{BRONZE_BUCKET}/demo/{bronze_table}"
+    register_location = f"s3a://{BRONZE_BUCKET}/demo/{bronze_table}"
     storage_options = {
         "AWS_ENDPOINT_URL": S3_ENDPOINT,
         "AWS_ACCESS_KEY_ID": S3_ACCESS_KEY,

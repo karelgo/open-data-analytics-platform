@@ -11,7 +11,7 @@
 #   7. ConfigMap `jupyterhub-config` bevat de oauthenticator-config
 #   8. ConfigMap `jupyter-starter-notebooks` bestaat met >=5 notebooks
 #   9. Singleuser ServiceAccount + Role + RoleBinding aanwezig
-#  10. Keycloak realm 'uwv' OIDC-discovery werkt (sanity, niet client-enum)
+#  10. Keycloak realm 'demo' OIDC-discovery werkt (sanity, niet client-enum)
 #  11. odap_lab Python-helper importeert in een kernel-test-pod
 #
 # Skipt elegant als JupyterHub nog niet gedeployd is.
@@ -127,16 +127,16 @@ kubectl -n "$NS" get rolebinding jupyterhub    >/dev/null 2>&1 || fail "RoleBind
 pass "RBAC voor Hub + singleuser correct opgezet"
 
 # 10. Keycloak realm answers OIDC discovery (sanity)
-log "Keycloak realm 'uwv' OIDC-discovery"
+log "Keycloak realm 'demo' OIDC-discovery"
 KC=$(kubectl -n odap-auth run kc-jupyter-check-$RANDOM \
        --image=curlimages/curl:8.10.1 --rm -i --restart=Never --quiet -- \
        curl -fsSL --max-time 10 \
          "http://keycloak.odap-auth.svc.cluster.local/realms/odap/.well-known/openid-configuration" \
        2>/dev/null || true)
 if echo "$KC" | grep -q '"issuer"'; then
-  pass "Keycloak realm 'uwv' OIDC-discovery werkt"
+  pass "Keycloak realm 'demo' OIDC-discovery werkt"
 else
-  fail "Keycloak realm 'uwv' beantwoordt geen OIDC-discovery"
+  fail "Keycloak realm 'demo' beantwoordt geen OIDC-discovery"
 fi
 
 # 11. odap_lab helper importeert in een kernel-test-pod (lichtgewicht — pod

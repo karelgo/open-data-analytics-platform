@@ -119,15 +119,15 @@ def upload_report(token: str, project_name: str, display_name: str) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--project", default="uc11_klantreis",
-                    help="Project dir onder platform/12-powerbi/. Default: uc11_klantreis (Fabric).")
+    ap.add_argument("--project", default="uc11_customer_journey",
+                    help="Project dir onder platform/12-powerbi/. Default: uc11_customer_journey (Fabric).")
     ap.add_argument("--semanticmodel-only", action="store_true")
     ap.add_argument("--report-only", action="store_true")
     args = ap.parse_args()
 
     project = args.project
     # Display names matchen het project (Fabric of Databricks variant).
-    sm_name = project  # bv. uc11_klantreis_databricks
+    sm_name = project  # bv. uc11_customer_journey_databricks
     rpt_name = f"{project}_dashboard"
 
     token = get_token()

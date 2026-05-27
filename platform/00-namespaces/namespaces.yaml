@@ -65,6 +65,6 @@ metadata:
     odap.io/environment: dev
     pod-security.kubernetes.io/enforce: baseline
   annotations:
-    odap.io/description: "Keycloak (OIDC IdP, mock realm UWV)"
+    odap.io/description: "Keycloak (OIDC IdP, mock realm ODAP)"
     odap.io/bio-classificatie: "vertrouwelijk"
     odap.io/doelbinding: "authenticatie"

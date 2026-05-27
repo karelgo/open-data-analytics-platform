@@ -6,15 +6,15 @@ Eén DAG die UC-11 op een verse cluster volledig operationeel maakt:
                                   (Spark file source: leest s3a://odap-raw/)
   2. ensure_seed                — kick `seed-data-generation` Job die
                                   JSONL-files naar s3a://odap-raw/ schrijft
-  3. wait_for_bronze            — poll bronze.uwv.persona_created tot
+  3. wait_for_bronze            — poll bronze.persons.created tot
                                   Spark-streaming de eerste batch schreef
   4. silver_* (parallel)        — trigger alle silver-staging DAGs
-  5. gold_uc11_klantreis        — bouwt int_klantreis_events + 2 marts
+  5. gold_uc11_customer_journey        — bouwt int_customer_journey_events + 2 marts
   6. render_dbt_manifest        — dbt parse + upload (OM-compat strip) naar
                                   s3://odap-meta/dbt/latest/
   7. governance_om_ingest       — Trino-catalog, dbt-lineage, Superset,
                                   Airflow — alle ingest-stappen
-  8. om_cleanup_duplicates      — verwijder bronze/silver uc11_klantreis
+  8. om_cleanup_duplicates      — verwijder bronze/silver uc11_customer_journey
                                   schemas (shared Hive metastore artefact)
   9. rebuild_superset_dashboard — re-create superset-dashboards-init Job
                                   zodat het UC-11 dashboard (12 charts)
@@ -52,7 +52,7 @@ DEFAULT_ARGS = {
 }
 
 # Silver-DAGs die UC-11 nodig heeft. Parallel triggeren is OK; ze hebben
-# geen inter-dependency. Deze + gold_uc11_klantreis + governance_om_ingest
+# geen inter-dependency. Deze + gold_uc11_customer_journey + governance_om_ingest
 # worden door hun factories met is_paused_upon_creation=False aangemaakt,
 # zodat TriggerDagRunOperator-calls niet queued blijven op een verse cluster.
 UC11_SILVER_DAGS = [
@@ -266,10 +266,10 @@ def trino(sql):
 deadline = time.time() + 720
 last_err = "?"
 while time.time() < deadline:
-    rows, err = trino("SELECT COUNT(*) FROM bronze.uwv.persona_created")
+    rows, err = trino("SELECT COUNT(*) FROM bronze.persons.created")
     if rows:
         n = int(rows[0][0])
-        print(f"[wait_for_bronze] persona_created rows={n}", flush=True)
+        print(f"[wait_for_bronze] person_created rows={n}", flush=True)
         if n > 0:
             raise SystemExit(0)
     elif err:
@@ -375,15 +375,15 @@ def del_by_fqn(kind, fqn):
         print(f"  ! delete {fqn}: {e.code}", flush=True)
 
 for fqn in [
-    "trino.bronze.uc11_klantreis.mart_uc11_klantreis_events",
-    "trino.bronze.uc11_klantreis.mart_uc11_klantreis_phases",
-    "trino.silver.uc11_klantreis.mart_uc11_klantreis_events",
-    "trino.silver.uc11_klantreis.mart_uc11_klantreis_phases",
+    "trino.bronze.uc11_customer_journey.mart_uc11_journey_events",
+    "trino.bronze.uc11_customer_journey.mart_uc11_journey_phases",
+    "trino.silver.uc11_customer_journey.mart_uc11_journey_events",
+    "trino.silver.uc11_customer_journey.mart_uc11_journey_phases",
 ]:
     del_by_fqn("tables", fqn)
 for fqn in [
-    "trino.bronze.uc11_klantreis",
-    "trino.silver.uc11_klantreis",
+    "trino.bronze.uc11_customer_journey",
+    "trino.silver.uc11_customer_journey",
 ]:
     del_by_fqn("databaseSchemas", fqn)
 """
@@ -438,7 +438,7 @@ body = {
                     "name":"superset-postgres-credentials","key":"adminUser.username"}}},
                 {"name":"ADMIN_PASSWORD","valueFrom":{"secretKeyRef":{
                     "name":"superset-postgres-credentials","key":"adminUser.password"}}},
-                {"name":"WIA_DATASET","value":"mart_uc01_wia_funnel_daily"},
+                {"name":"WIA_DATASET","value":"mart_uc01_claims_funnel_daily"},
             ],
             "volumeMounts":[{"name":"scripts","mountPath":"/scripts"}],
             "resources":{"requests":{"cpu":"50m","memory":"128Mi"},
@@ -480,7 +480,7 @@ with DAG(
     start_date=datetime(2026, 5, 1),
     catchup=False,
     max_active_runs=1,
-    tags=["uwv", "uc11", "bootstrap"],
+    tags=["demo", "uc11", "bootstrap"],
 ) as dag:
     ensure_streaming = _py_pod(
         task_id="ensure_streaming_bronze",
@@ -504,7 +504,7 @@ with DAG(
 
     # `allowed_states=[success, failed]` is bewust ruim: Cosmos draait
     # `dbt test` AFTER_EACH model, en de seed-data heeft een paar bekende
-    # DQ-issues (5 duplicate BSNs in stg_persona, ww_aanvraag.dlq events,
+    # DQ-issues (5 duplicate BSNs in stg_persons, service_request_application.dlq events,
     # ...). De modellen ZIJN gebouwd; de UC-11 downstream-keten heeft de
     # data, ook al klaagt een test. We zien `failed_states=[]` zodat
     # TriggerDagRunOperator nooit zelf raisen — alleen door `allowed_states`
@@ -523,8 +523,8 @@ with DAG(
     ]
 
     trigger_gold = TriggerDagRunOperator(
-        task_id="trigger_gold_uc11_klantreis",
-        trigger_dag_id="gold_uc11_klantreis",
+        task_id="trigger_gold_uc11_customer_journey",
+        trigger_dag_id="gold_uc11_customer_journey",
         reset_dag_run=True,
         wait_for_completion=True,
         poke_interval=20,
