@@ -44,7 +44,7 @@ _STREAM_PATH_RE = re.compile(r"/odap-raw/(?P<path>.+?)/dt=")
 
 
 def stream_to_table(stream: str) -> str | None:
-    """`customers.created` → `uwv.person_created` (Hive db=uwv, table=…).
+    """`customers.created` → `<domain>.person_created` (Hive db=uwv, table=…).
 
     Trino ziet deze als `bronze.demo.<table>` via de bronze-catalog.
     Returnt None voor onverwachte stream-naming.

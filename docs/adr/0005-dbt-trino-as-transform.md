@@ -37,7 +37,7 @@ silver/gold (CGM-conform, business-ready). Eisen:
 - **Macros zijn de juiste tool voor format-abstractie** (zie ADR-0002 §
   Implementatie-impact). Eén macro `table_format_properties()` switcht
   Iceberg ↔ Delta.
-- **Built-in tests + dbt-utils + dbt-expectations** dekken UWV-business-rules
+- **Built-in tests + dbt-utils + dbt-expectations** dekken business rules
   (BSN-checksum, IBAN-format, accepted-values voor wet/claim payoutssoort).
 - **`manifest.json` + `catalog.json` + `run_results.json`** zijn de input voor
   OpenMetadata's dbt-workflow → automatische lineage en descriptions in OM.

@@ -141,7 +141,7 @@ voor opvolg-werk.
 
 | # | Item | Prio | Effort |
 |---|---|---|---|
-| 3.2.1 | **Dead-Letter Queue (DLQ)** voor Spark streaming — failed records → `uwv.<domain>.<event>.dlq` | 🟠 | M |
+| 3.2.1 | **Dead-Letter Queue (DLQ)** voor Spark streaming — failed records → `<domain>.<domain>.<event>.dlq` | 🟠 | M |
 | 3.2.2 | **Retries + circuit-breakers** in spark-jobs voor transiente Kafka/HMS-issues | 🟡 | S |
 | 3.2.3 | **PodDisruptionBudgets** voor alle Stackable-clusters | 🟠 | S |
 | 3.2.4 | **HorizontalPodAutoscaler** voor Trino-workers + Spark-executors (gebaseerd op CPU/queue-depth) | 🟡 | M |

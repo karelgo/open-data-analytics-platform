@@ -51,7 +51,7 @@ trino_exec() {
 
 schemas=$(trino_exec "SHOW SCHEMAS FROM bronze" 2>&1 || true)
 if echo "$schemas" | grep -qx 'demo'; then
-  pass "schema bronze.uwv aanwezig"
+  pass "schema bronze.demo present"
 else
   fail "schema bronze.uwv ontbreekt — output:\n$schemas"
 fi

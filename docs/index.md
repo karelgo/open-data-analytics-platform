@@ -11,7 +11,7 @@ hide:
 # Open Data & Analytics Platform
 
 Een **fictieve, illustratieve** reference implementation van een modern data-
-en analyticsplatform voor UWV, gebouwd op open source en gericht op compliance
+en analyticsplatform for ODAP, gebouwd op open source en gericht op compliance
 met GDPR, ISO 27001/27002, NIS2, and the EU AI Act.
 
 !!! warning "Geen echte ODAP data"

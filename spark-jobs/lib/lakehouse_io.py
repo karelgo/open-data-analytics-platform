@@ -126,7 +126,7 @@ def ensure_bronze_schema(spark: "SparkSession") -> None:
     """Maak Hive-database `odap` aan voor bronze-Delta-tabellen (idempotent).
 
     Trino's `bronze` catalog mapt op deze Hive-metastore, dus Trino ziet
-    `bronze.demo.<table>`. Spark spreekt 2-level (`uwv.<table>`); de
+    `bronze.demo.<table>`. Spark spreekt 2-level (`<domain>.<table>`); de
     eerdere `CREATE SCHEMA bronze.uwv` faalde met
     `_LEGACY_ERROR_TEMP_1055` omdat Spark `bronze.uwv` als één
     database-naam met dot interpreteert (geen catalog-registratie voor

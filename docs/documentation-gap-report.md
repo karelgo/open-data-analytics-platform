@@ -57,7 +57,7 @@ in elke `_*.yml`). Onderstaande items vormen de openstaande gaten.
 | # | Pad | Wat ontbreekt | Prio |
 |---|---|---|---|
 | C.1 | `docs/runbook.md` | Zelf-aangegeven als "skeleton (fase 0)". Veel TODO-items. Acceptabel zolang het platform niet production-rijp is, maar de TODO-secties in §2.2, §4.x verdienen tenminste verwijzing to the bestaande `make`-targets en `scripts/doctor.sh`. | 🟠 hoog |
-| C.2 | `docs/data-contracts.md` (nieuw) | Bronze-sources zijn beschreven in `dbt/models/staging/_sources.yml` (8 topics) en in NiFi-templates. Een gecombineerd "data contract"-document per `uwv.<domain>.<entity>`-topic — schema-evolutie-regels, eigenaar, SLA, voorbeelddata — ontbreekt. | 🟡 polish |
+| C.2 | `docs/data-contracts.md` (nieuw) | Bronze-sources zijn beschreven in `dbt/models/staging/_sources.yml` (8 topics) en in NiFi-templates. Een gecombineerd "data contract"-document per `<domain>.<domain>.<entity>`-topic — schema-evolutie-regels, eigenaar, SLA, voorbeelddata — ontbreekt. | 🟡 polish |
 | C.3 | `docs/lineage.md` of diagram in `docs/architecture.md` | Lineage van Kafka-topic → bronze.* → silver.<domein>.* → gold.<uc>.* is impliciet (door dbt-refs), maar er is geen overzichtsdiagram. OpenMetadata genereert het runtime, maar een statisch fallback-diagram is handig voor lezers zonder cluster. | 🟡 polish |
 | C.4 | `platform/13-openmetadata-config/ingestion-pipelines/` | Lege map (improvements #1.14). Verwacht: voorbeeld-pipeline-yaml's. | 🟡 polish |
 | C.5 | Airflow DAGs (`platform/11-airflow/dags/`) | DAGs hebben docstrings ✓. Wat ontbreekt: een `README.md` in `dags/` met DAG-overzicht + schedule + eigenaar — handig voor data-stewards die de UI niet altijd open hebben. | 🟡 polish |

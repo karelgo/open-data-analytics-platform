@@ -20,7 +20,7 @@ zijn fout.
 
 ## Doel
 
-Eén geïntegreerd cliëntbeeld voor UWV-medewerkers. **Purpose limitation strikt**:
+Eén geïntegreerd cliëntbeeld for ODAP-medewerkers. **Purpose limitation strikt**:
 medewerker ziet alleen velden die nodig zijn voor diens rol/taak (column-level
 ABAC).
 
@@ -96,7 +96,7 @@ Elke API-call (Trino read door CRM-applicatie) wordt gelogd met:
 - gequeried `bsn`
 - timestamp
 
-Geleverd via Trino event-listener → Kafka topic `uwv.audit.client_360` → Spark
+Geleverd via Trino event-listener → Kafka topic `<domain>.audit.client_360` → Spark
 batch naar `bronze.audit.client_360_reads` (Delta, retention 7 jaar).
 
 ## OpenMetadata

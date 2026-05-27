@@ -1,6 +1,6 @@
 # data-generation
 
-Python-package met synthetische data-generators for the UWV-referentie-platform.
+Python-package met synthetische data-generators for the ODAP reference platform.
 
 > **STRIKT SYNTHETISCH.** Geen echte BSN's, geen echte adresgegevens, geen
 > echte cliënt-data. Test-BSN-bereik (`9XXXXXXXX`) per BRP-conventie.

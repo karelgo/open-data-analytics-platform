@@ -247,7 +247,7 @@ hide:
 # Open Data & Analytics Platform
 
 Een **fictieve, illustratieve** reference implementation van een modern data-
-en analyticsplatform voor UWV, gebouwd op open source en gericht op compliance
+en analyticsplatform for ODAP, gebouwd op open source en gericht op compliance
 met GDPR, ISO 27001/27002, NIS2, and the EU AI Act.
 
 !!! warning "Geen echte ODAP data"
@@ -814,8 +814,8 @@ uwv.<domain>.<event>
 Voorbeelden:
 
 - `claims.application`
-- `uwv.wia.beoordeling`
-- `uwv.ww.claim payout`
+- `<domain>.wia.beoordeling`
+- `<domain>.ww.claim payout`
 
 ## DNS
 

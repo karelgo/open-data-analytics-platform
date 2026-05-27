@@ -53,8 +53,8 @@ uwv.<domain>.<event>
 Voorbeelden:
 
 - `claims.application`
-- `uwv.wia.beoordeling`
-- `uwv.ww.claim payout`
+- `<domain>.wia.beoordeling`
+- `<domain>.ww.claim payout`
 
 ## DNS
 

@@ -36,7 +36,7 @@ Drie open source kandidaten: **DataHub**, **Apache Atlas**, **OpenMetadata**.
 
 - **Eén tool, vier capabilities**. OpenMetadata combineert catalog, lineage,
   classifications én DQ-profiler. Bij DataHub zit DQ in een aparte tool;
-  Atlas heeft geen native profiler. Voor UWV scheelt dit één integratie-punt.
+  Atlas heeft geen native profiler. Voor the platform saves this één integratie-punt.
 - **Sterke dbt-integratie**. OpenMetadata leest dbt's `manifest.json`,
   `catalog.json` en `run_results.json` direct → kolomniveau-lineage komt
   "gratis" mee from the SQL.
@@ -82,6 +82,6 @@ Drie open source kandidaten: **DataHub**, **Apache Atlas**, **OpenMetadata**.
   glossary-link + dbt-meta enrichment-jobs draaien als CronJob).
 - `dbt/dbt_project.yml` — exporteer `manifest.json` etc. naar
   `s3://odap-meta/dbt/<run_id>/`.
-- Trino — event-listener config naar Kafka topic `uwv.trino.queries` voor
+- Trino — event-listener config naar Kafka topic `trino.queries` voor
   lineage capture.
 - Airflow DAGs `om_ingest_*` halen periodiek metadata op.

@@ -93,7 +93,7 @@ Deze keuze is structureel: migreren is mogelijk maar duur. Daarom een expliciete
 | Deletion vectors | OK (v3 spec) | OK |
 | Change Data Feed | Via snapshots + diff | OK native |
 
-Voor UWV (veel correctie-runs op claimbeoordelingen, audits, herbeoordelingen) zijn **branching/tagging** en **partition evolution** nuttige features die alleen Iceberg biedt. **Liquid clustering** van Delta is interessant voor cliëntscans, maar niet kritisch.
+Voor the platform (veel correctie-runs op claimbeoordelingen, audits, herbeoordelingen) zijn **branching/tagging** en **partition evolution** nuttige features die alleen Iceberg biedt. **Liquid clustering** van Delta is interessant voor cliëntscans, maar niet kritisch.
 
 ### C7 — Performance op platform workloads
 
@@ -121,7 +121,7 @@ Geen duidelijke winnaar zonder benchmark op echte ODAP data.
 - **Azure Synapse**: Delta beter geïntegreerd; Iceberg via OSS Spark.
 - **On-prem / sovereign cloud (Stackable, OpenShift, IONOS, etc.)**: beide werken; Iceberg heeft sterkere out-of-the-box experience zonder Databricks.
 
-**Voor UWV specifiek:** geen besluit genomen over hyperscaler. Sovereign cloud (Leonardo) en on-prem zijn realistische scenario's. Daar is Iceberg de natuurlijkere keuze.
+**Voor specifically:** geen besluit genomen over hyperscaler. Sovereign cloud (Leonardo) en on-prem zijn realistische scenario's. Daar is Iceberg de natuurlijkere keuze.
 
 ---
 

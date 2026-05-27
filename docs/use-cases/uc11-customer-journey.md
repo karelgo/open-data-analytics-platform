@@ -177,7 +177,7 @@ de bestaande Trino event-listener gelogd. Audit-record bevat:
 - gequeried BSN (uit WHERE-clause; pseudonimiseerd in audit-log)
 - timestamp + applied-row-filter + applied-column-mask
 
-Pad: Trino event-listener → Kafka `uwv.audit.customer journey` → Spark batch →
+Pad: Trino event-listener → Kafka `<domain>.audit.customer journey` → Spark batch →
 `bronze.audit.customer journey_reads` (Delta, retentie 7 jaar).
 
 ## OpenMetadata
@@ -223,8 +223,8 @@ Pad: Trino event-listener → Kafka `uwv.audit.customer journey` → Spark batch
 - Het fase-model gebruikt vereenvoudigde regels; production zou state-machine
   per cliënt nodig hebben (Spark Structured Streaming met stateful
   aggregation). Voor demo-doeleinden voldoende.
-- Audit-Kafka-topic `uwv.audit.customer journey` is symmetrisch with the bestaande
-  `uwv.audit.client_360`. Eén Spark-job kan beide consumeren (out-of-scope).
+- Audit-Kafka-topic `<domain>.audit.customer journey` is symmetrisch with the bestaande
+  `<domain>.audit.client_360`. Eén Spark-job kan beide consumeren (out-of-scope).
 - "Saskia"-persona wordt nu **gevonden** in de mart (BSN met meest diverse
   events). Voor reproducerbare demo: in een volgende iteratie een dbt seed
   `seeds/uc11_demo_personas.csv` met deterministische test-BSN's.

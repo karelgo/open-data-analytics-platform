@@ -10,7 +10,7 @@
 
 ## Context
 
-Trino moet rijke authorisatie afdwingen die past bij UWV's compliance-eisen:
+Trino moet rijke authorisatie afdwingen die past bij the platform's compliance requirements:
 
 - **Purpose limitation** (R-AVG-06): access tot een dataset is gekoppeld aan een doel
   (claim payout, reintegration, handhaving, statistiek). Een query die niet

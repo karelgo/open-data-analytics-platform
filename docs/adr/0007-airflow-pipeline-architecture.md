@@ -90,15 +90,15 @@ Vanaf Airflow 2.4 is `Dataset` de canonieke manier om DAG-tot-DAG
 afhankelijkheden te modelleren. URI-conventie:
 
 ```
-bronze://uwv/<domain>_<entity>          # bronze.demo.<domain>_<entity>
+bronze://demo/<domain>_<entity>          # bronze.demo.<domain>_<entity>
 silver://<domain>/<entity>              # silver.<domain>.stg_<entity>
 gold://<usecase>/<table>                # gold.<usecase>.<table>
 ```
 
 Concreet:
 
-- `bronze_factory` publiceert `Dataset("bronze://uwv/claim_application")` per ronde.
-- `silver_factory` voor `wia` heeft `schedule=[Dataset("bronze://uwv/claim_application")]`
+- `bronze_factory` publiceert `Dataset("bronze://demo/claim_application")` per ronde.
+- `silver_factory` voor `wia` heeft `schedule=[Dataset("bronze://demo/claim_application")]`
   en publiceert `Dataset("silver://wia/aanvraag")`.
 - `gold_factory` voor `uc01` heeft `schedule=[Dataset("silver://wia/aanvraag")]`.
 - UC-05 (5 datasets in schedule) draait pas wanneer alle vijf bronnen geüpdatet zijn.
@@ -243,7 +243,7 @@ Mounts in pod:
   graph traversal). Cosmos ondersteunt dit via `render_config.test_behavior =
   TestBehavior.AFTER_EACH`. Default in onze setup.
 - **Source freshness** — Cosmos heeft `dbt source freshness` integratie. Voor
-  UWV (mostly streamed) is dit voornamelijk nuttig op `fez` (batch). Open.
+  the platform (mostly streamed) is dit voornamelijk nuttig op `fez` (batch). Open.
 - **Backfill-strategie** — Datasets zijn forward-only. Manuele backfill via
   `airflow dags backfill` blijft mogelijk.
 

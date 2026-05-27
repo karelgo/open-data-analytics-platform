@@ -1,10 +1,64 @@
 # WORKLOG
 
-Per sessie: wat gedaan, wat openstaand, welke beslissingen.
+Per session: what was done, what remains, which decisions were made.
 
 ---
 
-## 2026-04-30 — Sessie 1: Fase 0 (bootstrap + docs)
+## 2026-05-27 — Session N: Generic rebrand (UWV → ODAP)
+
+### Done
+- 8-phase rebrand to make the platform vendor- and customer-neutral.
+- All UWV identifiers replaced: namespaces (`uwv-*` → `odap-*`), labels
+  (`uwv.nl/*` → `odap.io/*`), hostnames (`*.uwv-platform.local` →
+  `*.odap.local`), Docker images (`uwv-platform/*` → `odap/*`), Keycloak
+  realm (`uwv` → `odap`), Postgres user, S3 buckets, env vars, OPA package,
+  Python package (`uwv_lab` → `odap_lab`).
+- 30+ files containing `uwv` in their name renamed (realm.json,
+  trino-roles.rego, ensure_schemas.sql, role_mappings.json, etc.).
+- Portal UI translated to English (ShellLayout, WorkspaceHome,
+  CommandPalette, NotificationBell, csv-upload, learn, me, access-request).
+  Logo SVGs rewordmarked "UWV" → "ODAP".
+- 7 Dutch personas collapsed/renamed to 5 generic business personas
+  (claims_analyst, fraud_analyst, marketing_analyst, finance_analyst,
+  operations_manager); 4 technical personas kept (data_engineer, data_steward,
+  researcher, platform_admin).
+- Demo data re-themed from UWV welfare domain (WIA/WW/Wajong/ZW/CRM/FEZ) to
+  generic customer/claim/event/finance domain. dbt model dirs, mart UCs,
+  Spark jobs, Kafka topics, Airflow datasets all renamed.
+- Compliance framework references re-mapped: NORA → SOC 2,
+  AVG → GDPR, BIO/BIO2 → ISO 27001/27002 (NIS2 + AI Act kept). Term
+  `doelbinding` → `purpose-limitation`.
+- Documentation translated where possible; root-level NL files
+  (reference-architecture.md, requirements.md, master-agent-prompt.md,
+  platform-mapping-research.md) rewritten as condensed English versions.
+- `docs/architectuur/` → `docs/architecture/`, `docs/rollen/` → `docs/roles/`.
+- mkdocs site_name + nav fully English; theme language `nl` → `en`.
+
+### Open items
+- Some Dutch narrative remains in `docs/handbooks/*.md` and
+  `portal/src/content/handbooks/*.md` + `portal/src/content/learn/*.mdx`
+  (deep role-specific workflows). The headings and entry-point copy are
+  English; the deep bodies need rewriting for the new generic personas.
+- A handful of code comments + ADR cross-references still mention UWV in
+  historical context (acceptable as commit-log-style mentions; not
+  user-visible).
+- VPN client `.pfx` is untracked; rename manually if needed.
+
+### Decisions
+- Platform name: **Open Data & Analytics Platform (ODAP)**.
+- Compliance: international frameworks only (GDPR/ISO/NIS2/AI Act/SOC 2);
+  NL-specific NORA/AVG/BIO dropped.
+- Hostnames: `example.com` placeholders for cloud; `odap.local` for k3d.
+- Persona set: 9 (4 technical + 5 business) replacing 11 (4 technical +
+  7 NL government).
+- Demo data domains: generic customer/claim/event scheme, mapping
+  documented in PLAN.md §5.
+- The currently-running cluster keeps working on its old names; rebrand
+  targets fresh deploys.
+
+---
+
+## 2026-04-30 — Session 1: Phase 0 (bootstrap + docs)
 
 ### Gedaan
 - Vier achtergronddocumenten gelezen + samengevat (`docs/context-summary.md`).
@@ -157,7 +211,7 @@ Per sessie: wat gedaan, wat openstaand, welke beslissingen.
 - `scripts/seed.sh` — vol uitgewerkt: ConfigMaps maken, oude Job verwijderen, Job apply, wait completion, logs.
 - `scripts/deploy-platform.sh` — sync `spark-jobs/*.py` → `platform/08-spark/scripts/` voor kustomize pickup.
 - `.gitignore` — `platform/08-spark/scripts/` toegevoegd.
-- `tests/smoke/03-bronze-data.sh` — checks: SparkApplication phase, schema `bronze.uwv` aanwezig in Trino, tabel `bronze.persons.created` aanwezig, row-count >= 10000, BSN-format begint met 9 (test-bereik).
+- `tests/smoke/03-bronze-data.sh` — checks: SparkApplication phase, schema `bronze.demo` aanwezig in Trino, tabel `bronze.persons.created` aanwezig, row-count >= 10000, BSN-format begint met 9 (test-bereik).
 
 ### Verificatie (host, geen cluster)
 - 19/19 pytest-tests groen (incl. 1000 generated BSN's all valid).

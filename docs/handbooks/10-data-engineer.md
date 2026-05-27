@@ -73,7 +73,7 @@ zuinig: **kijk niet meer dan nodig**.
 
 1. **Ontwerp**: schrijf een mini-spec in `docs/use-cases/uc-xyz.md` (entiteiten, classificatie, purpose-limitation, retention period).
 2. **NiFi-flow**: kopieer template `nifi-flows/templates/delta/source-xyz/` aan, pas processors aan.
-3. **Kafka-topic**: definieer `uwv.xyz.event` in `platform/06-kafka/topics.yaml`.
+3. **Kafka-topic**: definieer `<domain>.xyz.event` in `platform/06-kafka/topics.yaml`.
 4. **Spark-job**: voeg `streaming-bronze-xyz.yaml` toe; gebruik helper `lakehouse_io.write_delta()`.
 5. **Schema in HMS**: `CREATE TABLE bronze.demo.xyz_events (...) USING DELTA LOCATION 's3a://odap-bronze/xyz/'`.
 6. **dbt-stg**: `dbt/models/staging/stg_xyz.sql` met basisvalidatie.

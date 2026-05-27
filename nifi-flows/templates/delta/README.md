@@ -2,7 +2,7 @@
 
 Status: **flow-design beschreven; geen geautomatiseerde import in fase 4.**
 
-In de reference implementation wordt de `uwv.<domain>.<event>` Kafka-pijp
+In de reference implementation wordt de `<domain>.<domain>.<event>` Kafka-pijp
 voorlopig gevuld door [`data-generation/load_to_kafka.py`](../../../data-generation/load_to_kafka.py).
 NiFi-flows volgen in fase 5+ — dit document legt vast hoe ze ontworpen zijn,
 zodat de REST-API-deploy direct kan starten. **NiFi heeft géén publieke

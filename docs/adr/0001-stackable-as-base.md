@@ -47,9 +47,9 @@ We kiezen **Stackable Data Platform 26.3** als operator-baseline.
   publiek (`docker.stackable.tech`) zonder license-lock-in.
 - **Native Kubernetes**. Geen "VM-gebaseerd cluster van NiFi/Kafka/Trino" —
   alles is K8s-Pod, met StatefulSet/Deployment, NetworkPolicies, RBAC.
-  Dit past 1-op-1 on the UWV-doelarchitecture (zone-scheiding, segmentatie).
+  Dit past 1-op-1 on the ODAP target architecture (zone-scheiding, segmentatie).
 - **Geschikt voor sovereign / on-prem deployment**. Geen cloud-leverancier
-  vereist; werkt op IONOS, OpenShift, on-prem K8s — relevant voor UWV's
+  vereist; werkt op IONOS, OpenShift, on-prem K8s — relevant for ODAP's
   bijzondere persoonsgegevens.
 - **Versie-pinning per release**. `stackablectl` met release-bestand
   `infrastructure/stackablectl/release.yaml` borgt reproduceerbare deploys
@@ -72,7 +72,7 @@ We kiezen **Stackable Data Platform 26.3** als operator-baseline.
 
 - **Self-hosted Helm-charts per component**. Geen unified auth/secret/exposure
   CRD-laag → hoge integratie-kosten. Skip.
-- **Databricks / Fabric**. Vendor lock-in, geen sovereign-cloud-fit voor UWV
+- **Databricks / Fabric**. Vendor lock-in, geen sovereign-cloud-fit for ODAP
   in strikt-medische context. Skip.
 - **Kubeflow + Apache Beam stack**. Geen 1-op-1 fit; gericht op ML-pipelines,
   niet op lakehouse + BI + governance. Skip.

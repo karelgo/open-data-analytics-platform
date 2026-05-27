@@ -1,6 +1,6 @@
 # Access request tot data — usersgids
 
-Praktische gids for the request van access tot een dataset on the UWV
+Praktische gids for the request van access to a dataset on the platform
 data-platform. Architecture: zie [ADR-0008](adr/0008-self-service-data-access.md).
 Bridge-service: zie [platform/18-om-access-bridge/](../platform/18-om-access-bridge/README.md).
 
@@ -121,7 +121,7 @@ Motivation: Q2 bronze-reconciliatie — silver/gold-aggregaten checken
             tegen bronze na Q2-ETL-incident.
 ```
 
-Grant: `data_access:bronze.uwv`.
+Grant: `data_access:bronze.demo`.
 
 ---
 
