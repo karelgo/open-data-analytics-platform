@@ -35,7 +35,3 @@ spot_pool_vm_size = "Standard_D4s_v5"
 # Service principal used as AKS cluster identity.
 sp_client_id = "REPLACE-WITH-YOUR-SERVICE-PRINCIPAL-CLIENT-ID"
 
-# ---- VPN Gateway (optional; off by default — saves ~€260/mo) ----
-# Use 'bash scripts/azure/aks-pf.sh' for kubectl access without VPN.
-# Flip to true only if you specifically need Windows P2S VPN on the AKS VNet.
-vpn_gateway_enabled = false

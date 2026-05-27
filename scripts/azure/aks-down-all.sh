@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 # Full teardown — destroys EVERYTHING terraform created in dev-stackable-rg:
-#   AKS cluster, VPN Gateway, VNet, Public IP, certs.
+#   AKS cluster, VNet, Public IP, certs.
 # After this completes, Azure cost for this stack is €0.
 # The dev-stackable-rg resource group itself is preserved (it's a data source).
-#
-# VPN Gateway delete is the slow part (~10-15 min).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -17,7 +15,7 @@ error() { printf '\033[1;31mFAIL\033[0m %s\n' "$*" >&2; exit 1; }
 # shellcheck source=/dev/null
 source scripts/azure/env.sh
 
-log "terraform destroy (~10-20 min — VPN Gateway is the slow one)"
+log "terraform destroy (~5-10 min)"
 bash scripts/azure/aks-down.sh
 
 log "Verifying nothing is left in dev-stackable-rg that we created"

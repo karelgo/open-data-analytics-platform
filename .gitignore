@@ -95,9 +95,6 @@ scripts/azure/env.sh
 # Azure App Service Domain contact info (contains PII)
 *-contact.json
 
-# VPN client certs + private keys (terraform-generated)
-infrastructure/azure/vpn-client/
-
 # Session-local kubeconfig used to pin a worktree to one cluster
 .claude/kubeconfig.k3d
 .claude/kubeconfig.*

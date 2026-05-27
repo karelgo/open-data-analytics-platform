@@ -416,20 +416,16 @@ aks-down: ## terraform destroy — full teardown, zero ongoing cost
 ##@ AKS — unified lifecycle (one-shot scripts)
 
 .PHONY: aks-up-all
-aks-up-all: ## Provision EVERYTHING: AKS + VPN Gateway + bootstrap + deploy + smoke
+aks-up-all: ## Provision EVERYTHING: AKS + bootstrap + deploy + smoke
 	bash scripts/azure/aks-up-all.sh
 
 .PHONY: aks-stop-all
-aks-stop-all: ## Stop AKS to save compute cost (VPN Gateway still bills ~€28/month — see make aks-down-all)
+aks-stop-all: ## Stop AKS to save compute cost (full teardown: make aks-down-all)
 	bash scripts/azure/aks-stop-all.sh
 
 .PHONY: aks-down-all
-aks-down-all: ## terraform destroy ALL: AKS + VPN Gateway + VNet + certs (€0 after)
+aks-down-all: ## terraform destroy ALL: AKS + VNet + certs (€0 after)
 	bash scripts/azure/aks-down-all.sh
-
-.PHONY: aks-vpn-windows
-aks-vpn-windows: ## Package VPN client cert (.pfx) + Azure profile zip for Windows install
-	bash scripts/azure/vpn-windows-setup.sh
 
 .PHONY: aks-pf
 aks-pf: ## Start kubectl port-forward to AKS ingress (127.0.0.2:8443 → *.odap-platform.cloud)

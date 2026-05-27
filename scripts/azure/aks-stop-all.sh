@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Stop AKS to save COMPUTE costs. NOTE: Azure VPN Gateway cannot be stopped —
-# it bills ~€28/month (Basic SKU) until destroyed. For zero ongoing cost run
-# scripts/azure/aks-down-all.sh instead.
+# Stop AKS to save COMPUTE costs. For zero ongoing cost (including managed
+# disks) run scripts/azure/aks-down-all.sh instead.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -20,8 +19,6 @@ cat <<'EOF'
   --- Cost note -------------------------------------------------
    AKS nodes:    deallocated (no compute charge).
    AKS disks:    a few €/month for the managed disks (PVCs).
-   VPN Gateway:  STILL RUNNING — Azure does not allow stop/start.
-                 ~€28/month on Basic SKU until you destroy it.
                  Resume cluster: make aks-start
                  Full teardown:  make aks-down-all   (€0 after)
   ---------------------------------------------------------------
