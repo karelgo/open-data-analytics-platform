@@ -3,7 +3,7 @@
 mkdocs==1.6.1
 mkdocs-material==9.7.6
 mkdocs-awesome-pages-plugin==2.10.1
-pymdown-extensions==10.21.3
+pymdown-extensions==11.0
 # Material gebruikt deze voor emoji + social-cards; pinnen om CI-drift te
 # voorkomen.
 pillow==12.2.0
