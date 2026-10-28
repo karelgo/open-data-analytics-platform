@@ -1,101 +1,55 @@
 {
   "role_mappings": {
     "resource_purposes": {
-      "bronze.*": [
-        "primair_proces"
+      "bronze.job_market.*": [
+        "ingestion",
+        "quality_control"
       ],
-      "gold.uc01_claims_funnel.*": [
-        "sturingsinfo"
+      "gold.job_market.*": [
+        "labour_market_research",
+        "quality_control"
       ],
-      "gold.uc04_eligibility_outreach.*": [
-        "proactieve_dienstverlening"
-      ],
-      "gold.uc05_customer_360.*": [
-        "customer interaction",
-        "behandeling"
-      ],
-      "gold.uc06_cost_forecast.*": [
-        "actuarie",
-        "beleid"
-      ],
-      "gold.uc07_dq_policies.*": [
-        "primair_proces",
-        "kwaliteitscontrole"
-      ],
-      "gold.uc08_capacity_planning.*": [
-        "planning"
-      ],
-      "sensitive.eligibility_cases.*": [
-        "reintegration",
-        "behandeling"
-      ],
-      "silver.customers.*": [
-        "customer interaction",
-        "behandeling"
-      ],
-      "silver.finance.*": [
-        "actuarie",
-        "beleid"
-      ],
-      "silver.persons.*": [
-        "primair_proces",
-        "kwaliteitscontrole"
-      ],
-      "silver.policies.*": [
-        "primair_proces",
-        "kwaliteitscontrole"
-      ],
-      "silver.eligibility_cases.*": [
-        "reintegration",
-        "behandeling"
-      ],
-      "silver.claims.*": [
-        "claim payout",
-        "behandeling",
-        "reintegration"
-      ],
-      "silver.service_requests.*": [
-        "claim payout",
-        "handhaving"
-      ],
-      "silver.incidents.*": [
-        "claim payout"
+      "silver.job_market.*": [
+        "labour_market_research",
+        "quality_control"
       ]
     },
     "roles": {
-      "marketing_analyst": {
+      "claims_analyst": {
+        "break_glass": false,
+        "can_see_bankrekening": false,
+        "can_see_medical": false,
+        "can_see_pii": false,
+        "catalogs": [
+          "gold"
+        ],
+        "purposes": [
+          "labour_market_research"
+        ],
+        "regio_filter": false,
+        "schemas": [
+          "job_market"
+        ]
+      },
+      "data_engineer": {
         "break_glass": false,
         "can_see_bankrekening": false,
         "can_see_medical": false,
         "can_see_pii": true,
         "catalogs": [
+          "bronze",
+          "silver",
           "gold"
         ],
         "purposes": [
-          "customer_contact",
-          "case_handling",
-          "proactive_outreach"
+          "ingestion",
+          "labour_market_research",
+          "quality_control"
         ],
         "regio_filter": false,
         "schemas": [
-          "uc04_eligibility_outreach",
-          "uc05_customer_360"
+          "job_market"
         ]
-      },
-      "data_engineer": {
-        "break_glass": false,
-        "can_see_bankrekening": true,
-        "can_see_medical": false,
-        "can_see_pii": true,
-        "catalogs": [
-          "bronze"
-        ],
-        "jit_required": true,
-        "purposes": [
-          "primair_proces"
-        ],
-        "regio_filter": false,
-        "schemas": null
       },
       "data_steward": {
         "break_glass": false,
@@ -108,11 +62,13 @@
           "gold"
         ],
         "purposes": [
-          "sturingsinfo",
-          "kwaliteitscontrole"
+          "quality_control",
+          "labour_market_research"
         ],
         "regio_filter": false,
-        "schemas": null
+        "schemas": [
+          "job_market"
+        ]
       },
       "finance_analyst": {
         "break_glass": false,
@@ -123,25 +79,70 @@
           "gold"
         ],
         "purposes": [
-          "actuarie",
-          "beleid"
+          "labour_market_research"
         ],
         "regio_filter": false,
         "schemas": [
-          "uc06_cost_forecast"
+          "job_market"
+        ]
+      },
+      "fraud_analyst": {
+        "break_glass": false,
+        "can_see_bankrekening": false,
+        "can_see_medical": false,
+        "can_see_pii": false,
+        "catalogs": [
+          "gold"
+        ],
+        "purposes": [
+          "labour_market_research"
+        ],
+        "regio_filter": false,
+        "schemas": [
+          "job_market"
+        ]
+      },
+      "marketing_analyst": {
+        "break_glass": false,
+        "can_see_bankrekening": false,
+        "can_see_medical": false,
+        "can_see_pii": false,
+        "catalogs": [
+          "gold"
+        ],
+        "purposes": [
+          "labour_market_research"
+        ],
+        "regio_filter": false,
+        "schemas": [
+          "job_market"
+        ]
+      },
+      "operations_manager": {
+        "break_glass": false,
+        "can_see_bankrekening": false,
+        "can_see_medical": false,
+        "can_see_pii": false,
+        "catalogs": [
+          "gold"
+        ],
+        "purposes": [
+          "labour_market_research"
+        ],
+        "regio_filter": false,
+        "schemas": [
+          "job_market"
         ]
       },
       "platform_admin": {
-        "break_glass": true,
-        "can_see_bankrekening": true,
-        "can_see_medical": true,
+        "break_glass": false,
+        "can_see_bankrekening": false,
+        "can_see_medical": false,
         "can_see_pii": true,
         "catalogs": [
           "bronze",
           "silver",
-          "gold",
-          "sensitive",
-          "sandbox"
+          "gold"
         ],
         "purposes": [
           "*"
@@ -155,13 +156,16 @@
         "can_see_medical": false,
         "can_see_pii": false,
         "catalogs": [
-          "sandbox"
+          "silver",
+          "gold"
         ],
         "purposes": [
-          "statistisch_onderzoek"
+          "labour_market_research"
         ],
         "regio_filter": false,
-        "schemas": null
+        "schemas": [
+          "job_market"
+        ]
       },
       "smoketest": {
         "break_glass": false,
@@ -180,117 +184,16 @@
         ],
         "regio_filter": false,
         "schemas": null
-      },
-      "operations_manager": {
-        "break_glass": false,
-        "can_see_bankrekening": false,
-        "can_see_medical": false,
-        "can_see_pii": false,
-        "catalogs": [
-          "gold",
-          "silver"
-        ],
-        "purposes": [
-          "planning"
-        ],
-        "regio_filter": false,
-        "schemas": [
-          "uc08_capacity_planning",
-          "smz"
-        ]
-      },
-      "claims_analyst": {
-        "break_glass": false,
-        "can_see_bankrekening": false,
-        "can_see_medical": true,
-        "can_see_pii": true,
-        "catalogs": [
-          "sensitive",
-          "silver",
-          "gold"
-        ],
-        "four_eyes_required": true,
-        "purposes": [
-          "claim_processing",
-          "case_handling",
-          "reintegration"
-        ],
-        "regio_filter": true,
-        "schemas": [
-          "claims",
-          "eligibility_cases",
-          "uc01_claims_funnel",
-          "uc02_complex_cases"
-        ]
-      },
-      "fraud_analyst": {
-        "break_glass": false,
-        "can_see_bankrekening": true,
-        "can_see_medical": false,
-        "can_see_pii": true,
-        "catalogs": [
-          "silver",
-          "gold"
-        ],
-        "purposes": [
-          "handhaving"
-        ],
-        "regio_filter": false,
-        "schemas": [
-          "service_requests",
-          "uc03_fraud_risk"
-        ]
       }
     },
     "sensitive_columns": {
-      "achternaam": {
-        "bankrekening": false,
-        "medical": false,
+      "email": {
         "pii": true
       },
-      "bankrekening": {
-        "bankrekening": true,
-        "medical": false,
+      "phone": {
         "pii": true
       },
-      "bsn": {
-        "bankrekening": false,
-        "medical": false,
-        "pii": true
-      },
-      "diagnose": {
-        "bankrekening": false,
-        "medical": true,
-        "pii": false
-      },
-      "birth_date": {
-        "bankrekening": false,
-        "medical": false,
-        "pii": true
-      },
-      "huisnummer": {
-        "bankrekening": false,
-        "medical": false,
-        "pii": true
-      },
-      "iban": {
-        "bankrekening": true,
-        "medical": false,
-        "pii": true
-      },
-      "icd10": {
-        "bankrekening": false,
-        "medical": true,
-        "pii": false
-      },
-      "straat": {
-        "bankrekening": false,
-        "medical": false,
-        "pii": true
-      },
-      "voornaam": {
-        "bankrekening": false,
-        "medical": false,
+      "raw_payload": {
         "pii": true
       }
     }

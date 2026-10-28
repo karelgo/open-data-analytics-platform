@@ -1,11 +1,3 @@
----
-title: Security Policy
-description: Hoe kwetsbaarheden te rapporteren — NIS2-compliant disclosure flow.
----
-
-<!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
-
 # Security Policy
 
 > Improvements #10 / R-NIS2-05.
@@ -130,4 +122,3 @@ Deze policy ondersteunt:
 
 Zie [`docs/compliance-mapping.md`](docs/compliance-mapping.md) voor de
 volledige mapping.
-

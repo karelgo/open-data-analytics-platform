@@ -1,0 +1,84 @@
+---
+title: "Het platform for the Operations Manager"
+role: operations_manager
+level: foundation
+order: 1
+duration: "20 min"
+summary: "Operationale capacity planning op geaggregeerde data — geen cliënt-PII zichtbaar, ook niet bij ‘even kijken’."
+labs:
+  - title: "Open SMZ Capacity planning (UC-08)"
+    hint: "Spreekuur-bezetting per locatie en week"
+    href: "/go/superset/"
+  - title: "Glossary: spreekuur-typen"
+    hint: "Eerste/herhaal/spoed — eenduidige definities"
+    href: "/go/openmetadata/"
+quiz:
+  - q: "Welke gegevens zie jij niet?"
+    options:
+      - "Aantallen spreekuren per locatie"
+      - "Verzuimpercentages op team-niveau"
+      - "Welke individuele cliënt op spreekuur komt of welke arts hem ziet"
+      - "Geboorte- en eindtijd van een spreekuur-blok"
+    correct: 2
+  - q: "Een leidinggevende vraagt to the naam van de cliënt achter een no-show. Wat doe je?"
+    options:
+      - "Je opent silver.smz en geeft de naam"
+      - "Je legt uit dat individueel cliënt-niveau bij capacity planning niet relevant is en verwijst voor nazorg to the SMZ-arbeidsdeskundige met cliënt-doel"
+      - "Je vraagt JIT-access"
+      - "Je negeert de vraag"
+    correct: 1
+  - q: "Welke catalog gebruik jij?"
+    options:
+      - "sensitive.wajong"
+      - "gold.uc08_capacity_planning_planning (afgeleid van silver.smz, geaggregeerd)"
+      - "bronze.uwv"
+      - "sandbox.research"
+    correct: 1
+---
+
+Welcome. Capacity planning is bewust een rol *zonder* cliënt-PII. Niet uit
+gemak — uit ontwerp: voor goede planning hoef je niet te weten *wie* er komt.
+
+## Wat is UC-08?
+
+`gold.uc08_capacity_planning_planning` aggregeert spreekuur-request, beschikbaarheid van
+artsen en gerealiseerde bezetting tot één plannings-mart. Per locatie × week
+× spreekuur-type zie je:
+
+- aantal openstaande request;
+- gerealiseerde bezetting (en no-show%);
+- voorspelde behoefte for the komende 8 weken;
+- knelpunten (rood = onder de norm).
+
+## Waarom geen cliënt-data?
+
+Eén van de stelregels van het platform: een rol ziet alleen wat strikt nodig
+is voor zijn taak. Voor planning is de geaggregeerde stroom genoeg. Bekend
+voorbeeld: een planner die per ongeluk uit dezelfde tabel een lijst van
+"problematische cliënten" gaat maken — dat hoort niet bij planning.
+
+OPA blokkeert dat niet alleen technisch (geen kolom-access), het is ook
+expliciet zo afgesproken in de [purpose-limitation](/docs/compliance-mapping.md):
+planning ≠ behandeling.
+
+## Glossary: één definitie
+
+"No-show" lijkt simpel maar: telt een afgemelde afspraak ook? Hoe snel afmelden
+voor het wel een no-show is? Dat staat in de [glossary](/go/openmetadata/),
+gekoppeld aan de kolom — niet in een ondergeschoven Word-document.
+
+Voordat je een cijfer aan een leidinggevende presenteert, lees de glossary-term.
+Die voorkomt 80% van de verwarring later.
+
+## Twee applicaties
+
+| Applicatie | Waarvoor? |
+|---|---|
+| **Superset** | UC-08 dashboard, primair |
+| **OpenMetadata** | Glossary, kolomdefinities |
+
+## Volgende stap
+
+In de Practitioner-module bouw je een eenvoudige what-if scenario op de
+spreekuur-mart: "wat als we 10% extra herhaal-spreekuur inplannen?". Geen
+PII, alleen aggregaten.

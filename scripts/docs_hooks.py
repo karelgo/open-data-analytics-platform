@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import re
 
-REPO_BLOB = "https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/"
-REPO_TREE = "https://github.com/fresh-minds/FreshStackableDataPlatform/tree/main/"
+REPO_BLOB = "https://github.com/karelgo/open-data-analytics-platform/blob/main/"
+REPO_TREE = "https://github.com/karelgo/open-data-analytics-platform/tree/main/"
 
 # Repo-root bestanden die GEKOPIEERD zijn naar binnen docs/ — links er naar
 # vanuit elders binnen docs/ moeten to the interne kopie wijzen, niet naar
@@ -27,6 +27,7 @@ INTERNAL_REWRITE: dict[str, str] = {
 EXTERNAL_REPO_ROOTS: tuple[str, ...] = (
     ".github",
     "data-generation",
+    "examples",
     "dbt",
     "infrastructure",
     "nifi-flows",

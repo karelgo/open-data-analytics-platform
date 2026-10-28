@@ -1,77 +1,21 @@
----
-title: Naming conventions
-description: Namen voor namespaces, schemas, topics, DNS — consistent over alle components.
----
-
-<!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
-
 # Naming conventions
 
-Eén consistente naamgevingsstrategie maakt zoeken in OpenMetadata, lineage
-en logs een stuk eenvoudiger. Alle components houden zich hieraan.
+The same job-market subject crosses every layer.
 
-## Kubernetes namespaces
-
-| Namespace | Inhoud |
+| Name | Meaning |
 |---|---|
-| `odap-platform` | Stackable workloads (Trino, Spark, Kafka, NiFi, OPA, …) |
-| `odap-data` | Synthetic data jobs, dbt-runners |
-| `odap-meta` | OpenMetadata stack |
-| `odap-monitoring` | Prometheus, Grafana, Vector |
-| `odap-auth` | Keycloak |
+| `bronze.job_market.observations` | Source observations partitioned by snapshot date |
+| `silver.job_market.stg_job_observations` | Standardized analytical records |
+| `silver.job_market.int_job_snapshots` | Deduplicated group/day records |
+| `gold.job_market.mart_job_inventory` | Inventory in the latest observed snapshot |
+| `gold.job_market.mart_job_demand_daily` | Daily demand by overlapping domain |
+| `gold.job_market.mart_job_skills` | Skill demand |
+| `gold.job_market.mart_job_salary` | Salary evidence with original units and estimate flags |
+| `gold.job_market.mart_job_geography` | Geography |
+| `gold.job_market.mart_job_work_arrangements` | Contracts and work arrangements |
+| `gold.job_market.mart_job_source_quality` | Source-level completeness and provenance |
+| `dutch_it_jobs_daily` | Airflow DAG |
+| `dutch-it-job-market` | Superset dashboard slug |
+| `snapshot_date=YYYY-MM-DD/` | Dated extraction partition |
 
-## Trino-schemas
-
-| Pattern | Voorbeelden |
-|---|---|
-| `bronze.demo.<entity>` | `bronze.claims.application`, `bronze.demo.ww_claim payout` |
-| `silver.<domain>.<entity>` | `silver.claims.application_pseudo`, `silver.customers.interaction` |
-| `gold.<uc_id>.<artifact>` | `gold.uc01_claims_funnel.daily_kpi`, `gold.uc05_customer_360.profile` |
-| `sensitive.<domain>.<entity>` | `sensitive.medisch.diagnose` |
-
-Domein-codes: `ww`, `wia`, `wajong`, `crm`, `fez`, `polisadm`, `smz`.
-
-## dbt-models
-
-```
-<layer>_<domain>_<entity>.sql
-```
-
-Voorbeelden:
-
-- `stg_claim_application.sql` — staging-laag
-- `int_wia_funnel_daily.sql` — intermediate
-- `mart_uc01_claims_funnel_daily.sql` — mart (gold)
-
-## Kafka-topics
-
-```
-uwv.<domain>.<event>
-```
-
-Voorbeelden:
-
-- `claims.application`
-- `<domain>.wia.beoordeling`
-- `<domain>.ww.claim payout`
-
-## DNS
-
-```
-<service>.odap.local
-```
-
-Voor lokale k3d-clusters. In AKS-deploys (`example.com`)
-rewrite de portal client-side; zie
-[`portal/src/layouts/Layout.astro`](https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/portal/src/layouts/Layout.astro).
-
-## OpenMetadata services
-
-| Service-naam | Inhoud |
-|---|---|
-| `trino-prod` | Trino-instance met alle catalogs (bronze/silver/gold/sensitive/sandbox) |
-| `dbt` | dbt-project (lineage + tests) |
-| `superset-prod` | Superset BI (dashboards) |
-| `airflow` | Airflow (pipeline-runs) |
-| `kafka` | Kafka (event-topics + schemas) |
+Domains use stable lowercase values: `data`, `cloud`, `sap`, `ai`, `software`, `security`. Unknown facts remain null or explicit unknown categories as documented; they must not be inferred from unrelated vacancies.

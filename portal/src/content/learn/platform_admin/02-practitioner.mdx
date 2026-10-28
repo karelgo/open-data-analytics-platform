@@ -1,148 +1,41 @@
 ---
-title: "Een nieuwe rol uitrollen: Keycloak-group → OPA → bundle-reload → smoke-test"
-role: platform_admin
-level: practitioner
-order: 2
-duration: "90 min"
-summary: "Een verzoek for a nieuwe rol `dq_inspector` (read-only DQ-rapportages) in production krijgen, zonder dat business-rollen verstoring zien."
-prereqs:
-  - "platform_admin/foundation/1"
-labs:
-  - title: "Keycloak admin"
-    href: "/go/keycloak/"
-  - title: "OPA-policies in vscode.dev"
-    href: "/go/openmetadata/"
-    vscodePath: "opa-policies-src"
-  - title: "Smoke-tests in vscode.dev"
-    href: "/dbt-docs/"
-    vscodePath: "tests/smoke"
-  - title: "Prometheus — bundle-reload events"
-    href: "/go/prometheus/"
-checks:
-  - id: "admin_practitioner_role"
-    title: "Nieuwe rol werkend, smoke-test groen, audit-log compleet"
-quiz:
-  - q: "In welke volgorde rol je een nieuwe rol uit?"
-    options:
-      - "OPA → smoke → Keycloak"
-      - "1) PR met role-mapping + tests → 2) merge → 3) bundle-reload → 4) Keycloak group + test-user → 5) smoke-test als test-user → 6) communicatie aan data-steward"
-      - "Direct in Keycloak"
-      - "Zonder smoke-test"
-    correct: 1
-  - q: "Test-user for the nieuwe rol — waarom is die belangrijk?"
-    options:
-      - "Niet"
-      - "Smoke-test draait als die test-user; je weet of de rol *werkt* op een echte query, niet alleen of de YAML klopt"
-      - "Voor cosmetisch effect"
-      - "Wegens ISO 27001 / ISO 27002"
-    correct: 1
-  - q: "Bundle-reload faalt — wat doe je niet?"
-    options:
-      - "Logs lezen"
-      - "Wijziging revert in een nieuwe commit, niet in een force-push naar main; auditspoor moet kloppen"
-      - "Roll-back via aparte PR"
-      - "Smoke-test re-runnen"
-    correct: 1
+{
+  "title": "Trace a vacancy through the platform",
+  "role": "platform_admin",
+  "level": "practitioner",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Operate service health, identity and authorization for the daily pipeline.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-Hands-on. Een data-steward vraagt een nieuwe rol `dq_inspector`: read-only
-access tot DQ-overzichten, geen cliënt-PII. Klinkt simpel — maar als je
-het verkeerd uitrolt zie je het pas op production.
+Open the Superset job-market dashboard and the `mart_job_inventory` dataset. Follow the dataset in OpenMetadata to the Silver deduplication model and Bronze observations. Read the dated extraction manifest before comparing counts across days.
 
-## Stap 1 — role-mapping ontwerpen
+In Jupyter, run `00_dutch_it_job_market.ipynb`. The offline section reads SQLite; the platform section queries Trino under your assigned identity. Use only the layers authorized to your role.
 
-Open
-[role_mappings.json](https://vscode.dev/github.com/UWV/UDP_Stackable/blob/main/opa-policies-src/data/role_mappings.json)
-in vscode.dev. Voeg toe:
-
-```json
-"dq_inspector": {
-  "catalogs": ["openmetadata", "gold"],
-  "schemas": ["dq", "uc01_claims_funnel", "uc06_cost_forecast"],
-  "purposes": ["dq_review"],
-  "can_see_pii": false,
-  "can_see_medical": false,
-  "can_see_bankrekening": false,
-  "regio_filter": false,
-  "break_glass": false,
-  "_role_purpose": "Read-only DQ-rapportages voor data-stewards-in-opleiding."
-}
-```
-
-## Stap 2 — Rego-test
-
-In `opa-policies-src/trino/policy_test.rego` voeg je toe:
-
-```rego
-test_dq_inspector_no_pii {
-  not allow_select with input as {
-    "user": "dq.test", "groups": ["dq_inspector"],
-    "resource": "silver.claims.application.bsn"
-  }
-}
-
-test_dq_inspector_can_dq {
-  allow_select with input as {
-    "user": "dq.test", "groups": ["dq_inspector"],
-    "resource": "openmetadata.dq.test_results"
-  }
-}
-```
-
-`make opa-test`. Groen voor je gaat verder.
-
-## Stap 3 — PR aanmaken & laten reviewen
-
-Reviewers: data-steward (intentie) + tweede platform-admin (technisch).
-Geen self-merge. Bewust: de OPA-policy raakt iedereen — dus 4-eyes.
-
-## Stap 4 — Merge → bundle-reload
-
-Na merge:
-
-```bash
-make opa-bundle-reload
-# Checkt: alle Trino-coordinators picken nieuwe bundle binnen 30s
-```
-
-Verifieer in [Prometheus](/go/prometheus/): `opa_bundle_loaded_timestamp`
-moet hoger staan dan vóór de reload, op alle replicas.
-
-## Stap 5 — Keycloak group + test-user
-
-In [Keycloak](/go/keycloak/) → realm `odap` → Groups → "dq_inspector"
-aanmaken. Daarna een test-user `dq.test` met deze group.
-
-> Test-user is geen permanente account. Doel: de rol werkend bewijzen op een
-> echte applicatie, niet alleen in de YAML.
-
-## Stap 6 — Smoke-test als test-user
-
-```bash
-KEYCLOAK_USER=dq.test make test SUITE=role-smoke ROLE=dq_inspector
-```
-
-Dit draait een set queries:
-
-- access tot `gold.dq.*` — moet werken;
-- access tot `silver.claims.application.bsn` — moet 0 rijen geven;
-- access tot `sensitive.eligibility_cases.*` — moet 0 rijen geven.
-
-Alle drie groen? Verder. Een falend signaal? Revert (zie volgende stap).
-
-## Stap 7 — Communicatie
-
-E-mail data-steward: "Rol uitgerold, smoke-test groen, test-user
-`dq.test` actief tot maandag voor jullie eigen validatie. Production-users
-toevoegen als jullie tevreden zijn."
-
-## Wat als bundle-reload faalt?
-
-Niet panicken. Niet in production debuggen. Revert via een nieuwe commit
-(geen force-push); audit-spoor moet kloppen. Research de fout in een
-worktree. Het oude bundle blijft actief, dus je users merken niets.
-
-## Verificatie
-
-De auto-check valideert dat de role-smoke-test groen is voor `dq_inspector`
-en dat de bundle-reload op alle replica's is doorgekomen.
+[Continue in the job-market explorer](/job-market/).

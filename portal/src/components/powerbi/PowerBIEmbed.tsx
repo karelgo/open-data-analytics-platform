@@ -11,8 +11,8 @@
     4. Handle loading + error states; auto-refresh token bij expiry.
 
   State-persistence: gekozen report-ID leeft in URL ?report=<id> én
-  localStorage (`udp-portal:powerbi:lastReportId`) zodat refresh hetzelfde
-  rapport opent. URL wint van localStorage wint van de UC-12 default.
+  localStorage (`odap-portal:powerbi:selectedReportId`) zodat refresh hetzelfde
+  rapport opent. URL wint van localStorage wint van de explicit selection.
 
   Identity-toggle: ?identity=on triggert {effectiveIdentity:true} in de
   embed-token-mint, zodat RLS-rules op USERNAME() de gefedereerde
@@ -56,10 +56,9 @@ interface ReportsResponse {
   reports:      ReportInfo[];
 }
 
-// UC-12 FOCUS FinOps dashboard — gedeployed in Phase 1 van het Power BI plan.
-// Wordt als ultieme fallback gebruikt als de reports-lijst leeg of onbereikbaar is.
-const DEFAULT_REPORT_ID  = "3f508254-867b-4b58-9c7d-ebafb0947df2";
-const LAST_REPORT_LS_KEY = "udp-portal:powerbi:lastReportId";
+// Optional integration: an operator/user must explicitly choose a report.
+const DEFAULT_REPORT_ID = "";
+const LAST_REPORT_LS_KEY = "odap-portal:powerbi:selectedReportId";
 
 
 // ─── Backend helpers ──────────────────────────────────────────────────
@@ -115,7 +114,7 @@ function rememberLastReport(id: string): void {
 
 
 export default function PowerBIEmbed({ reportId: propReportId, pageName }: Props): JSX.Element {
-  // Initiële report-keuze: prop → URL → localStorage → UC-12 default.
+  // Initiële report-keuze: prop → URL → localStorage → explicit selection.
   const initialReportId = useMemo<string>(
     () => propReportId ?? urlParam("report") ?? storedLastReport() ?? DEFAULT_REPORT_ID,
     [propReportId],
@@ -143,7 +142,7 @@ export default function PowerBIEmbed({ reportId: propReportId, pageName }: Props
         // Als de geselecteerde report-ID niet in de lijst zit, fallback
         // to the eerste; behoudt geen "ghost" selectie na een delete.
         if (r.reports.length > 0 && !r.reports.some((x) => x.id === selectedReportId)) {
-          setSelectedId(r.reports[0].id);
+          setSelectedId("");
         }
       })
       .catch((e) => { if (!cancelled) setReportsErr(String(e?.message ?? e)); });
@@ -165,6 +164,7 @@ export default function PowerBIEmbed({ reportId: propReportId, pageName }: Props
     let cancelled = false;
     setCfg(null);
     setErr(null);
+    if (!selectedReportId) return;
     fetchEmbedConfig(selectedReportId, identityMode)
       .then((c) => { if (!cancelled) setCfg(c); })
       .catch((e) => { if (!cancelled) setErr(String(e?.message ?? e)); });
@@ -220,7 +220,9 @@ export default function PowerBIEmbed({ reportId: propReportId, pageName }: Props
         onIdentityToggle={onIdentityToggle}
       />
       <div className="pbi-wrap">
-        {err ? (
+        {!selectedReportId ? (
+          <div className="pbi-loading"><p>Power BI is optional. Choose a configured job-market report, or <a href="/job-market/">open the Dutch IT job-market explorer</a>.</p></div>
+        ) : err ? (
           <PowerBIErrorPanel err={err} reportId={selectedReportId} />
         ) : !cfg ? (
           <div className="pbi-loading" aria-live="polite">
@@ -328,7 +330,7 @@ function PowerBIErrorPanel({ err, reportId }: { err: string; reportId: string })
       <p>
         Controleer dat je bent ingelogd via Entra (Keycloak-broker), en dat
         de portal-backend de FABRIC_* env-vars heeft. Zie{" "}
-        <code>docs/use-cases/powerbi-embed-aks-entra.md</code>.
+        <code>docs/use-cases/dutch-it-job-market.md</code>.
       </p>
       <a
         className="pbi-fallback-link"

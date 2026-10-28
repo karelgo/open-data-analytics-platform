@@ -1,107 +1,41 @@
 ---
-title: "Inzage-verzoek van een cliënt afhandelen — UC-10"
-role: marketing_analyst
-level: expert
-order: 3
-duration: "60 min"
-summary: "Een cliënt vraagt zijn data-export aan op grond van AVG art. 15. Jij start de UC-10-flow correct, with the juiste reikwijdte en terugkoppeling."
-prereqs:
-  - "marketing_analyst/practitioner/2"
-labs:
-  - title: "Customer 360 — inzage-aanvraag starten"
-    href: "/go/superset/"
-  - title: "UC-10 documentation in OpenMetadata"
-    href: "/go/openmetadata/"
-checks:
-  - id: "crm_expert_inzage"
-    title: "Inzage-verzoek correct ingediend met scope + auth"
-quiz:
-  - q: "Cliënt belt voor inzage-verzoek. Welke verificatie doe je?"
-    options:
-      - "Niets, accepteren op naam"
-      - "Sterke verificatie: BSN + birth_date + minimaal twee andere kenmerken (laatste werkgever, dossier-jaar) — anders schriftelijk verzoek met DigiD-bevestiging"
-      - "Alleen naam"
-      - "Op het oog goed"
-    correct: 1
-  - q: "Wat is de juiste scope for a AVG art. 15-verzoek?"
-    options:
-      - "Alle data over deze cliënt — UC-10-flow zorgt dat ALLES uit alle systemen wordt aggregeerd in één leverbaar pakket"
-      - "Alleen wat in Customer 360 zit"
-      - "Alleen recente data"
-      - "Alleen voornaam"
-    correct: 0
-  - q: "Hoeveel tijd heb je formeel?"
-    options:
-      - "Geen termijn"
-      - "Maximaal één maand (verlengbaar tot 3 met onderbouwing); start de UC-10-flow zsm zodat de aggregatie loopt en je tijd hebt voor review"
-      - "Een week"
-      - "Een dag"
-    correct: 1
-certifies: true
+{
+  "title": "Review evidence and source coverage",
+  "role": "marketing_analyst",
+  "level": "expert",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Explain a result with definitions, limitations and reproducible evidence.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-In deze module behandel je één AVG art. 15 inzage-verzoek volledig. Doel:
-het volledige UC-10 proces onder je vingers — incl. de stap waar de
-meeste medewerkers vergissen: scope.
+Prepare a short analysis comparing two daily snapshots. Include the source set and extraction status, distinct vacancy denominator, overlapping domains and salary coverage. Explain whether any observed change could come from missing sources or page limits.
 
-## Casus
+Engineers can rerun a date and verify that its partition remains unique. Stewards review lineage and classifications. Analysts verify that estimates, hourly rates and unknown values are treated according to the dictionary.
 
-Mw J. Pietersen belt: "Ik wil graag alles weten dat UWV over mij heeft."
-
-## Stap 1 — verifiëren
-
-Niet for the zwakke zenuwen: dit moet écht waterdicht. Je hebt nodig:
-
-- BSN + birth_date (basis);
-- twee aanvullende kenmerken die niet uit publieke bron te raden zijn
-  (bijv. laatste werkgever-naam, jaar laatste WW-aanvraag);
-- als je twijfelt: schriftelijk verzoek vragen met DigiD-bevestiging.
-
-Een onterecht inzage-uitvoeren is een datalek. Liever 5 minuten extra
-verificatie.
-
-## Stap 2 — UC-10 starten
-
-Op het profiel klik je "Inzage-verzoek (AVG art. 15)". Vul:
-
-- gevraagde reikwijdte = `volledig` (default voor art. 15);
-- aanvraag-bron = `telefoon, geverifieerd op [datum]`;
-- doelteam = `juridische zaken / privacy-officer`.
-
-UC-10 starts een Airflow-flow die uit alle bronnen aggregeert: silver +
-sensitive (gepseudonimiseerd voor jou tijdens review) + audit-log van wie
-wat zag in welke periode.
-
-## Stap 3 — termijn beheersen
-
-Formeel max 1 maand, verlengbaar tot 3 met onderbouwing. Praktisch:
-
-- Dag 0–1: aggregatie loopt;
-- Dag 1–7: privacy-officer reviewt op leverbaarheid (bv welke data niet
-  geleverd kan zijn vanwege rechten van derden);
-- Dag 7–14: pakket gereed, naar cliënt;
-- Dag 14–28: buffer voor onverwachte issues.
-
-Niet de laatste week starten.
-
-## Stap 4 — terugkoppeling
-
-Bij oplevering belt of mailt het privacy-team de cliënt. Jij hoort daar
-later van — geen actie meer voor jou, behalve evt. follow-up als de
-cliënt vragen heeft.
-
-## Speciaal: niet alles is leverbaar
-
-Sommige velden komen van derden (BRP, polisadm) en behouden hun eigen
-geheimhoudingsregime. UC-10 markeert die expliciet in het pakket: "Niet
-geleverd, reden: [rechtsgrond]". Cliënt heeft daar dan de juiste
-vervolgstap (bij de bronhouder).
-
-## Verificatie
-
-De auto-check controleert dat het verzoek is ingediend met scope
-`volledig`, met geverifieerde authenticatie-stap, en dat de
-Airflow-flow `uc10_inzage_export` is gestart.
-
-> Bij voltooiing van deze module krijg je het Academy-certificaat
-> **Marketing Analyst**.
+[Continue in the job-market explorer](/job-market/).

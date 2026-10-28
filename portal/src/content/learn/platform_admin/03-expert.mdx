@@ -1,161 +1,41 @@
 ---
-title: "Major upgrade van Stackable zonder data-verlies"
-role: platform_admin
-level: expert
-order: 3
-duration: "3 uur"
-summary: "Stackable Data Platform 26.3 → 27.x: voorbereiding, dry-run, rolling upgrade, recovery-plan en communicatie. Inclusief: wat je niet doet."
-prereqs:
-  - "platform_admin/practitioner/2"
-labs:
-  - title: "Stackable release notes in vscode.dev"
-    href: "/dbt-docs/"
-    vscodePath: "infrastructure"
-  - title: "Runbook openen"
-    href: "/dbt-docs/"
-    vscodePath: "docs/runbook.md"
-  - title: "Prometheus — pre/post upgrade metrics"
-    href: "/go/prometheus/"
-checks:
-  - id: "admin_expert_upgrade"
-    title: "Upgrade-plan opgeleverd, dry-run gedraaid, smoke-test groen"
-quiz:
-  - q: "Eerste actie voordat je begint?"
-    options:
-      - "Upgrade starten"
-      - "Compatibiliteits-matrix tussen Stackable-versies, hun afhankelijke service-versies (NiFi, Spark) en jouw gebruikte features lezen — én de release notes lezen"
-      - "DB drop"
-      - "Naar bed"
-    correct: 1
-  - q: "Welke service kan je *niet* in-place upgraden zonder data-overweging?"
-    options:
-      - "NiFi (state in flowfile-repo)"
-      - "Spark"
-      - "Trino"
-      - "Airflow"
-    correct: 0
-  - q: "Wat is het verschil tussen ‘dry-run’ en ‘rollende upgrade’?"
-    options:
-      - "Geen"
-      - "Dry-run: toepassen op een tijdelijk identiek cluster (k3d-clone) om verschillen te zien; rollende upgrade: één service tegelijk in production, met smoke-test ertussen, met rollback-plan klaar"
-      - "Rollende = sneller"
-      - "Dry-run = met sudo"
-    correct: 1
-certifies: true
+{
+  "title": "Review evidence and source coverage",
+  "role": "platform_admin",
+  "level": "expert",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Explain a result with definitions, limitations and reproducible evidence.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-In deze module bereid je een major Stackable-upgrade voor. Dit is geen
-zaterdagavond-actie maar een traject van weken. Doel: het volledige denken
-erom — voorbereiding, dry-run, rollende upgrade, communicatie.
+Prepare a short analysis comparing two daily snapshots. Include the source set and extraction status, distinct vacancy denominator, overlapping domains and salary coverage. Explain whether any observed change could come from missing sources or page limits.
 
-## Stap 1 — compatibiliteits-matrix lezen
+Engineers can rerun a date and verify that its partition remains unique. Stewards review lineage and classifications. Analysts verify that estimates, hourly rates and unknown values are treated according to the dictionary.
 
-Open de release-notes van Stackable 27.x. Zoek expliciet:
-
-- breaking changes in CRD-versies (bv `nifi.stackable.tech/v1alpha2`);
-- nieuwe minimum K8s-versie;
-- gewijzigde default-storage classes;
-- ingrijpende wijzigingen in OPA-bundle-distributie.
-
-Maak een tabel:
-
-| Service | Huidige | Doel | Breaking? | Migratie-stap |
-|---|---|---|---|---|
-| NiFi | 1.27 | 1.28 | nee | none |
-| Spark | 3.5.1 | 3.5.4 | nee | none |
-| Trino | 470 | 478 | yes (catalog YAML) | catalog-yaml-format |
-| Airflow | 2.10 | 2.10.4 | nee | none |
-| OpenMetadata | 1.5 | 1.6 | yes (DB-migratie) | run migration |
-
-## Stap 2 — dry-run op k3d
-
-Maak een lokaal k3d cluster, restore de production-state met
-synthetische data, voer de upgrade uit. Documenteer alle hand-acties.
-
-```bash
-make cluster CLUSTER=upgrade-test
-make bootstrap
-make seed
-make upgrade STACKABLE=27.0.0      # nieuw target
-make test SUITE=full
-```
-
-Falen verwacht — dat is precies waarom je dry-runt.
-
-## Stap 3 — production-plan
-
-```markdown
-# Upgrade Stackable 26.3 → 27.0 — plan
-
-## Pre
-- Bevroren window: za 21:00 — zo 03:00.
-- Backup: MinIO bucket-versies, Hive Metastore Postgres dump,
-  OpenMetadata Postgres dump, Keycloak realm export.
-- Communicatie: e-mail naar alle business-rollen 1 week van te voren;
-  herinnering 24u; live updates op #data-platform Slack.
-
-## Volgorde (rolling)
-1. ZooKeeper      — 21:00 (10 min, kort uitval coordination)
-2. Hive Metastore — 21:15 (15 min, Postgres-migratie)
-3. Trino          — 21:35 (catalog-yaml refactor) ← spannend
-4. Spark/Airflow  — 22:00 (geen runs in window; check om 22:30)
-5. NiFi           — 22:45 (flowfile-repo migration; 30 min)
-6. Kafka          — 23:30 (rolling broker)
-7. Superset       — 00:00 (re-deploy)
-8. OpenMetadata   — 00:30 (DB-migratie) ← spannend
-9. Smoke-test     — 01:00
-10. Communicatie  — 01:30: alles groen of rollback
-
-## Per-service smoke
-Na elke stap: minste 1 bevestigende query als `dq_inspector` test-user.
-
-## Rollback
-- Tot stap 4 (NiFi): Stackable-release-pin terug + manifests reapply.
-- Vanaf stap 5: Postgres-restore + flowfile-repo restore;
-  data-loss-risico van het geblokte window. Communicatie met data-steward.
-
-## Post
-- 24h monitoring: Prometheus alerts, OpenSearch error-log volume.
-- Postmortem onafhankelijk van uitkomst (ook bij succes leerpunten).
-```
-
-## Stap 4 — communicatie
-
-Een korte e-mail aan alle rollen, helder en concreet:
-
-```
-Onderwerp: data-platform onderhoud zaterdag 23-09 21:00 — 03:00
-
-We voeren onderhoud uit on the data-platform. Tijdens dit venster:
-- Dashboards in Superset zijn niet bereikbaar.
-- Trino, NiFi, Airflow zijn niet bereikbaar.
-- Lopende dbt-runs en streaming pauzeren.
-- Geen data-loss; achtergebleven processing pakt op zondag automatisch op.
-
-Bij vragen tijdens het venster: niet bellen. Live updates op
-#data-platform-Slack-channel.
-
-Maandag 06:00 staat alles op nieuwe versie. Verwachte users-impact:
-nul (UI ongewijzigd; achterliggend nieuwer).
-
-Met vriendelijke groet,
-Platform team
-```
-
-## Wat je niet doet
-
-- Niet upgraden zonder dry-run.
-- Niet alle services tegelijk.
-- Niet zonder backup.
-- Niet zonder rollback-plan dat is *getest*.
-- Niet "ach, het komt wel goed" — zorg for a tweede admin als
-  4-eyes-aanwezigheid tijdens kritieke stappen (Trino, OpenMetadata).
-
-## Verificatie
-
-De auto-check valideert dat een upgrade-plan-document bestaat in
-`docs/runbook/upgrades/`, dat een dry-run-cluster bestaat (k3d label) en
-dat een rollback-script aanwezig is.
-
-> Bij voltooiing van deze module krijg je het Academy-certificaat
-> **Platform-admin**.
+[Continue in the job-market explorer](/job-market/).

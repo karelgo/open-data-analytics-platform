@@ -6,8 +6,8 @@
 #
 # Stappen (afhankelijk van `flow` input):
 #   - smoke       — make aks-smoke (12 tests, ~5 min)
-#   - uc11        — bash tests/e2e/uc11-flow.sh (UC-11 gold-pad, ~10 min)
-#   - both        — smoke + uc11 (default, ~15 min)
+#   - job-market        — bash tests/e2e/job-market-flow.sh (Job-market gold-pad, ~10 min)
+#   - both        — smoke + job-market (default, ~15 min)
 #
 # Manual-only — geen auto-trigger. Draai via Actions-tab → "aks-e2e".
 #
@@ -24,10 +24,10 @@ on:
         type: choice
         options:
           - smoke
-          - uc11
+          - job-market
           - both
 
-# Eén AKS-e2e tegelijk — uc11 muteert dbt-state en zou interfereren met
+# Eén AKS-e2e tegelijk — job-market muteert dbt-state en zou interfereren met
 # parallelle runs. Niet cancellen, queue liever.
 concurrency:
   group: aks-e2e
@@ -54,7 +54,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dbt-trino (voor smoke 04 + uc11 dbt-parse)
+      - name: Install dbt-trino (voor smoke 04 + job-market dbt-parse)
         run: pip install --quiet 'dbt-core>=1.10' 'dbt-trino>=1.9' pyyaml
 
       - name: Install OPA CLI
@@ -89,12 +89,12 @@ jobs:
         if: ${{ inputs.flow == 'smoke' || inputs.flow == 'both' }}
         run: make aks-smoke
 
-      - name: UC-11 e2e (tests/e2e/uc11-flow.sh)
-        if: ${{ inputs.flow == 'uc11' || inputs.flow == 'both' }}
+      - name: Job-market e2e (tests/e2e/job-market-flow.sh)
+        if: ${{ inputs.flow == 'job-market' || inputs.flow == 'both' }}
         env:
           DEPLOYMENT_MODE: aks
           PLATFORM_DOMAIN: example.com
-        run: bash tests/e2e/uc11-flow.sh
+        run: bash tests/e2e/job-market-flow.sh
 
       - name: Dump pod-status bij failure
         if: failure()

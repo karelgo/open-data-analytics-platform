@@ -104,3 +104,10 @@ scripts/azure/env.sh
 .venv-docs/
 .docs_gen_debug.json
 infrastructure/stackit/terraform/terraform.tfstate.*.backup
+
+# Job-market extracts include licensed source payloads; regenerate locally.
+examples/dutch-it-jobs/output/
+examples/dutch-it-jobs/output-live/
+.venv-jobs/
+
+infrastructure/job-market/.user.yml

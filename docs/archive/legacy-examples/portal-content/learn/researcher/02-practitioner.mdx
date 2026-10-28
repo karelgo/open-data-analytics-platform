@@ -1,0 +1,155 @@
+---
+title: "Mini-onderzoek: vraag → sandbox → notebook → k-check → rapport"
+role: researcher
+level: practitioner
+order: 2
+duration: "90 min"
+summary: "Eén kort reproduceerbaar onderzoekje doorlopen on the sandbox-zone — incl. k-anonimiteit-check on the output en een notebook in vscode.dev."
+prereqs:
+  - "researcher/foundation/1"
+labs:
+  - title: "Trino — sandbox-zone openen"
+    href: "/go/trino/"
+  - title: "Open notebook-template in vscode.dev"
+    hint: "Reproduceerbare structuur met dbt-versie + datum-filter"
+    href: "/dbt-docs/"
+    vscodePath: "spark-jobs/lib"
+  - title: "OpenMetadata — bias-rapport UC-09"
+    href: "/go/openmetadata/"
+checks:
+  - id: "researcher_practitioner_kcheck"
+    title: "k-anonimiteit-check uitgevoerd op output"
+quiz:
+  - q: "Je groepeert je dataset op (regio × leeftijdsklasse × claim payoutsoort) en ziet één groep met n=3. Wat doe je?"
+    options:
+      - "Negeren — n=3 is genoeg"
+      - "Combineer leeftijdsklasses (bv 35-44 + 45-54) tot een grovere groep, of laat de groep weg from the rapport — nooit publiceren onder k=10"
+      - "Een ander onderzoek doen"
+      - "Pseudonimisering uitschakelen"
+    correct: 1
+  - q: "Wat is de verplichte vermelding in een onderzoeksrapport over reproduceerbaarheid?"
+    options:
+      - "Alleen titel"
+      - "Tabelnamen, dbt-model-commit/-tag, datum-filter (bv `as_of_date='2025-09-01'`), pseudonimisering-versie, k-check-resultaat"
+      - "Alleen datum"
+      - "Niets, lezer ziet het in de query"
+    correct: 1
+  - q: "Je notebook gebruikt `current_date` in plaats van een vast datum-filter. Wat is het probleem?"
+    options:
+      - "Niets, gemak"
+      - "Niet-reproduceerbaar: een herhaalde run levert een ander resultaat omdat de dataset is gegroeid; voor publicatie altijd vast datum-filter zetten"
+      - "Te traag"
+      - "Te snel"
+    correct: 1
+---
+
+In deze module doorloop je één compleet, reproduceerbaar mini-onderzoek.
+Doel: het volledige patroon onder je vingers — niet de inhoud, maar de
+discipline.
+
+## Researchsvraag
+
+> Is er een verschil in reintegration-uitkomst tussen cliënten met
+> claim payoutsoort A en B in de leeftijdsklasse 35–54 (geanonimiseerd)?
+
+## Stap 1 — sandbox query
+
+Open [Trino](/go/trino/) en draai:
+
+```sql
+-- ETHICS-2025-103 (onderzoek) — onderzoeksvraag goedgekeurd in commitee
+WITH cohort AS (
+    SELECT
+        pseudo_id,
+        regio_klasse,
+        leeftijdsklasse,
+        claim payoutsoort,
+        re_integratie_uitkomst
+    FROM sandbox.research.cohort_2025
+    WHERE leeftijdsklasse IN ('35-44', '45-54')
+      AND claim payoutsoort  IN ('A', 'B')
+      AND as_of_date = DATE '2025-09-01'   -- vast datum-filter
+)
+SELECT
+    leeftijdsklasse,
+    claim payoutsoort,
+    COUNT(*)                                 AS n,
+    AVG(CASE WHEN re_integratie_uitkomst='positief' THEN 1.0 ELSE 0.0 END) AS positief_pct
+FROM cohort
+GROUP BY 1, 2
+ORDER BY 1, 2;
+```
+
+Twee dingen om op te merken: `pseudo_id` (geen BSN), en
+`as_of_date='2025-09-01'` (geen `current_date`).
+
+## Stap 2 — k-check
+
+Voor publicatie controleer je elke groep op n ≥ 10:
+
+| leeftijdsklasse | claim payoutsoort | n | check |
+|---|---|---|---|
+| 35-44 | A | 1247 | ok |
+| 35-44 | B | 38 | ok |
+| 45-54 | A | 853 | ok |
+| 45-54 | B | 8 | **fail** |
+
+Eén groep heeft n=8. Twee opties:
+
+- **Combineren** (35–54 als één klasse), of
+- **Weglaten** (in tekst noemen dat de groep niet rapporteerbaar was).
+
+Voor dit onderzoek combineren we — verder breekt de vergelijking.
+
+## Stap 3 — notebook
+
+Open de [notebook-template in vscode.dev](https://vscode.dev/) en zet
+de query erin als reproduceerbaar Python-blok:
+
+```python
+import pandas as pd
+from trino.dbapi import connect
+
+QUERY = """..."""   # zoals hierboven, met as_of_date hard
+df = pd.read_sql(QUERY, connect(host='trino', port=8443))
+df_combined = df.groupby('claim payoutsoort').agg(
+    n=('n', 'sum'),
+    positief_pct=('positief_pct', 'mean'),  # gewogen kan beter — exercise
+)
+assert (df_combined['n'] >= 10).all(), 'k-anonimiteit gebroken'
+print(df_combined)
+```
+
+Geen credentials hardcoded — gebruik `KEYCLOAK_*` env vars uit de
+devcontainer.
+
+## Stap 4 — mini-rapport
+
+```
+SUBJECT: Reintegration uitkomst per claim payoutsoort, 35-54 jaar
+(reproduceerbaar)
+
+Bron:
+  sandbox.research.cohort_2025
+  dbt-tag: research_2025_q3
+  as_of_date: 2025-09-01
+  pseudonimisering: pseudo-v3
+
+k-check: alle groepen ≥ 10 (na combineren 35-44 en 45-54).
+
+Resultaat:
+  claim payoutsoort A: positief 64% (n=2100)
+  claim payoutsoort B: positief 51% (n=46)
+Verschil: 13 procentpunt, statistische significantie te toetsen.
+
+Caveats:
+- Klein cohort B; herhalen op grotere dataset aanbevolen.
+- Combinatie van leeftijdsklasses ivm k-anonimiteit; verlies van
+  granulariteit.
+```
+
+## Verificatie
+
+De auto-check controleert dat je query een vast `as_of_date` heeft, dat
+de k-check aantoonbaar is uitgevoerd, en dat het rapport dbt-tag +
+pseudonimisering-versie noemt.

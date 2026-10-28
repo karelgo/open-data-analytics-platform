@@ -23,15 +23,7 @@ resources:
 configMapGenerator:
   - name: jupyter-starter-notebooks
     files:
-      - starter-notebooks/00_welcome.ipynb
-      - starter-notebooks/01_trino_quickstart.ipynb
-      - starter-notebooks/02_layered_query_bronze_silver_gold.ipynb
-      - starter-notebooks/03_delta_direct_with_deltalake.ipynb
-      - starter-notebooks/04_minio_browse.ipynb
-      - starter-notebooks/05_openmetadata_catalog.ipynb
-      - starter-notebooks/06_git_workflow.ipynb
-      - starter-notebooks/07_minio_regression.ipynb
-      - starter-notebooks/08_trino_uc11_customer_journey.ipynb
+      - starter-notebooks/00_dutch_it_job_market.ipynb
     options:
       disableNameSuffixHash: true
 

@@ -25,12 +25,7 @@ python3 "$ROOT/scripts/render-trino-catalogs.py"
 # load-restrictor=None, dus we kopieren naar platform/08-spark/scripts/.
 log "Syncing spark-jobs/ -> platform/08-spark/scripts/"
 mkdir -p "$ROOT/platform/08-spark/scripts"
-cp "$ROOT/spark-jobs/streaming_files_to_lakehouse.py" "$ROOT/platform/08-spark/scripts/"
-cp "$ROOT/spark-jobs/lib/lakehouse_io.py"             "$ROOT/platform/08-spark/scripts/"
-# WIA bronze→silver→gold demo (parallel-Spark-pad naast dbt).
-cp "$ROOT/spark-jobs/seed_bronze_claims.py"              "$ROOT/platform/08-spark/scripts/"
-cp "$ROOT/spark-jobs/batch_silver_claims.py"             "$ROOT/platform/08-spark/scripts/"
-cp "$ROOT/spark-jobs/batch_gold_claims.py"               "$ROOT/platform/08-spark/scripts/"
+cp "$ROOT/spark-jobs/job_market_bronze.py" "$ROOT/platform/08-spark/scripts/"
 
 # Bootstrap dev-placeholder secrets for layers that need them. Same pattern
 # as the om-bridge target in the Makefile: only generate if missing, so a
@@ -74,7 +69,7 @@ LAYERS=(
   "platform/01-secrets"
   "platform/02-authentication"
   "platform/03-storage"
-  # 04-zookeeper, 06-kafka, 07-nifi disabled — UC11 leest uit s3a://odap-raw/
+  # Job postings use daily bounded batch extracts; Kafka and NiFi are optional infrastructure.
   "platform/05-hive-metastore"
   "platform/08-spark"
   "platform/09-trino"
@@ -104,23 +99,6 @@ for layer in "${LAYERS[@]}"; do
   if [[ ! -d "$ROOT/$layer" ]]; then
     log "$layer — leeg, skip (wordt in latere fase ingevuld)"
     continue
-  fi
-
-  # platform/11-airflow contains the dbt-manifest-render Job, whose
-  # git-sync initContainer reads GITSYNC_REPO from ConfigMap odap-repo-url
-  # (optional key). Without it, git-sync exits "required flag: --repo"
-  # and the Job fails — noisy and confusing, even though the same
-  # manifest gets seeded later via the Docker-based renderer below.
-  # Seed the ConfigMap from `git remote get-url origin` so the Job runs
-  # to completion. Skip silently if git or the remote is missing.
-  if [[ "$layer" == "platform/11-airflow" ]]; then
-    repo_url="$(git -C "$ROOT" remote get-url origin 2>/dev/null || true)"
-    if [[ -n "$repo_url" ]]; then
-      kubectl -n odap-platform create configmap odap-repo-url \
-        --from-literal=url="$repo_url" \
-        --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-      log "  odap-repo-url ConfigMap geseed met ${repo_url} (voor dbt-manifest-render Job)"
-    fi
   fi
 
   # Prefer mode-specific overlay; fall back to flat layout for components
@@ -374,67 +352,9 @@ else
   printf '\033[1;33m!!\033[0m OpenMetadata deployment niet Ready binnen 5m — JWT-seed overgeslagen\n'
 fi
 
-log "dbt-manifest ConfigMap renderen via odap/dbt-trino:1.9.0"
-if docker image inspect odap/dbt-trino:1.9.0 >/dev/null 2>&1; then
-  TMP=$(mktemp -d)
-  docker run --rm -v "$TMP:/out" --entrypoint sh odap/dbt-trino:1.9.0 -c '
-    cd /opt/odap/dbt
-    cp profiles.yml.template profiles.yml 2>/dev/null || true
-    DBT_PROFILES_DIR=/opt/odap/dbt \
-    TRINO_HOST=placeholder TRINO_PORT=8443 \
-    TRINO_USER=placeholder TRINO_PASSWORD=placeholder \
-    TABLE_FORMAT=delta \
-    dbt parse --target dev >/tmp/dbt.log 2>&1 || cat /tmp/dbt.log >&2
-    cp target/manifest.json /out/manifest.json 2>/dev/null || true
-    # NB: --exclude pattern moet `./<naam>` zijn (niet kale `<naam>`) en
-    # vóór de bron staan. .venv (~107MB) sluipt anders mee uit nieuwere
-    # dbt-images en blaast de tarball about the 3MB etcd-record-limiet.
-    tar -czf /out/dbt-project.tar.gz \
-      --exclude=./target --exclude=./logs --exclude=./dbt_packages \
-      --exclude=./.venv --exclude=./.user.yml --exclude=./.dockerignore \
-      . 2>/dev/null
-  ' 2>&1 | tail -3 || true
-  if [[ -s "$TMP/manifest.json" ]]; then
-    gzip -f -c "$TMP/manifest.json" > "$TMP/manifest.json.gz"
-    kubectl -n odap-platform create configmap dbt-manifest \
-      --from-file=manifest.json.gz="$TMP/manifest.json.gz" \
-      --from-file=dbt-project.tar.gz="$TMP/dbt-project.tar.gz" \
-      --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-    # Forceer Airflow scheduler-rollout zodat manifest-decompress init opnieuw runt.
-    kubectl -n odap-platform delete pod -l app.kubernetes.io/component=scheduler --ignore-not-found >/dev/null 2>&1 || true
-    printf '\033[1;32mOK\033[0m dbt-manifest ConfigMap geseed (manifest.json.gz=%s, dbt-project.tar.gz=%s)\n' \
-      "$(du -h "$TMP/manifest.json.gz" | cut -f1)" "$(du -h "$TMP/dbt-project.tar.gz" | cut -f1)"
-  else
-    printf '\033[1;33m!!\033[0m dbt parse leverde geen manifest.json op — Cosmos draait in fallback (lege DAG-set)\n'
-  fi
-  rm -rf "$TMP"
-else
-  printf '\033[1;33m!!\033[0m odap/dbt-trino:1.9.0 image niet gevonden — `make dbt-image` eerst draaien\n'
-fi
-
-# Unpause de Platform DAGs so they automatically start on their cron schedule once
-# de scheduler ze ziet. Airflow's default is is_paused_upon_creation=true,
-# en op een verse cluster betekent dat ze stilstaan tot je via de UI klikt.
-log "Unpause Platform DAGs (governance/ingest/transform/maintenance)"
-# Pod-readiness gate: `kubectl get pod` succeeds even when the pod is
-# pending/no-host (the resource exists). With `set -o pipefail` an
-# `exec` failure here aborts the whole script. Use a `Ready` check.
-if kubectl -n odap-platform wait --for=condition=Ready pod/airflow-scheduler-default-0 --timeout=1s >/dev/null 2>&1; then
-  kubectl -n odap-platform exec airflow-scheduler-default-0 -c airflow -- bash -c '
-for dag in bronze_watch \
-           silver_persoon silver_polisadm silver_ww silver_wia \
-           silver_wajong silver_zw silver_crm silver_fez silver_customer interaction \
-           gold_uc01_claims_funnel gold_uc04_eligibility_outreach gold_uc05_customer_360 \
-           gold_uc06_cost_forecast gold_uc07_dq_policies gold_uc09_reintegration_effect \
-           gold_uc_customer_satisfaction_customer_satisfaction \
-           governance_om_ingest retention period_enforcer lakehouse_maintenance; do
-  airflow dags unpause "$dag" >/dev/null 2>&1 || true
-done
-echo "DAGs unpaused (skipped any that don'\''t exist yet — parse delay is normal)"
-  ' 2>&1 | tail -2 || true
-else
-  printf '\033[1;33m!!\033[0m airflow-scheduler-default-0 nog niet ready — DAGs blijven paused tot je manueel `airflow dags unpause` draait\n'
-fi
+# The job-market DAG executes a packaged dbt project; no generated legacy
+# Cosmos DAGs or synthetic catalog tables are loaded.
+log "Dutch IT Job Market is the only scheduled example (05:00 Europe/Amsterdam)."
 
 # om-access-bridge (ADR-0008): self-service data-access webhook bridge.
 #

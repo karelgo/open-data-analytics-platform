@@ -6,7 +6,7 @@ Quick start in a notebook cell::
 
     # SQL against the Bronze / Silver / Gold / Sensitive Trino catalogs
     # (OPA evaluates row filters and column masks for your Keycloak role).
-    df = trino.query("SELECT * FROM silver.claims.application LIMIT 100")
+    df = trino.query("SELECT * FROM silver.job_market.stg_job_observations LIMIT 100")
 
     # Browse raw objects in MinIO.
     s3.ls("odap-bronze/")

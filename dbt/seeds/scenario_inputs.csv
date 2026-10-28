@@ -1,6 +1,0 @@
-scenario_id,beschrijving,parameter,waarde
-baseline,Geen wijzigingen — referentie-projectie,n/a,n/a
-iva_afschaf_2027,IVA afgeschaft per 2027,iva_volume_factor_2027,0.0
-ww_versoberen,WW max 12 mnd ipv 24,ww_max_duur_mnd,12
-wajong_uitbreiden_doelgroep,Wajong-doelgroep verbreed,wajong_volume_factor,1.15
-proactieve_tw_uitrol,Proactieve TW-aanvulling actief,tw_aanvraag_factor,1.30

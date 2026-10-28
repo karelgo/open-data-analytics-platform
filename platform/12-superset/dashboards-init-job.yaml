@@ -1,9 +1,3 @@
-# Improvements #13 — Superset WIA Funnel-dashboard via API.
-#
-# Volgt na de bestaande superset-init Job. Maakt 3 charts + 1 dashboard
-# tegen de Trino-database via REST API. Idempotent: skipt als naam reeds
-# bestaat.
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,7 +5,7 @@ metadata:
   namespace: odap-platform
 data:
   build_dashboards.py: |
-    """Bouw WIA Funnel-dashboard programmatisch in Superset."""
+    """Build the single Dutch IT Job Market dashboard."""
     import json
     import os
     import sys
@@ -24,7 +18,7 @@ data:
     SUPERSET_URL = os.environ.get("SUPERSET_URL", "http://superset-node:8088")
     ADMIN_USER = os.environ.get("ADMIN_USER", "odap")
     ADMIN_PW   = os.environ["ADMIN_PASSWORD"]
-    DATASET_NAME = os.environ.get("WIA_DATASET", "mart_uc01_claims_funnel_daily")
+
 
 
     def log(m): print(f"[dash] {m}", flush=True)
@@ -44,13 +38,17 @@ data:
 
 
     def get_dataset_id(s, name: str) -> int:
-        r = s.get(urljoin(SUPERSET_URL, "/api/v1/dataset/"),
-                  params={"q": f"(filters:!((col:table_name,opr:eq,value:{name})))"})
-        r.raise_for_status()
-        results = r.json().get("result", [])
-        if not results:
-            sys.exit(f"FAIL: dataset {name} niet gevonden — run superset-init Job eerst.")
-        return results[0]["id"]
+        deadline = time.monotonic() + 600
+        while True:
+            r = s.get(urljoin(SUPERSET_URL, "/api/v1/dataset/"),
+                params={"q": f"(filters:!((col:table_name,opr:eq,value:{name})))"}, timeout=30)
+            r.raise_for_status()
+            results = r.json().get("result", [])
+            if results:
+                return results[0]["id"]
+            if time.monotonic() > deadline:
+                raise RuntimeError(f"Dataset {name} not registered; run the extraction and dbt pipeline first")
+            time.sleep(10)
 
 
     def find_chart_id(s, slice_name: str) -> Optional[int]:
@@ -354,498 +352,43 @@ data:
         #   dataset (table_name in Superset)
         #   charts: list of (slice_name, viz_type, params)
         #   layout: chart-order top→down in dashboard
-        DASHBOARDS = [
-            # ─────────────── UC-01 WIA Funnel ───────────────
-            {
-                "slug": "wia-funnel",
-                "title": "UC-01 — WIA Funnel",
-                "dataset": "mart_uc01_claims_funnel_daily",
-                "charts": [
-                    ("Totaal WIA request", "big_number_total", {
-                        "metric": metric("n_request", "SUM", "INTEGER", "Totaal"),
-                    }),
-                    ("WIA request per dag", "echarts_timeseries_line", {
-                        "x_axis": "aanvraag_datum",
-                        "time_grain_sqla": "P1D",
-                        "metrics": [metric("n_request", "SUM", "INTEGER", "Request")],
-                        "groupby": [],
-                    }),
-                    ("WIA request per status", "pie", {
-                        "metrics": [metric("n_request", "SUM", "INTEGER", "Request")],
-                        "groupby": ["status"],
-                    }),
-                ],
-            },
-            # ─────────────── UC-04 TW Eligibility ───────────────
-            {
-                "slug": "tw-eligibility",
-                "title": "UC-04 — Toeslagenwet eligibility",
-                "dataset": "mart_uc04_eligibility_outreach",
-                "charts": [
-                    ("Cliënten met TW-recht", "big_number_total", {
-                        "metric": {"expressionType": "SIMPLE",
-                                   "column": {"column_name": "bsn", "type": "VARCHAR"},
-                                   "aggregate": "COUNT", "label": "Cliënten"},
-                    }),
-                    ("Totaal maandelijks TW-tekort (EUR)", "big_number_total", {
-                        "metric": metric("gat_per_maand", "SUM", "DECIMAL", "Tekort EUR/mnd"),
-                    }),
-                    ("Gemiddeld inkomen vs TW-norm", "big_number_total", {
-                        "metric": metric("inkomen_maand_eur", "AVG", "DECIMAL", "Avg inkomen"),
-                    }),
-                ],
-            },
-            # ─────────────── UC-05 Client 360 ───────────────
-            {
-                "slug": "client-360",
-                "title": "UC-05 — Cliënt 360",
-                "dataset": "mart_uc05_customer_360",
-                "charts": [
-                    ("Totaal cliënten in 360", "big_number_total", {
-                        "metric": {"expressionType": "SIMPLE",
-                                   "column": {"column_name": "bsn", "type": "VARCHAR"},
-                                   "aggregate": "COUNT", "label": "Cliënten"},
-                    }),
-                    ("Cliënten per geslacht", "pie", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "bsn", "type": "VARCHAR"},
-                                     "aggregate": "COUNT", "label": "Cliënten"}],
-                        "groupby": ["geslacht"],
-                    }),
-                    ("Cliënten met lopende WIA", "big_number_total", {
-                        "metric": metric("n_lopende_wia", "SUM", "INTEGER", "Lopende WIA"),
-                    }),
-                ],
-            },
-            # ─────────────── UC-06 Cost forecast ───────────────
-            {
-                "slug": "cost forecast",
-                "title": "UC-06 — Claim payoutslast 5-jaar prognose",
-                "dataset": "mart_uc06_cost_5y",
-                "charts": [
-                    ("Totaal claim_cost 5-jaar (EUR)", "big_number_total", {
-                        "metric": metric("uitbetaald_bruto_eur_projection", "SUM",
-                                         "DECIMAL", "Totaal EUR"),
-                    }),
-                    ("Claim payouten per wet", "pie", {
-                        "metrics": [metric("uitbetaald_bruto_eur_projection", "SUM",
-                                           "DECIMAL", "EUR")],
-                        "groupby": ["wet"],
-                    }),
-                    ("Aantal claim payouten per regio", "dist_bar", {
-                        "metrics": [metric("aantal_claim payouten_projection", "SUM",
-                                           "INTEGER", "Aantal")],
-                        "groupby": ["regio_code"],
-                    }),
-                ],
-            },
-            # ─────────────── UC-07 DQ Polisadministratie ───────────────
-            {
-                "slug": "dq-polisadm",
-                "title": "UC-07 — Datakwaliteit polisadministratie",
-                "dataset": "mart_uc07_dq_dagrapport",
-                "charts": [
-                    ("Totaal IKVs gevalideerd", "big_number_total", {
-                        "metric": metric("n_ikvs", "SUM", "INTEGER", "IKVs"),
-                    }),
-                    ("Unieke BSN's", "big_number_total", {
-                        "metric": metric("n_unieke_bsns", "SUM", "INTEGER", "Unieke BSN"),
-                    }),
-                    ("DQ-fouten BSN buiten test-bereik", "big_number_total", {
-                        "metric": metric("n_bsn_buiten_test_bereik", "SUM", "INTEGER",
-                                         "Fouten"),
-                    }),
-                ],
-            },
-            # ─────────────── UC-09 Reintegration effect (sandbox) ───────────────
-            {
-                "slug": "reint-effect",
-                "title": "UC-09 — Reintegration effect (sandbox)",
-                "dataset": "mart_uc09_effect_panel",
-                "charts": [
-                    ("Panel-deelnemers", "big_number_total", {
-                        "metric": {"expressionType": "SIMPLE",
-                                   "column": {"column_name": "bsn_pseudo",
-                                              "type": "VARCHAR"},
-                                   "aggregate": "COUNT", "label": "Deelnemers"},
-                    }),
-                    ("Verdeling huidige status", "pie", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "bsn_pseudo",
-                                                "type": "VARCHAR"},
-                                     "aggregate": "COUNT", "label": "Aantal"}],
-                        "groupby": ["huidige_status"],
-                    }),
-                    ("Verdeling per geslacht", "pie", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "bsn_pseudo",
-                                                "type": "VARCHAR"},
-                                     "aggregate": "COUNT", "label": "Aantal"}],
-                        "groupby": ["geslacht"],
-                    }),
-                ],
-            },
-            # ─────────────── Cross-UC Datakwaliteit ───────────────
-            # Eén-stop overzicht for the DQ-steward: per UC totaal-records,
-            # violations per severity, en een tabel met alle individuele
-            # checks. Bron: mart_dq_overview + mart_dq_violations (live
-            # geteld on the gold-marts; geen test-runner-output nodig).
-            {
-                "slug": "dq-overview",
-                "title": "Datakwaliteit — overzicht alle UCs",
-                "dataset": "mart_dq_overview",
-                "charts": [
-                    ("Aantal use-cases gemonitord", "big_number_total", {
-                        "metric": {"expressionType": "SIMPLE",
-                                   "column": {"column_name": "uc_code",
-                                              "type": "VARCHAR"},
-                                   "aggregate": "COUNT_DISTINCT",
-                                   "label": "Use-cases"},
-                    }),
-                    ("Totaal DQ-violations (alle UCs)", "big_number_total", {
-                        "metric": metric("n_violations", "SUM", "BIGINT",
-                                         "Violations"),
-                    }),
-                    ("Critical violations", "big_number_total", {
-                        "metric": metric("n_violations_critical", "SUM",
-                                         "BIGINT", "Critical"),
-                    }),
-                    ("Gemiddelde DQ-score (%)", "big_number_total", {
-                        "metric": metric("dq_score_pct", "AVG", "DOUBLE",
-                                         "Avg DQ-score %"),
-                    }),
-                    ("DQ-score per use-case", "dist_bar", {
-                        "metrics": [metric("dq_score_pct", "AVG", "DOUBLE",
-                                           "DQ-score %")],
-                        "groupby": ["uc_name"],
-                    }),
-                    ("Violations per use-case", "dist_bar", {
-                        "metrics": [metric("n_violations", "SUM", "BIGINT",
-                                           "Violations")],
-                        "groupby": ["uc_name"],
-                    }),
-                    ("DQ-status verdeling", "pie", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "uc_code",
-                                                "type": "VARCHAR"},
-                                     "aggregate": "COUNT",
-                                     "label": "Use-cases"}],
-                        "groupby": ["dq_status"],
-                    }),
-                ],
-            },
-            # ─────────────── UC-11 Integrale Customer journey ───────────────
-            # Multi-mart dashboard: events-mart als default, phases-mart als
-            # per-chart override. Layout is 5 rijen: KPI-strip, temporal,
-            # distribution, drill-down, detail-tabel.
-            {
-                "slug": "uc11-customer-journey",
-                "title": "UC-11 — Integrale Customer journey",
-                "dataset": "mart_uc11_journey_events",
-                "charts": [
-                    # ── Rij 1: KPI strip ── (4 × width 3)
-                    ("Unieke cliënten in customer journey", "big_number_total", {
-                        "metric": {"expressionType": "SIMPLE",
-                                   "column": {"column_name": "bsn", "type": "VARCHAR"},
-                                   "aggregate": "COUNT_DISTINCT",
-                                   "label": "Unieke BSN's"},
-                    }, {"width": 3, "height": 30}),
-                    ("Totaal events", "big_number_total", {
-                        "metric": {"expressionType": "SIMPLE",
-                                   "column": {"column_name": "event_seq", "type": "BIGINT"},
-                                   "aggregate": "COUNT",
-                                   "label": "Events"},
-                    }, {"width": 3, "height": 30}),
-                    ("Totaal fase-overgangen", "big_number_total", {
-                        "metric": {"expressionType": "SIMPLE",
-                                   "column": {"column_name": "fase_volgnr", "type": "BIGINT"},
-                                   "aggregate": "COUNT",
-                                   "label": "Fases"},
-                    }, {"dataset": "mart_uc11_journey_phases",
-                        "width": 3, "height": 30}),
-                    ("Gem. fase-duur (dagen)", "big_number_total", {
-                        "metric": metric("duur_dagen", "AVG", "BIGINT", "Avg dagen"),
-                    }, {"dataset": "mart_uc11_journey_phases",
-                        "width": 3, "height": 30}),
-
-                    # ── Rij 2: Temporal ── (2 × width 6)
-                    # `echarts_timeseries_line` ipv legacy `line`:
-                    # de NVD3 `line` viz verwacht een `__timestamp`-kolom; de
-                    # BASE_AXIS-query levert die niet → "Unexpected error".
-                    ("Events per maand — alle domeinen", "echarts_timeseries_line", {
-                        "x_axis": "event_ts",
-                        "time_grain_sqla": "P1M",
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "event_seq", "type": "BIGINT"},
-                                     "aggregate": "COUNT",
-                                     "label": "Events"}],
-                        "groupby": ["domein"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                    }, {"width": 6, "height": 50}),
-                    ("Nieuwe fases per maand", "echarts_timeseries_line", {
-                        "x_axis": "fase_start_ts",
-                        "time_grain_sqla": "P1M",
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "bsn", "type": "VARCHAR"},
-                                     "aggregate": "COUNT",
-                                     "label": "Fase-starts"}],
-                        "groupby": ["fase"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                    }, {"dataset": "mart_uc11_journey_phases",
-                        "width": 6, "height": 50}),
-
-                    # ── Rij 3: Distributie ── (3 × width 4)
-                    ("Events per domein", "pie", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "event_seq", "type": "BIGINT"},
-                                     "aggregate": "COUNT",
-                                     "label": "Events"}],
-                        "groupby": ["domein"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                        "label_type": "key_percent",
-                    }, {"width": 4, "height": 50}),
-                    ("Fases per type", "pie", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "bsn", "type": "VARCHAR"},
-                                     "aggregate": "COUNT",
-                                     "label": "Aantal"}],
-                        "groupby": ["fase"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                        "label_type": "key_percent",
-                    }, {"dataset": "mart_uc11_journey_phases",
-                        "width": 4, "height": 50}),
-                    ("Events per regio (WIA)", "pie", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "event_seq", "type": "BIGINT"},
-                                     "aggregate": "COUNT",
-                                     "label": "Events"}],
-                        "groupby": ["regio_code"],
-                        "adhoc_filters": [{
-                            "expressionType": "SIMPLE",
-                            "subject": "regio_code",
-                            "operator": "IS NOT NULL",
-                            "clause": "WHERE",
-                        }],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                    }, {"width": 4, "height": 50}),
-
-                    # ── Rij 4: Drill-downs ── (2 × width 6)
-                    ("Top 10 event-types", "dist_bar", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "event_seq", "type": "BIGINT"},
-                                     "aggregate": "COUNT",
-                                     "label": "Events"}],
-                        "groupby": ["event_type"],
-                        "row_limit": 10,
-                        "order_desc": True,
-                        "color_scheme": "preset_ui_1",
-                    }, {"width": 6, "height": 55}),
-                    ("Gem. duur per fase-type (dagen)", "dist_bar", {
-                        "metrics": [metric("duur_dagen", "AVG", "BIGINT", "Avg dagen")],
-                        "groupby": ["fase"],
-                        "row_limit": 20,
-                        "order_desc": True,
-                        "color_scheme": "preset_ui_1",
-                    }, {"dataset": "mart_uc11_journey_phases",
-                        "width": 6, "height": 55}),
-
-                    # ── Rij 5: Detail-tabel ── (1 × width 12)
-                    ("Cliënten met meeste events (top 50)", "table", {
-                        "metrics": [{"expressionType": "SIMPLE",
-                                     "column": {"column_name": "event_seq", "type": "BIGINT"},
-                                     "aggregate": "COUNT",
-                                     "label": "Events"},
-                                    {"expressionType": "SIMPLE",
-                                     "column": {"column_name": "domein", "type": "VARCHAR"},
-                                     "aggregate": "COUNT_DISTINCT",
-                                     "label": "Domeinen"}],
-                        "groupby": ["bsn"],
-                        "row_limit": 50,
-                        "order_desc": True,
-                        "include_search": True,
-                        "query_mode": "aggregate",
-                    }, {"width": 12, "height": 60}),
-                ],
-            },
-            # ─────────────── UC-12 FinOps / FOCUS billing ───────────────
-            # Multi-mart dashboard met 5 datasources (spend_monthly als
-            # default; service_breakdown, commitment_utilization, savings,
-            # top_resources als per-chart override). Layout volgt UC-11:
-            # KPI-strip, trends, breakdowns, drill-downs, detail-tabel.
-            {
-                "slug": "uc12-focus-finops",
-                "title": "UC-12 — Cloud Cost (FOCUS / FinOps)",
-                "dataset": "mart_uc12_focus_spend_monthly",
-                "charts": [
-                    # ── Rij 1: KPI-strip ── (4 × width 3)
-                    ("Totale effective cost", "big_number_total", {
-                        "metric": metric("effective_cost", "SUM", "DECIMAL",
-                                         "EUR effective"),
-                    }, {"width": 3, "height": 30}),
-                    ("Totale list cost", "big_number_total", {
-                        "metric": metric("list_cost", "SUM", "DECIMAL",
-                                         "EUR list"),
-                    }, {"width": 3, "height": 30}),
-                    ("Totale savings", "big_number_total", {
-                        "metric": metric("savings_amount", "SUM", "DECIMAL",
-                                         "EUR savings"),
-                    }, {"dataset": "mart_uc12_focus_savings",
-                        "width": 3, "height": 30}),
-                    ("Commitment coverage (gem.)", "big_number_total", {
-                        "metric": metric("commitment_coverage_pct", "AVG",
-                                         "DOUBLE", "Coverage"),
-                    }, {"dataset": "mart_uc12_focus_commitment_utilization",
-                        "width": 3, "height": 30}),
-
-                    # ── Rij 2: Trends ── (2 × width 6)
-                    ("Effective cost per maand — per provider",
-                     "echarts_timeseries_line", {
-                        "x_axis": "billing_month",
-                        "time_grain_sqla": "P1M",
-                        "metrics": [metric("effective_cost", "SUM", "DECIMAL",
-                                           "EUR")],
-                        "groupby": ["provider"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                        "adhoc_filters": [{
-                            "expressionType": "SIMPLE",
-                            "subject": "charge_category",
-                            "operator": "==",
-                            "comparator": "Usage",
-                            "clause": "WHERE",
-                        }],
-                    }, {"width": 6, "height": 50}),
-                    ("Commitment coverage % per maand",
-                     "echarts_timeseries_line", {
-                        "x_axis": "billing_month",
-                        "time_grain_sqla": "P1M",
-                        "metrics": [metric("commitment_coverage_pct", "AVG",
-                                           "DOUBLE", "Coverage")],
-                        "groupby": ["service_category"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                    }, {"dataset": "mart_uc12_focus_commitment_utilization",
-                        "width": 6, "height": 50}),
-
-                    # ── Rij 3: Breakdowns ── (3 × width 4)
-                    ("Spend per service-categorie", "pie", {
-                        "metrics": [metric("effective_cost", "SUM", "DECIMAL",
-                                           "EUR")],
-                        "groupby": ["service_category"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                        "label_type": "key_percent",
-                        "adhoc_filters": [{
-                            "expressionType": "SIMPLE",
-                            "subject": "charge_category",
-                            "operator": "==",
-                            "comparator": "Usage",
-                            "clause": "WHERE",
-                        }],
-                    }, {"width": 4, "height": 50}),
-                    ("Spend per regio", "pie", {
-                        "metrics": [metric("effective_cost", "SUM", "DECIMAL",
-                                           "EUR")],
-                        "groupby": ["region"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                        "label_type": "key_percent",
-                    }, {"dataset": "mart_uc12_focus_service_breakdown",
-                        "width": 4, "height": 50}),
-                    ("Spend per environment", "pie", {
-                        "metrics": [metric("effective_cost", "SUM", "DECIMAL",
-                                           "EUR")],
-                        "groupby": ["environment"],
-                        "color_scheme": "preset_ui_1",
-                        "show_legend": True,
-                        "label_type": "key_percent",
-                    }, {"dataset": "mart_uc12_focus_service_breakdown",
-                        "width": 4, "height": 50}),
-
-                    # ── Rij 4: Drill-downs ── (2 × width 6)
-                    ("Top 10 services op spend", "dist_bar", {
-                        "metrics": [metric("effective_cost", "SUM", "DECIMAL",
-                                           "EUR")],
-                        "groupby": ["service_name"],
-                        "row_limit": 10,
-                        "order_desc": True,
-                        "color_scheme": "preset_ui_1",
-                    }, {"dataset": "mart_uc12_focus_service_breakdown",
-                        "width": 6, "height": 55}),
-                    ("Spend per applicatie (tagged)", "dist_bar", {
-                        "metrics": [metric("effective_cost", "SUM", "DECIMAL",
-                                           "EUR")],
-                        "groupby": ["application"],
-                        "row_limit": 15,
-                        "order_desc": True,
-                        "color_scheme": "preset_ui_1",
-                    }, {"dataset": "mart_uc12_focus_service_breakdown",
-                        "width": 6, "height": 55}),
-
-                    # ── Rij 5: Detail-tabel ── (1 × width 12)
-                    ("Top 50 resources op spend (deze maand)", "table", {
-                        "metrics": [metric("effective_cost", "SUM", "DECIMAL",
-                                           "EUR effective")],
-                        "groupby": ["resource_name", "resource_type",
-                                    "service_name", "region", "application",
-                                    "environment"],
-                        "row_limit": 50,
-                        "order_desc": True,
-                        "include_search": True,
-                        "query_mode": "aggregate",
-                        "adhoc_filters": [{
-                            "expressionType": "SIMPLE",
-                            "subject": "rank_in_month",
-                            "operator": "<=",
-                            "comparator": "50",
-                            "clause": "WHERE",
-                        }],
-                    }, {"dataset": "mart_uc12_focus_top_resources",
-                        "width": 12, "height": 60}),
-                ],
-            },
-            # Detail-dashboard: 1 rij per (UC × check), gevoed door
-            # mart_dq_violations. Apart dashboard zodat steward kan
-            # drillen na het zien van een rood blok in het overzicht.
-            {
-                "slug": "dq-violations-detail",
-                "title": "Datakwaliteit — violations per check",
-                "dataset": "mart_dq_violations",
-                "charts": [
-                    ("Totaal checks gemonitord", "big_number_total", {
-                        "metric": {"expressionType": "SIMPLE",
-                                   "column": {"column_name": "check_name",
-                                              "type": "VARCHAR"},
-                                   "aggregate": "COUNT",
-                                   "label": "Checks"},
-                    }),
-                    ("Violations per severity", "pie", {
-                        "metrics": [metric("n_violations", "SUM", "BIGINT",
-                                           "Violations")],
-                        "groupby": ["severity"],
-                    }),
-                    ("Violations per check (top 20)", "dist_bar", {
-                        "metrics": [metric("n_violations", "SUM", "BIGINT",
-                                           "Violations")],
-                        "groupby": ["check_name"],
-                        "row_limit": 20,
-                    }),
-                    ("Alle checks (tabel)", "table", {
-                        "metrics": [metric("n_violations", "SUM", "BIGINT",
-                                           "Violations")],
-                        "groupby": ["uc_name", "check_name", "severity"],
-                        "row_limit": 1000,
-                        "include_search": True,
-                        "query_mode": "aggregate",
-                    }),
-                ],
-            },
-        ]
+        DASHBOARDS = [{
+            "slug": "dutch-it-job-market",
+            "title": "Dutch IT Job Market — daily observed vacancies",
+            "dataset": "mart_job_inventory",
+            "charts": [
+                ("Latest observed distinct job candidates", "big_number_total", {
+                    "metric": metric("duplicate_group_id", "COUNT_DISTINCT", "VARCHAR", "Jobs")}, {"width":4,"height":30}),
+                ("Hiring employers in latest snapshot", "big_number_total", {
+                    "metric": metric("company", "COUNT_DISTINCT", "VARCHAR", "Employers")}, {"width":4,"height":30}),
+                ("Collection date", "table", {"groupby":["snapshot_date","is_synthetic"],
+                    "metrics":[metric("duplicate_group_id","COUNT_DISTINCT","VARCHAR","Jobs")]}, {"width":4,"height":30}),
+                ("Observed demand per domain (domains overlap)", "echarts_timeseries_line", {
+                    "x_axis":"snapshot_date", "time_grain_sqla":"P1D", "groupby":["domain"],
+                    "metrics":[metric("observed_jobs")],"show_legend":True},
+                    {"dataset":"mart_job_demand_daily","width":12,"height":55}),
+                ("Skills by domain and collection date", "table", {
+                    "groupby":["snapshot_date","domain","skill"], "metrics":[metric("observed_jobs")],
+                    "query_mode":"aggregate","row_limit":1000},
+                    {"dataset":"mart_job_skills","width":6,"height":60}),
+                ("Annual EUR salary samples (estimated separated)", "table", {
+                    "groupby":["snapshot_date","domain","seniority","salary_is_estimated"],
+                    "metrics":[metric("salary_sample_size"), metric("avg_annual_midpoint_eur","AVG","DOUBLE"),
+                        metric("median_annual_midpoint_eur","AVG","DOUBLE")], "query_mode":"aggregate"},
+                    {"dataset":"mart_job_salary","width":6,"height":60}),
+                ("Geography by city and province", "table", {
+                    "groupby":["snapshot_date","domain","city","province"], "metrics":[metric("observed_jobs")],
+                    "query_mode":"aggregate"}, {"dataset":"mart_job_geography","width":6,"height":55}),
+                ("Contracts, remote work and seniority", "table", {
+                    "groupby":["snapshot_date","domain","work_mode","employment_type","contract_type","seniority"],
+                    "metrics":[metric("observed_jobs")],"query_mode":"aggregate"},
+                    {"dataset":"mart_job_work_arrangements","width":6,"height":55}),
+                ("Source coverage and freshness (successful extracts)", "table", {
+                    "groupby":["snapshot_date","source"],"metrics":[metric("source_observations"),
+                        metric("salary_present"),metric("skills_present"),metric("estimated_salary_observations")],
+                    "query_mode":"aggregate"}, {"dataset":"mart_job_source_quality","width":12,"height":55}),
+            ],
+        }]
 
         # Bouw alle dashboards.
         # Chart-spec format (3-tuple legacy): (slice_name, viz_type, params)
@@ -912,7 +455,6 @@ data:
 
     if __name__ == "__main__":
         sys.exit(main())
-
 ---
 apiVersion: batch/v1
 kind: Job
@@ -931,39 +473,41 @@ spec:
     spec:
       restartPolicy: OnFailure
       containers:
-        - name: build-dashboards
-          image: python:3.11-slim
-          command: ["bash", "-euo", "pipefail", "-c"]
-          args:
-            - |
-              pip install --quiet --disable-pip-version-check requests
-              python /scripts/build_dashboards.py
-          env:
-            - name: SUPERSET_URL
-              value: "http://superset-node:8088"
-            - name: ADMIN_USER
-              valueFrom:
-                secretKeyRef:
-                  name: superset-postgres-credentials
-                  key: adminUser.username
-            - name: ADMIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: superset-postgres-credentials
-                  key: adminUser.password
-            - name: WIA_DATASET
-              value: "mart_uc01_claims_funnel_daily"
-          volumeMounts:
-            - name: scripts
-              mountPath: /scripts
-          resources:
-            requests:
-              cpu: 50m
-              memory: 128Mi
-            limits:
-              cpu: 500m
-              memory: 256Mi
-      volumes:
+      - name: build-dashboards
+        image: python:3.11-slim
+        command:
+        - bash
+        - -euo
+        - pipefail
+        - -c
+        args:
+        - |
+          pip install --quiet --disable-pip-version-check requests
+          python /scripts/build_dashboards.py
+        env:
+        - name: SUPERSET_URL
+          value: http://superset-node:8088
+        - name: ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: superset-postgres-credentials
+              key: adminUser.username
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: superset-postgres-credentials
+              key: adminUser.password
+        volumeMounts:
         - name: scripts
-          configMap:
-            name: superset-dashboards-init-script
+          mountPath: /scripts
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+      volumes:
+      - name: scripts
+        configMap:
+          name: superset-dashboards-init-script

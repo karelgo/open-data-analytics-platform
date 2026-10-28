@@ -1,9 +1,13 @@
-# AKS patch for AirflowCluster — switch BASE_URL to the public hostname so
-# Flask's OAuth redirect_uri (and X-Forwarded-Host proxy_fix) builds URLs
-# that match what the browser sees on https://airflow.${PLATFORM_DOMAIN}.
+# Airflow 3 uses API and FAB base URLs (the webserver setting was removed).
 - op: replace
-  path: /spec/webservers/envOverrides/AIRFLOW__WEBSERVER__BASE_URL
-  value: "https://airflow.example.com"
+  path: /spec/webservers/envOverrides/AIRFLOW__API__BASE_URL
+  value: "https://platform.example.com/airflow"
 - op: replace
-  path: /spec/schedulers/envOverrides/AIRFLOW__WEBSERVER__BASE_URL
-  value: "https://airflow.example.com"
+  path: /spec/webservers/envOverrides/AIRFLOW__FAB__BASE_URL
+  value: "https://platform.example.com/airflow"
+- op: replace
+  path: /spec/schedulers/envOverrides/AIRFLOW__API__BASE_URL
+  value: "https://platform.example.com/airflow"
+- op: replace
+  path: /spec/schedulers/envOverrides/AIRFLOW__FAB__BASE_URL
+  value: "https://platform.example.com/airflow"

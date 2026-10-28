@@ -1,0 +1,20 @@
+---
+import ShellLayout from '../layouts/ShellLayout.astro';
+import JobMarketExplorer from '../components/JobMarketExplorer';
+import '../styles/job-market.css';
+---
+<ShellLayout title="Dutch IT Job Market" activeSection="job-market" description="Daily Dutch IT vacancy observations across Data, Cloud, SAP, AI, Software and Security.">
+  <main class="jobs-page">
+    <header class="jobs-hero"><div><p class="eyebrow">One use case · the whole platform</p><h1>Dutch IT <em>Job Market</em></h1><p>What skills are employers asking for, where are the jobs, and what pay is advertised?</p></div><a class="action" href="/embed/superset/?path=/superset/dashboard/dutch-it-job-market/">Open platform dashboard ↗</a></header>
+    <JobMarketExplorer client:load />
+    <section class="panel journey"><h2>Follow the same data across the platform</h2><ol>
+      <li><a href="/embed/airflow/">Airflow</a><span>Daily at 05:00 Europe/Amsterdam</span></li>
+      <li><a href="/embed/minio/">MinIO + Spark</a><span>Raw evidence → Bronze Delta</span></li>
+      <li><a href="/embed/dbt-docs/">Trino + dbt</a><span>Silver deduplication → tested Gold</span></li>
+      <li><a href="/embed/superset/">Superset + Jupyter</a><span>Demand, skills, pay and quality</span></li>
+      <li><a href="/embed/openmetadata/">OpenMetadata</a><span>Definitions, owners and lineage</span></li>
+    </ol><p><a href="https://github.com/karelgo/open-data-analytics-platform/blob/main/docs/use-cases/dutch-it-job-market.md" target="_blank" rel="noreferrer">Walkthrough and full data dictionary ↗</a> · <a href="/learn/">Learn with this dataset</a> · <a href="/embed/jupyter/">Open the notebook</a></p>
+      <p class="small">Domains overlap, so their counts cannot be added. Annual pay comparisons use reported EUR/year or monthly × 12; hourly, non-EUR, estimated and unknown-unit amounts stay separate. Source search limits and failures can change coverage. No applicant data or candidate scoring is involved.</p>
+    </section>
+  </main>
+</ShellLayout>

@@ -86,7 +86,7 @@ def list_tables() -> list[dict]:
 
 
 def _glob_from_fqn(fqn: str) -> str | None:
-    """trino.gold.uc01_claims_funnel.mart_x → gold.uc01_claims_funnel.*
+    """trino.gold.job_market.mart_job_inventory → gold.job_market.*
 
     Service-prefix verwijderen, schema-glob bouwen. FQN-segmenten met
     quotes worden gestript (OM kwoot soms namen met punten/dashes).

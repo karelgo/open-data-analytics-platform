@@ -1,12 +1,3 @@
-# Post-deploy init-Job: registreert Trino als Superset-database en maakt
-# datasets aan voor UC-01 (WIA Funnel) en UC-06 (Cost forecast).
-#
-# Idempotent: API-calls gebruiken POST → 200/201 of 422 (already exists).
-# De Job wacht via een `until`-loop tot de Superset-webserver healthy is.
-#
-# Production zou dit via een GitOps-tool (ArgoCD ApplicationSet) of een
-# Superset-bundle (zip) doen. Voor dev volstaat een eenvoudige Python-Job.
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -14,561 +5,73 @@ metadata:
   namespace: odap-platform
 data:
   init_superset.py: |
-    """Bootstrap Superset met platform defaults.
-
-    Volgorde:
-      1. Wacht tot Superset webserver health-endpoint OK.
-      2. Login als admin → CSRF + access token.
-      3. Trino registreren als database (idempotent).
-      4. Datasets aanmaken voor gold.uc01_claims_funnel.* en gold.uc06_cost_forecast.*.
-    """
-    import os
-    import sys
-    import time
+    """Register the single Dutch IT job-market dataset family, idempotently."""
     import json
+    import os
+    import time
     from urllib.parse import urljoin
-
     import requests
 
-    SUPERSET_URL = os.environ.get(
-        "SUPERSET_URL",
-        "http://superset-node:8088",
-    )
-    ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
-    ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
-    TRINO_HOST = os.environ.get("TRINO_HOST", "trino-coordinator.odap-platform.svc.cluster.local")
-    # Hardcoded — Kubernetes injecteert auto-env TRINO_PORT=tcp://IP:PORT bij
-    # dezelfde-naam service (collision met onze env-var); ignore en hardcode.
-    TRINO_PORT = "8443"
-    TRINO_PROTOCOL = "https"
-    TRINO_USER = os.environ.get("TRINO_USER", "smoketest")
-    TRINO_PASSWORD = os.environ["TRINO_PASSWORD"]
-    # Cert-bundle voor self-signed Trino TLS — niet nodig met verify=False
-    # in requests-call hieronder, maar urllib3-warning suppressen kan helpen.
-    import urllib3 as _u3  # noqa: PLC0415
-    _u3.disable_warnings()
+    BASE = os.getenv('SUPERSET_URL', 'http://superset-node:8088')
+    TABLES = ['mart_job_inventory', 'mart_job_demand_daily', 'mart_job_skills',
+              'mart_job_salary', 'mart_job_geography', 'mart_job_work_arrangements',
+              'mart_job_source_quality']
 
 
-    def log(msg: str) -> None:
-        print(f"[init] {msg}", flush=True)
-
-
-    def wait_for_superset(timeout_s: int = 600) -> None:
-        log(f"Wachten op Superset op {SUPERSET_URL}/health")
-        deadline = time.time() + timeout_s
-        while time.time() < deadline:
+    def main():
+        s = requests.Session()
+        deadline = time.monotonic() + 600
+        while True:
             try:
-                r = requests.get(urljoin(SUPERSET_URL, "/health"), timeout=5)
-                if r.status_code == 200 and "OK" in r.text:
-                    log("Superset health OK")
-                    return
+                r = s.get(urljoin(BASE, '/health'), timeout=10)
+                if r.ok:
+                    break
             except requests.RequestException:
                 pass
+            if time.monotonic() > deadline:
+                raise TimeoutError('Superset did not become healthy')
             time.sleep(5)
-        sys.exit("FAIL: Superset bereikt /health niet binnen timeout")
-
-
-    def login() -> requests.Session:
-        s = requests.Session()
-        # 1. CSRF-token
-        r = s.get(urljoin(SUPERSET_URL, "/api/v1/security/csrf_token/"))
-        # CSRF-token komt er pas nadat we ingelogd zijn — eerst access-token via /api/v1/security/login
-        login_payload = {
-            "username": ADMIN_USER,
-            "password": ADMIN_PASSWORD,
-            "provider": "db",
-            "refresh": True,
-        }
-        r = s.post(urljoin(SUPERSET_URL, "/api/v1/security/login"), json=login_payload, timeout=30)
+        r = s.post(urljoin(BASE, '/api/v1/security/login'), json={
+            'username':os.environ['ADMIN_USER'], 'password':os.environ['ADMIN_PASSWORD'],
+            'provider':'db', 'refresh':True}, timeout=30)
         r.raise_for_status()
-        access_token = r.json()["access_token"]
-        s.headers.update({"Authorization": f"Bearer {access_token}"})
-        # CSRF-token voor mutation-calls
-        r = s.get(urljoin(SUPERSET_URL, "/api/v1/security/csrf_token/"), timeout=10)
-        r.raise_for_status()
-        s.headers.update({"X-CSRFToken": r.json()["result"]})
-        log("Login + CSRF OK")
-        return s
-
-
-    def ensure_trino_database(s: requests.Session, name: str, catalog: str) -> int:
-        """Maak een Trino-database connection aan voor één catalog; retourneert id.
-
-        Idempotent op `database_name`. Per catalog 1 connection is de
-        Superset-conventie (Superset's `database` = Trino-catalog).
-        """
-        # SQLAlchemy URI — Trino zonder password (smoketest via X-Trino-User).
-        # Trino's password-authenticator weigert basic-auth bij niet-direct-TLS,
-        # `method=none` werkt wel (dezelfde aanpak als dbt-trino profiles.yml).
-        # Cert-validation: REQUESTS_CA_BUNDLE wijst naar /etc/platform-ca/ca.crt
-        # die zowel de platform-issuer als de Stackable secret-operator-CA
-        # bevat (zie scripts/bootstrap.sh sectie 8). Geen verify=False nodig.
-        uri = f"trino://{TRINO_USER}@{TRINO_HOST}:8443/{catalog}"
-        body = {
-            "database_name": name,
-            "sqlalchemy_uri": uri,
-            "expose_in_sqllab": True,
-            "allow_ctas": False,
-            "allow_cvas": False,
-            "allow_dml": False,
-            "extra": json.dumps({
-                "engine_params": {
-                    "connect_args": {"http_scheme": "https"},
-                },
-            }),
-        }
-        # Check of hij al bestaat
-        r = s.get(urljoin(SUPERSET_URL, "/api/v1/database/"), params={"q": f"(filters:!((col:database_name,opr:eq,value:{name})))"})
-        r.raise_for_status()
-        result = r.json()
-        if result.get("count", 0) > 0:
-            db_id = result["result"][0]["id"]
-            log(f"Database '{name}' bestaat al (id={db_id}); skip create.")
-            return db_id
-
-        r = s.post(urljoin(SUPERSET_URL, "/api/v1/database/"), json=body, timeout=30)
-        if r.status_code not in (200, 201):
-            log(f"Database POST status={r.status_code} body={r.text[:300]}")
+        s.headers['Authorization'] = 'Bearer ' + r.json()['access_token']
+        r = s.get(urljoin(BASE, '/api/v1/security/csrf_token/'), timeout=30)
+        r.raise_for_status(); s.headers['X-CSRFToken'] = r.json()['result']
+        def request(method, path, **kwargs):
+            r = s.request(method, urljoin(BASE, path), timeout=60, **kwargs)
             r.raise_for_status()
-        db_id = r.json()["id"]
-        log(f"Database '{name}' aangemaakt (id={db_id})")
-        return db_id
-
-
-    # Trino-type-code → Superset-kolom-type. Lowercase keys, fallback = upper().
-    _TRINO_TYPE_MAP = {
-        "date": "DATE", "timestamp": "TIMESTAMP",
-        "varchar": "VARCHAR", "char": "CHAR",
-        "bigint": "BIGINT", "integer": "INTEGER", "smallint": "SMALLINT",
-        "double": "DOUBLE", "real": "REAL", "decimal": "DECIMAL",
-        "boolean": "BOOLEAN",
-    }
-
-
-    def refresh_dataset_columns(s: requests.Session, ds_id: int,
-                                schema: str, table: str) -> None:
-        """Sync kolom-metadata vanuit Trino naar Superset.
-
-        Bij API-creation maakt Superset alleen de temporal-default kolom
-        aan; charts falen daarna met "Columns missing in dataset".
-
-        Implementatie via Trino REST `SELECT * LIMIT 1` — de response
-        bevat een `columns: [{name,type}]` array with the complete kolomlijst.
-        Trino's SHOW COLUMNS / SQL Lab pad geeft op deze cluster maar 1
-        kolom terug (oorzaak onduidelijk in Stackable+OPA-combinatie),
-        dus dit pad omzeilt dat probleem.
-
-        PUT /api/v1/dataset/{id}?override_columns=true accepteert wel
-        de payload maar persisteert maar 1 kolom; daarom direct via
-        Postgres (zie scripts/sync_dataset_columns.sql).
-        """
-        # 1. Vind de database id (catalog) voor deze dataset.
-        rd = s.get(urljoin(SUPERSET_URL, f"/api/v1/dataset/{ds_id}"))
-        if rd.status_code != 200:
-            log(f"  ! GET dataset {ds_id}: {rd.status_code}")
-            return
-        db_info = rd.json()["result"]["database"]
-        db_id = db_info["id"]
-
-        # 2. Catalog uit URI parsen: trino://user@host:port/<catalog>
-        # We hebben deze info nodig om Trino direct aan te spreken.
-        # Voor de ingebouwde Stackable-setup: dataset.database.database_name
-        # is bijv. "trino-gold" → catalog = "gold".
-        db_name = db_info.get("database_name", "")
-        catalog = db_name.split("-")[-1] if "-" in db_name else "gold"
-
-        # 3. Direct SELECT * LIMIT 1 via Trino REST — geeft cursor.description.
-        trino_url = f"{TRINO_PROTOCOL}://{TRINO_HOST}:{TRINO_PORT}/v1/statement"
-        sql = f"SELECT * FROM {catalog}.{schema}.{table} LIMIT 1"
-        try:
-            rq = requests.post(trino_url, data=sql,
-                               headers={"X-Trino-User": TRINO_USER,
-                                        "Content-Type": "text/plain"},
-                               verify=False, timeout=30)
-        except requests.RequestException as exc:
-            log(f"  ! Trino REST {schema}.{table}: {exc}")
-            return
-        if rq.status_code != 200:
-            log(f"  ! Trino {schema}.{table}: {rq.status_code} {rq.text[:200]}")
-            return
-        j = rq.json()
-        cols_meta = j.get("columns") or []
-        # Volg nextUri tot end zodat statement netjes afsluit.
-        while j.get("nextUri"):
-            jr = requests.get(j["nextUri"],
-                              headers={"X-Trino-User": TRINO_USER},
-                              verify=False, timeout=30)
-            j = jr.json()
-            if not cols_meta and j.get("columns"):
-                cols_meta = j["columns"]
-
-        if not cols_meta:
-            log(f"  ! geen kolom-metadata van Trino voor {schema}.{table}")
-            return
-
-        # 4. Build column list voor Superset PUT.
-        # NB: Superset persisteert via API maar 1 kolom (validatie tegen
-        # SHOW COLUMNS dropt de rest). Voor production-fix: direct in Postgres
-        # via /scripts/sync_dataset_columns.sql.
-        wanted = []
-        for c in cols_meta:
-            t_raw = (c.get("type") or "varchar").lower()
-            t_base = t_raw.split("(")[0]
-            wanted.append({
-                "column_name": c["name"],
-                "type": _TRINO_TYPE_MAP.get(t_base, t_base.upper() or "VARCHAR"),
-                "is_dttm": t_base in ("date", "timestamp"),
-                "filterable": True,
-                "groupby": True,
-            })
-
-        ru = s.put(urljoin(SUPERSET_URL, f"/api/v1/dataset/{ds_id}"),
-                   json={"columns": wanted},
-                   params={"override_columns": "true"})
-        if ru.status_code != 200:
-            log(f"  ! sync cols dataset {ds_id}: {ru.status_code} {ru.text[:200]}")
+            return r.json() if r.content else {}
+        databases = request('GET', '/api/v1/database/', params={'q':'(page:0,page_size:100)'})['result']
+        existing = next((d for d in databases if d['database_name']=='trino-gold'), None)
+        if existing:
+            db_id = existing['id']
         else:
-            # Re-check werkelijk persisted aantal — als <wanted-count is
-            # de Postgres-fallback nodig.
-            rcheck = s.get(urljoin(SUPERSET_URL, f"/api/v1/dataset/{ds_id}"))
-            persisted = len(rcheck.json()["result"].get("columns", []))
-            if persisted < len(wanted):
-                log(f"  ⚠ {persisted}/{len(wanted)} kolommen persisted "
-                    f"({schema}.{table}) — direct INSERT in superset Postgres "
-                    f"nodig voor volledige sync (zie sync_dataset_columns.sql)")
-            else:
-                log(f"  ✓ {len(wanted)} kolommen gesynced ({schema}.{table})")
+            host = os.getenv('TRINO_HOST', 'trino-coordinator.odap-platform.svc.cluster.local')
+            body={'database_name':'trino-gold', 'sqlalchemy_uri':f'trino://smoketest@{host}:8443/gold',
+                  'expose_in_sqllab':True, 'allow_ctas':False, 'allow_cvas':False, 'allow_dml':False,
+                  'extra':json.dumps({'engine_params':{'connect_args':{'http_scheme':'https'}}})}
+            db_id = request('POST','/api/v1/database/',json=body)['id']
+        # Table creation can still be running during a first deployment. Retry
+        # metadata refresh rather than publishing a dashboard with empty schemas.
+        for table in TABLES:
+            deadline = time.monotonic() + 600
+            while True:
+                try:
+                    datasets=request('GET','/api/v1/dataset/',params={'q':f'(filters:!((col:table_name,opr:eq,value:{table})))'})['result']
+                    existing=next((d for d in datasets if d.get('schema')=='job_market'),None)
+                    did=existing['id'] if existing else request('POST','/api/v1/dataset/',json={
+                        'database':db_id,'schema':'job_market','table_name':table})['id']
+                    request('PUT',f'/api/v1/dataset/{did}/refresh')
+                    print(f'Registered gold.job_market.{table}',flush=True)
+                    break
+                except requests.HTTPError:
+                    if time.monotonic() > deadline: raise
+                    time.sleep(10)
 
 
-    def ensure_dataset(s: requests.Session, db_id: int, schema: str, table: str) -> int:
-        # Idempotent
-        params = {"q": f"(filters:!((col:table_name,opr:eq,value:{table})))"}
-        r = s.get(urljoin(SUPERSET_URL, "/api/v1/dataset/"), params=params, timeout=10)
-        r.raise_for_status()
-        if r.json().get("count", 0) > 0:
-            ds_id = r.json()["result"][0]["id"]
-            log(f"Dataset {schema}.{table} bestaat al (id={ds_id})")
-            refresh_dataset_columns(s, ds_id, schema, table)
-            return ds_id
-        body = {
-            "database": db_id,
-            "schema": schema,
-            "table_name": table,
-        }
-        r = s.post(urljoin(SUPERSET_URL, "/api/v1/dataset/"), json=body, timeout=30)
-        if r.status_code not in (200, 201):
-            log(f"Dataset POST {schema}.{table}: status={r.status_code} body={r.text[:300]}")
-            return -1
-        ds_id = r.json()["id"]
-        log(f"Dataset {schema}.{table} aangemaakt (id={ds_id})")
-        refresh_dataset_columns(s, ds_id, schema, table)
-        return ds_id
-
-
-    def main() -> int:
-        wait_for_superset()
-        s = login()
-        # Per Trino-catalog 1 Superset-database. Voor BI dashboards is gold
-        # de hoofdcatalog (mart-tabellen), maar SQL Lab heeft baat bij
-        # bronze + silver erbij voor exploratie/lineage-checks.
-        bronze_id = ensure_trino_database(s, "trino-bronze", "bronze")
-        silver_id = ensure_trino_database(s, "trino-silver", "silver")
-        gold_id = ensure_trino_database(s, "trino-gold", "gold")
-
-        # Datasets — gold.uc0x_*.mart_uc0x_* (UC-mart-tabellen voor BI).
-        # Naam komt uit dbt-models in dbt/models/marts/uc0x_*.
-        gold_targets = [
-            ("uc01_claims_funnel", "mart_uc01_claims_funnel_daily"),
-            ("uc04_eligibility_outreach", "mart_uc04_eligibility_outreach"),
-            ("uc05_customer_360", "mart_uc05_customer_360"),
-            ("uc06_cost_forecast", "mart_uc06_cost_5y"),
-            ("uc06_cost_forecast", "mart_uc06_scenario_results"),
-            ("uc07_dq_policies", "mart_uc07_dq_dagrapport"),
-            ("uc11_customer_journey", "mart_uc11_journey_events"),
-            ("uc11_customer_journey", "mart_uc11_journey_phases"),
-            ("uc12_focus_finops", "mart_uc12_focus_spend_monthly"),
-            ("uc12_focus_finops", "mart_uc12_focus_service_breakdown"),
-            ("uc12_focus_finops", "mart_uc12_focus_commitment_utilization"),
-            ("uc12_focus_finops", "mart_uc12_focus_top_resources"),
-            ("uc12_focus_finops", "mart_uc12_focus_savings"),
-            ("dq_overview", "mart_dq_overview"),
-            ("dq_overview", "mart_dq_violations"),
-        ]
-        for schema, table in gold_targets:
-            ensure_dataset(s, gold_id, schema, table)
-
-        # UC-09 leeft in silver (sandbox-schema, gepseudonimiseerd).
-        silver_targets = [
-            ("sandbox_uc09", "mart_uc09_effect_panel"),
-        ]
-        for schema, table in silver_targets:
-            ensure_dataset(s, silver_id, schema, table)
-
-        # Fallback: PUT-API persisteert maar 1 kolom; om alle dashboard-charts
-        # te laten renderen ('Columns missing in dataset' error in UI) doen we
-        # een directe INSERT in Superset's Postgres-metadata.
-        sync_columns_postgres()
-
-        # Break-glass: zorg dat platform.admin (Keycloak realm-rol
-        # `platform_admin`) ook in Superset de Admin-rol heeft. Werkt
-        # samen met AUTH_ROLES_MAPPING: dat synct bij login, deze fallback
-        # synct bij elke deploy/restart — zodat de gebruiker na een
-        # volledige cluster-shutdown direct weer admin-rechten heeft, ook
-        # als z'n Keycloak-token om wat voor reden dan ook de realm-rol
-        # niet correct overbracht.
-        ensure_admin_role_in_db([
-            "platform.admin",
-        ])
-
-        log("Init voltooid.")
-        return 0
-
-
-    def ensure_admin_role_in_db(usernames):
-        """Zet de Admin-rol op een lijst usernames in Superset's Postgres.
-
-        Idempotent en run-on-every-deploy: lost het probleem op dat een
-        Keycloak-user die via OIDC inlogt soms op `Public` blijft staan
-        ondanks AUTH_ROLES_MAPPING (kan gebeuren als de eerste login
-        plaatsvond vóór de mapping-config, of als realm_access ontbrak
-        in een specifieke token). Werkt ook als de user nog nooit heeft
-        ingelogd — dan slaat het script die over en is de volgende
-        OIDC-login alsnog de bron van waarheid.
-        """
-        import os, urllib.parse  # noqa: PLC0415
-        try:
-            import psycopg2  # noqa: PLC0415
-        except ImportError:
-            log("  psycopg2 niet beschikbaar → admin-bridge skip "
-                "(AUTH_ROLES_MAPPING blijft als enige sync-pad)")
-            return
-
-        uri = os.environ.get("SUPERSET_DB_URI", "")
-        if not uri:
-            log("  geen SUPERSET_DB_URI → admin-bridge skip")
-            return
-        u = urllib.parse.urlparse(uri.replace("+psycopg2", ""))
-        try:
-            conn = psycopg2.connect(host=u.hostname, port=u.port or 5432,
-                                    user=u.username, password=u.password,
-                                    dbname=u.path.lstrip("/"))
-        except Exception as exc:
-            log(f"  admin-bridge connect failed: {exc}")
-            return
-
-        try:
-            with conn, conn.cursor() as cur:
-                cur.execute("SELECT id FROM ab_role WHERE name = 'Admin'")
-                row = cur.fetchone()
-                if row is None:
-                    log("  Admin-rol bestaat nog niet in DB → skip")
-                    return
-                admin_role_id = row[0]
-                for username in usernames:
-                    cur.execute("SELECT id FROM ab_user WHERE username = %s",
-                                (username,))
-                    row = cur.fetchone()
-                    if row is None:
-                        log(f"  user '{username}' bestaat nog niet "
-                            f"(eerste OIDC-login nog niet gedaan) → skip")
-                        continue
-                    user_id = row[0]
-                    # Vervang alle bestaande rollen door alleen Admin.
-                    # ab_user_role.id is een PK zonder DEFAULT sequence —
-                    # in tegenstelling tot ab_user/ab_role waar Flask-
-                    # AppBuilder een AUTO_INCREMENT op postgres genereert.
-                    # We fetchen daarom expliciet een nieuwe id via een
-                    # subquery (MAX+1 is veilig hier omdat de init-Job
-                    # serialized loopt).
-                    cur.execute("DELETE FROM ab_user_role WHERE user_id = %s",
-                                (user_id,))
-                    cur.execute(
-                        "INSERT INTO ab_user_role (id, user_id, role_id) "
-                        "VALUES ("
-                        "  COALESCE((SELECT MAX(id) FROM ab_user_role), 0) + 1,"
-                        "  %s, %s)",
-                        (user_id, admin_role_id))
-                    log(f"  ✓ {username} → Admin")
-        finally:
-            conn.close()
-
-
-    def sync_columns_postgres():
-        """Direct in Superset's metadata DB de complete kolomlijst INSERTen.
-
-        De API-route (PUT /api/v1/dataset/{id} met override_columns) wordt
-        geaccepteerd maar persisteert in Superset 4.x maar 1 kolom — Superset
-        valideert tegen Trino's SHOW COLUMNS, die op deze cluster om onbekende
-        reden 1 kolom returnt. Workaround: bypass de validation.
-        """
-        import os, urllib.parse  # noqa: PLC0415
-        # Re-use Superset's eigen DB-URI uit Secret-mount (zelfde als airflow.cfg)
-        try:
-            import psycopg2  # noqa: PLC0415
-        except ImportError:
-            log("  psycopg2 niet geïnstalleerd → sla DB-fallback over (UI-fix nodig)")
-            return
-
-        uri = os.environ.get("SUPERSET_DB_URI", "")
-        if not uri:
-            log("  geen SUPERSET_DB_URI env → DB-fallback skip")
-            return
-
-        # Strip 'postgresql+psycopg2://' prefix → connect-string
-        u = urllib.parse.urlparse(uri.replace("+psycopg2", ""))
-        try:
-            conn = psycopg2.connect(host=u.hostname, port=u.port or 5432,
-                                    user=u.username, password=u.password,
-                                    dbname=u.path.lstrip("/"))
-        except Exception as exc:
-            log(f"  psycopg2 connect failed: {exc} — DB-fallback skip")
-            return
-
-        # Hardcoded kolomlijst per UC-mart.
-        DATASET_COLS = {
-            "mart_uc01_claims_funnel_daily": [
-                ("aanvraag_datum", "DATE", True),
-                ("regio_code", "VARCHAR", False), ("onderdeel", "VARCHAR", False),
-                ("status", "VARCHAR", False), ("n_request", "BIGINT", False),
-                ("gemid_ao_pct", "DOUBLE", False), ("n_in_behandeling", "BIGINT", False),
-                ("n_toegekend", "BIGINT", False), ("n_afgewezen", "BIGINT", False),
-            ],
-            "mart_uc04_eligibility_outreach": [
-                ("bsn", "VARCHAR", False), ("inkomen_maand_eur", "DECIMAL", False),
-                ("norm_per_maand_eur", "INTEGER", False), ("gat_per_maand", "DECIMAL", False),
-                ("huishoud_type_aanname", "VARCHAR", False),
-                ("toelichting", "VARCHAR", False), ("opt_out", "BOOLEAN", False),
-            ],
-            "mart_uc05_customer_360": [
-                ("bsn", "VARCHAR", False), ("voornaam", "VARCHAR", False),
-                ("achternaam", "VARCHAR", False), ("geslacht", "VARCHAR", False),
-                ("birth_date", "DATE", True), ("straat", "VARCHAR", False),
-                ("huisnummer", "INTEGER", False), ("postcode", "VARCHAR", False),
-                ("woonplaats", "VARCHAR", False),
-                ("n_dienstverbanden_lopend", "BIGINT", False),
-                ("totaal_loon_jaar", "BIGINT", False), ("n_lopende_ww", "BIGINT", False),
-                ("n_lopende_wia", "BIGINT", False), ("max_ao_pct", "INTEGER", False),
-                ("n_customer interactionen_30d", "BIGINT", False),
-            ],
-            "mart_uc06_cost_5y": [
-                ("jaar", "BIGINT", False), ("maand", "BIGINT", False),
-                ("wet", "VARCHAR", False), ("regio_code", "VARCHAR", False),
-                ("uitbetaald_bruto_eur_projection", "INTEGER", False),
-                ("aantal_claim payouten_projection", "INTEGER", False),
-                ("scenario_id", "VARCHAR", False),
-            ],
-            "mart_uc06_scenario_results": [
-                ("jaar", "BIGINT", False), ("maand", "BIGINT", False),
-                ("wet", "VARCHAR", False), ("regio_code", "VARCHAR", False),
-                ("uitbetaald_bruto_eur_projection", "INTEGER", False),
-                ("aantal_claim payouten_projection", "INTEGER", False),
-                ("scenario_id", "VARCHAR", False),
-            ],
-            "mart_uc07_dq_dagrapport": [
-                ("rapport_datum", "DATE", True), ("n_ikvs", "BIGINT", False),
-                ("n_unieke_bsns", "BIGINT", False), ("n_lopend", "BIGINT", False),
-                ("n_bsn_buiten_test_bereik", "BIGINT", False),
-                ("n_loon_null", "BIGINT", False), ("n_loon_boven_250k", "BIGINT", False),
-                ("n_lh_format_fout", "BIGINT", False),
-            ],
-            "mart_uc09_effect_panel": [
-                ("bsn_pseudo", "VARCHAR", False), ("leeftijd", "BIGINT", False),
-                ("geslacht", "VARCHAR", False), ("n_ww_request", "BIGINT", False),
-                ("ooit_ww_toegekend", "BOOLEAN", False),
-                ("n_wia_request", "BIGINT", False), ("max_ao_pct", "INTEGER", False),
-                ("dienstverbanden_lopend", "BIGINT", False),
-                ("loon_jaar_lopend", "BIGINT", False),
-                ("huidige_status", "VARCHAR", False),
-            ],
-            "mart_uc11_journey_events": [
-                ("bsn", "VARCHAR", False),
-                ("event_seq", "BIGINT", False),
-                ("event_ts", "TIMESTAMP", True),
-                ("event_date", "DATE", True),
-                ("domein", "VARCHAR", False),
-                ("event_type", "VARCHAR", False),
-                ("event_label", "VARCHAR", False),
-                ("event_status", "VARCHAR", False),
-                ("regio_code", "VARCHAR", False),
-                ("numeric_value", "DOUBLE", False),
-                ("source_ref_id", "VARCHAR", False),
-            ],
-            "mart_uc11_journey_phases": [
-                ("bsn", "VARCHAR", False),
-                ("fase_volgnr", "BIGINT", False),
-                ("fase", "VARCHAR", False),
-                ("trigger_event_type", "VARCHAR", False),
-                ("fase_start_ts", "TIMESTAMP", True),
-                ("fase_eind_ts", "TIMESTAMP", True),
-                ("duur_dagen", "BIGINT", False),
-                ("is_lopend", "BOOLEAN", False),
-            ],
-            "mart_dq_overview": [
-                ("uc_code", "VARCHAR", False), ("uc_name", "VARCHAR", False),
-                ("n_records", "BIGINT", False), ("n_checks", "BIGINT", False),
-                ("n_passing_checks", "BIGINT", False),
-                ("n_failing_checks", "BIGINT", False),
-                ("n_violations", "BIGINT", False),
-                ("n_violations_critical", "BIGINT", False),
-                ("n_violations_high", "BIGINT", False),
-                ("n_violations_medium", "BIGINT", False),
-                ("dq_score_pct", "DOUBLE", False),
-                ("dq_status", "VARCHAR", False),
-            ],
-            "mart_dq_violations": [
-                ("uc_code", "VARCHAR", False), ("uc_name", "VARCHAR", False),
-                ("check_name", "VARCHAR", False), ("severity", "VARCHAR", False),
-                ("n_violations", "BIGINT", False), ("n_records", "BIGINT", False),
-            ],
-        }
-
-        cur = conn.cursor()
-        cur.execute("SELECT id, table_name FROM tables")
-        tables = {row[1]: row[0] for row in cur.fetchall()}
-        total_inserted = 0
-        dttm_updates = 0
-        for table_name, cols in DATASET_COLS.items():
-            tid = tables.get(table_name)
-            if tid is None:
-                continue
-            for col_name, col_type, is_dttm in cols:
-                cur.execute(
-                    "INSERT INTO table_columns "
-                    "(table_id, column_name, type, is_dttm, is_active, "
-                    " groupby, filterable, uuid, created_on, changed_on) "
-                    "VALUES (%s, %s, %s, %s, true, true, true, "
-                    " gen_random_uuid(), now(), now()) "
-                    "ON CONFLICT (table_id, column_name) DO NOTHING",
-                    (tid, col_name, col_type, is_dttm),
-                )
-                if cur.rowcount > 0:
-                    total_inserted += 1
-            # main_dttm_col on the table-rij zetten zodat line-charts werken:
-            # zonder dit krijgt elke time-series chart-API een 500 met
-            # "Datetime column not provided as part table configuration".
-            # We pakken de EERSTE is_dttm-kolom from the DATASET_COLS-spec.
-            dttm_col = next((c[0] for c in cols if c[2]), None)
-            if dttm_col:
-                cur.execute(
-                    "UPDATE tables SET main_dttm_col = %s "
-                    "WHERE id = %s AND (main_dttm_col IS NULL "
-                    "                   OR main_dttm_col NOT IN ("
-                    "    SELECT column_name FROM table_columns "
-                    "    WHERE table_id = %s AND is_dttm = true))",
-                    (dttm_col, tid, tid),
-                )
-                if cur.rowcount > 0:
-                    dttm_updates += 1
-        conn.commit()
-        cur.close()
-        conn.close()
-        log(f"  ✓ Postgres-fallback: {total_inserted} kolom-rijen + "
-            f"{dttm_updates} main_dttm_col gezet")
-
-
-    if __name__ == "__main__":
-        sys.exit(main())
-
+    if __name__ == '__main__':
+        main()
 ---
 apiVersion: batch/v1
 kind: Job
@@ -577,7 +80,7 @@ metadata:
   namespace: odap-platform
   labels:
     odap.io/component: superset-init
-    odap.io/dev-only: "true"
+    odap.io/dev-only: 'true'
 spec:
   ttlSecondsAfterFinished: 3600
   backoffLimit: 2
@@ -588,52 +91,41 @@ spec:
     spec:
       restartPolicy: OnFailure
       containers:
-        - name: init
-          image: python:3.11-slim
-          command: ["bash", "-euo", "pipefail", "-c"]
-          args:
-            - |
-              pip install --quiet --disable-pip-version-check requests psycopg2-binary
-              python /scripts/init_superset.py
-          env:
-            - name: SUPERSET_URL
-              value: "http://superset-node:8088"
-            - name: ADMIN_USER
-              valueFrom:
-                secretKeyRef:
-                  name: superset-postgres-credentials
-                  key: adminUser.username
-            - name: ADMIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: superset-postgres-credentials
-                  key: adminUser.password
-            - name: TRINO_HOST
-              value: "trino-coordinator.odap-platform.svc.cluster.local"
-            - name: TRINO_USER
-              value: "smoketest"
-            - name: TRINO_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: trino-static-users
-                  key: smoketest
-            # Postgres-fallback voor dataset-kolommen (zie sync_columns_postgres()).
-            - name: SUPERSET_DB_URI
-              valueFrom:
-                secretKeyRef:
-                  name: superset-postgres-credentials
-                  key: connections.sqlalchemyDatabaseUri
-          volumeMounts:
-            - name: scripts
-              mountPath: /scripts
-          resources:
-            requests:
-              cpu: 50m
-              memory: 128Mi
-            limits:
-              cpu: 500m
-              memory: 256Mi
-      volumes:
+      - name: init
+        image: python:3.11-slim
+        command:
+        - bash
+        - -euo
+        - pipefail
+        - -c
+        args:
+        - |-
+          pip install --quiet --disable-pip-version-check requests==2.32.3
+          python /scripts/init_superset.py
+        env:
+        - name: SUPERSET_URL
+          value: http://superset-node:8088
+        - name: ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: superset-postgres-credentials
+              key: adminUser.username
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: superset-postgres-credentials
+              key: adminUser.password
+        volumeMounts:
         - name: scripts
-          configMap:
-            name: superset-init-script
+          mountPath: /scripts
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+      volumes:
+      - name: scripts
+        configMap:
+          name: superset-init-script

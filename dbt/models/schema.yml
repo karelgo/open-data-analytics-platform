@@ -1,0 +1,246 @@
+version: 2
+sources:
+- name: job_market
+  database: bronze
+  schema: job_market
+  description: Daily normalized job-board observations; raw responses are restricted
+    in S3.
+  tables:
+  - name: observations
+    columns:
+    - name: job_id
+      tests:
+      - not_null
+    - name: snapshot_date
+      tests:
+      - not_null
+models:
+- name: stg_job_observations
+  description: Dutch job-board observations with unknowns preserved as NULL.
+  columns:
+  - name: source
+    tests:
+    - not_null
+  - name: canonical_url
+    tests:
+    - not_null
+  - name: country_code
+    tests:
+    - accepted_values:
+        arguments:
+          values:
+          - NL
+- name: int_job_snapshots
+  description: One conservative employer/title/city duplicate group per collection
+    day, with source provenance.
+  columns:
+  - name: duplicate_group_id
+    tests:
+    - not_null
+- name: mart_job_inventory
+  description: Jobs observed in the latest completed daily extract; absence does not
+    establish closure.
+  data_tests:
+  - job_market_grain:
+      arguments:
+        columns:
+        - duplicate_group_id
+  columns:
+  - name: snapshot_date
+    data_tests:
+    - not_null
+  - name: duplicate_group_id
+    data_tests:
+    - not_null
+    - unique
+  - name: job_id
+    data_tests:
+    - not_null
+  - name: company
+    data_tests:
+    - not_null
+- name: mart_job_demand_daily
+  description: Multi-label domains overlap; domain totals must not be added to obtain
+    a distinct total.
+  data_tests:
+  - job_market_grain:
+      arguments:
+        columns:
+        - snapshot_date
+        - domain
+        - is_synthetic
+  columns:
+  - name: snapshot_date
+    data_tests:
+    - not_null
+  - name: observed_jobs
+    data_tests:
+    - not_null
+    - job_market_nonnegative
+  - name: domain
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - data
+          - cloud
+          - sap
+          - ai
+          - software
+          - security
+- name: mart_job_skills
+  description: Observed jobs by snapshot, domain and rule-extracted skill.
+  data_tests:
+  - job_market_grain:
+      arguments:
+        columns:
+        - snapshot_date
+        - domain
+        - skill
+        - is_synthetic
+  columns:
+  - name: snapshot_date
+    data_tests:
+    - not_null
+  - name: observed_jobs
+    data_tests:
+    - not_null
+    - job_market_nonnegative
+  - name: domain
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - data
+          - cloud
+          - sap
+          - ai
+          - software
+          - security
+  - name: skill
+    data_tests:
+    - not_null
+- name: mart_job_salary
+  description: EUR yearly equivalent (month times 12); hourly/unknown excluded, reported
+    and estimated separate.
+  data_tests:
+  - job_market_grain:
+      arguments:
+        columns:
+        - snapshot_date
+        - domain
+        - seniority
+        - salary_is_estimated
+        - is_synthetic
+  columns:
+  - name: snapshot_date
+    data_tests:
+    - not_null
+  - name: observed_jobs
+    data_tests:
+    - not_null
+    - job_market_nonnegative
+  - name: domain
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - data
+          - cloud
+          - sap
+          - ai
+          - software
+          - security
+- name: mart_job_geography
+  description: Observed job locations; NULL is unknown, never an inferred province.
+  data_tests:
+  - job_market_grain:
+      arguments:
+        columns:
+        - snapshot_date
+        - domain
+        - city
+        - province
+        - is_synthetic
+  columns:
+  - name: snapshot_date
+    data_tests:
+    - not_null
+  - name: observed_jobs
+    data_tests:
+    - not_null
+    - job_market_nonnegative
+  - name: domain
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - data
+          - cloud
+          - sap
+          - ai
+          - software
+          - security
+- name: mart_job_work_arrangements
+  description: Contract, work mode, seniority, language, education and hours.
+  data_tests:
+  - job_market_grain:
+      arguments:
+        columns:
+        - snapshot_date
+        - domain
+        - work_mode
+        - employment_type
+        - contract_type
+        - seniority
+        - language
+        - education
+        - is_synthetic
+  columns:
+  - name: snapshot_date
+    data_tests:
+    - not_null
+  - name: observed_jobs
+    data_tests:
+    - not_null
+    - job_market_nonnegative
+  - name: domain
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - data
+          - cloud
+          - sap
+          - ai
+          - software
+          - security
+- name: mart_job_source_quality
+  description: Completeness and last observation times for successful source extracts;
+    run manifests record failures.
+  data_tests:
+  - job_market_grain:
+      arguments:
+        columns:
+        - snapshot_date
+        - source
+        - is_synthetic
+  columns:
+  - name: snapshot_date
+    data_tests:
+    - not_null
+  - name: source_observations
+    data_tests:
+    - not_null
+    - job_market_nonnegative
+  - name: source
+    data_tests:
+    - not_null
+  - name: last_observed_at
+    data_tests:
+    - not_null

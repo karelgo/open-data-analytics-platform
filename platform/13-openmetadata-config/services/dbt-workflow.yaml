@@ -16,10 +16,10 @@ source:
       dbtConfigSource:
         dbtConfigType: s3
         dbtSecurityConfig:
-          awsAccessKeyId: platformadmin
+          awsAccessKeyId: ${MINIO_ACCESS_KEY}
           awsSecretAccessKey: ${MINIO_SECRET_KEY}
           awsRegion: eu-nl-1
-          endPointURL: https://minio.odap-platform.svc.cluster.local:9000
+          endPointURL: ${MINIO_ENDPOINT}
         dbtPrefixConfig:
           dbtBucketName: odap-meta
           dbtObjectPrefix: dbt/latest/

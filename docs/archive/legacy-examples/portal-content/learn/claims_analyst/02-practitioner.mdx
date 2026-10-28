@@ -1,0 +1,114 @@
+---
+title: "UC-01 doorlopen: van werklijst tot beslissing"
+role: claims_analyst
+level: practitioner
+order: 2
+duration: "45 min"
+summary: "Eén complete WIA-aanvraag van werklijst tot een onderbouwde beslissing — with the juiste dashboards, een ad-hoc Trino-query for the details en een lookup in de glossary."
+prereqs:
+  - "claims_analyst/foundation/1"
+labs:
+  - title: "Open de WIA-funnel — werklijst voor jouw regio"
+    href: "/go/superset/"
+  - title: "Open SQL Lab — for the dossier-detail-query"
+    href: "/go/superset/"
+  - title: "Glossary — wat is ‘arbeidsongeschiktheidsklasse’?"
+    href: "/go/openmetadata/"
+checks:
+  - id: "wia_practitioner_query"
+    title: "Detail-query op silver.claims.application uitgevoerd"
+    hint: "Met regio-filter, met geldige PII-doel-comment"
+quiz:
+  - q: "Wat is een correcte SQL-comment for a ad-hoc detail-query?"
+    options:
+      - "Geen comment — niet nodig"
+      - "-- WIA-1234 (dossier) — doel: beoordeling/claim payout"
+      - "-- nieuwsgierig"
+      - "-- TODO"
+    correct: 1
+    explain: "Comment koppelt query aan dossier en doel. Audit-log gebruikt dit veld."
+  - q: "Welk SQL-voorbeeld is correct voor jouw rol?"
+    options:
+      - "SELECT * FROM bronze.claims.application"
+      - "SELECT bsn, status, datum_ingediend FROM silver.claims.application WHERE regio_code='UWV-NH' AND status='open'"
+      - "SELECT * FROM sensitive.eligibility_cases.dossier"
+      - "DROP TABLE silver.claims.application"
+    correct: 1
+  - q: "De funnel toont 12 dossiers > 8 weken open. Wat doe je eerst?"
+    options:
+      - "Allemaal afwijzen"
+      - "Drill-down per dossier; bij elke uitkomst kijk je of er een legitimate reden is (medische hold, nadere info opgevraagd) of dat het een werkelijke termijn-overschrijding is — die meld je bij teamleider"
+      - "Negeren"
+      - "Naar de Finance Analyst"
+    correct: 1
+---
+
+In deze module behandel je één WIA-dossier van begin tot eind. Doel: leer
+de pad van werklijst → detail → beslissing onder je vingers krijgen.
+
+## Casus
+
+Op je werklijst van vanmorgen staat dossier **WIA-2024-7782**, regio
+UWV-NH, status `open`, ingediend 9 weken geleden. De wettelijke termijn
+is 8 weken. Wat is hier aan de hand?
+
+## Stap 1 — werklijst openen
+
+Open het [WIA-funnel dashboard](/go/superset/) en filter op:
+
+- regio = je eigen
+- status = `open`
+- doorlooptijd_dagen > 56
+
+Dossier 7782 staat in de top-3. Open het kaartje for the overzichtsvelden.
+
+## Stap 2 — detail in SQL Lab
+
+Niet alle velden staan in de funnel. Voor het dossier-detail open je
+[SQL Lab](/go/superset/) en draait:
+
+```sql
+-- WIA-2024-7782 (dossier) — doel: beoordeling/claim payout
+SELECT
+    application_id,
+    bsn,
+    voornaam, achternaam, birth_date,
+    datum_ingediend,
+    datum_laatste_actie,
+    status_reden,
+    arbeidsongeschiktheidsklasse_voorlopig
+FROM silver.claims.application
+WHERE application_id = 'WIA-2024-7782'
+  AND regio_code = 'UWV-NH';
+```
+
+> Twee dingen om op te merken:
+>
+> 1. **Comment** met dossier + doel — die staat in de audit-log.
+> 2. **Filter regio_code** — overbodig (OPA filtert al), maar het maakt je
+>    intentie expliciet en voorkomt traagheid.
+
+Als de OPA-policy of de regio-filter ontbreekt, krijg je 0 rijen — niet
+een fout. Dat is bewust.
+
+## Stap 3 — glossary checken
+
+Het veld `arbeidsongeschiktheidsklasse_voorlopig` staat op `WGA-gedeeltelijk`.
+Wat is het verschil met `WGA-volledig`? Open de [glossary](/go/openmetadata/),
+zoek de term op en lees de eenduidige definitie. Geen synoniemen-soep.
+
+## Stap 4 — beslissing onderbouwen
+
+Alle informatie is nu zichtbaar:
+
+- `status_reden` = `wachten_medische_keuring` → legitieme hold;
+- de keuring is gepland over 4 dagen.
+
+Conclusie: termijn is overschreden, *maar* de oorzaak ligt buiten dit team.
+Dit moet je vastleggen als zodanig — zodat de funnel-cijfers niet ten
+onrechte een foute KPI tonen.
+
+## Verificatie
+
+De auto-check controleert dat je een query op `silver.claims.application` hebt
+gedraaid mét regio-filter én een SQL-comment met doel-vermelding.

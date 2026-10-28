@@ -1,118 +1,41 @@
 ---
-title: "Een UC-03 risk-signaal van begin tot afronding"
-role: fraud_analyst
-level: practitioner
-order: 2
-duration: "45 min"
-summary: "Eén dossier met hoge risk-score: drill-down on the top-features, een ad-hoc query for the IBAN-detail, en de juiste vastlegging in tracker — incl. menselijk-oordeel-stap."
-prereqs:
-  - "fraud_analyst/foundation/1"
-labs:
-  - title: "WW-risk dashboard openen"
-    href: "/go/superset/"
-  - title: "Trino — query voor IBAN-context"
-    href: "/go/trino/"
-  - title: "Lineage UC-03 — top-features uitleg"
-    href: "/go/openmetadata/"
-checks:
-  - id: "ww_practitioner_decision"
-    title: "Beslissing vastgelegd in tracker"
-    hint: "Met TICKET-id, score, top-3 features en menselijk oordeel"
-quiz:
-  - q: "Een dossier heeft score 0.87 (hoog). Welke actie?"
-    options:
-      - "Direct sanctioneren"
-      - "Drill-down: top-3 features bekijken; hand-onderzoek inplannen; voorlopige conclusie + mensenlijke beslissing in tracker"
-      - "Score lager zetten"
-      - "Naar de teamleider mailen zonder verder onderzoek"
-    correct: 1
-  - q: "Welke kolommen mag jij zien dat de Marketing Analyst niet ziet?"
-    options:
-      - "iban (volledig), risk_score"
-      - "Geen verschil"
-      - "Alleen voornaam"
-      - "Alleen risk_score"
-    correct: 0
-  - q: "Hoe registreer je dat een hoge score na onderzoek tóch geen handhaving rechtvaardigt?"
-    options:
-      - "Niets — gewoon doorgaan"
-      - "TICKET-id sluiten met motivering ‘false positive: ondersteuning vermoedelijk ongeldig wegens X’ + verwijzing naar bron-data; dit is de feedback-lus for the model"
-      - "Alleen mondeling melden"
-      - "Mailen to the directeur"
-    correct: 1
+{
+  "title": "Trace a vacancy through the platform",
+  "role": "fraud_analyst",
+  "level": "practitioner",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Review source coverage, completeness and duplicate observations.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-In deze module verwerk je één signaal van het WW-risk-model. Doel: het
-volledige proces — van score on the dashboard tot een menselijke beslissing
-met onderbouwing — onder je vingers krijgen.
+Open the Superset job-market dashboard and the `mart_job_inventory` dataset. Follow the dataset in OpenMetadata to the Silver deduplication model and Bronze observations. Read the dated extraction manifest before comparing counts across days.
 
-## Casus
+In Jupyter, run `00_dutch_it_job_market.ipynb`. The offline section reads SQLite; the platform section queries Trino under your assigned identity. Use only the layers authorized to your role.
 
-Op het dashboard staat een nieuwe waarschuwing:
-
-> Dossier **WW-2025-1142**, regio UWV-OV, risk-score `0.87` (top 5%
-> binnen je werklijst).
-
-Top-3 signalen:
-
-1. parttime-uren afwijkend van laatste werkgever-opgave (+12);
-2. IBAN-mutatie 3 dagen voor aanvraag (+9);
-3. inkomen-discrepantie BRP↔polisadm (+6).
-
-## Stap 1 — drill-down on the dashboard
-
-Open de [risk-card](/go/superset/) voor WW-2025-1142. Het dashboard toont
-naast de score de drie sterkste features. Belangrijk: **dit is geen bewijs**.
-Het zijn afwijkingen die menselijk onderzoek waard kunnen zijn.
-
-## Stap 2 — IBAN-context in Trino
-
-Voor handhaving heb je IBAN ongelinkt nodig (PII-doel `handhaving`).
-Open [Trino](/go/trino/) en draai:
-
-```sql
--- HANDH-2143 (zaak) — doel: handhaving
-SELECT
-    application_id,
-    bsn,
-    iban,                             -- ongelinkt voor jouw rol
-    iban_mutatiedatum,
-    aanvraag_datum,
-    werkgever_laatste,
-    parttime_uren_opgave_aanvrager,
-    parttime_uren_polisadm
-FROM silver.service_requests.application
-WHERE application_id = 'WW-2025-1142';
-```
-
-Andere rollen zien op exact deze tabel `iban` als hash. Niet jij.
-
-## Stap 3 — beoordeel het signaal
-
-Voor je een conclusie noteert: lees de feature-uitleg in
-[OpenMetadata](/go/openmetadata/). Een IBAN-mutatie is verdacht *in
-combinatie* met andere afwijkingen, niet op zichzelf. Mensen veranderen
-banken om legitieme redenen.
-
-Mogelijke uitkomsten:
-
-- **Hand-onderzoek inplannen** — alle drie signalen onafhankelijk valideerbaar.
-- **False positive** — uitleg uit andere bron beschikbaar (huwelijk, verhuis).
-- **Fraudemelding** — hard bewijs uit primaire bron, hand-onderzoek niet meer nodig.
-
-## Stap 4 — vastleggen
-
-Maak een ticket aan in de tracker met:
-
-- TICKET-id `HANDH-2143` (gebruikt in de SQL-comments);
-- score + top-features als snapshot;
-- jouw menselijke beoordeling + onderbouwing;
-- vervolgactie + uiterste datum.
-
-Dit is geen administratieve last: het is de feedback-lus waarmee het model
-verbetert (false-positives komen terug to the data-engineer).
-
-## Verificatie
-
-De auto-check valideert dat een ticket in de tracker is aangemaakt met de
-juiste velden en dat de query mét `TICKET-id` als comment is gedraaid.
+[Continue in the job-market explorer](/job-market/).

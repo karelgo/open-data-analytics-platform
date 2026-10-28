@@ -1,102 +1,41 @@
 ---
-title: "Eigen sturingsdashboard met OPA-bewuste filters"
-role: claims_analyst
-level: expert
-order: 3
-duration: "90 min"
-summary: "Bouw een persoonlijk Superset-dashboard voor jouw team — filtert correct op regio, leest vanuit gold, en je kunt aan een collega uitleggen waarom hij andere cijfers ziet."
-prereqs:
-  - "claims_analyst/practitioner/2"
-labs:
-  - title: "Superset — nieuw dashboard"
-    href: "/go/superset/"
-  - title: "OpenMetadata — gold.uc01_claims_funnel"
-    href: "/go/openmetadata/"
-checks:
-  - id: "wia_expert_dashboard"
-    title: "Dashboard gepubliceerd, getest met collega-rol"
-quiz:
-  - q: "Twee collega's openen jouw dashboard en zien verschillende totalen. Wat is de verklaring?"
-    options:
-      - "Bug"
-      - "OPA past per gebruiker een regio-filter toe; ze zien hun eigen regio. Documenteer dit expliciet bij het dashboard zodat niemand denkt dat de cijfers niet kloppen"
-      - "Caching"
-      - "Tijdzone"
-    correct: 1
-  - q: "Welke kolom mag je niet als filter blootstellen in een gedeeld dashboard?"
-    options:
-      - "regio_code"
-      - "bsn"
-      - "status"
-      - "datum_ingediend"
-    correct: 1
-  - q: "Wat is een goede dashboard-titelconventie?"
-    options:
-      - "‘Mijn ding’"
-      - "‘[Domein] [Doel] — [eigenaar] — [versie/datum]’ — eigenaar staat erop, anders weet niemand bij wie te zijn voor vragen"
-      - "Een nummer"
-      - "Niets"
-    correct: 1
-certifies: true
+{
+  "title": "Review evidence and source coverage",
+  "role": "claims_analyst",
+  "level": "expert",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Explain a result with definitions, limitations and reproducible evidence.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-Dit is je laatste module. Doel: zelfstandig een sturingsdashboard
-opzetten dat over twee weken nog steeds zinnig is.
+Prepare a short analysis comparing two daily snapshots. Include the source set and extraction status, distinct vacancy denominator, overlapping domains and salary coverage. Explain whether any observed change could come from missing sources or page limits.
 
-## Brief
+Engineers can rerun a date and verify that its partition remains unique. Stewards review lineage and classifications. Analysts verify that estimates, hourly rates and unknown values are treated according to the dictionary.
 
-Jouw teamleider vraagt een wekelijks dashboard met:
-
-- aantal lopende WIA-request per regio (alleen jullie regio's),
-- gemiddelde doorlooptijd in dagen,
-- aantal dossiers >8 weken open (wettelijke termijn),
-- forecast komende 4 weken.
-
-Geen PII zichtbaar. Bouw het in [Superset](/go/superset/).
-
-## Stap 1 — datasource
-
-`gold.uc01_claims_funnel` is jouw bron. Dat is bewust: deze mart is precies
-voor sturing gemodelleerd, met DQ-tests en lineage. Bouw niet op silver —
-dat is geen sturings-mart en je dwingt jezelf in herhaalwerk.
-
-## Stap 2 — charts
-
-Vier charts, in een 2×2 grid:
-
-| Chart | Type | Filters |
-|---|---|---|
-| Voorraad per regio | bar | regio (auto via OPA) |
-| Doorlooptijd | line per week | rolling 12wk |
-| Termijn-overschrijdingen | KPI met threshold | doorlooptijd > 56 |
-| Forecast | line + band | 4wk horizon |
-
-## Stap 3 — OPA-bewustheid documenteren
-
-Op het dashboard, onderaan, een notitie:
-
-> Filters worden per gebruiker automatisch beperkt tot diens regio.
-> Eigenaar: [naam]. Bron: gold.uc01_claims_funnel. Vragen: data-steward.
-
-Zonder die regel krijg je gegarandeerd de mail "ik zie minder dan jij"
-en moet je elke keer uitleggen.
-
-## Stap 4 — testen met collega-rol
-
-Vraag een collega in een andere regio het dashboard te openen en jou de
-KPI te mailen. Zelfde structuur, ander cijfer. Dat is de bevestiging dat
-OPA werkt.
-
-## Stap 5 — publiceren
-
-Sla op met titel `WIA Sturing — [team] — v1`. Laat de teamleider
-review-vinkje geven (binnen Superset). Pas dán delen.
-
-## Verificatie
-
-De auto-check controleert dat het dashboard publiek is binnen je
-team-folder, dat alleen `gold`-tabellen erin zitten, en dat geen PII-kolom
-aan een filter is gekoppeld.
-
-> Bij voltooiing van deze module krijg je het Academy-certificaat
-> **Claims Analyst**.
+[Continue in the job-market explorer](/job-market/).

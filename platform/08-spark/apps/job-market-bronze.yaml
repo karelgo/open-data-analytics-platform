@@ -1,0 +1,90 @@
+apiVersion: spark.stackable.tech/v1alpha1
+kind: SparkApplication
+metadata:
+  name: job-market-bronze
+  namespace: odap-platform
+  labels:
+    odap.io/use-case: dutch-it-job-market
+spec:
+  sparkImage:
+    productVersion: 3.5.8
+  mode: cluster
+  mainApplicationFile: local:///stackable/spark/jobs/job_market_bronze.py
+  s3connection:
+    reference: s3-minio
+  deps:
+    requirements: []
+    packages:
+    - io.delta:delta-spark_2.12:3.2.1
+    - org.apache.hadoop:hadoop-aws:3.3.6
+  sparkConf:
+    spark.sql.shuffle.partitions: '4'
+    spark.kubernetes.driver.deleteOnTermination: 'true'
+    spark.kubernetes.executor.deleteOnTermination: 'true'
+    spark.eventLog.enabled: 'true'
+    spark.eventLog.dir: s3a://odap-checkpoints/spark-events/
+  driver:
+    config:
+      logging:
+        enableVectorAgent: false
+      resources:
+        cpu:
+          min: 200m
+          max: 1000m
+        memory:
+          limit: 1500Mi
+    podOverrides:
+      spec:
+        containers:
+        - name: spark
+          env:
+          - name: S3_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio-s3-credentials
+                key: accessKey
+          - name: S3_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio-s3-credentials
+                key: secretKey
+          volumeMounts:
+          - name: spark-jobs
+            mountPath: /stackable/spark/jobs
+        volumes:
+        - name: spark-jobs
+          configMap:
+            name: spark-streaming-jobs
+  executor:
+    replicas: 1
+    config:
+      logging:
+        enableVectorAgent: false
+      resources:
+        cpu:
+          min: 200m
+          max: 1000m
+        memory:
+          limit: 1500Mi
+    podOverrides:
+      spec:
+        containers:
+        - name: spark
+          env:
+          - name: S3_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio-s3-credentials
+                key: accessKey
+          - name: S3_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio-s3-credentials
+                key: secretKey
+          volumeMounts:
+          - name: spark-jobs
+            mountPath: /stackable/spark/jobs
+        volumes:
+        - name: spark-jobs
+          configMap:
+            name: spark-streaming-jobs

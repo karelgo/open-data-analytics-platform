@@ -1,23 +1,5 @@
-# NiFi flow templates — Iceberg variant
+# Optional NiFi transport
 
-Status: **niet actief in deze implementatie** (we draaien Delta — zie
-[ADR-0006](../../../docs/adr/0006-delta-chosen-for-this-implementation.md)).
-Bewaard als template voor terug-switch.
+The single supported example is [Dutch IT Jobs](../../../examples/dutch-it-jobs/). Its daily batch path is source API/feed → S3 → Spark Delta → dbt/Trino → Superset and OpenMetadata. NiFi and Kafka operators are disabled in the default platform and are not required by this example. No imported NiFi flow is provided.
 
-## Verschil met Delta-variant
-
-NiFi 2.x heeft een **native `PutIceberg`-processor**. Het ingest-pad kan
-daardoor NiFi-only zijn:
-
-```
-GetSFTP / GetS3 → ValidateRecord → UpdateAttribute (PII) → PutIceberg → bronze
-```
-
-Geen tussenstap via Kafka nodig. Spark Streaming wordt dan alleen ingezet voor
-silver/gold-transformations (CDC-applies, joins, MERGE INTO).
-
-Bij switch terug naar Iceberg:
-1. `platform-config.yaml`: `table_format: iceberg`.
-2. `make render-catalogs && kubectl apply -k platform/09-trino/`.
-3. NiFi-flows uit deze directory importeren (TODO fase 5+).
-4. Spark streaming-job kan blijven, of vervangen door NiFi-only ingest.
+If transport through NiFi is required later, forward the same normalized JSONL contract with its `job_id`, `snapshot_date` and source provenance; source permission, retries and manifest completion must be retained.

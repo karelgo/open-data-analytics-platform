@@ -1,349 +1,70 @@
-# Declaratieve mapping van dbt `meta` velden naar OpenMetadata-entiteiten.
-#
-# Wordt geconsumeerd door `enrich_from_dbt_meta.py` na de dbt-ingest workflow.
-# Tag-FQNs verwijzen naar classifications.yaml; glossary-term-FQNs naar
-# glossary-cgm.yaml. Onbekende waardes worden gelogd en overgeslagen
-# (fail-soft — een typo in één mart blokkeert de hele run niet).
-
-# meta.purpose-limitation[] (lijst) → tags Purpose limitation.*
-purpose-limitation_to_tag:
-  sturingsinfo: Purpose limitation.Sturingsinfo
-  customer interaction: Purpose limitation.Customer interaction
-  behandeling: Purpose limitation.Behandeling
-  proactieve_dienstverlening: Purpose limitation.Proactieve_Dienstverlening
-  kwaliteitscontrole: Purpose limitation.Kwaliteitscontrole
-  actuarie: Purpose limitation.Actuarie
-  beleid: Purpose limitation.Beleid
-  statistisch_onderzoek: Purpose limitation.Statistisch_Research
-  claim payout: Purpose limitation.Claim payout
-  reintegration: Purpose limitation.Reintegration
-  handhaving: Purpose limitation.Handhaving
-  externe_levering: Purpose limitation.Externe_Levering
-  planning: Purpose limitation.Planning
-  # "primair_proces" = claim handling (primaire taak).
-  primair_proces: Purpose limitation.Claim payout
-  # Klanttevredenheids- / UX-onderzoek = sturings-/beleidsinput.
-  klantonderzoek: Purpose limitation.Sturingsinfo
-
-# meta.legal_basis → tags LegalBasis.* (lijst). Rauwe waarde bewaard als
-# custom property `legal_basis_text` zodat de exacte wetsverwijzing
-# zichtbaar blijft.
-legal_basis_to_tags:
-  AVG_art_6_1e: [LegalBasis.Art6_1e]
-  AVG_art_6_1_e: [LegalBasis.Art6_1e]        # typo-tolerant
-  AVG_art_6_1f: [LegalBasis.Art6_1f]
-  AVG_art_6_1_f: [LegalBasis.Art6_1f]        # UC-12 FinOps (gerechtvaardigd belang)
-  WIA_art_64: [LegalBasis.Art6_1c]
-  Wet_proactieve_dienstverlening_SZW_2025: [LegalBasis.Art6_1c]
-  Wet_SUWI+Wfsv: [LegalBasis.Art6_1c]
-  WIA+WW+Wajong+TW: [LegalBasis.Art6_1c]
-  art_5_1b_verenigbaar_gebruik: [LegalBasis.Art5_1b_VerenigbaarGebruik]
-  AVG_art_5_1d_juistheid: []                  # juistheids-principe is geen rechtsgrond
-  "n/a": []
-
-# meta.bio_classificatie → Confidentiality.* (axis = vertrouwelijkheid).
-# BIO.BIV-* (in classifications.yaml) is een andere axis (BIV-niveau);
-# dat is niet wat dbt's veld bedoelt — die schaal blijft handmatig.
-bio_classificatie_to_tag:
-  publiek: Confidentiality.Public
-  intern: Confidentiality.Internal
-  vertrouwelijk: Confidentiality.Confidential
-  geheim: Confidentiality.Secret
-
-# meta.risk_tier → AI.Risk-*. "laag-midden" rondt conservatief naar boven.
-risk_tier_to_tag:
-  laag: AI.Risk-Laag
-  laag-midden: AI.Risk-Midden
-  midden: AI.Risk-Midden
-  midden-hoog: AI.Risk-Hoog
-  hoog: AI.Risk-Hoog
-  verboden: AI.Risk-Verboden
-
-# meta.pii_kolommen[] → PII.* tags op kolom-niveau (case-insensitive match
-# op kolom-naam in OM-tabel).
-pii_column_to_tag:
-  bsn: PII.BSN
-  voornaam: PII.Naam
-  achternaam: PII.Naam
-  naam: PII.Naam
-  birth_date: PII.Geboortedatum
-  straat: PII.Adres
-  huisnummer: PII.Adres
-  postcode: PII.Adres
-  adres: PII.Adres
-  iban: PII.IBAN
-  telefoon: PII.Telefoon
-  email: PII.Email
-  lh_nummer: PII.LH_Nummer
-  # Vrije-tekst-velden kunnen indirect PII bevatten (UC-11 event_label).
-  event_label: PII.Sensitive
-  source_ref_id: PII.Sensitive
-
-# meta.eigenaar → Team-naam in OM. Teams worden geseed door init-Job
-# (zie init-job.yaml `apply_teams`). Onbekende waarden vallen terug op
-# user-lookup (sommige eigenaars zijn personen, geen teams).
-eigenaar_to_team:
-  divisie_ag: divisie_ag
-  divisie_ww: divisie_ww
-  divisie_wia: divisie_wia
-  divisie_fez: divisie_fez
-  divisie_crm: divisie_crm
-  divisie_customer interaction: divisie_customer interaction
-  divisie_finance: divisie_finance
-  knowledge_center: knowledge_center
-  data_steward_polisadm: data_steward_polisadm
-  data_steward_platform: data_steward_platform
-  data_office: data_office
-
-# Tier-default per tabel. Override-regels overstemmen de default:
-# - DoD-anchor marts (UC01 WIA Funnel, UC11 Customer journey)        → Tier1
-# - sandbox / research marts                                    → Tier3
-# - alle andere marts                                           → Tier2
-# - non-mart tabellen (bronze/silver staging)                   → Tier4
-tier_rules:
-  default: Tier4
-  by_dbt_tag:
-    marts: Tier2
-    sandbox: Tier3
-    cross: Tier1
-    uc01: Tier1
-    uc11: Tier1
-    uc12: Tier2     # FinOps spend dashboard — tactical, geen DoD-anchor
-
-# Custom-properties die op Table-entiteit geregistreerd worden door de
-# init-Job (PUT /metadata/types/{table-id}). One-offe registratie;
-# enricher zet de waardes per tabel via PATCH /tables/{id} extension.
-#
-# OM 1.5 heeft GEEN `boolean` primitive — booleans worden gemodelleerd als
-# enum {"true","false"} met `enumValues`. Enum-waardes worden door OM als
-# ARRAY opgeslagen, zelfs bij multiSelect=false; enricher schrijft ["true"]
-# of ["false"], niet de scalaire string.
-custom_properties:
-  - name: retention period_jaren
-    propertyType: integer
-    description: "Retentie-periode in jaren (R-AVG-08). Bron: dbt meta.retention period_jaren."
-  - name: dpia_id
-    propertyType: string
-    description: "Referentie naar DPIA-document. Bron: dbt meta.dpia_id."
-  - name: algoritmeregister_id
-    propertyType: string
-    description: "Registratienummer in algorithm register. Bron: dbt meta.algoritmeregister_id."
-  - name: legal_basis_text
-    propertyType: string
-    description: "Rauwe wetsverwijzing voor mapping naar LegalBasis-tag."
-  - name: dbt_domain
-    propertyType: string
-    description: "dbt meta.domain — business division / domein. Bron voor Domain-koppeling."
-  - name: human_in_the_loop
-    propertyType: enum
-    enumValues: ["true", "false"]
-    description: "Menselijke tussenkomst vereist voor besluit (AVG art. 22)."
-  - name: access_via_OPA_policies
-    propertyType: enum
-    enumValues: ["true", "false"]
-    description: "Access afgedwongen via OPA-Trino policies (rij/kolom-filter)."
-  - name: profilering
-    propertyType: enum
-    enumValues: ["true", "false"]
-    description: "Bevat profilering (AVG art. 22) — true vereist DPIA + opt-out."
-  - name: opt_out_supported
-    propertyType: enum
-    enumValues: ["true", "false"]
-    description: "Opt-out mechanisme aanwezig (Wet proactieve DV)."
-  - name: sandbox_only
-    propertyType: enum
-    enumValues: ["true", "false"]
-    description: "Sandbox-zone — verenigbaar gebruik art. 5 lid 1b AVG."
-  - name: pseudonymized
-    propertyType: enum
-    enumValues: ["true", "false"]
-    description: "Directe identifiers vervangen door pseudo-IDs."
-  - name: publiek_te_publiceren
-    propertyType: enum
-    enumValues: ["true", "false"]
-    description: "Geaggregeerde, niet-tot-persoon-herleidbare output — geschikt voor open data."
-  - name: juistheid_AVG_art_5_1d
-    propertyType: enum
-    enumValues: ["true", "false"]
-    description: "Tabel ondersteunt juistheids-principe (AVG art. 5 lid 1 onder d)."
-
-# Lijst van Teams die geseed worden in OM. Naam moet matchen met
-# eigenaar_to_team waardes hierboven. OM 1.5 staat owner-toewijzing alleen
-# toe aan Teams van type `Group` — `BusinessUnit` geeft 400 "Team of type
-# BusinessUnit can't own entities".
-teams:
-  - name: divisie_ag
-    displayName: "Divisie AG (Arbeidsgeschiktheid)"
-    teamType: Group
-  - name: divisie_ww
-    displayName: "Divisie WW"
-    teamType: Group
-  - name: divisie_wia
-    displayName: "Divisie WIA"
-    teamType: Group
-  - name: divisie_fez
-    displayName: "Divisie FEZ (Financieel Economische Zaken)"
-    teamType: Group
-  - name: divisie_crm
-    displayName: "Divisie CRM"
-    teamType: Group
-  - name: divisie_customer interaction
-    displayName: "Divisie Customer interaction"
-    teamType: Group
-  - name: knowledge_center
-    displayName: "Knowledge Center"
-    teamType: Group
-  - name: data_steward_polisadm
-    displayName: "Data Steward Polisadministratie"
-    teamType: Group
-  - name: data_steward_platform
-    displayName: "Data Steward Platform"
-    teamType: Group
-  - name: data_office
-    displayName: "Data Office"
-    teamType: Group
-  - name: divisie_finance
-    displayName: "Divisie Finance (FinOps)"
-    teamType: Group
-
-# OM Domains — mesh model. dbt meta.domain → domain-name mapping.
-# Source-aligned = de divisie 'bezit' het brondomein. Aggregate = cross-domein
-# product. OM 1.5 CreateDataProduct verwacht singular `domain` (string), niet
-# `domains` array — die switch zit in OM 1.7+.
-domains:
-  - name: AG
-    displayName: "Divisie AG"
-    description: "Arbeidsgeschiktheid — WIA/WGA/IVA/Wajong. Bron-domein."
-    domainType: Source-aligned
-    owner: divisie_ag
-  - name: WW
-    displayName: "Divisie WW"
-    description: "Werkloosheidswet — claim payouten + reintegration. Bron-domein."
-    domainType: Source-aligned
-    owner: divisie_ww
-  - name: WIA
-    displayName: "Divisie WIA"
-    description: "WIA-uitvoering (subset AG, eigen team). Bron-domein."
-    domainType: Source-aligned
-    owner: divisie_wia
-  - name: FEZ
-    displayName: "Divisie FEZ"
-    description: "Financieel-economische zaken: cost forecast, actuariële berekeningen."
-    domainType: Source-aligned
-    owner: divisie_fez
-  - name: CRM
-    displayName: "Divisie CRM"
-    description: "Klantrelatiebeheer — contacten, kanalen, cliënt-360."
-    domainType: Source-aligned
-    owner: divisie_crm
-  - name: Customer interaction
-    displayName: "Divisie Customer interaction"
-    description: "Customer interaction / customer_satisfaction. Cross-divisie."
-    domainType: Source-aligned
-    owner: divisie_customer interaction
-  - name: Polisadm
-    displayName: "Polisadministratie"
-    description: "Werknemer/werkgever/IKV brondomein. Wet SUWI + Wfsv."
-    domainType: Source-aligned
-    owner: data_steward_polisadm
-  - name: Persoon
-    displayName: "Persoon"
-    description: "Persoons-/BRP-spiegel. Eigenaar: Data Office."
-    domainType: Source-aligned
-    owner: data_office
-  - name: Cross
-    displayName: "Cross-Domain"
-    description: "Cross-domain integraties zoals UC-11 Customer journey. Aggregaat."
-    domainType: Aggregate
-    owner: divisie_customer interaction
-  - name: Governance
-    displayName: "Governance & Data Quality"
-    description: "Data-quality overzicht, audit, lineage-monitoring."
-    domainType: Aggregate
-    owner: data_steward_platform
-  - name: FinOps
-    displayName: "FinOps & Cloud Spend"
-    description: "FOCUS-spec cloud-spend telemetrie (UC-12). Provider-agnostisch (OCI/AWS/Azure/GCP)."
-    domainType: Aggregate
-    owner: divisie_finance
-
-# Mapping meta.domain (dbt) → Domain-naam (OM).
-dbt_domain_to_om:
-  ag: AG
-  ww: WW
-  wia: WIA
-  fez: FEZ
-  crm: CRM
-  customer interaction: Customer interaction
-  polisadm: Polisadm
-  persoon: Persoon
-  cross: Cross
-  governance: Governance
-  zw: AG          # ZW = onderdeel van AG (vangnet)
-  wajong: AG
-  intermediate: Cross
-  finops: FinOps
-
-# Data Products — één per Use-Case / use-case-groep. Tabellen worden via
-# dbt-tag (uc01 / uc04 / etc.) gelinkt aan een DataProduct.
-data_products:
-  - name: uc01_claims_funnel
-    displayName: "UC-01 — WIA Funnel"
-    description: "Sturings-dashboard dagelijkse WIA-request (DoD-anchor)."
-    domain: AG
-    owner: divisie_ag
-    dbt_tag: uc01
-  - name: uc04_eligibility_outreach
-    displayName: "UC-04 — TW Proactieve dienstverlening"
-    description: "Cliënten potentieel rechthebbend op TW-aanvulling."
-    domain: WW
-    owner: divisie_ww
-    dbt_tag: uc04
-  - name: uc05_customer_360
-    displayName: "UC-05 — Cliënt 360°"
-    description: "360-graden cliëntbeeld voor customer interaction (OPA-masking)."
-    domain: CRM
-    owner: divisie_crm
-    dbt_tag: uc05
-  - name: uc06_cost_forecast
-    displayName: "UC-06 — Cost forecast 5-jaars"
-    description: "Actuariële projectie claim_cost + scenario's."
-    domain: FEZ
-    owner: divisie_fez
-    dbt_tag: uc06
-  - name: uc07_dq_policies
-    displayName: "UC-07 — DQ Polisadministratie"
-    description: "Datakwaliteits-dagrapport voor polisadm-zone."
-    domain: Polisadm
-    owner: data_steward_polisadm
-    dbt_tag: uc07
-  - name: uc09_reintegration_effect
-    displayName: "UC-09 — Reintegration effectmeting"
-    description: "Researchspanel reintegration (sandbox, pseudonimisering)."
-    domain: AG
-    owner: knowledge_center
-    dbt_tag: uc09
-  - name: uc11_customer_journey
-    displayName: "UC-11 — Integrale Customer journey"
-    description: "Cross-domein customer journey (Kafka → bronze → silver → gold)."
-    domain: Cross
-    owner: divisie_customer interaction
-    dbt_tag: uc11
-  - name: uc_customer_satisfaction
-    displayName: "UC — Klanttevredenheid"
-    description: "Klanttevredenheids-trend per kanaal × maand."
-    domain: Customer interaction
-    owner: divisie_customer interaction
-    dbt_tag: uc_customer_satisfaction
-  - name: dq_overview
-    displayName: "DQ Overview (cross-UC)"
-    description: "Cross-UC datakwaliteits-samenvatting + violations-tabel."
-    domain: Governance
-    owner: data_steward_platform
-    dbt_tag: dq
-  - name: uc12_focus_finops
-    displayName: "UC-12 — FinOps Spend (FOCUS)"
-    description: "Cloud-spend telemetrie volgens FOCUS-spec. Spend × provider × service × commitment-utilization + savings + top-resources."
-    domain: FinOps
-    owner: divisie_finance
-    dbt_tag: uc12
+{
+  "purpose-limitation_to_tag": {
+    "labour_market_research": "Purpose.LabourMarketResearch",
+    "quality_control": "Purpose.QualityControl"
+  },
+  "legal_basis_to_tags": {
+    "source_permission_required": []
+  },
+  "bio_classificatie_to_tag": {
+    "intern": "Confidentiality.Internal",
+    "vertrouwelijk": "Confidentiality.Confidential"
+  },
+  "risk_tier_to_tag": {},
+  "pii_column_to_tag": {},
+  "eigenaar_to_team": {
+    "data_platform": "data_platform"
+  },
+  "tier_rules": {
+    "default": "Tier3",
+    "by_dbt_tag": {
+      "job_market": "Tier2"
+    }
+  },
+  "custom_properties": [
+    {
+      "name": "legal_basis_text",
+      "propertyType": "string",
+      "description": "Source-specific permission or contract must be configured before live collection."
+    },
+    {
+      "name": "retention_years",
+      "propertyType": "integer",
+      "description": "Reference retention policy in years; configure storage lifecycle separately."
+    },
+    {
+      "name": "dbt_domain",
+      "propertyType": "string",
+      "description": "Job-market domain identifier from dbt metadata."
+    }
+  ],
+  "teams": [
+    {
+      "name": "data_platform",
+      "displayName": "Job Market Data Platform",
+      "teamType": "Group"
+    }
+  ],
+  "domains": [
+    {
+      "name": "JobMarket",
+      "displayName": "Dutch IT Job Market",
+      "description": "Daily advertised demand across six IT domains in the Netherlands.",
+      "domainType": "Aggregate",
+      "owner": "data_platform"
+    }
+  ],
+  "dbt_domain_to_om": {
+    "job_market": "JobMarket"
+  },
+  "data_products": [
+    {
+      "name": "dutch_it_job_market",
+      "displayName": "Dutch IT Job Market",
+      "description": "Daily source observations, deduplicated snapshots and demand/skills/salary/region/quality marts.",
+      "domain": "JobMarket",
+      "owner": "data_platform",
+      "dbt_tag": "job_market"
+    }
+  ]
+}

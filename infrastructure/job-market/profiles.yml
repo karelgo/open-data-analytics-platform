@@ -1,0 +1,14 @@
+trino_default:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      method: none
+      user: "{{ env_var('TRINO_USER', 'smoketest') }}"
+      host: "{{ env_var('TRINO_HOST', 'trino-coordinator.odap-platform.svc.cluster.local') }}"
+      port: 8443
+      http_scheme: https
+      cert: "{{ env_var('REQUESTS_CA_BUNDLE', '/etc/platform-ca/ca.crt') }}"
+      database: silver
+      schema: job_market
+      threads: 2

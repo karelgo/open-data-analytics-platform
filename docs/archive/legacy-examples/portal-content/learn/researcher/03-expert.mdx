@@ -1,0 +1,125 @@
+---
+title: "Reproduceerbaar onderzoek publiceren in de repo"
+role: researcher
+level: expert
+order: 3
+duration: "2 uur"
+summary: "Een notebook + dataset-fingerprint + rapport in de repo zetten — zodat een collega je conclusies in 1 commando opnieuw kan draaien, en de glossary-termen die je gebruikt in OpenMetadata kloppen."
+prereqs:
+  - "researcher/practitioner/2"
+labs:
+  - title: "Open je notebook in vscode.dev"
+    href: "/dbt-docs/"
+    vscodePath: "spark-jobs"
+  - title: "Glossary — termen voor je rapport"
+    href: "/go/openmetadata/"
+checks:
+  - id: "researcher_expert_repro"
+    title: "Reproduceerbaar onderzoek-PR aangeleverd"
+quiz:
+  - q: "Wat is een ‘dataset-fingerprint’?"
+    options:
+      - "Een vingerafdruk-scan"
+      - "Een hash about the query-output op een vast as_of_date — zodat een herhaalde run ofwel exact dezelfde hash geeft (data ongewijzigd) ofwel duidelijk afwijkt (data is gewijzigd, oorzaak onderzoeken)"
+      - "Een biometrisch attribuut"
+      - "Een naam"
+    correct: 1
+  - q: "Hoe deel je je conclusies?"
+    options:
+      - "Email"
+      - "PR met (a) notebook met `as_of_date`, (b) dataset-fingerprint-bestand, (c) markdown-rapport, (d) link to the glossary-termen die je gebruikt — dan kan een collega het in 1 commando narekenen"
+      - "Slack-message"
+      - "Mondeling"
+    correct: 1
+  - q: "Welke glossary-discipline hoort hier?"
+    options:
+      - "Geen, schrijf gewoon"
+      - "Elke term met meer dan één definitie wordt aan een glossary-term gekoppeld in je rapport (bijv. ‘reintegration-uitkomst’) — voorkomt latere discussie"
+      - "Glossary alleen voor data-engineers"
+      - "Niet nodig"
+    correct: 1
+certifies: true
+---
+
+In deze module lever je één onderzoek aan dat een ander over een jaar nog
+kan reproduceren. Dat klinkt simpel; het is de moeilijkste discipline op
+het platform.
+
+## Het pakket
+
+Eén PR met:
+
+```
+research/
+  uc09_uitkomst_per_groep_2025q3/
+    README.md                  # rapport met conclusies + caveats
+    notebook.ipynb             # met as_of_date hardcoded
+    fingerprint.json           # dataset-hash ten tijde van publicatie
+    schema.yaml                # welke gold/sandbox-tabellen + dbt-tag
+```
+
+## README.md (rapport)
+
+Structuur:
+
+```markdown
+# UC-09: Reintegration-uitkomst per groep, Q3 2025
+
+## Researchsvraag
+Bestaat er een verschil in reintegration-uitkomst tussen
+{omschrijving} groepen, gecorrigeerd voor leeftijd en claim payoutsoort?
+
+## Bron
+- Tabellen: sandbox.research.cohort_2025
+- dbt-tag: research_2025_q3
+- as_of_date: 2025-09-01
+- Pseudonimisering: pseudo-v3
+
+## Methode
+[korte beschrijving — chi-kwadraat, regressie, etc.]
+
+## Resultaten
+[tabellen + chart-references]
+
+## Conclusies
+1. ...
+2. ...
+
+## Caveats
+- k-anonimiteit: groep B&lt;10 samengevoegd met B'.
+- Klein cohort, herhalen aanbevolen op grotere dataset.
+- Glossary: {term} gebruikt zoals gedefinieerd in OpenMetadata, link.
+
+## Reproduceren
+$ jupyter notebook notebook.ipynb
+$ python -c "from check import verify_fingerprint; verify_fingerprint()"
+```
+
+## fingerprint.json
+
+```json
+{
+  "tables": ["sandbox.research.cohort_2025"],
+  "as_of_date": "2025-09-01",
+  "dbt_tag": "research_2025_q3",
+  "row_count": 5740,
+  "column_hashes": {
+    "claim payoutsoort": "sha256:8a7d...",
+    "leeftijdsklasse": "sha256:1f3c...",
+    "re_integratie_uitkomst": "sha256:9e2a..."
+  }
+}
+```
+
+Een herhaalde run van het notebook met dezelfde `as_of_date` moet
+dezelfde `column_hashes` opleveren. Verschil = data is gewijzigd, en dat
+moet je weten.
+
+## Verificatie
+
+De auto-check valideert dat de PR de bovenstaande structuur heeft, dat
+het notebook een vast `as_of_date` heeft en dat een
+fingerprint-verificatie groen is.
+
+> Bij voltooiing van deze module krijg je het Academy-certificaat
+> **Researcher**.

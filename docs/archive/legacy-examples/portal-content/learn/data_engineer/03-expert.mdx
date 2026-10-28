@@ -1,0 +1,132 @@
+---
+title: "Streaming-pipeline troubleshooten zonder downtime"
+role: data_engineer
+level: expert
+order: 3
+duration: "2 uur"
+summary: "Een Spark Structured Streaming job hangt; je hebt 1 uur om te diagnosticeren en herstellen zonder data-verlies en zonder downtime voor downstream-verbruikers — en zonder break-glass."
+prereqs:
+  - "data_engineer/practitioner/2"
+labs:
+  - title: "Open Spark History Server"
+    href: "/go/airflow/"
+  - title: "Open Kafka topics in vscode.dev"
+    href: "/go/openmetadata/"
+    vscodePath: "platform/06-kafka"
+  - title: "Open OpenSearch — Spark logs"
+    href: "/go/opensearch/"
+checks:
+  - id: "engineer_expert_streaming"
+    title: "Streaming pipeline hersteld zonder data-loss"
+quiz:
+  - q: "Streaming-job hangt op stage 4. Eerste check?"
+    options:
+      - "Restart"
+      - "Spark History Server: tasks per stage; OpenSearch logs for the specifieke executor; Kafka consumer-group lag — combineer voor diagnose voordat je wat doet"
+      - "Schaal op"
+      - "Kill"
+    correct: 1
+  - q: "De job draait, maar verwerkt niets. Kafka-lag stijgt. Wat is een mogelijke oorzaak?"
+    options:
+      - "Niet genoeg coffee"
+      - "Schema-evolutie incompatibel: nieuwe veld in producent dat consumer niet kan parsen → checkpoint klem; oplossing: schema-fix in nifi/avro registry, niet de checkpoint wissen"
+      - "Te veel CPU"
+      - "Te weinig partitions"
+    correct: 1
+  - q: "Recovery-stap die data-verlies kan veroorzaken?"
+    options:
+      - "Job restart met behoud checkpoint"
+      - "`rm -rf` van checkpoint-directory om ‘fresh te starten’ — verliest exact-once garantie; in plaats daarvan: schema-fix, restart, herprocessing laten plaatsvinden via offset-replay"
+      - "Schema-fix"
+      - "Wachten"
+    correct: 1
+certifies: true
+---
+
+In deze module krijg je het scenario dat elke engineer een keer
+meemaakt: een streaming-job die hangt op production. Doel: diagnose en
+recovery zonder paniekaccie.
+
+## Casus
+
+Het is dinsdagochtend. Alert: `streaming_bronze_xyz` job heeft sinds 03:14
+geen output meer. Kafka-lag op `<domain>.xyz.event` 47.000 records en stijgt.
+
+## Stap 1 — diagnose, niet actie
+
+Drie bronnen tegelijk openen:
+
+| Bron | Wat zoek je? |
+|---|---|
+| **Spark History Server** | Welke stage hangt? Hoeveel tasks gefaald? |
+| **OpenSearch logs** (executor) | Stack-traces, OOM, schema-fouten |
+| **Kafka consumer-group** | Welke offsets niet committed? |
+
+Niet eerder iets aanraken. Diagnose duurt 5-10 minuten en bespaart een uur
+fout-fixen.
+
+## Stap 2 — typische oorzaken
+
+Op basis van de logs zie je een patroon:
+
+```
+java.lang.RuntimeException: schema mismatch on field 'value':
+  expected DoubleType, got StringType
+```
+
+Schema-evolutie. Een producent (NiFi-flow) heeft een nieuw bron-formaat
+opgevangen waar `value` een string is in plaats van een double — bv door
+een leeg veld dat als `""` wordt doorgegeven.
+
+## Stap 3 — niet-destructieve recovery
+
+Verleidelijk: checkpoint wissen, restart, "fresh start". **Niet doen.**
+Je verliest dan de exact-once-garantie, en mogelijk dubbele records in
+bronze.
+
+In plaats daarvan:
+
+1. **Schema-fix in NiFi-flow.** Cast lege string naar `null`, of accepteer
+   beide types in Avro-schema.
+2. **Update schema-registry-versie** (compatibele evolutie).
+3. **Spark-job restart.** De job pakt op vanaf de laatste committed
+   offset, herverwerkt de gehangen batch, gaat door.
+
+## Stap 4 — verificatie
+
+Na 5 minuten:
+
+- Kafka-lag daalt;
+- Spark History toont nieuwe completed batches;
+- bronze.xyz.events: nieuwe records met nu-timestamp.
+
+Als dat niet gebeurt: pauze, niet escaleren. Vaak heb je een tweede issue
+gemist (configmap niet bijgewerkt, schema-registry-cache).
+
+## Stap 5 — postmortem
+
+Geen blame-talk. Wel:
+
+```markdown
+# Incident 2025-09-23 — streaming_bronze_xyz hang
+
+Symptom: 47k Kafka-lag, geen output sinds 03:14
+Diagnose: schema-mismatch (DoubleType vs StringType) na producent-update
+Recovery: schema-flexibilisering in NiFi + Avro; restart job (data-loss: 0)
+Duration: 47 min van alert tot herstel
+
+Root cause: producent introduceerde lege strings zonder schema-update
+gecommuniceerd
+
+Acties:
+- Schema-registry validatie nu in CI van NiFi-flow PRs
+- Alerting op `value=string` patroon vroegtijdig in flow
+```
+
+## Verificatie
+
+De auto-check valideert dat de job draait, lag onder threshold ligt en
+dat een postmortem is gepublishd in `docs/incidents/`.
+
+> Bij voltooiing van deze module krijg je het Academy-certificaat
+> **Data-engineer**.

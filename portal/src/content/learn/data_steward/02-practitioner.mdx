@@ -1,127 +1,41 @@
 ---
-title: "Een nieuwe kolom taggen van bron tot mart"
-role: data_steward
-level: practitioner
-order: 2
-duration: "60 min"
-summary: "Een data-engineer voegt `werkgever_branchecode` toe aan silver.service_requests. Jouw taak: classificeren, glossary-term koppelen, lineage controleren, OPA-mapping bijwerken."
-prereqs:
-  - "data_steward/foundation/1"
-labs:
-  - title: "OpenMetadata — silver.service_requests.application"
-    href: "/go/openmetadata/"
-  - title: "dbt-docs — staging model"
-    href: "/dbt-docs/"
-  - title: "Bewerk role-mappings in vscode.dev"
-    href: "/go/openmetadata/"
-    vscodePath: "opa-policies-src/data/role_mappings.json"
-checks:
-  - id: "steward_practitioner_classify"
-    title: "Kolom getagd, glossary-term gekoppeld, lineage gevalideerd"
-quiz:
-  - q: "Een nieuwe kolom heeft geen tag, geen glossary-term en geen test. Wat doe je?"
-    options:
-      - "Door laten gaan — engineer regelt later"
-      - "Blokkeer de PR-merge: zonder tag krijgt OPA geen masking-regel; zonder glossary heeft de business geen definitie; zonder test blijft DQ blind"
-      - "Alleen een tag toevoegen"
-      - "Self-fix in production"
-    correct: 1
-  - q: "Welke tags horen bij `werkgever_branchecode` (SBI-code)?"
-    options:
-      - "PII"
-      - "Geen — interne metadata"
-      - "Bedrijfsdata, geen PII (technisch een attribuut van de werkgever, niet de cliënt)"
-      - "Medisch"
-    correct: 2
-  - q: "OpenMetadata laat zien dat lineage stopt op silver — gold-mart trekt de kolom niet door. Wat doe je?"
-    options:
-      - "Laten staan"
-      - "Vraag de data-engineer om gold-model te updaten als de kolom relevant is voor sturing; documenteer in glossary anders"
-      - "Direct in production wijzigen"
-      - "Ticket sluiten"
-    correct: 1
+{
+  "title": "Trace a vacancy through the platform",
+  "role": "data_steward",
+  "level": "practitioner",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Own job definitions, source provenance, quality tests and classifications.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-In deze module loop je één concreet governance-traject door: van PR-melding
-tot afgeronde classificatie.
+Open the Superset job-market dashboard and the `mart_job_inventory` dataset. Follow the dataset in OpenMetadata to the Silver deduplication model and Bronze observations. Read the dated extraction manifest before comparing counts across days.
 
-## Casus
+In Jupyter, run `00_dutch_it_job_market.ipynb`. The offline section reads SQLite; the platform section queries Trino under your assigned identity. Use only the layers authorized to your role.
 
-In de PR-queue staat:
-
-> #4271 — Add `werkgever_branchecode` to silver.service_requests.application
-
-Engineer-comment: "Nieuwe kolom uit polisadm; SBI-code 4-cijferig. Heb
-schema.yml aangevuld; geen tag toegevoegd, vraag data-steward."
-
-## Stap 1 — review request
-
-Open de [tabelpagina](/go/openmetadata/) op `silver.service_requests.application`. Klik
-"Nieuwe kolom: branchecode" → tab "Tags". Leeg.
-
-Zonder tag heeft OPA geen reden om de kolom te beschermen — hij is dan
-ineens zichtbaar voor *alle* WW-rollen. Vaak is dat fine (interne
-metadata), maar je moet het bewust doen.
-
-## Stap 2 — classificeren
-
-Branchecode is geen PII (cliënt-attribuut). Het is een attribuut van de
-*werkgever*. Tags die passen:
-
-- `bedrijfsdata`
-- `intern_gebruik`
-
-Geen `PII`, geen `medisch`, geen `bsn`. Dit zijn de tags die OPA
-gebruikt voor automatische masking.
-
-## Stap 3 — glossary
-
-Maak een glossary-term aan — als die nog niet bestaat:
-
-```
-Term: branchecode (SBI)
-Definitie: Vier-cijferige code volgens de Standaard Bedrijfsindeling van
-   het CBS (2008-versie), aangeleverd door werkgever bij polisinschrijving.
-Bron: silver.service_requests.application.werkgever_branchecode
-Eigenaar: data.steward@odap.local
-Use cases: UC-03 (handhaving), UC-06 (cost forecast) — branche-trends
-```
-
-## Stap 4 — DQ-tests checken
-
-In dbt-docs: open `stg_service_request_application` → tab Tests. Engineer heeft toegevoegd:
-
-- `not_null` op `werkgever_branchecode` — goed
-- `relationships` naar `seed_sbi_codes` — goed (volledigheidscheck)
-
-Voor jou geen verdere actie hier, maar je hebt het wel gezien.
-
-## Stap 5 — OPA role-mappings
-
-Open
-[role_mappings.json](https://vscode.dev/github.com/UWV/UDP_Stackable/blob/main/opa-policies-src/data/role_mappings.json)
-in vscode.dev. Onder `roles.fraud_analyst.unmasked_columns` voeg je:
-
-```json
-"silver.service_requests.application.werkgever_branchecode"
-```
-
-Voor `marketing_analyst` is de kolom niet relevant — niet toevoegen. Default
-is "niet zichtbaar" voor onbekende rollen, dat is bewust restrictief.
-
-## Stap 6 — review afsluiten
-
-Comment on the PR:
-
-```
-Approved.
-Tags: bedrijfsdata, intern_gebruik
-Glossary: branchecode (SBI) — koppeling toegevoegd
-OPA: fraud_analyst krijgt unmasked access; andere rollen niet
-DQ: not_null + relationships geconfigureerd door @engineer
-```
-
-## Verificatie
-
-De auto-check valideert dat de kolom getagd is, een glossary-term heeft
-en in role-mappings.json correct is verwerkt.
+[Continue in the job-market explorer](/job-market/).

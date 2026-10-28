@@ -1,0 +1,52 @@
+name: Dutch IT job market
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  offline-example:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: make jobs-test
+      - run: make jobs-demo JOBS_DATE=2026-10-28
+      - uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-job-market
+          path: examples/dutch-it-jobs/output/dashboard.json
+  lakehouse-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install dbt-core==1.11.16 dbt-trino==1.9.3 PyYAML==6.0.3
+      - run: cp dbt/profiles.yml.template dbt/profiles.yml
+      - run: dbt parse --project-dir dbt --profiles-dir dbt
+      - run: python ci/scripts/check-dbt-meta.py
+      - run: python ci/scripts/check-dbt-tests.py
+      - run: python ci/scripts/check-platform-config-sync.py
+      - name: Render the active service manifests
+        run: |
+          mkdir -p platform/08-spark/scripts
+          cp spark-jobs/job_market_bronze.py platform/08-spark/scripts/
+          for component in 08-spark 10-opa 11-airflow 12-superset 13-openmetadata-config; do
+            kubectl kustomize "platform/$component" > /dev/null
+          done
+  access-policies:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned OPA
+        run: |
+          curl -fsSL -o /usr/local/bin/opa https://openpolicyagent.org/downloads/v0.69.0/opa_linux_amd64_static
+          chmod +x /usr/local/bin/opa
+      - run: make opa-test

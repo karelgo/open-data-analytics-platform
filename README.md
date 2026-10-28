@@ -1,38 +1,40 @@
 # Open Data & Analytics Platform
 
-A **fictive, illustrative** reference implementation of a modern data and
-analytics platform built on open source and designed for compliance with
-GDPR, ISO 27001 / 27002, NIS2, the EU AI Act, and SOC 2-aligned controls.
+One end-to-end example runs through the whole platform: **Dutch IT Job Market**. Daily vacancy observations from Dutch job sources become governed analytics across **Data, Cloud, SAP, AI, Software and Security**.
 
-> **Disclaimer.** No real data, no real personal identifiers, no production code.
-> All datasets are synthetic and marked with
-> `# SYNTHETIC DATA — OPEN DATA AND ANALYTICS PLATFORM — NOT FOR REAL USE`.
-> This repository is not a product and not a procurement document.
+The platform connects extraction → MinIO → Spark/Delta → Hive Metastore → Trino/dbt → Superset/Jupyter, scheduled by Airflow and described in OpenMetadata. Keycloak, OPA and platform monitoring support the same journey. NiFi/Kafka and vendor integrations remain optional infrastructure; they are not required by this batch use case.
 
----
+## Run the example locally
 
-## What the platform does
+```bash
+make jobs-demo     # seven synthetic daily snapshots + SQLite + dashboard export
+make jobs-test     # normalization, source-failure, history and quality checks
+```
 
-A Kubernetes-native lakehouse + analytics stack:
+The offline example needs Python 3.11+ and no cluster or API credentials. The portal's `/job-market/` page offers a clearly labelled synthetic sample with domain, date, location and work-mode filters. Every example record carries `is_synthetic=true`; live mode never silently substitutes sample records.
 
-- **Storage**: MinIO (S3-compatible).
-- **Table format**: Delta Lake (default for this implementation — see [ADR-0006](docs/adr/0006-delta-chosen-for-this-implementation.md)). The Iceberg path stays covered through an abstraction.
-- **Catalog backend**: Apache Hive Metastore (Postgres-backed).
-- **Ingestion**: file-source → Spark Structured Streaming → Delta on MinIO. NiFi/Kafka flows live as templates ([`nifi-flows/templates/`](nifi-flows/templates/)) but the corresponding Stackable operators are **off** in this release — UC-11 reads directly from the S3 raw zone.
-- **Query engine**: Trino, with OPA authorization (Rego: purpose limitation, row filters, column masking).
-- **Transformation**: dbt-trino, table-format-agnostic through the `table_format()` macro.
-- **Orchestration**: Apache Airflow 3 + astronomer-cosmos for dbt DAGs.
-- **BI**: Apache Superset.
-- **Notebooks**: JupyterHub + KubeSpawner (ODAP Lab) — Python/SQL across all data layers, with Git integration. See [`platform/16-jupyter/`](platform/16-jupyter/).
-- **Catalog / governance / lineage / data quality**: OpenMetadata, with a self-service [om-access-bridge](platform/18-om-access-bridge/) (OM task approval → Keycloak realm role → OPA grant).
-- **Authentication**: Keycloak (OIDC).
-- **Portal**: Astro/React workspace shell that embeds all service UIs under one URL ([`portal/`](portal/), [`platform/15-portal/`](platform/15-portal/)).
-- **Agent tooling**: Multica server + Nanitics observatory (see [`platform/17-multica/`](platform/17-multica/), [`platform/19-nanitics-observatory/`](platform/19-nanitics-observatory/), [`platform/20-multica-daemon/`](platform/20-multica-daemon/)). Exploratory, not yet hooked into the governance flow.
-- **Logs / metrics / tracing**: Vector + Prometheus; OpenSearch single-node shared between logs and OM search. OpenTelemetry tracing is wired up for Trino/Airflow but not yet connected to a backend.
+For live extraction, configure the [sources](examples/dutch-it-jobs/sources.json) and provide `ADZUNA_APP_ID` and `ADZUNA_APP_KEY`. The adapter uses the Netherlands Adzuna API plus operator-approved RSS/JobPosting sources. Coverage depends on source permissions, available fields and pagination limits. It is not a census of Dutch vacancies.
 
-Stackable Data Platform operators in this release (see [`infrastructure/stackablectl/release.yaml`](infrastructure/stackablectl/release.yaml)): **airflow, commons, hive, listener, opa, secret, spark-k8s, superset, trino**. NiFi/Kafka/ZooKeeper are **commented out** in [`release.yaml`](infrastructure/stackablectl/release.yaml) — UC-11 doesn't need them and skipping them saves ~2 vCPU + 4 GiB on k3d.
+[Read the complete use-case walkthrough, live setup and data dictionary](docs/use-cases/dutch-it-job-market.md).
 
----
+## What the example shows
+
+- Daily snapshots, source provenance, conservative cross-source deduplication and repeatable reruns.
+- Titles, employers, locations, seniority, skills, languages, education, hours, contracts and work arrangements.
+- Original salary units and annual EUR comparisons, with estimated salaries separated from reported pay.
+- Job demand, skill demand, geography, work patterns, salary coverage and source quality.
+- One set of Bronze, Silver and Gold `job_market` tables, shared by SQL, dashboards, catalog and notebooks.
+
+Multi-domain roles count in each matching domain; domain counts are not additive. A disappearing search result does not establish that a vacancy closed. Historical claims, customer and finance examples are retired under `docs/archive/legacy-examples/` and are not active platform use cases.
+
+## Run it on the platform
+
+```bash
+make jobs-image   # build and import odap/job-market:dev into k3d
+make jobs-run     # run the complete pipeline on an existing platform
+```
+
+Airflow's `dutch_it_jobs_daily` runs at **05:00 Europe/Amsterdam**. Fresh installations default to demo mode; configure live credentials before opting into live extraction. The container runtime runs extraction, Bronze loading, dbt build/tests and catalog publication in sequence. Cloud deployments must publish the runtime image to their registry.
 
 ## Quick start
 
@@ -72,7 +74,8 @@ make deploy MODE=k3d   # cluster + bootstrap + platform + portal + smoke
 make cluster MODE=k3d
 make bootstrap MODE=k3d
 make deploy-platform MODE=k3d
-make seed
+make jobs-image
+make jobs-run
 make test
 
 # 4. Cleanup
@@ -125,42 +128,28 @@ Run 'make aks-context'.
 
 ## Repository layout
 
-| Directory | Contents |
+| Directory | Purpose |
 |---|---|
-| `platform-config.yaml` | Central configuration. Change `table_format` here, not elsewhere. |
-| `docs/` | Architecture, ADRs, use-case specs, compliance mapping, runbook. |
-| `infrastructure/` | k3d config, external Helm values (cert-manager, Keycloak, MinIO, Postgres, OpenMetadata), Stackable release pinning. |
-| `platform/` | Kubernetes manifests per layer (00-namespaces … 13-openmetadata-config). |
-| `dbt/` | dbt project, models (staging/intermediate/marts/uc01..uc12), macros, tests. |
-| `data-generation/` | Synthetic data generators (Python). |
-| `nifi-flows/` | NiFi flow templates (Iceberg / Delta variants). |
-| `spark-jobs/` | PySpark jobs (streaming + batch + ML demo). |
-| `opa-policies-src/` | Rego policies + tests. |
-| `scripts/` | Bash helpers for `make` targets. |
-| `tests/` | Smoke / integration / e2e tests. |
-| `ci/` | GitHub Actions workflows. |
-
----
+| `examples/dutch-it-jobs/` | Daily extraction, deterministic fixtures, normalization and local SQLite analytics |
+| `dbt/` | Job-market staging, deduplication, Gold marts, tests and semantic metadata |
+| `spark-jobs/` | Bronze Delta loading and lakehouse support |
+| `platform/11-airflow/` | Daily job-market orchestration and runtime configuration |
+| `platform/12-superset/` | The Dutch IT job-market dashboard |
+| `platform/13-openmetadata-config/` | Catalog, glossary, ownership and lineage configuration |
+| `platform/16-jupyter/` | The same job-market walkthrough in a notebook |
+| `portal/` | Service workspace and interactive `/job-market/` sample explorer |
+| `opa-policies-src/` | Trino access policy and tests |
+| `docs/` | Active use case, architecture, deployment and decisions |
+| `infrastructure/`, `platform-overlays/` | Shared platform infrastructure and environment configuration |
 
 ## Documentation
 
+- [Dutch IT Job Market](docs/use-cases/dutch-it-job-market.md)
 - [Architecture](docs/architecture/index.md)
-- [Context summary](docs/context-summary.md)
-- [Compliance mapping](docs/compliance-mapping.md)
 - [Runbook](docs/runbook.md)
-- ADRs: [0001](docs/adr/0001-stackable-as-base.md) · [0002](docs/adr/0002-iceberg-vs-delta.md) · [0003](docs/adr/0003-opa-as-trino-authz.md) · [0004](docs/adr/0004-openmetadata-as-catalog.md) · [0005](docs/adr/0005-dbt-trino-as-transform.md) · [0006](docs/adr/0006-delta-chosen-for-this-implementation.md) · [0007](docs/adr/0007-airflow-pipeline-architecture.md) · [0008](docs/adr/0008-self-service-data-access.md) · [0009](docs/adr/0009-networkpolicies-strategy.md) · [0010](docs/adr/0010-platform-config-single-source.md)
-- Use cases: [UC-01](docs/use-cases/uc01-claims-funnel.md) · [UC-02](docs/use-cases/uc02-complex-cases-ai.md) · [UC-03](docs/use-cases/uc03-fraud-risk.md) · [UC-04](docs/use-cases/uc04-eligibility-outreach.md) · [UC-05](docs/use-cases/uc05-customer-360.md) · [UC-06](docs/use-cases/uc06-cost-forecast.md) · [UC-07](docs/use-cases/uc07-dq-policies.md) · [UC-08](docs/use-cases/uc08-capacity-planning.md) · [UC-09](docs/use-cases/uc09-reintegration-effect.md) · [UC-10](docs/use-cases/uc10-data-services.md) · [UC-11](docs/use-cases/uc11-customer-journey.md) · [UC-12](docs/use-cases/uc12-focus-finops.md)
+- [Architecture decisions](docs/adr/index.md)
+- [Role handbooks](docs/handbooks/README.md)
 
----
-
-## Status
-
-Work in progress. See [WORKLOG.md](WORKLOG.md) for the latest phase and open
-items. The [Definition of Done](docs/architecture.md#definition-of-done) lives
-in `docs/architecture.md`.
-
----
-
-## License
+This repository is an illustrative reference implementation. Offline records are synthetic. Live collection requires source credentials and appropriate access; no applicant or CV data is collected.
 
 Apache License 2.0 — see [LICENSE](LICENSE).

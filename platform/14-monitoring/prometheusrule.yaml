@@ -268,3 +268,17 @@ spec:
               p99 OPA decision latency is {{ $value | printf "%.3f" }}s.
               Typical target is <10ms. Check OPA bundle-size (data.json) and
               policy-complexity in `opa-policies-src/trino/`.
+
+    - name: dutch-it-job-market
+      interval: 1m
+      rules:
+        - alert: JobMarketBatchFailed
+          expr: kube_job_status_failed{namespace="odap-platform",job_name=~"job-market-.*"} > 0
+          for: 2m
+          labels:
+            severity: warning
+            component: job-market
+          annotations:
+            summary: "Dutch IT job-market batch or metadata refresh failed"
+            description: "Inspect the failed Job logs and source manifest. Downstream metadata and dashboard refresh require successful extraction and dbt tests."
+            runbook_url: "/docs/use-cases/dutch-it-job-market/"

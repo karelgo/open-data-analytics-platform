@@ -13,8 +13,8 @@ configMapGenerator:
   - name: opa-trino-bundle
     files:
       - policies/trino-base.rego
-      - policies/trino-platform-roles.rego
-      - policies/trino-purpose-limitation.rego
+      - policies/trino-roles.rego
+      - policies/trino-doelbinding.rego
       - policies/trino-row-filters.rego
       - policies/trino-column-masks.rego
       - policies/trino-data-access.rego

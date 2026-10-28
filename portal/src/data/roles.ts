@@ -27,15 +27,15 @@ export interface RoleMeta {
 }
 
 export const roles: RoleMeta[] = [
-  { id: 'claims_analyst',     displayName: 'Claims Analyst',     domain: 'Claims',             category: 'business', handbookPath: 'handbooks/claims_analyst/' },
-  { id: 'fraud_analyst',      displayName: 'Fraud Analyst',      domain: 'Risk & Compliance',  category: 'business', handbookPath: 'handbooks/fraud_analyst/' },
-  { id: 'marketing_analyst',  displayName: 'Marketing Analyst',  domain: 'Customer 360',       category: 'business', handbookPath: 'handbooks/marketing_analyst/' },
-  { id: 'finance_analyst',    displayName: 'Finance Analyst',    domain: 'Finance',            category: 'business', handbookPath: 'handbooks/finance_analyst/' },
-  { id: 'operations_manager', displayName: 'Operations Manager', domain: 'Operations',         category: 'business', handbookPath: 'handbooks/operations_manager/' },
-  { id: 'researcher',         displayName: 'Researcher',         domain: 'Research (sandbox)', category: 'business', handbookPath: 'handbooks/researcher/' },
-  { id: 'data_steward',       displayName: 'Data Steward',       domain: 'Governance',         category: 'tech',     handbookPath: 'handbooks/data_steward/' },
-  { id: 'data_engineer',      displayName: 'Data Engineer',      domain: 'Pipelines',          category: 'tech',     handbookPath: 'handbooks/data_engineer/' },
-  { id: 'platform_admin',     displayName: 'Platform Admin',     domain: 'Cluster / security', category: 'tech',     handbookPath: 'handbooks/platform_admin/' },
+  { id: 'claims_analyst',     displayName: 'Job Market Analyst',     domain: 'Vacancy demand',             category: 'business', handbookPath: 'handbooks/claims_analyst/' },
+  { id: 'fraud_analyst',      displayName: 'Source Quality Analyst',      domain: 'Source quality',  category: 'business', handbookPath: 'handbooks/fraud_analyst/' },
+  { id: 'marketing_analyst',  displayName: 'Skills Analyst',  domain: 'Skills demand',       category: 'business', handbookPath: 'handbooks/marketing_analyst/' },
+  { id: 'finance_analyst',    displayName: 'Salary Analyst',    domain: 'Advertised compensation',            category: 'business', handbookPath: 'handbooks/finance_analyst/' },
+  { id: 'operations_manager', displayName: 'Market Operations', domain: 'Daily market coverage',         category: 'business', handbookPath: 'handbooks/operations_manager/' },
+  { id: 'researcher',         displayName: 'Labour Market Researcher',         domain: 'Job market research', category: 'business', handbookPath: 'handbooks/researcher/' },
+  { id: 'data_steward',       displayName: 'Data Steward',       domain: 'Job market governance',         category: 'tech',     handbookPath: 'handbooks/data_steward/' },
+  { id: 'data_engineer',      displayName: 'Data Engineer',      domain: 'Job market pipeline',          category: 'tech',     handbookPath: 'handbooks/data_engineer/' },
+  { id: 'platform_admin',     displayName: 'Platform Admin',     domain: 'Platform operations', category: 'tech',     handbookPath: 'handbooks/platform_admin/' },
 ];
 
 export interface RoleCapability {

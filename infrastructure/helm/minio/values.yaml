@@ -155,9 +155,7 @@ policies:
           - "s3:PutObject"
           - "s3:AbortMultipartUpload"
           - "s3:ListMultipartUploadParts"
-      # 1b. WRITE — legacy bron-specifieke CSV-staging (mc CLI / Airflow watcher).
-      # Behouden zodat `mc cp … incoming/<bron>/…` blijft werken voor
-      # bestaande customer_satisfaction/focus_billing flows.
+      # Compatibility upload area; the job-market extractor uses a separate service credential.
       - effect: Allow
         resources:
           - "arn:aws:s3:::odap-staging/incoming/*"
@@ -191,8 +189,7 @@ policies:
           - "s3:ListBucket"
       # 4. READ — alleen-lezen op processed-archief, eigen uploads + alle
       # bronze/silver/gold. Maakt "Inkijken"-sectie in portal werkend.
-      # Let op: omvat de hele data-lake; voor production zou je per use-case
-      # een eigen policy maken zodat een UC-12-uploader geen UC-11-PII kan zien.
+      # Raw job-source payloads are explicitly excluded below.
       - effect: Allow
         resources:
           - "arn:aws:s3:::odap-staging/processed/*"
@@ -200,6 +197,14 @@ policies:
           - "arn:aws:s3:::odap-bronze/*"
           - "arn:aws:s3:::odap-silver/*"
           - "arn:aws:s3:::odap-gold/*"
+        actions:
+          - "s3:GetObject"
+
+      # Raw responses can contain recruiter contacts and licensed descriptions.
+      # This browser-facing policy never grants access to those source objects.
+      - effect: Deny
+        resources:
+          - "arn:aws:s3:::odap-bronze/job-market/raw/*"
         actions:
           - "s3:GetObject"
 

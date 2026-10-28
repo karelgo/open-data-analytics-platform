@@ -1,93 +1,26 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: odap-platform
-
-# Architecture: docs/adr/0007-airflow-pipeline-architecture.md.
-#
-# DAGs worden via 3 ConfigMaps gemount:
-#   - airflow-dags     → /stackable/airflow/dags/  (DAG-aanroepers)
-#   - airflow-include  → /opt/odap/airflow/include/ (factories + helpers, op PYTHONPATH)
-#   - airflow-sources  → /opt/odap/airflow/sources/ (YAML-registry)
-#
-# Production: vervang door Stackable's `dagsGitSync` with a interne git-mirror.
-
 resources:
   - airflowcluster.yaml
   - ingress.yaml
   - ingress-auth.yaml
   - webserver-config.yaml
-  - jobs/dbt-manifest-job.yaml
-  - uc11-rbac.yaml
   - spark-launcher-rbac.yaml
-
+  - job-market-settings.yaml
 configMapGenerator:
-  # 1. DAG-aanroeperfiles. Houd dit minimaal — geen logica, alleen factory-calls.
-  #    .airflowignore voorkomt recursieve walk over k8s-ConfigMap-symlinks (..data).
   - name: airflow-dags
     files:
       - .airflowignore=dags/.airflowignore
       - dags/__init__.py
-      - dags/ingest_bronze_watch.py
-      - dags/ingest_csv_batch.py
-      - dags/transform_silver_per_domain.py
-      - dags/transform_gold_per_usecase.py
-      - dags/governance_om_ingest.py
-      - dags/retention period_enforcer.py
-      - dags/lakehouse_maintenance.py
-      - dags/uc11_full_setup.py
-      - dags/uc11_databricks.py
-      - dags/uc11_fabric.py
-      - dags/convert_to_delta.py
-      # Spark-pad voor WIA bronze→silver→gold (parallel aan dbt).
-      # Zie platform/08-spark/README.md for the seed-stap.
-      - dags/transform_wia_spark.py
-      # synthetic_data_load.py uitgesloten — gebruikt verouderde
-      # KubernetesJobOperator signature (job_template is geen geldige arg meer).
-      # Voor seed: gebruik `make seed` of `kubectl apply -f data-generation/k8s/`.
-
-  # 2. Factories + helpers. Op PYTHONPATH zodat `from silver_factory import ...`
-  #    werkt vanuit de DAG-aanroepers.
+      - dags/dutch_it_jobs_daily.py
   - name: airflow-include
     files:
       - include/__init__.py
-      - include/sources_loader.py
-      - include/datasets.py
-      - include/trino_helpers.py
       - include/k8s_helpers.py
-      - include/bronze_factory.py
-      - include/silver_factory.py
-      - include/gold_factory.py
       - include/governance_factory.py
-      - include/csv_ingest_factory.py
-      - include/databricks_helpers.py
-      - include/fabric_helpers.py
-
-  # 3. YAML source-registry — single source of truth voor brondefinities.
-  #    Gelezen via env SOURCES_DIR.
   - name: airflow-sources
-    files:
-      - sources/persoon.yml
-      - sources/polisadm.yml
-      - sources/ww.yml
-      - sources/wia.yml
-      - sources/wajong.yml
-      - sources/zw.yml
-      - sources/crm.yml
-      - sources/fez.yml
-      - sources/customer_satisfaction.yml
-      - sources/focus_billing.yml
-
-  # 4. Loader-scripts voor KubernetesPodOperator-tasks (csv_ingest_factory).
-  #    Gemount op /opt/odap/airflow/jobs/ in de KPO-pod.
-  - name: airflow-jobs
-    files:
-      - jobs/csv_to_bronze.py
-      - jobs/convert_to_delta.py
-      # SparkApplication-templates voor DAG transform_wia_spark.
-      # De DAG mountert deze ConfigMap en doet `sed | kubectl apply -f -`
-      # with a unieke ${RUN_ID} per run.
-      - jobs/spark-silver-wia.yaml
-      - jobs/spark-gold-wia.yaml
-
+    literals:
+      - use_case=dutch-it-job-market
 generatorOptions:
   disableNameSuffixHash: true

@@ -1,170 +1,38 @@
 ---
-title: "Handbook — Marketing Analyst"
+title: "Skills Analyst"
 role: marketing_analyst
 ---
 
-> Rol-key: `marketing_analyst` · Domein: Customer interaction · Risiconiveau access: middel (PII gemaskeerd, geen medisch)
+Explore technologies, skills and employer demand in advertised roles. All exercises use the same Dutch IT Job Market pipeline. The existing identity key `marketing_analyst` remains for compatibility with Keycloak accounts; it does not activate an earlier business use case.
 
-Deze handbook is voor **medewerkers van customer interaction en CRM**. Je werkt
-met het 360°-cliëntbeeld (UC-05) en helpt cliënten via telefoon, balie of
-Workspace. Je ziet **gemaskeerde BSN's** en **geen medische gegevens** —
-beide bewust beperkt om dataminimalisatie te respecteren.
+## Start
 
----
+Open the portal's `/job-market/` page, then the Superset dashboard `dutch-it-job-market`. Sign in through Keycloak for platform services. Offline sample records are synthetic; live observations require explicitly configured source access.
 
-## 1. Wat doet jouw rol?
+Your analytical scope is **Gold job-market tables**. Do not assume that access to a chart grants access to source payloads. Raw responses can contain contact details and remain restricted.
 
-Je beantwoordt vragen van cliënten en routeert hen to the juiste afdeling.
-Je gebruikt het platform om:
+## Daily task
 
-- Het 360°-cliëntbeeld te raadplegen (UC-05)
-- Te zien welke claim payouten lopen, welke customer interactionen al hebben plaatsgevonden
-- Trends in klantvraag te zien per kanaal
-- Geen besluiten te nemen over claim payout of behandeling — dat doen domein-rollen
-
----
-
-## 2. Sign in, MFA & applicaties
-
-### 2.1 Account
-
-Accountnaam `marketing.analyst`. **MFA verplicht**. Bij eerste login
-wachtwoord wijzigen.
-
-### 2.2 Welke applicaties?
-
-| Applicatie | Wat doe je daar? | URL |
-|---|---|---|
-| **Apache Superset** | Cliënt-360-dashboard, contact-trends | https://superset.odap.local |
-| **OpenMetadata** | Begrippen opzoeken | https://openmetadata.odap.local |
-
-Voor production: meestal werk je vanuit een **Workspace-frontend** die UC-05
-via Trino REST API consumeert. Het platform is dan onzichtbaar; deze
-referentie laat zien wat erachter zit.
-
----
-
-## 3. Welke data zie je wel en niet?
-
-### 3.1 Catalog en schema
-
-| Catalog | Schema | Inhoud | Access |
-|---|---|---|---|
-| `gold` | `uc05_customer_360` | 360°-cliëntbeeld | **Ja** |
-| `silver` | `crm` | Customer interaction-historie | **Indirect** (alleen via UC-05) |
-| `silver` | `wia`, `ww`, `wajong` | Domein-data | **Nee** |
-| `sensitive` | * | (geen) | **Nee** |
-
-### 3.2 Welke kolommen?
-
-In `gold.uc05_customer_360.client_overview`:
-
-| Kolom | Wat zie je? |
-|---|---|
-| `bsn` | **GEMASKEERD** — `'XXXXXXX' || substring(bsn, 8)` (laatste 2 cijfers zichtbaar) |
-| `voornaam`, `achternaam` | Volledig — voor herkenning aan de telefoon |
-| `birth_date` | Volledig — voor identificatie |
-| `straat`, `huisnummer` | Volledig — adres voor balie |
-| `iban`, `bankrekening` | **GEMASKEERD** — niet nodig voor customer interaction |
-| `diagnose`, `icd10` | NULL (kolom-mask) — geen medisch |
-| `lopende_claim payouten` | Type + status + bedrag-categorie | Voor doorverwijzing |
-| `kanaal_voorkeur` | Telefoon / Workspace / Brief | Voor customer interaction |
-| `opt_out` | Ja/nee proactieve dienstverlening | Respecteer altijd |
-
-### 3.3 Purpose limitation
-
-Je rol heeft de purposes **"customer interaction"** en **"behandeling"**. Een query
-die data uit een andere zone aanspreekt zonder geldig doel wordt geweigerd.
-
----
-
-## 4. Dagelijkse workflows met voorbeelden
-
-### 4.1 Workflow A — Cliënt aan de telefoon
-
-**Scenario.** Mevrouw Jansen belt: "Ik krijg geen brief, maar wel een
-betaling. Klopt dat?"
-
-1. Vraag haar birth_date + de laatste 2 cijfers van haar BSN voor identificatie.
-2. Open **Superset → dashboard "Cliënt 360°"**, zoek op gemaskeerde BSN of birth_date + naam.
-3. Bekijk de tegels: Lopende claim payout, Laatste contact, Kanaalvoorkeur.
-4. Beantwoord de vraag of route je haar to the juiste afdeling.
-
-### 4.2 Workflow B — Trends in kanaalkeuze
-
-**Scenario.** Hoeveel cliënten zijn de afgelopen maand overgestapt van
-brief naar Workspace?
+Explore technologies, skills and employer demand in advertised roles.
 
 ```sql
-SELECT
-  oude_kanaalvoorkeur,
-  nieuwe_kanaalvoorkeur,
-  COUNT(*) AS aantal
-FROM gold.uc05_customer_360.kanaalwijzigingen
-WHERE wijzig_datum >= CURRENT_DATE - INTERVAL '30' DAY
-GROUP BY oude_kanaalvoorkeur, nieuwe_kanaalvoorkeur
-ORDER BY aantal DESC;
+SELECT *
+FROM gold.job_market.mart_job_inventory
+LIMIT 20;
 ```
 
-### 4.3 Workflow C — Pieken in klantvraag
+Inspect the same table in OpenMetadata and follow its dbt lineage to `silver.job_market.int_job_snapshots` and `bronze.job_market.observations`. Query underlying layers only when your role permits it.
 
-```sql
-SELECT
-  date_trunc('day', contact_datum) AS dag,
-  COUNT(*) AS contacten,
-  AVG(behandel_duur_min) AS gem_duur
-FROM gold.uc05_customer_360.contact_log
-WHERE contact_datum >= CURRENT_DATE - INTERVAL '14' DAY
-GROUP BY 1
-ORDER BY 1;
-```
+## Interpretation checklist
 
-### 4.4 Workflow D — Overview voor teamleider
+- Compare the same snapshot dates and source coverage. A failed source can change counts.
+- Domain labels overlap. A Cloud Security Engineer can belong to both domains.
+- Separate reported from estimated pay. Monthly EUR amounts are annualized × 12; hourly pay remains a separate unit.
+- Missing fields are unknown. A listing absent from a bounded search is not proven closed.
+- Preserve `source`, `source_job_id`, `canonical_url`, `snapshot_date` and `is_synthetic` in evidence.
 
-In Superset → dashboard "CRM Trends" → filteren op je team → exporteer als PDF.
+## When something fails
 
-> **Niet doen.** Geen lijst met BSN's exporteren — ook niet gemaskeerde.
-> Voor teamleider zijn aggregaten genoeg.
+For stale data, inspect Airflow's `dutch_it_jobs_daily` and the dated extraction manifest. For denied access, verify the signed-in role and ask the asset owner through the access-request page. For definitions or source completeness, contact the data steward. Platform logs and service dashboards are available to approved operational roles.
 
-### 4.5 Workflow E — Eén cliënt zonder andere data koppelen
-
-Stel een cliënt vraagt: "Wat hebben jullie over mij?" — Beantwoord:
-
-1. Wat **jij** ziet in het 360°-beeld (= een **deel** van het volledige platform image)
-2. Verwijs voor volledige inzage to the AVG-inzageformulier (out-of-platform proces)
-3. Geef nooit een uitprint van het scherm — laat zien on the scherm en lees voor
-
----
-
-## 5. Hulp, fouten & escalatie
-
-### 5.1 Errors
-
-| Foutmelding | Betekenis | Actie |
-|---|---|---|
-| `bsn = NULL` of "uitgegrijsd" | Kolom gemaskeerd, niet gewist | Voor klantidentificatie volstaat naam + birth_date |
-| `Access Denied: silver.claims.*` | Andere domeinen niet zichtbaar | Verwijs cliënt door naar WIA-team |
-| `Cliënt niet gevonden` | Mogelijk synthesedata-mismatch (referentie-omgeving) | Check spelling, gebruik birth_date |
-
-### 5.2 Wie helpt?
-
-| Probleem | Contact |
-|---|---|
-| Sign in / MFA | Platform-admin |
-| Cliënt staat niet in 360° | Data-steward (mogelijke ingestion-vertraging) |
-| Cliënt vraagt complexe inzage | Verwijs naar AVG-loket UWV |
-
----
-
-## 6. Wat je nooit doet
-
-- Een volledige BSN noemen aan de telefoon — gebruik gemaskeerde versie.
-- Decisions nemen over claim payouten — alleen WIA/WW/Wajong-rollen.
-- Schermafbeeldingen mailen, ook niet "even" naar een collega.
-- Cliënt-data combineren in eigen Excel — alle analyses gaan via Superset.
-
----
-
-**Vorige:** [03-claims-analyst.md](03-claims-analyst.md) ·
-**Volgende:** [05-finance-analyst.md](05-finance-analyst.md) ·
-**Index:** [README.md](README.md)
+[Complete walkthrough and data dictionary](../use-cases/dutch-it-job-market.md).

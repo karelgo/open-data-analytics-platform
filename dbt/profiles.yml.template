@@ -1,100 +1,14 @@
-# dbt profiles for the ODAP platform.
-#
-# Plaats deze file in ~/.dbt/profiles.yml of zet env DBT_PROFILES_DIR=./dbt
-# (en hernoem naar profiles.yml). Voor in-cluster Airflow-runs (fase 6) wordt
-# een eigen profiles.yml gerenderd vanuit een Kubernetes Secret.
-#
-# Auth: voor referentie gebruiken we Trino's static-user `smoketest`. Production
-# gebruikt OIDC met ldap-of-jwt method.
-#
-# Multi-platform: dit profiel heeft drie outputs for the uc11-demo:
-#   - dev / prod       → Stackable Trino (huidige, default)
-#   - databricks_dev   → Databricks SQL warehouse + Unity Catalog
-#   - fabric_dev       → Microsoft Fabric Spark via dbt-fabricspark
-#
-# Adapters die geïnstalleerd moeten zijn for the extra targets:
-#   pip install dbt-databricks   # voor databricks_dev
-#   pip install dbt-fabricspark  # voor fabric_dev
----
 trino_default:
   target: dev
   outputs:
     dev:
       type: trino
-      # In dev werkt Trino's password-authenticator niet via dbt-trino client
-      # ("Password not allowed for insecure authentication") door TLS-detectie
-      # met http-server.process-forwarded. method=none stuurt alleen
-      # X-Trino-User header, wat Trino accepteert.
       method: none
       user: "{{ env_var('TRINO_USER', 'smoketest') }}"
-      host: "{{ env_var('TRINO_HOST', 'trino.odap.local') }}"
-      port: "{{ env_var('TRINO_PORT', '8443') | int }}"
-      http_scheme: https
-      cert: "{{ env_var('TRINO_TLS_CERT_PATH', '/etc/ssl/odap-platform-ca.crt') }}"
-      database: silver               # default Trino-catalog (zie dbt_project.yml voor per-laag)
-      schema: dbt_default            # default schema (overridden per model)
-      threads: 4
-      session_properties: {}
-
-    prod:
-      type: trino
-      method: oidc                   # OIDC via Keycloak (production)
-      user: "{{ env_var('TRINO_USER') }}"
-      jwt_token: "{{ env_var('TRINO_JWT') }}"
-      host: trino.odap.local
+      host: "{{ env_var('TRINO_HOST', 'trino-coordinator.odap-platform.svc.cluster.local') }}"
       port: 8443
       http_scheme: https
+      cert: "{{ env_var('REQUESTS_CA_BUNDLE', '/etc/platform-ca/ca.crt') }}"
       database: silver
-      schema: dbt_prod
-      threads: 8
-
-    # ─────────────────────────────────────────────────────────────────
-    # Databricks Unity Catalog (uc11 multi-platform demo).
-    # Connect via SQL warehouse; catalog `databricks` met schemas
-    # silver_* en gold_*. Tabellen zijn UC-managed (Databricks-default
-    # ADLS Gen2 storage onder de motorkap, geen externe locatie nodig).
-    # ─────────────────────────────────────────────────────────────────
-    databricks_dev:
-      type: databricks
-      host: "{{ env_var('DATABRICKS_HOST') }}"           # bv. dbc-xxxx.cloud.databricks.com
-      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}" # SQL-warehouse HTTP path
-      token: "{{ env_var('DATABRICKS_TOKEN') }}"         # PAT of OAuth via secret-scope
-      catalog: "{{ env_var('DATABRICKS_CATALOG', 'databricks') }}"
-      schema: "{{ env_var('DATABRICKS_SCHEMA', 'dbt_default') }}"
-      threads: 4
-      connect_retries: 3
-      connect_timeout: 60
-
-    # ─────────────────────────────────────────────────────────────────
-    # Microsoft Fabric Spark (uc11 multi-platform demo).
-    # Schrijft Delta-tabellen in een Fabric Lakehouse op OneLake via
-    # de Livy endpoint van de workspace. Auth via Service Principal
-    # (creds in secrets/local/uc11-multiplatform.env; cluster gebruikt
-    # K8s Secret 'uc11-multiplatform-creds').
-    #
-    # `authentication` in dbt-fabricspark valt door naar SPN-flow voor
-    # élke waarde behalve "CLI"/"int_tests"/"fabric_notebook"/"token_credential".
-    # `ServicePrincipal` is daarom puur cosmetisch — de string-naam doet
-    # niets afgezien van vallen in de else-branch (zie livysession.get_headers).
-    #
-    # Non-schema lakehouse: schema wordt through the adapter geforceerd
-    # naar lakehouse-naam (`uc11_lakehouse`). spark_config.name is verplicht.
-    # ─────────────────────────────────────────────────────────────────
-    fabric_dev:
-      type: fabricspark
-      method: livy
-      authentication: ServicePrincipal
-      tenant_id: "{{ env_var('FABRIC_TENANT_ID') }}"
-      client_id: "{{ env_var('FABRIC_CLIENT_ID') }}"
-      client_secret: "{{ env_var('FABRIC_CLIENT_SECRET') }}"
-      workspaceid: "{{ env_var('FABRIC_WORKSPACE_ID') }}"
-      lakehouseid: "{{ env_var('FABRIC_LAKEHOUSE_ID') }}"
-      lakehouse: "{{ env_var('FABRIC_LAKEHOUSE_NAME', 'uc11_lakehouse') }}"
-      endpoint: "{{ env_var('FABRIC_ENDPOINT', 'https://api.fabric.microsoft.com/v1') }}"
-      schema: "{{ env_var('FABRIC_SCHEMA', 'uc11_lakehouse') }}"
-      spark_config:
-        name: "dbt-uc11"
-      threads: 4
-      connect_retries: 5
-      connect_timeout: 60
-      retry_all: true
+      schema: job_market
+      threads: 2

@@ -1,145 +1,51 @@
-# CGM (Canonical Data Model) glossary voor OpenMetadata.
-#
-# Termen uit referentiearchitecture Bijlage B + use-case-secties.
-# Wordt via init-Job met POST /api/v1/glossaries en /api/v1/glossaryTerms toegepast.
-#
-# Production zou de officiële CGM-yaml from the Data Office repo halen.
-#
-# Reviewers/Owners per term — gebruikt through the Request Access-flow (ADR-0008).
-# Default valt terug op `glossary.reviewers` + `glossary.owner` als de term
-# zelf niets specifieks zet. dataOwner per term scopet request op het
-# verantwoordelijke domein.
-
-glossary:
-  name: CGM
-  displayName: "Canonical Data Model"
-  description: |
-    Canoniek Gegevensmodel — enterprise-wide conceptual data model. Elke gold-tabel
-    mapt 1-op-1 naar één of meer CGM-entiteiten; afwijking vereist explicit
-    waiver van Data Office.
-  reviewers:
-    - data.steward
-  owner:
-    type: user
-    name: data.steward
-
-terms:
-  # Cliënt-domein
-  - name: Client
-    displayName: "Cliënt"
-    description: "Natuurlijke persoon waarvoor the platform performs a service."
-    relatedTerms: [Aanvraag, Claim payout, Contact]
-  - name: Persona
-    displayName: "Persoon"
-    description: "Persoonsgegeven-deel van een Cliënt (NAW + birth_date)."
-
-  # Aanvraag- en beoordelings-domein
-  - name: Aanvraag
-    displayName: "Aanvraag"
-    description: "Verzoek tot claim payout of voorziening (WW, WIA, Wajong, ZW, TW)."
-  - name: Assessment
-    displayName: "Assessment"
-    description: "Inhoudelijke toetsing van een Aanvraag door beoordelaar."
-  - name: Beoordelaar
-    displayName: "Beoordelaar"
-    description: "Platform user performing the assessment (verzekeringsarts of arbeidsdeskundige)."
-  - name: Capaciteit
-    displayName: "Capaciteit"
-    description: "Beschikbare uren per Beoordelaar (UC-08)."
-
-  # Diagnose / operational
-  - name: Diagnose
-    displayName: "Diagnose"
-    description: "Medische diagnose — bijzonder PG (art. 9 AVG). Sensitive Vault."
-    # Medisch art. 9 AVG — review door arbeidsdeskundige naast data.steward.
-    dataOwner: case.manager
-    reviewers:
-      - case.manager
-      - data.steward
-
-  # Reintegration
-  - name: Traject
-    displayName: "Reintegrationtraject"
-    description: "Reintegration-instrument (IPS, proefplaatsing, scholing, jobcoaching)."
-  - name: Werkhervatting
-    displayName: "Werkhervatting"
-    description: "Daadwerkelijke werkhervatting na een traject."
-  - name: Uitkomst
-    displayName: "Uitkomst"
-    description: "Resultaat van een Traject, gemeten op duurzaam-werk-criterium."
-
-  # Polisadministratie
-  - name: IKV
-    displayName: "Inkomstenverhouding"
-    description: "Kerneenheid polisadministratie — combinatie werknemer × werkgever × periode."
-  - name: Werknemer
-    displayName: "Werknemer"
-    description: "Natuurlijke persoon met lopend dienstverband."
-  - name: Werkgever
-    displayName: "Werkgever"
-    description: "Werkgever — onderneming met loonheffingennummer."
-  - name: Dienstverband
-    displayName: "Dienstverband"
-    description: "Arbeidsovereenkomst — onderdeel van een IKV."
-  - name: Ontslag
-    displayName: "Ontslag"
-    description: "Beëindiging van een Dienstverband."
-
-  # Claim payout / financieel — FEZ-domein
-  - name: Claim payout
-    displayName: "Claim payout"
-    description: "Periodieke betaling aan Cliënt op grond van een wet (WW/WIA/Wajong/ZW/TW)."
-    dataOwner: finance.analyst
-  - name: Inkomen
-    displayName: "Inkomen"
-    description: "Bruto inkomen per periode (uit IKV's)."
-    dataOwner: finance.analyst
-  - name: Huishouden
-    displayName: "Huishouden"
-    description: "Huishoudsamenstelling (uit BRP-spiegel) voor TW-toets."
-  - name: Aggregaat
-    displayName: "Aggregaat"
-    description: "Geanonimiseerde geaggregeerde claim_cost per wet × regio × periode (UC-06)."
-    dataOwner: finance.analyst
-
-  # CRM
-  - name: Contact
-    displayName: "Customer interaction"
-    description: "Contactgebeurtenis between Client and the platform (telefoon, balie, beeldbellen, mail)."
-    dataOwner: marketing.analyst
-  - name: Kanaal
-    displayName: "Kanaal"
-    description: "Communicatiekanaal — telefoon, balie, beeldbellen, workspace_bericht, mail."
-    dataOwner: marketing.analyst
-
-  # Doelgroep
-  - name: Doelgroepregister
-    displayName: "Doelgroepregister Banenafspraak"
-    description: "Indicaties art. 38d Wfsv."
-
-  # Cross-domein customer journey (UC-11)
-  - name: Customer journey
-    displayName: "Integrale Customer journey"
-    description: |
-      Cross-domein aggregaat: chronologische reeks van fase-overgangen van een
-      cliënt across applicable laws (werknemer → ziek → WIA → reintegration → ...).
-      Afgeleid uit events in IKV, WW, ZW, WIA, Wajong en Contact. Eigenaar is
-      divisie_customer interaction; OPA filtert per rol op kolom + rij.
-    relatedTerms: [Client, IKV, Aanvraag, Assessment, Claim payout, Contact, Traject, Werkhervatting]
-    dataOwner: marketing.analyst
-    reviewers:
-      - marketing.analyst
-      - data.steward
-  - name: Fase
-    displayName: "Customer journey-fase"
-    description: |
-      Periode in de customer journey waarin de cliënt in een bepaalde status
-      verkeert (werknemer, ziek, service_request_application, ww_claim payout, wia_in_behandeling,
-      wga, iva, wajong_actief, tussen_dienstverband).
-    relatedTerms: [Customer journey]
-  - name: EventStream
-    displayName: "Event-stream"
-    description: |
-      Tijdgeordende reeks van cliënt-gebeurtenissen, geünificeerd over
-      domeinen. Basis voor customer journey-tijdlijn-visualisaties.
-    relatedTerms: [Customer journey, Contact]
+{
+  "glossary": {
+    "name": "CGM",
+    "displayName": "Dutch IT Job Market",
+    "description": "Definitions for the single job-market data product. Existing CGM identifier retained for integration compatibility.",
+    "reviewers": [
+      "data.steward"
+    ],
+    "owner": {
+      "type": "user",
+      "name": "data.steward"
+    }
+  },
+  "terms": [
+    {
+      "name": "JobPosting",
+      "displayName": "Job posting",
+      "description": "A source-specific advert with source ID and canonical URL. An advert is not necessarily a unique vacancy."
+    },
+    {
+      "name": "DailySnapshot",
+      "displayName": "Daily snapshot",
+      "description": "Jobs observed for one logical collection date; bounded searches do not establish total market inventory or closure."
+    },
+    {
+      "name": "Employer",
+      "displayName": "Employer",
+      "description": "Organization named by the posting; recruiting agencies may differ from the actual employer."
+    },
+    {
+      "name": "Skill",
+      "displayName": "Skill",
+      "description": "Versioned deterministic keyword evidence in the advert. Missing evidence is not proof a skill is unnecessary."
+    },
+    {
+      "name": "Domain",
+      "displayName": "IT domain",
+      "description": "Multi-label: Data, Cloud, SAP, AI, Software and Security. Domain totals are not additive."
+    },
+    {
+      "name": "Salary",
+      "displayName": "Salary",
+      "description": "Stated currency and period retained; annual EUR figures use 12 times monthly, excluding hourly and unknown periods. Estimates are identified separately."
+    },
+    {
+      "name": "DuplicateGroup",
+      "displayName": "Potential duplicate group",
+      "description": "Conservative normalized employer/title/city match. Retains source observations; can combine distinct roles sharing those values."
+    }
+  ]
+}

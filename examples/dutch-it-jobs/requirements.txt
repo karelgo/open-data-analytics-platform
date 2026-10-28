@@ -1,0 +1,2 @@
+# Offline ingestion, normalization and SQLite analytics use Python 3.11+ standard library.
+# Cluster upload is handled by the platform runner, which provides boto3 separately.
