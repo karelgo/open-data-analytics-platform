@@ -1,191 +1,41 @@
 ---
-title: "Nieuwe bron toevoegen: NiFi → Kafka → Spark → dbt-staging in één PR"
-role: data_engineer
-level: practitioner
-order: 2
-duration: "2 uur"
-summary: "Een echte mini-feature: synthetische bron `xyz` toevoegen — NiFi-template aanpassen, Kafka-topic registreren, Spark-job, dbt-staging, OPA-update, OpenMetadata-config, smoke-test, PR aanleveren."
-prereqs:
-  - "data_engineer/foundation/1"
-labs:
-  - title: "Open NiFi"
-    href: "/go/nifi/"
-  - title: "Open Airflow for the dbt-run"
-    href: "/go/airflow/"
-  - title: "Werk in vscode.dev — repo"
-    href: "/dbt-docs/"
-    vscodePath: "nifi-flows/templates"
-  - title: "Bewerk de role-mapping"
-    href: "/go/openmetadata/"
-    vscodePath: "opa-policies-src/data/role_mappings.json"
-  - title: "Bekijk dbt-staging template"
-    href: "/dbt-docs/"
-    vscodePath: "dbt/models/staging"
-checks:
-  - id: "engineer_practitioner_pipeline"
-    title: "End-to-end smoke test groen"
-    hint: "make test slaagt on the nieuwe pipeline"
-quiz:
-  - q: "Welke volgorde is correct for the PR-checklist?"
-    options:
-      - "merge → test → docs"
-      - "1) NiFi-template → 2) Kafka-topic → 3) Spark-job → 4) dbt-staging → 5) OPA-update → 6) OpenMetadata-config → 7) smoke-test groen → 8) PR + review"
-      - "Alles tegelijk pushen"
-      - "Eerst production, dan dev"
-    correct: 1
-  - q: "Wat doet de helper `lakehouse_io.write_delta()` voor je?"
-    options:
-      - "Hij is decoratief"
-      - "Hij abstraheert table-format (Delta nu, Iceberg-pad open) en regelt schema-evolutie + checkpoints — zodat je in spark-jobs niets handmatig hoeft te configureren"
-      - "Hij verzendt mail"
-      - "Hij scheduled de job"
-    correct: 1
-  - q: "Bronze-access nodig om je nieuwe pipeline te debuggen. Hoe?"
-    options:
-      - "Direct in Trino — je bent engineer"
-      - "JIT-procedure: ticket met scope + reden, platform-admin keurt goed (4 uur), elke query met TICKET-id; niet werken zonder ticket"
-      - "Vragen aan business"
-      - "Zelf rol switchen"
-    correct: 1
+{
+  "title": "Trace a vacancy through the platform",
+  "role": "data_engineer",
+  "level": "practitioner",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Operate extraction, Spark Bronze and tested dbt Silver and Gold models.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-Hands-on. Doel: één synthetische bron `xyz` aanleveren in de hele keten,
-in één klein-maar-volledig PR.
+Open the Superset job-market dashboard and the `mart_job_inventory` dataset. Follow the dataset in OpenMetadata to the Silver deduplication model and Bronze observations. Read the dated extraction manifest before comparing counts across days.
 
-## Spec van de "bron"
+In Jupyter, run `00_dutch_it_job_market.ipynb`. The offline section reads SQLite; the platform section queries Trino under your assigned identity. Use only the layers authorized to your role.
 
-We doen alsof beleid een nieuwe stroom `xyz` levert: een gebeurtenis-stream
-("event_id, ts, type, value") die elke 5 minuten in batches binnenkomt.
-Synthetisch via een generator in `data-generation/`.
-
-## Stap 1 — NiFi-template
-
-Open [NiFi](/go/nifi/), navigeer naar `templates/delta/source-xyz/` (we
-kopiëren een bestaand template-paar). Pas processors aan:
-
-- bron-pad in MinIO `s3a://incoming/xyz/`;
-- destination Kafka-topic = `<domain>.xyz.event`;
-- schema-validatie: `xyz_event.avsc`.
-
-Sla op als nieuwe template-versie.
-
-## Stap 2 — Kafka-topic registreren
-
-In `platform/06-kafka/topics.yaml`:
-
-```yaml
-- name: uwv.xyz.event
-  partitions: 3
-  replicationFactor: 1   # k3d single-node; cloud override apart
-  config:
-    retention.ms: "604800000"  # 7 dagen
-```
-
-`make apply-topics` reconciled.
-
-## Stap 3 — Spark-job
-
-`spark-jobs/streaming-bronze-xyz.yaml` (Stackable SparkApplication-CRD) +
-de Python:
-
-```python
-# spark-jobs/streaming_bronze_xyz.py
-from lib.lakehouse_io import write_delta, kafka_source
-
-stream = (
-    kafka_source(topic='uwv.xyz.event', schema_registry='avro:xyz_event')
-)
-write_delta(
-    stream,
-    table='bronze.xyz.events',
-    path='s3a://odap-bronze/xyz/',
-    checkpoint='s3a://odap-checkpoints/bronze-xyz/',
-    trigger='1 minute',
-)
-```
-
-`lakehouse_io.write_delta` doet schema-evolutie en checkpoints. Niet
-opnieuw uitvinden.
-
-## Stap 4 — Hive-tabel
-
-```sql
-CREATE TABLE bronze.xyz.events (
-  event_id  STRING,
-  ts        TIMESTAMP,
-  type      STRING,
-  value     DOUBLE
-) USING DELTA LOCATION 's3a://odap-bronze/xyz/';
-```
-
-In `platform/05-hive-metastore/init-schemas.sql`.
-
-## Stap 5 — dbt-staging
-
-`dbt/models/staging/stg_xyz.sql`:
-
-```sql
-{{ config(materialized='view') }}
-
-SELECT
-    event_id,
-    ts,
-    type,
-    value
-FROM {{ source('bronze_xyz', 'events') }}
-WHERE ts >= dateadd('day', -90, current_date)
-```
-
-Plus `schema.yml`:
-
-```yaml
-version: 2
-sources:
-  - name: bronze_xyz
-    schema: xyz
-    database: bronze
-    tables:
-      - name: events
-models:
-  - name: stg_xyz
-    meta:
-      eigenaar: data.engineer@odap.local
-      classification: intern
-    columns:
-      - name: event_id
-        tests: [not_null, unique]
-      - name: ts
-        tests: [not_null]
-```
-
-## Stap 6 — OPA role-mapping
-
-In `opa-policies-src/data/role_mappings.json` voeg je `bronze.xyz.*`
-toe aan `roles.data_engineer.catalogs_jit` (JIT-only) en `purposes` met
-`technisch_onderhoud`.
-
-`make opa-test` om te valideren.
-
-## Stap 7 — OpenMetadata service
-
-`platform/13-openmetadata-config/services/xyz.yaml` voor auto-discovery
-van de tabel.
-
-## Stap 8 — Smoke test
-
-`tests/smoke/test_xyz_e2e.py` produceert één event en assert dat het in
-`bronze.xyz.events` aankomt binnen 2 minuten.
-
-```bash
-make test SUITE=smoke FILTER=xyz
-```
-
-## Stap 9 — PR
-
-Eén PR. Reviewers: data-steward (tags + glossary) + platform-admin
-(OPA-bundle + smoke-test groen).
-
-## Verificatie
-
-De auto-check valideert dat `make test SUITE=smoke FILTER=xyz` groen is in
-CI op je branch.
+[Continue in the job-market explorer](/job-market/).

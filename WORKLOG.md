@@ -635,3 +635,9 @@ Per session: what was done, what remains, which decisions were made.
 
 ### Resterende verbeteringen
 Zie [`docs/improvements.md`](improvements.md) — ~135 items in lager-prio categorieën blijven open (HA-overlays, GitOps/ArgoCD, NiFi-flows, dashboard-builder voor andere UC's, NetworkPolicies, MDM, etc.).
+
+## 2026-10-28 — One platform-wide Dutch IT job-market example
+
+Replaced the active claims/customer/finance examples with daily Dutch IT job observations covering Data, Cloud, SAP, AI, Software and Security. The single workflow includes an offline synthetic dataset, supported live API/approved-feed adapters, immutable source attempts, replayable daily Delta snapshots, dbt analytics/tests, Superset, catalog/lineage/governance, a Jupyter notebook and a portal explorer. Former documentation and teaching material is retained in an excluded legacy archive; unrelated executable demos and schedules are retired.
+
+Verified offline extraction/publication behavior, OPA access decisions including shared-metastore catalog aliases, dbt parse and resolved governance/test coverage, affected Kustomize builds, Python lint, portal build/type checks, strict documentation generation, and a packaged Docker demo/dbt parse. Live provider requests and a full Kubernetes/Spark/Trino execution were not run; source credentials and target-cluster verification remain deployment prerequisites. Existing dashboards read individual marts during dbt build; passing tests gate catalog/dashboard refresh, not atomic multi-mart promotion.

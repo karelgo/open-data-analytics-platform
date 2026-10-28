@@ -1,98 +1,11 @@
-# docs/ — Index
+# Platform documentation
 
-Alle documentation van het Open Data & Analytics Platform op één plek. De
-[top-level `README.md`](../README.md) is het instappunt; van daar verwijst
-deze map dieper.
+The single active use case is [Dutch IT Job Market](use-cases/dutch-it-job-market.md), covering daily extraction, all observation fields, analytics, governance and the platform walkthrough.
 
-## Per onderwerp
+- [Architecture](architecture/index.md)
+- [Role handbooks](handbooks/README.md)
+- [Deployment modes](deployment-modes.md)
+- [Operations runbook](runbook.md)
+- [Architecture decisions](adr/index.md)
 
-### Architecture en context
-
-- [architecture/index.md](architecture/index.md) — High-level architecture, lagen, data zones, identity, naming. Definition of Done staat in de [originele referentie](architecture/reference.md#definition-of-done).
-- [context-summary.md](context-summary.md) — Achtergrondsamenvatting van de vier referentiedocumenten (NORA, AVG, BIO, AI Act).
-- [compliance-mapping.md](compliance-mapping.md) — Per requirement (R-NORA-/R-AVG-/R-BIO-/R-NIS2-/R-AIACT-) waar het in de repo wordt geadresseerd.
-
-### Decisions (ADR's)
-
-- [0001 — Stackable als basis](adr/0001-stackable-as-base.md)
-- [0002 — Iceberg vs Delta](adr/0002-iceberg-vs-delta.md)
-- [0003 — OPA als Trino-authz](adr/0003-opa-as-trino-authz.md)
-- [0004 — OpenMetadata als catalog](adr/0004-openmetadata-as-catalog.md)
-- [0005 — dbt-trino als transformationlaag](adr/0005-dbt-trino-as-transform.md)
-- [0006 — Delta gekozen voor deze implementatie](adr/0006-delta-chosen-for-this-implementation.md)
-- [0007 — Airflow pipeline-architecture](adr/0007-airflow-pipeline-architecture.md)
-- [0008 — Self-service data-access](adr/0008-self-service-data-access.md)
-- [0009 — NetworkPolicies-strategie](adr/0009-networkpolicies-strategy.md)
-- [0010 — platform-config als single source](adr/0010-platform-config-single-source.md)
-
-### Use cases
-
-Twaalf use-case-specs onder [`use-cases/`](use-cases/), elk met scope, CGM-
-entiteiten, purpose-limitation, AI-Act-classificatie en Definition-of-Done-anchors.
-
-| ID | Titel | Status |
-|---|---|---|
-| [UC-01](use-cases/uc01-claims-funnel.md) | WIA-funnel-dashboard (DoD-anchor) | Mart aanwezig |
-| [UC-02](use-cases/uc02-complex-cases-ai.md) | Wajong AI-ondersteuning (hoog-risico) | Placeholder |
-| [UC-03](use-cases/uc03-fraud-risk.md) | WW-risico-screening (verboden-grens) | Placeholder + guard-test |
-| [UC-04](use-cases/uc04-proactieve-tw.md) | Proactieve TW-eligibility | Mart aanwezig |
-| [UC-05](use-cases/uc05-customer-360.md) | Customer 360 (gepseudonimiseerd) | Mart aanwezig |
-| [UC-06](use-cases/uc06-cost forecast.md) | Cost forecast-prognose 5 jaar | Mart aanwezig |
-| [UC-07](use-cases/uc07-dq-policies.md) | DQ-dagrapport polisadministratie | Mart aanwezig |
-| [UC-08](use-cases/uc08-capacity-planning-planning.md) | SMZ-capacity planning | Placeholder |
-| [UC-09](use-cases/uc09-reintegration-effect.md) | Reintegration-effectmeting | Mart aanwezig |
-| [UC-10](use-cases/uc10-gegevensdiensten.md) | Gegevensdiensten-API | Placeholder |
-| [UC-11](use-cases/uc11-customer-journey.md) | Integrale Customer journey (event-stream + fasen) | Mart aanwezig · [walkthrough](use-cases/uc11-customer-journey-walkthrough.md) |
-| [UC-12](use-cases/uc12-focus-finops.md) | FOCUS FinOps — kostenrapportage | Mart aanwezig |
-
-UC-11 heeft een aparte **demo-walkthrough** in
-[uc11-customer-journey-walkthrough.md](use-cases/uc11-customer-journey-walkthrough.md) —
-stap-voor-stap rondleiding door alle platform-onderdelen, met directe
-links to the live UI's (portal, dbt-docs, OpenMetadata, Trino, Airflow,
-Superset). Handig als presentatie-script of als onboarding-tour.
-
-#### Presentatie-artefacten voor UC-11
-
-| Artefact | Pad | Regenereren |
-|---|---|---|
-| Demo-walkthrough (markdown) | [uc11-customer-journey-walkthrough.md](use-cases/uc11-customer-journey-walkthrough.md) | — |
-| Walkthrough als PDF | [uc11-customer-journey-walkthrough.pdf](use-cases/uc11-customer-journey-walkthrough.pdf) | `make pdf-uc11` |
-| UC-spec als PDF | [uc11-customer-journey.pdf](use-cases/uc11-customer-journey.pdf) | `make pdf-uc11` |
-| PowerPoint-deck (12 slides) | [uc11-customer-journey-deck.pptx](use-cases/uc11-customer-journey-deck.pptx) | `make deck-uc11` |
-
-De PDF-generator gebruikt Chrome headless (script
-[scripts/md-to-pdf.py](../scripts/md-to-pdf.py)). Het deck wordt gebouwd
-met PptxGenJS (script [scripts/build-uc11-deck.js](../scripts/build-uc11-deck.js)).
-Beide hebben geen externe service nodig.
-
-### Operationeel
-
-- [runbook.md](runbook.md) — Cluster-lifecycle, healthchecks, incidenten, backup & restore, upgrades, observability, compliance-evidence.
-- [improvements.md](improvements.md) — Roadmap met bekende gaps, prio + effort.
-- [documentation-gap-report.md](documentation-gap-report.md) — Aparte audit van doc-coverage.
-
-### Persona-handbooken
-
-Onder [`handbooks/`](handbooks/) staan 13 stap-voor-stap-handbooken
-voor verschillende rollen (Claims Analyst, Fraud Analyst, Finance Analyst,
-data-steward, platform-admin, …). Zie [handbooks/README.md](handbooks/README.md)
-voor de index.
-
-## Conventies
-
-- **Taal:** Nederlands voor inhoudelijke content; Engels voor technische
-  identifiers (paden, kolomnamen, tool-namen).
-- **ADR-format:** numbered, immutable. Een nieuwe beslissing krijgt een
-  nieuw ADR; de oude wordt niet bewerkt maar als "superseded by" gemarkeerd.
-- **Use-case-format:** scope, CGM-entiteiten, purpose-limitation, legal_basis,
-  risk_tier, DoD-anchor, datapad (bronze → silver → gold).
-- **Compliance-meta** in dbt-models sluit 1-op-1 aan op
-  [`compliance-mapping.md`](compliance-mapping.md). Zie
-  [`../dbt/README.md#compliance-velden-in-meta`](../dbt/README.md).
-
-## Bijdragen
-
-`CONTRIBUTING.md` is nog open (zie [improvements #1.18](improvements.md)).
-Tot die er is: een nieuwe doc volgt de bestaande structuur (ADR ↔ use-case ↔
-handbook), en kruisverwijzingen worden bijgewerkt in deze index én in de
-top-level [`README.md`](../README.md).
+Earlier examples remain under `archive/legacy-examples/` as historical material, excluded from the documentation site. Code and data identifiers remain in English. Keep the source registry, dbt models and use-case dictionary consistent when evolving the example.

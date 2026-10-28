@@ -152,6 +152,7 @@ allow if {
 allow if {
 	authenticated
 	is_read_op
+	layer_allows_resource
 	role_allows_resource
 	purpose_allows_resource
 }
@@ -161,6 +162,7 @@ allow if {
 allow if {
 	authenticated
 	is_write_op
+	role_allows_resource
 	some r in user_roles
 	r in {"data_engineer", "platform_admin", "smoketest"}
 }
@@ -172,4 +174,30 @@ batch contains i if {
 
 	# Vrijgevig op meta-list-ops; per-resource policies vangen het later af.
 	is_read_op
+}
+
+# All three Trino catalogs use the same Hive Metastore. A Gold catalog name
+# alone does not prevent reading a Bronze Delta table through an alias.
+# Enforce the logical layer by both catalog and table name, including grants.
+layer_allows_resource if resource_schema != "job_market"
+
+layer_allows_resource if resource_table == ""
+
+layer_allows_resource if {
+	resource_catalog == "bronze"
+	resource_table == "observations"
+}
+
+layer_allows_resource if {
+	resource_catalog == "silver"
+	resource_table in {"stg_job_observations", "int_job_snapshots"}
+}
+
+layer_allows_resource if {
+	resource_catalog == "gold"
+	resource_table in {
+		"mart_job_inventory", "mart_job_demand_daily", "mart_job_skills",
+		"mart_job_salary", "mart_job_geography", "mart_job_work_arrangements",
+		"mart_job_source_quality",
+	}
 }

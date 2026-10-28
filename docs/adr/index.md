@@ -1,33 +1,15 @@
----
-title: Decisions (ADRs) — overzicht
-description: Architecture Decision Records die de fundamentele keuzes vastleggen.
----
+# Architecture decisions
 
-<!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
+Decisions record the platform's history. Earlier domain examples mentioned in these records are historical; the active use case is [Dutch IT Job Market](../use-cases/dutch-it-job-market.md).
 
-# Architecture Decision Records (ADRs)
-
-Numbered, immutable. Een nieuwe beslissing krijgt een nieuw ADR; de oude
-wordt niet bewerkt maar als "superseded by" gemarkeerd.
-
-| ADR | Beslissing | Status |
-|---|---|---|
-| [0001](0001-stackable-as-base.md) | Stackable Data Platform als basis | Accepted |
-| [0002](0002-iceberg-vs-delta.md) | Iceberg vs Delta — afweging | Superseded by 0006 |
-| [0003](0003-opa-as-trino-authz.md) | OPA als Trino-autorisatie-engine | Accepted |
-| [0004](0004-openmetadata-as-catalog.md) | OpenMetadata als catalog/lineage/DQ | Accepted |
-| [0005](0005-dbt-trino-as-transform.md) | dbt-trino als transformationlaag | Accepted |
-| [0006](0006-delta-chosen-for-this-implementation.md) | Delta gekozen voor deze implementatie | Accepted |
-| [0007](0007-airflow-pipeline-architecture.md) | Airflow pipeline-architecture | Accepted |
-| [0008](0008-self-service-data-access.md) | Self-service data-access flow | Accepted |
-
-## ADR-format
-
-Elke ADR volgt dezelfde indeling:
-
-- **Status** — Proposed / Accepted / Deprecated / Superseded by N
-- **Context** — wat speelt er, welke krachten werken on the keuze
-- **Beslissing** — wat is besloten
-- **Gevolgen** — wat verandert er door deze keuze
-- **Alternatieven** — wat is overwogen en waarom afgewezen
+- [ADR-0001: Stackable Data Platform als operator-baseline](0001-stackable-as-base.md)
+- [ADR-0002: Iceberg of Delta Lake als tabelformaat](0002-iceberg-vs-delta.md)
+- [ADR-0003: Open Policy Agent als authorisatielaag voor Trino](0003-opa-as-trino-authz.md)
+- [ADR-0004: OpenMetadata als catalog, governance en lineage-laag](0004-openmetadata-as-catalog.md)
+- [ADR-0005: dbt-core + dbt-trino als transformationlaag](0005-dbt-trino-as-transform.md)
+- [ADR-0006: Delta Lake gekozen voor déze reference implementation](0006-delta-chosen-for-this-implementation.md)
+- [ADR-0007: Airflow pipeline-architecture — Cosmos, Datasets, YAML-registry](0007-airflow-pipeline-architecture.md)
+- [ADR-0008: Microsoft Entra ID via Keycloak-brokering (i.p.v. parallelle IDPs)](0008-entra-broker-via-keycloak.md)
+- [ADR-0008: Self-service data access via OpenMetadata + OPA-brug](0008-self-service-data-access.md)
+- [ADR-0009: NetworkPolicies — default-deny in cloud, off in k3d](0009-networkpolicies-strategy.md)
+- [ADR-0010: platform-config.yaml als single source of truth](0010-platform-config-single-source.md)

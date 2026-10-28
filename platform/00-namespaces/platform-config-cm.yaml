@@ -57,3 +57,8 @@ data:
 
   # ---- Scale profile ----
   SCALE_PROFILE: "scaled-down"
+
+  USE_CASE: "dutch-it-job-market"
+  JOBS_SCHEDULE: "0 5 * * *"
+  JOBS_TIMEZONE: "Europe/Amsterdam"
+  JOBS_MODE: "demo"

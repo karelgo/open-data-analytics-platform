@@ -6,7 +6,7 @@ tabellen in OM bestaan. Per dbt-model:
   - Purpose limitation.*, LegalBasis.*, Confidentiality.*, AI.Risk-*   → tags
   - CGM.<term>                                                  → glossary-terms
   - meta.eigenaar (divisie_*)                                   → owner (team)
-  - config.tags (uc01 / uc11 / cross / sandbox / marts)         → Tier1..4
+  - config.tags (job_market)         → Tier1..4
   - meta.retention period_jaren / dpia_id / risk-flags             → Custom Properties
   - meta.pii_kolommen[]                                         → PII.* op kolom
   - meta.domain                                                  → OM Domain
@@ -319,7 +319,7 @@ def build_extension(node: dict, mapping: dict) -> dict:
     ext: dict[str, Any] = {}
 
     if "retention period_jaren" in meta:
-        ext["retention period_jaren"] = int(meta["retention period_jaren"])
+        ext["retention_years"] = int(meta["retention period_jaren"])
     if meta.get("dpia_id"):
         ext["dpia_id"] = str(meta["dpia_id"])
     if meta.get("algoritmeregister_id"):
@@ -385,7 +385,7 @@ def resolve_domain(node: dict, mapping: dict) -> dict | None:
 
 def resolve_data_products(node: dict, mapping: dict) -> list[dict]:
     """Match dbt config.tags tegen data_products[].dbt_tag. Zelfde tabel kan
-    in meerdere data-products zitten (UC11 events + phases delen 'uc11')."""
+    in meerdere data-products zitten (job-market marts delen 'job_market')."""
     config_tags = {
         str(t).lower() for t in (node.get("config") or {}).get("tags") or []
     }

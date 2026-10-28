@@ -54,6 +54,7 @@ dns:
 
 # Persistentie-pads in MinIO buckets.
 buckets:
+  raw: odap-raw
   bronze: odap-bronze
   silver: odap-silver
   gold: odap-gold
@@ -61,3 +62,11 @@ buckets:
   staging: odap-staging
   checkpoints: odap-checkpoints
   meta: odap-meta
+
+# Single active example. Live extraction is opt-in through a Kubernetes Secret.
+use_case:
+  name: dutch-it-job-market
+  schedule: "0 5 * * *"
+  timezone: Europe/Amsterdam
+  default_mode: demo
+  domains: [data, cloud, sap, ai, software, security]

@@ -1,99 +1,41 @@
 ---
-title: "Grenzen van het UC-03 model uitleggen — aan een niet-tech collega"
-role: fraud_analyst
-level: expert
-order: 3
-duration: "60 min"
-summary: "Leg in een korte memo uit waarom de risk-score géén bewijs is, welke false-positives je vandaag zag, en welke verbetering je for the model zou aandragen — voor je teamleider."
-prereqs:
-  - "fraud_analyst/practitioner/2"
-labs:
-  - title: "WW-risk dashboard — feature-uitleg"
-    href: "/go/superset/"
-  - title: "UC-03 model in OpenMetadata"
-    href: "/go/openmetadata/"
-checks:
-  - id: "ww_expert_memo"
-    title: "Memo opgesteld met false-positive-analyse"
-quiz:
-  - q: "Welke uitleg is correct for a leidinggevende?"
-    options:
-      - "‘Het algoritme is altijd nauwkeurig’"
-      - "‘Het model rangschikt waarschijnlijkheid van onderzoekswaardigheid; we schatten dat ~25% van top-5% scores false-positive is na hand-onderzoek; die feedback gaat terug to the modeleigenaar voor verbetering’"
-      - "‘Het model werkt niet’"
-      - "‘Geen idee’"
-    correct: 1
-  - q: "Welke aanbeveling tot model-verbetering is realistisch?"
-    options:
-      - "Het hele model afschaffen"
-      - "Een feature toevoegen die nu ontbreekt en die in 4 van mijn afgelopen 10 false-positives de oorzaak van de afwijking verklaarde — bijvoorbeeld een huwelijks-update als legitime IBAN-mutatie-context"
-      - "Andere data-engineer"
-      - "Hogere drempel zonder onderzoek"
-    correct: 1
-  - q: "Wat hoort niet in een memo aan de teamleider?"
-    options:
-      - "Aantallen onderzoeken per week"
-      - "Cliëntnamen of BSN's — we praten over patronen, niet over individuele cliënten"
-      - "Voorbeelden geanonimiseerd"
-      - "Voorstel verbeteractie"
-    correct: 1
-certifies: true
+{
+  "title": "Review evidence and source coverage",
+  "role": "fraud_analyst",
+  "level": "expert",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Explain a result with definitions, limitations and reproducible evidence.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-Hier ben je. Doel: een korte memo waarin je het UC-03 model voor je
-leidinggevende kadert — niet als black box, maar ook niet als orakel.
+Prepare a short analysis comparing two daily snapshots. Include the source set and extraction status, distinct vacancy denominator, overlapping domains and salary coverage. Explain whether any observed change could come from missing sources or page limits.
 
-## De vraag
+Engineers can rerun a date and verify that its partition remains unique. Stewards review lineage and classifications. Analysts verify that estimates, hourly rates and unknown values are treated according to the dictionary.
 
-Teamleider zit met externe stakeholders die vragen: "Hoe goed werkt het
-model? Wat zien jullie aan false-positives?". Jij hebt twee weken in de
-trenches gezeten — je weet meer dan iedereen anders.
-
-## Schrijf een memo (max 1 A4)
-
-Structuur:
-
-```
-1. Context (1 alinea)
-   Wat doet UC-03? Een waarschijnlijkheidsmodel, geen besluit.
-
-2. Wat we 2 weken zagen (2 alineas, geen PII)
-   - Aantal verwerkte signalen, top 5%, top 1%.
-   - Geschatte false-positive ratio op top 5% na hand-onderzoek.
-   - Drie patronen van false-positives (geanonimiseerd):
-     a) IBAN-mutatie + huwelijksregistratie BRP
-     b) Parttime-uren-discrepantie + bekende seizoens-werkgever
-     c) Inkomen-mismatch + toelage-correctie achteraf
-
-3. Wat dit betekent (1 alinea)
-   - Score is signaal, niet bewijs; menselijk oordeel verplicht.
-   - Concrete verbetering: feature X toevoegen, ETA Y.
-
-4. Aanbeveling (3 bullets)
-   - Doorgaan met huidige drempel, focus op patroon (a).
-   - Modeleigenaar feedback toespelen voor volgende training.
-   - Periodiek (kwartaal) zelf-evaluatie.
-```
-
-## Belangrijk
-
-Geen cliëntnamen. Geen BSN's. Geen scores per dossier. Patronen, ratios,
-voorbeelden — anders heeft het Excel-export-karakter en raak je in
-discussie over individuele cases die je niet wilde voeren.
-
-## Wat een teamleider eraan heeft
-
-Een goed gefundeerde memo geeft de teamleider:
-
-- iets om aan stakeholders te tonen waar je zelf achter staat;
-- het bewijs dat je *kritisch* with the model omgaat;
-- input for the volgende UC-03-update.
-
-## Verificatie
-
-De auto-check controleert dat de memo geen cliënt-PII bevat, dat de
-ratio en de patronen zijn benoemd en dat een verbetervoorstel is
-opgenomen.
-
-> Bij voltooiing van deze module krijg je het Academy-certificaat
-> **Fraud Analyst**.
+[Continue in the job-market explorer](/job-market/).

@@ -1,0 +1,117 @@
+---
+title: "Sturingsbrief schrijven op een afwijking in UC-06"
+role: finance_analyst
+level: practitioner
+order: 2
+duration: "60 min"
+summary: "Een afwijking in de cost forecast verklaren: dbt-tests checken, lineage volgen, een korte sturingsnotitie opstellen die DQ-status expliciet vermeldt."
+prereqs:
+  - "finance_analyst/foundation/1"
+labs:
+  - title: "Cost forecast dashboard"
+    href: "/go/superset/"
+  - title: "dbt-docs — UC-06 models"
+    href: "/dbt-docs/"
+  - title: "OpenMetadata — lineage UC-06"
+    href: "/go/openmetadata/"
+checks:
+  - id: "fez_practitioner_note"
+    title: "Sturingsnotitie bevat DQ-status en lineage-verwijzing"
+quiz:
+  - q: "Een cost forecast voor regio Noord ligt 8% onder gemiddelde. Welke check is verstandig?"
+    options:
+      - "Direct in de notitie zetten"
+      - "Eerst dbt-tests op `gold.uc06_cost_forecast` checken — als de `not_null` op `bedrag_eur` rood staat is de aggregatie onbetrouwbaar"
+      - "Negeren"
+      - "Naar de data-steward voor advies — zonder zelf gekeken te hebben"
+    correct: 1
+  - q: "Lineage toont dat een upstream silver-tabel sinds gisteren rood staat op `unique`. Wat betekent dat?"
+    options:
+      - "Niets, dat lost zich op"
+      - "Er zijn dubbele records in silver, wat dubbeltelling in gold kan veroorzaken; je kunt geen besluitneming op dit cijfer baseren — eerst data-engineer inschakelen"
+      - "Het cijfer is hoger dan werkelijk"
+      - "Het cijfer is lager dan werkelijk"
+    correct: 1
+  - q: "Welke vermelding hoort altijd in een sturingsnotitie op data?"
+    options:
+      - "Alleen het cijfer"
+      - "Cijfer + tabel + datum-snapshot + DQ-status van het onderliggende model + bekende caveats"
+      - "Alleen tabel"
+      - "Alleen datum"
+    correct: 1
+---
+
+In deze module schrijf je een korte sturingsnotitie op basis van een
+afwijking in de cost forecast. Het schrijven is het makkelijke deel; de
+data-discipline daarvoor is wat we hier oefenen.
+
+## Casus
+
+Een leidinggevende vraagt: "De voorspelling voor Noord ligt voor december
+8% onder de gewone trend. Klopt dat? Wat is er aan de hand?"
+
+## Stap 1 — afwijking valideren
+
+Open [Cost forecast](/go/superset/) → filter regio Noord → december-cohort.
+Bevestigt het 8%. Maar: het cijfer kan kloppen *of* het kan een artefact
+zijn van data-issues. Volgende stap.
+
+## Stap 2 — DQ-status checken
+
+Open [dbt-docs](/dbt-docs/) → model `gold.uc06_cost_forecast` → tab `Tests`.
+
+Drie tests die er nu toe doen:
+
+| Test | Status | Betekenis |
+|---|---|---|
+| `not_null` op `bedrag_eur` | groen | geen ontbrekende bedragen |
+| `unique` op `(maand, regio, claim payoutsoort)` | groen | geen dubbeltellingen |
+| `accepted_values` op `claim payoutsoort` | **oranje** | onbekende waarde 'WW-flex-pilot' opgedoken |
+
+De laatste is verdacht. "WW-flex-pilot" is een nieuwe categorie die nog niet
+in de glossary staat — die kan voor december juist het verschil maken.
+
+## Stap 3 — lineage volgen
+
+Open [lineage UC-06](/go/openmetadata/). Volg `bedrag_eur` terug to the bron:
+
+```
+bronze.fin.betaling.bedrag → silver.fin.claim payout_betaling.bedrag_eur → gold.uc06_cost_forecast.bedrag_eur
+```
+
+Op silver staat sinds vorige week een nieuwe `claim payoutsoort` die nog niet
+in de mart wordt meegerekend (filter sluit "WW-flex-pilot" uit). Dat
+verklaart de 8%.
+
+## Stap 4 — notitie schrijven
+
+```
+SUBJECT: Cost forecast Noord december — afwijking verklaard
+
+Cijfer: -8% t.o.v. trend (gold.uc06_cost_forecast, snapshot 2025-09-01)
+
+Onderbouwing:
+- Niet een werkelijke daling in claim payouten.
+- Sinds week 35 staat in silver.fin.claim payout_betaling een nieuwe
+  claim payoutsoort 'WW-flex-pilot' (~12k records). Deze wordt door de
+  huidige UC-06 mart nog niet meegerekend (accepted_values-test
+  rapporteert oranje sinds 2025-08-30).
+- Verwacht herstel zodra data-engineer de mart-definitie aanvult
+  (PR uitstaand, ETA: deze week).
+
+Caveats:
+- DQ-status onderliggend model: oranje (accepted_values).
+- Andere tests groen.
+
+Aanbeveling:
+- Geen actie op basis van deze afwijking; melding houden tot mart-fix.
+```
+
+Dit is geen bureaucratie. Een lezer ziet meteen: het cijfer klopt
+*statistisch*, maar het verhaal erachter is een data-issue, niet een
+operationele trend.
+
+## Verificatie
+
+De auto-check controleert dat je notitie minstens vermeldt: tabelnaam,
+snapshot-datum, DQ-status, lineage-relatie en aanbeveling.

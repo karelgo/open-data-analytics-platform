@@ -1,0 +1,111 @@
+---
+title: "OPA-policy reviewen onder druk"
+role: data_steward
+level: expert
+order: 3
+duration: "90 min"
+summary: "Een PR onder tijdsdruk reviewen die zegt ‘snelle uitbreiding van rol X’ — en de nuances zien die anderen missen."
+prereqs:
+  - "data_steward/practitioner/2"
+labs:
+  - title: "Bewerk role-mappings in vscode.dev"
+    href: "/go/openmetadata/"
+    vscodePath: "opa-policies-src/data/role_mappings.json"
+  - title: "Bekijk bestaande PR-templates"
+    href: "/dbt-docs/"
+    vscodePath: ".github"
+checks:
+  - id: "steward_expert_review"
+    title: "PR-review afgesloten met onderbouwd standpunt"
+quiz:
+  - q: "Engineer schrijft: ‘Voeg unmasked IBAN toe aan marketing_analyst — handhaving heeft het nodig’. Wat is hier mis?"
+    options:
+      - "Niets, snel doen"
+      - "Twee dingen: (a) handhaving heeft een eigen rol, niet via marketing_analyst; (b) IBAN unmasking voor customer interaction is geen bestaande purpose-limitation. Vraag de business-eigenaar in plaats van te approven"
+      - "Naam"
+      - "Volgorde"
+    correct: 1
+  - q: "Een wijziging staat onder hoge tijdsdruk. Wat doe je?"
+    options:
+      - "Approven om het tempo te halen"
+      - "Vraag wat de echte deadline-driver is; vaak blijkt er ruimte voor 1 dag review; anders escaleer naar AVG-coördinator — niet je principes opofferen voor tempo"
+      - "Niets reviewen"
+      - "Negeren"
+    correct: 1
+  - q: "Wanneer markeer je een wijziging als ‘kritiek’?"
+    options:
+      - "Altijd"
+      - "Wanneer hij purpose-limitation wijzigt, of een nieuwe PII-categorie unmaskt — zelfs als hij technisch klein is"
+      - "Bij grote diff"
+      - "Bij Engelse PR-titel"
+    correct: 1
+certifies: true
+---
+
+In deze module review je een PR die on the oog klein lijkt maar grote
+governance-gevolgen heeft. Doel: leer principle-driven reageren onder
+druk.
+
+## De PR
+
+```
+PR #5012 — quick: extend marketing_analyst access for handhaving collab
+- 3 lines changed in opa-policies-src/data/role_mappings.json
+- author: data.engineer.junior@odap.local
+- urgency: "blocker for project deadline donderdag"
+
+  diff:
+  -    "can_see_bankrekening": false,
+  +    "can_see_bankrekening": true,    // unmasked IBAN voor crm
+```
+
+## Het probleem
+
+Vier dingen die niet kloppen:
+
+1. **Purpose limitation overstegen.** marketing_analyst heeft purpose-limitation `customer interaction`,
+   niet `handhaving`. IBAN-unmasking voor customer interaction-doel is geen bestaande
+   grondslag — en kan niet zomaar uit een collab-verzoek volgen.
+2. **Verkeerde rol gebruikt.** Als handhaving moet kijken: zij hebben
+   `fraud_analyst` met al unmasked IBAN. Het probleem is dat hun *werkproces*
+   denkt dat ze dat via customer interaction moeten lopen.
+3. **Tijdsdruk als argument.** "Project deadline donderdag" is geen
+   AVG-uitzondering. Een vraag aan de AVG-coördinator was beter geweest dan
+   een quick-PR.
+4. **Junior author + geen review-aanvraag.** Een junior heeft niet zomaar
+   de scope om dit alleen te doen.
+
+## Hoe je reageert
+
+```markdown
+Niet approven. Vragen die ik wil beantwoord hebben voordat dit verder gaat:
+
+1. Wie is de business-eigenaar van dit verzoek? Direct contact met
+   crm-team-lead.
+2. Wat is het werkproces dat dit veronderstelt? Mogelijk willen we
+   het werkproces aanpassen, niet de policies.
+3. Heeft de AVG-coördinator hier naar gekeken?
+4. Als IBAN echt nodig is in een specifiek scenario: waarom geen
+   tijdelijke role-elevation in plaats van permanente uitbreiding?
+
+Geen approval voor donderdag haalbaar; een quick fix op
+purpose-limitation-niveau hoort niet onder tijdsdruk.
+
+Eens met dit standpunt? — let me know.
+```
+
+## Wat is de uitkomst
+
+In de praktijk: ofwel het werkproces wordt aangepast (handhaver doet eigen
+queries, crm verwijst), ofwel een tijdelijke role-elevation met
+verwachtingen-clausule. Niet de purpose-limitation van marketing_analyst permanent
+verbreden.
+
+## Verificatie
+
+De auto-check controleert dat je een review-comment hebt geplaatst met
+minstens één van de bovenstaande argumenten en dat je géén "approve"
+hebt gegeven.
+
+> Bij voltooiing van deze module krijg je het Academy-certificaat
+> **Data-steward**.

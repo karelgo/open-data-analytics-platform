@@ -112,8 +112,7 @@ jobs:
           pip install --quiet pyyaml
           python3 scripts/render-trino-catalogs.py
           mkdir -p platform/08-spark/scripts
-          cp spark-jobs/streaming_files_to_lakehouse.py platform/08-spark/scripts/
-          cp spark-jobs/lib/lakehouse_io.py             platform/08-spark/scripts/
+          cp spark-jobs/job_market_bronze.py platform/08-spark/scripts/
 
       - name: kustomize build (every overlay)
         run: |
@@ -150,8 +149,7 @@ jobs:
           pip install --quiet pyyaml
           python3 scripts/render-trino-catalogs.py
           mkdir -p platform/08-spark/scripts
-          cp spark-jobs/streaming_files_to_lakehouse.py platform/08-spark/scripts/
-          cp spark-jobs/lib/lakehouse_io.py             platform/08-spark/scripts/
+          cp spark-jobs/job_market_bronze.py platform/08-spark/scripts/
 
       - name: Install kubectl + kubeconform
         run: |

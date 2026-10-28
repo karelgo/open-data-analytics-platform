@@ -1,89 +1,41 @@
 ---
-title: "Het platform for the Fraud Analyst"
-role: fraud_analyst
-level: foundation
-order: 1
-duration: "25 min"
-summary: "Hoe risk-signalen tot stand komen, welke gegevens je voor handhaving wél mag zien (incl. IBAN), en waarom je nooit op cijfers alleen handhaaft."
-labs:
-  - title: "Open het WW-risk dashboard in Superset"
-    hint: "Risico-scores per dossier"
-    href: "/go/superset/"
-  - title: "Lineage UC-03 — hoe komt de score tot stand?"
-    hint: "Bron → silver → gold model"
-    href: "/go/openmetadata/"
-quiz:
-  - q: "Waarom mag jij IBAN ongelinkt zien terwijl andere rollen het gemaskeerd krijgen?"
-    options:
-      - "Omdat IBAN technisch geen PII is"
-      - "Omdat handhaving een wettelijke grondslag heeft die deze data nodig maakt for the onderzoeksdoel"
-      - "Omdat de handhavers het zelf hebben aangevraagd"
-      - "Omdat het in jouw rolnaam staat"
-    correct: 1
-    explain: "OPA staat unmasked IBAN toe als je purpose-limitation 'handhaving' is. Andere rollen op dezelfde tabel zien IBAN gehasht."
-  - q: "Wat is de juiste reactie op een hoge risk-score?"
-    options:
-      - "Direct sanctioneren"
-      - "Notificeren en het dossier aan de handhavingsdesk doorgeven voor menselijke beoordeling"
-      - "Het dossier verbergen tot de score lager wordt"
-      - "Naar de data-engineer mailen"
-    correct: 1
-    explain: "Een score is een signaal, geen besluit. Decisions vereisen menselijke beoordeling — AI Act art. 14."
-  - q: "Welke laag bevat de samengestelde risk-score per dossier?"
-    options:
-      - "bronze.uwv"
-      - "silver.ww"
-      - "gold.uc03_fraud_risk"
-      - "sandbox.research"
-    correct: 2
+{
+  "title": "Read a job-market snapshot",
+  "role": "fraud_analyst",
+  "level": "foundation",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Recognize source provenance, overlapping domains and original salary units.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-Welcome. Handhaving is een rol with a hoge bevoegdheid en een hoge
-verantwoordelijkheid. Deze module zet de spelregels uiteen voordat je het
-platform ingaat.
+Open the Dutch IT jobs page and choose one Cloud + Security role. Inspect its employer, location, source, observation date and domain labels. Compare the vacancy count with source observations; two advertisements can describe the same vacancy.
 
-## Wat doet UC-03?
+Publication date records when an advertisement was published. Snapshot date records the logical daily observation. Neither establishes when the employer filled the role.
 
-Use case 03 (`gold.uc03_fraud_risk`) combineert WW-aanvraagdata, polisadministratie
-en historie tot een **risk-score per dossier**. Hoog = aanleiding voor extra
-controle. Het model wijst geen sancties toe — dat doe jij, en je teamleider.
-
-## Wat zie jij dat anderen niet zien?
-
-Op exact dezelfde tabel `silver.service_requests.application` zien rollen verschillende dingen.
-Dat regelt OPA op kolomniveau:
-
-| Kolom | Jij (handhaving) | Marketing Analyst |
-|---|---|---|
-| `bsn` | volledig | volledig |
-| `iban` | volledig | gehasht (`sha256:...`) |
-| `regio_code` | landelijk | regio-gefilterd |
-| `risk_score` | volledig | nvt — kolom hidden |
-
-Reden: jouw purpose-limitation (`handhaving`) is een aparte grondslag in
-[role-mappings](/opa-policies-src/data/role_mappings.json) en geeft access
-tot data die voor customer interaction niet relevant is.
-
-## Drie principes die altijd gelden
-
-1. **Geen besluit op cijfers alleen.** Een hoge score is signaal, niet bewijs.
-   De [AI Act art. 14](https://eur-lex.europa.eu/eli/reg/2024/1689/oj) eist
-   menselijke regie bij dergelijke models — die *ben jij*.
-2. **Doelregistratie.** Bij elke ad-hoc query zet je de ticket-id of dossier-id
-   als comment in de SQL: `-- HANDH-1234`. Dat is je papieren spoor.
-3. **Geen vermenging.** Data uit `gold.uc03_fraud_risk` deel je niet met collega's
-   buiten handhaving — ook niet "even" via een Excel-export.
-
-## Drie applicaties
-
-| Applicatie | Waarvoor? |
-|---|---|
-| **Superset** | Het WW-risk dashboard, dossier-overzicht per regio |
-| **Trino** | Detail-queries op `silver.service_requests.*` met ongelinkt IBAN |
-| **OpenMetadata** | Lineage — *waar* komt deze score precies vandaan? |
-
-## Volgende stap
-
-Open het dashboard om de structuur te zien. In de Practitioner-module
-loop je één concreet dossier door — van waarschuwingssignaal tot aantekening
-in het tracker-systeem.
+[Continue in the job-market explorer](/job-market/).

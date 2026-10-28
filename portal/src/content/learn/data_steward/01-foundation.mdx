@@ -1,100 +1,41 @@
 ---
-title: "Het platform for the Data-steward"
-role: data_steward
-level: foundation
-order: 1
-duration: "30 min"
-summary: "OpenMetadata als governance-werkbank: classificaties, lineage, glossary en de DQ-overzichten — plus hoe jij OPA-policies reviewt zonder zelf Rego te hoeven schrijven."
-labs:
-  - title: "Open OpenMetadata — Data Quality dashboard"
-    hint: "DQ-checks, profielen, severity-trend"
-    href: "/go/openmetadata/"
-  - title: "Open dbt-docs in vscode.dev"
-    hint: "Welke tests definieert de data-engineer in schema.yml?"
-    href: "/dbt-docs/"
-    vscodePath: "dbt/models"
-  - title: "Bekijk role-mappings in vscode.dev"
-    hint: "Waar de purpose-limitation-regels per rol staan"
-    href: "/go/openmetadata/"
-    vscodePath: "opa-policies-src/data/role_mappings.json"
-quiz:
-  - q: "Wat is je primaire werkbank?"
-    options:
-      - "Trino"
-      - "OpenMetadata"
-      - "Airflow"
-      - "Spark"
-    correct: 1
-  - q: "Een data-engineer wil een nieuwe kolom in een silver-mart toevoegen. Welke check doe jij?"
-    options:
-      - "Geen — engineers regelen dat zelf"
-      - "Tag-classificatie (PII / medisch / financieel), eigenaar, dbt-tests, glossary-koppeling — anders gaat het door classificatie heen"
-      - "Alleen of de kolomnaam goed gespeld is"
-      - "Of het in production staat"
-    correct: 1
-  - q: "Waar zie jij in één oogstorage dat een DQ-test al een week faalt?"
-    options:
-      - "In Airflow"
-      - "In het Data Quality dashboard van OpenMetadata, met severity-kleuring"
-      - "In een Excel-export"
-      - "Nergens"
-    correct: 1
+{
+  "title": "Read a job-market snapshot",
+  "role": "data_steward",
+  "level": "foundation",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Recognize source provenance, overlapping domains and original salary units.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-Welcome. Data-steward is een coördinerende rol: jij bewaakt dat de
-afspraken die wij over data maken (eigenaar, classificatie, kwaliteit,
-purpose-limitation) ook in praktijk staan. Geen Rego nodig — wel een goed oog
-voor afwijkingen.
+Open the Dutch IT jobs page and choose one Cloud + Security role. Inspect its employer, location, source, observation date and domain labels. Compare the vacancy count with source observations; two advertisements can describe the same vacancy.
 
-## Vier werkbanken
+Publication date records when an advertisement was published. Snapshot date records the logical daily observation. Neither establishes when the employer filled the role.
 
-| Tool | Waarvoor? |
-|---|---|
-| **OpenMetadata** | Classificaties, glossary, lineage, DQ-overzicht |
-| **dbt-docs** | Tests, model-eigenaren, kolomdocumentation |
-| **Superset (DQ-overview)** | Cross-UC kwaliteits-totaal |
-| **Trino (profiler)** | Adhoc kolom-profielen op kwaliteits-doel |
-
-## Drie kerntaken
-
-### 1. Classificeer
-
-Elke kolom krijgt minstens één tag from the standaard-set: `PII`,
-`medisch`, `financieel`, `bsn`, `iban`, `regio_code`, `intern`. Tags
-zijn de input voor OPA: zonder tag geen automatische masking. De data-
-engineer stelt voor; jij keurt goed.
-
-### 2. Borg de glossary
-
-Termen als "doorlooptijd", "no-show", "cost forecast" hebben in elk
-domein hun eigen variant. De glossary geeft één definitie per term,
-gekoppeld aan alle kolommen waar hij van toepassing is. Zonder glossary
-bestaat een sturingsmaat alleen in iemands hoofd.
-
-### 3. Bewaak DQ
-
-Het Data Quality dashboard toont per UC een groen/oranje/rood-status
-op `not_null`, `unique`, `accepted_values` en custom checks. Jouw vraag
-is niet "draait alles?" maar "wat staat al > 24 uur op rood en heeft
-nog geen ticket?".
-
-## OPA reviewen — zonder Rego
-
-OPA-regels staan in `opa-policies-src/`, maar de data ervan staat in
-`opa-policies-src/data/role_mappings.json` — een leesbare JSON.
-Daarin lees je per rol:
-
-- welke catalogs/schemas;
-- welke purpose-limitation(en);
-- welke kolommen ge-unmask't worden;
-- of JIT en/of 4-eyes vereist is.
-
-Jouw review-vraag bij een wijziging: "klopt dit met de
-purpose-limitation-afspraak in de glossary?" Niet de Rego-syntax, wel de
-intentie.
-
-## Volgende stap
-
-In de Practitioner-module tag je een nieuwe kolom van bron tot mart, in
-één doorlopend verhaal — en je vindt minstens één DQ-fout die je teruglegt
-bij de data-engineer.
+[Continue in the job-market explorer](/job-market/).

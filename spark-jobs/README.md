@@ -1,34 +1,18 @@
-# spark-jobs
+# Dutch IT jobs — Bronze Delta ingestion
 
-PySpark-jobs for the ODAP platform.
+`job_market_bronze.py` is the active Spark job. It reads the successful extract
+at `s3://odap-bronze/job-market/raw/snapshot_date=YYYY-MM-DD/normalized/observations.jsonl`,
+validates the grain and date, and atomically replaces only that date's Delta
+partition. Rerunning does not duplicate jobs or erase older days.
 
-| Bestand | Doel |
-|---|---|
-| [`lib/lakehouse_io.py`](lib/lakehouse_io.py) | Format-agnostische helper. Leest `TABLE_FORMAT` env; bouwt SparkSession met Hive Metastore + S3A + Delta/Iceberg extensions. |
-| [`streaming_files_to_lakehouse.py`](streaming_files_to_lakehouse.py) | File-source streaming: leest JSONL uit `s3a://odap-raw/<domain>/<entity>/dt=…/` en schrijft per stream naar `bronze.demo.<domain>_<entity>` via `foreachBatch`. |
-| `batch_polisadm_load.py` | TBD fase 5 — batch-ingest van staging-bestanden. |
-| `ml_wajong_features.py` | TBD fase 9+ — feature engineering UC-02 placeholder. |
-| `lakehouse_maintenance.py` | TBD fase 6 — Delta `OPTIMIZE`/`VACUUM` (Iceberg `expire_snapshots`). |
+Airflow `dutch_it_jobs_daily` and `make jobs-run` launch the same Stackable
+SparkApplication through `infrastructure/job-market/runtime.py`. The job requires
+Delta Lake; the current example does not claim an equivalent Iceberg execution path.
 
-## Deployment
-
-De scripts worden via `kustomize configMapGenerator` gemount in de
-SparkApplication-pods (zie [`platform/08-spark/`](../platform/08-spark/)).
-`scripts/deploy-platform.sh` synchroniseert deze map naar
-`platform/08-spark/scripts/` (gitignored) zodat kustomize ze van een
-toegestane root-pad kan oppikken.
-
-## Lokaal draaien (zonder cluster)
-
-```bash
-cd spark-jobs
-TABLE_FORMAT=delta python3 -c "import lib.lakehouse_io as m; print(m.TABLE_FORMAT)"
-```
-
-End-to-end testen vereist HMS + MinIO (met `odap-raw` + `odap-bronze` buckets); doe dat in de cluster.
-
-## Format-switch
-
-Wijzig in [`platform-config.yaml`](../platform-config.yaml) en
-herapply de SparkApplication. De Spark-driver leest `TABLE_FORMAT` env
-en gebruikt automatisch de juiste extension + connector.
+A lakehouse is pinned to either demo or live by `job-market/mode.json` in the
+Bronze bucket. Use separate deployments to compare modes; a mode change requires
+a deliberate reset of all job-market tables and objects. Successful extracts are
+uploaded under immutable `raw/snapshot_date=DATE/attempts/UUID/` prefixes. The
+date-root `current.json` pointer is published only after every upload succeeds.
+Spark verifies that pointer, the success manifest, mode and record count before
+replacing a Delta partition.

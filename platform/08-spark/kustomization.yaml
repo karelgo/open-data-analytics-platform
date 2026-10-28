@@ -1,39 +1,13 @@
-# platform/08-spark — Spark streaming + batch jobs.
-#
-# De SparkApplication referent een ConfigMap `spark-streaming-jobs` die door
-# kustomize wordt gegenereerd uit platform/08-spark/scripts/. Deze directory
-# wordt door scripts/deploy-platform.sh gevuld vanuit `spark-jobs/` (canonical
-# bron) — kustomize kan namelijk niet uit ../../<dir> laden zonder
-# load-restrictor=None.
-
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: odap-platform
-
 resources:
-  # streaming-bronze (zie apps/streaming-bronze.yaml) is uitgeschakeld omdat
-  # de long-running driver/executor onder load de k3d-nodes verzadigde en
-  # de kubelet-probes deed timeouten (incident 2026-05-15). Manifest blijft
-  # in repo; her-enable nadat resource-ceilings of executor-count zijn
-  # heroverwogen for the doel-cluster.
-  # - apps/streaming-bronze.yaml
   - spark-events-prefix-init.yaml
   - history-server.yaml
   - ingress.yaml
-
 configMapGenerator:
   - name: spark-streaming-jobs
     files:
-      - scripts/streaming_files_to_lakehouse.py
-      - scripts/lakehouse_io.py
-      # WIA bronze→silver→gold demo (parallel-Spark-pad naast dbt).
-      # Job-bestanden zijn door scripts/deploy-platform.sh gekopieerd uit
-      # spark-jobs/. seed_bronze_claims.py wordt aangeroepen door
-      # platform/08-spark/apps/seed-bronze-claims.yaml (handmatige apply);
-      # batch_silver_claims.py + batch_gold_claims.py door DAG transform_wia_spark.
-      - scripts/seed_bronze_claims.py
-      - scripts/batch_silver_claims.py
-      - scripts/batch_gold_claims.py
-
+      - scripts/job_market_bronze.py
 generatorOptions:
   disableNameSuffixHash: true

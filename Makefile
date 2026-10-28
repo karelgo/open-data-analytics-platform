@@ -54,7 +54,7 @@ bootstrap: ## Installeer Helm-charts: cert-manager, MinIO, Postgres, Keycloak, S
 	bash scripts/bootstrap.sh --mode=$(MODE)
 
 .PHONY: deploy-platform
-deploy-platform: render-catalogs portal-image dbt-image jupyter-image nanitics-image multica-daemon-image ## Deploy alle platform-manifests onder platform/ (mode-aware)
+deploy-platform: render-catalogs portal-image jobs-image jupyter-image nanitics-image multica-daemon-image ## Deploy alle platform-manifests onder platform/ (mode-aware)
 	bash scripts/deploy-platform.sh --mode=$(MODE)
 
 .PHONY: deploy
@@ -100,22 +100,6 @@ portal-publish-dbt-docs: dbt-docs-offline portal-image ## Genereer dbt-docs → 
 	kubectl -n odap-platform rollout status  deploy/portal --timeout=120s
 	@echo "[portal-publish-dbt-docs] klaar — open https://platform.odap.local:8443/dbt-docs.html"
 
-.PHONY: pdf-uc11
-pdf-uc11: ## Exporteer UC-11 docs (UC-spec + walkthrough) naar PDF (Chrome headless)
-	python3 scripts/md-to-pdf.py docs/use-cases/uc11-customer-journey.md
-	python3 scripts/md-to-pdf.py docs/use-cases/uc11-customer-journey-walkthrough.md
-	@echo "[pdf-uc11] PDFs naast de .md-bronnen in docs/use-cases/"
-
-.PHONY: deck-uc11
-deck-uc11: ## Bouw UC-11 PowerPoint-deck (12 slides, donker platform-amber thema)
-	@command -v node >/dev/null 2>&1 || { echo "node niet gevonden — installeer Node.js"; exit 1; }
-	@if [ ! -d /tmp/uc11-deck/node_modules/pptxgenjs ]; then \
-	  echo "[deck-uc11] eerste run — pptxgenjs installeren in /tmp/uc11-deck/"; \
-	  mkdir -p /tmp/uc11-deck && cd /tmp/uc11-deck && npm install pptxgenjs >/dev/null; \
-	fi
-	NODE_PATH=/tmp/uc11-deck/node_modules node scripts/build-uc11-deck.js
-	@echo "[deck-uc11] docs/use-cases/uc11-customer-journey-deck.pptx bijgewerkt"
-
 .PHONY: render-catalogs
 render-catalogs: ## Render Trino-catalog templates op basis van platform-config.yaml
 	python3 scripts/render-trino-catalogs.py
@@ -132,23 +116,7 @@ opa-bundle: opa-test ## Build OPA-bundle: sync rego + data naar platform/10-opa/
 	bash scripts/build-opa-bundle.sh
 
 .PHONY: dbt-image
-dbt-image: ## Build odap/dbt-trino:1.9.0 (incl. dbt-fabricspark) en importeer in lokale cluster. Voor aks: gebruik een registry.
-	@if [ "$(MODE)" = "aks" ]; then echo "[dbt-image] mode=aks: build + push to the Azure container registry, daarna 'helm upgrade' on the Cosmos image-tag"; exit 0; fi
-	@cp infrastructure/airflow/dbt/profiles.yml dbt/profiles.yml
-	docker build -t odap/dbt-trino:1.9.0 -f infrastructure/airflow/dbt/Dockerfile dbt
-	k3d image import odap/dbt-trino:1.9.0 -c $(CLUSTER_NAME)
-	@echo "Image geïmporteerd (mode=$(MODE)). Cosmos KPO sub-pods pakken 'm bij volgende dbt-task run."
-
-.PHONY: uc11-multiplatform-secret
-uc11-multiplatform-secret: ## Maak/refresh K8s Secret uc11-multiplatform-creds vanuit secrets/local/uc11-multiplatform.env.
-	@if [ ! -f secrets/local/uc11-multiplatform.env ]; then \
-	  echo "[uc11-multiplatform-secret] secrets/local/uc11-multiplatform.env ontbreekt — kopieer template uit platform/11-airflow/uc11-multiplatform-secret.yaml en vul SP-creds in."; \
-	  exit 1; \
-	fi
-	kubectl -n odap-platform create secret generic uc11-multiplatform-creds \
-	  --from-env-file=secrets/local/uc11-multiplatform.env \
-	  --dry-run=client -o yaml | kubectl apply -f -
-	@echo "Secret uc11-multiplatform-creds bijgewerkt in odap-platform. fabric_dbt_gold pod leest hier de FABRIC_* env-vars uit."
+dbt-image: jobs-image ## Compatibility alias: the job-market runtime includes dbt
 
 .PHONY: om-bridge-image
 om-bridge-image: ## Build odap/om-access-bridge:dev en importeer in k3d
@@ -181,20 +149,8 @@ deploy-om-bridge: om-bridge-image ## Deploy de OM→Keycloak access-bridge (ADR-
 	bash scripts/setup-om-bridge-subscription.sh
 
 .PHONY: seed
-seed: ## Genereer en laad synthetische data (10k cliënten)
+seed: ## Load the single synthetic Dutch IT job-market example into the cluster
 	bash scripts/seed.sh
-
-.PHONY: wia-spark-demo
-wia-spark-demo: ## Run Spark bronze→silver→gold WIA demo end-to-end (workaround voor Stackable Airflow 3 execution-API bug)
-	bash scripts/wia-spark-demo.sh
-
-.PHONY: om-demo-seed
-om-demo-seed: ## Vul OpenMetadata met UC-mart tabel-entities + governance-meta voor demo (idempotent).
-	bash scripts/om-demo-seed.sh
-
-.PHONY: om-glossary-link
-om-glossary-link: ## Koppel CGM-glossary-termen aan logisch passende tables (idempotent).
-	bash scripts/om-glossary-link.sh
 
 .PHONY: om-fix-search-mapping
 om-fix-search-mapping: ## Patch OS-mappings zodat OM 1.12 Explore-UI werkt (idempotent).
@@ -216,21 +172,8 @@ alert-test-resolve: ## Resolveer de synthetische test-alert (verstuurt zelfde al
 	bash scripts/alert-test.sh --mode=$(MODE) resolve
 
 .PHONY: e2e
-e2e: ## Run e2e test (UC-01 full flow)
-	bash tests/e2e/full-flow-uc01.sh
-
-.PHONY: e2e-uc11
-e2e-uc11: ## Run e2e test (UC-11 Integrale Customer journey) — vereist bestaand cluster
-	bash tests/e2e/uc11-flow.sh
-
-.PHONY: dbt-build-uc11
-dbt-build-uc11: ## Build alle UC-11 models (tag:uc11) — vereist Trino-bereik
-	cd dbt && $(DBT) deps && $(DBT) run -s tag:uc11
-	cd dbt && $(DBT) test -s tag:uc11
-
-.PHONY: test-uc11
-test-uc11: ## UC-11 smoke (rego-tests + optionele OPA-decision-calls)
-	bash tests/smoke/11-uc11-customer-journey.sh
+e2e: ## Validate the Dutch IT job-market cluster pipeline
+	bash tests/e2e/job-market-flow.sh
 
 .PHONY: clean
 clean: ## Verwijder de k3d-cluster
@@ -246,19 +189,20 @@ lint-yaml: ## yamllint over platform/ + infrastructure/
 	yamllint -c ci/yamllint.yaml platform/ infrastructure/ || true
 
 .PHONY: lint-rego
-lint-rego: ## opa fmt + opa test
-	opa fmt --diff opa-policies-src/
-	opa test opa-policies-src/
+lint-rego: opa-test ## Validate the source policy using the deployed data layout
 
 .PHONY: lint-python
-lint-python: ## ruff + mypy over data-generation/ en spark-jobs/
-	ruff check data-generation/ spark-jobs/
-	# mypy is best-effort
-	mypy data-generation/ spark-jobs/ --ignore-missing-imports || true
+lint-python: ## Lint job-market extractor and Spark ingestion
+	ruff check examples/dutch-it-jobs/ spark-jobs/job_market_bronze.py infrastructure/job-market/
 
 .PHONY: dbt-parse
-dbt-parse: ## dbt parse + compile (geen warehouse-access vereist)
-	cd dbt && dbt deps && dbt parse
+dbt-parse: ## Parse the job-market dbt graph without warehouse access
+	@test -f dbt/profiles.yml || cp dbt/profiles.yml.template dbt/profiles.yml
+	@if [ -n "$(DBT)" ]; then \
+	  $(DBT) parse --project-dir dbt --profiles-dir dbt; \
+	else \
+	  docker run --rm --entrypoint dbt "$(JOBS_IMAGE)" parse --project-dir /opt/job-market/dbt --profiles-dir /opt/job-market/dbt; \
+	fi
 
 # dbt-binary: prefereer dbt-core (Python) — die ondersteunt `docs generate
 # --static`. dbt-fusion (Rust-rewrite) ondersteunt het commando nog niet,
@@ -438,3 +382,31 @@ aks-pf-stop: ## Stop the AKS port-forward
 .PHONY: aks-portal-publish
 aks-portal-publish: ## Build portal/dist (if missing) + ship it as a ConfigMap to AKS, then roll the Deployment
 	bash scripts/azure/portal-publish.sh
+
+##@ Dutch IT Job Market (the single platform example)
+
+PYTHON ?= python3
+JOBS_DATE ?= $(shell date +%F)
+JOBS_OUTPUT ?= examples/dutch-it-jobs/output
+JOBS_LIVE_OUTPUT ?= examples/dutch-it-jobs/output-live
+JOBS_IMAGE ?= odap/job-market:dev
+export JOBS_IMAGE
+
+.PHONY: jobs-demo jobs-live jobs-test jobs-image jobs-run job-market-image
+jobs-demo: ## Run seven synthetic daily extracts and local SQLite analytics (no cluster or credentials)
+	$(PYTHON) examples/dutch-it-jobs/job_market.py --mode demo --date "$(JOBS_DATE)" --output-dir "$(JOBS_OUTPUT)"
+
+jobs-live: ## Collect one date from configured live sources (requires source credentials)
+	$(PYTHON) examples/dutch-it-jobs/job_market.py --mode live --date "$(JOBS_DATE)" --output-dir "$(JOBS_LIVE_OUTPUT)"
+
+jobs-test: ## Run deterministic extraction, quality, history and failure tests without network
+	$(PYTHON) -m unittest discover -s tests/unit -p 'test_job_market*.py' -v
+
+jobs-image: ## Build packaged extraction/dbt runtime; import into local k3d when MODE=k3d
+	docker build -t "$(JOBS_IMAGE)" -f infrastructure/job-market/Dockerfile .
+	@if [ "$(MODE)" = "k3d" ]; then k3d image import "$(JOBS_IMAGE)" -c "$(CLUSTER_NAME)"; fi
+
+job-market-image: jobs-image ## Alias for jobs-image
+
+jobs-run: ## Run the complete extraction -> Spark -> dbt -> metadata pipeline on an existing cluster
+	bash scripts/job-market-cluster.sh

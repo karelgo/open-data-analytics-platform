@@ -46,6 +46,15 @@ const {
     </div>
   </header>
 
+  <section class="v2-section job-market-intro">
+    <span class="v2-eyebrow">One use case across the platform</span>
+    <h2><a href="/job-market/">Dutch IT Job Market →</a></h2>
+    <p>Daily vacancy observations across Data, Cloud, SAP, AI, Software and Security.
+      Explore demand, skills, salary evidence and source quality, then follow the same data through the platform.</p>
+    <p><a href="/job-market/">Open the synthetic sample explorer</a> ·
+      <a href="/embed/superset/?path=/superset/dashboard/dutch-it-job-market/">Open the platform dashboard</a></p>
+  </section>
+
   <!-- ─── Recents ─── -->
   <!-- SSR rendert sample-recents (uit v2-homepage.ts) als first paint.
        Client-side script hieronder fetcht /api/portal/recents en
@@ -126,14 +135,14 @@ const {
     // Technical personas
     data_engineer:      'Data Engineer',
     data_steward:       'Data Steward',
-    researcher:         'Researcher',
+    researcher:         'Labour Market Researcher',
     platform_admin:     'Platform Admin',
     // Business personas
-    claims_analyst:     'Claims Analyst',
-    fraud_analyst:      'Fraud Analyst',
-    marketing_analyst:  'Marketing Analyst',
-    finance_analyst:    'Finance Analyst',
-    operations_manager: 'Operations Manager',
+    claims_analyst:     'Job Market Analyst',
+    fraud_analyst:      'Source Quality Analyst',
+    marketing_analyst:  'Skills Analyst',
+    finance_analyst:    'Salary Analyst',
+    operations_manager: 'Market Operations',
   };
 
   function applyPersona(role: string): void {

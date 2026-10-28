@@ -1,140 +1,49 @@
-# Platform Classifications for OpenMetadata.
-#
-# Deze YAML wordt through the init-Job (`init-job.yaml`) via de OpenMetadata REST API
-# (POST /api/v1/classifications) toegepast. De init-script leest dit bestand
-# als ConfigMap-gemounte data.
-#
-# Categorieën (per master agent prompt §5 fase 8):
-#   PII.*               personally identifiable
-#   Health.Article9     gezondheidsgegevens art. 9 AVG
-#   Confidentiality.*   classificatie-niveau (publiek/intern/vertrouwelijk/geheim)
-#   BIO.BIV.*           BIO Beschikbaarheid/Integriteit/Vertrouwelijkheid niveau
-#   LegalBasis.*        AVG-rechtsgrond per dataset
-#   Purpose limitation.*       toegestane doelen (UC-04 R-AVG-06)
-#   AI.Risk.*           AI Act risicoclassificatie
-
-classifications:
-  - name: PII
-    description: |
-      Personally Identifiable Information. Veld bevat data die direct of
-      indirect tot een persoon herleidbaar is.
-    mutuallyExclusive: false
-    tags:
-      - name: BSN
-        description: "Burgerservicenummer (9 cijfers, 11-proef)."
-      - name: Naam
-        description: "Voor- of achternaam."
-      - name: Adres
-        description: "Postcode, straat, huisnummer."
-      - name: Geboortedatum
-        description: "Geboortedatum."
-      - name: IBAN
-        description: "Bankrekening / IBAN."
-      - name: Telefoon
-        description: "Telefoonnummer."
-      - name: Email
-        description: "Email-adres."
-      - name: LH_Nummer
-        description: "Loonheffingennummer werkgever."
-      - name: Sensitive
-        description: "Algemene PII-marker — gebruik specifieke tag waar mogelijk."
-
-  - name: Health
-    description: "Gezondheids- en medische gegevens (bijzondere persoonsgegevens AVG art. 9)."
-    mutuallyExclusive: false
-    tags:
-      - name: Article9
-        description: "Bijzondere persoonsgegevens, art. 9 lid 2 onder h (sociale zekerheid)."
-      - name: Diagnose
-        description: "Medische diagnose (ICD-10 of vrije tekst)."
-      - name: VerzekeringsArts
-        description: "Rapport verzekeringsarts."
-      - name: Arbeidsdeskundige
-        description: "Rapport arbeidsdeskundige."
-
-  - name: Confidentiality
-    description: "Vertrouwelijkheidsklasse volgens platform classification scheme."
-    mutuallyExclusive: true
-    tags:
-      - name: Public
-        description: "Publiek — geen restricties."
-      - name: Internal
-        description: "Intern — alleen platform users."
-      - name: Confidential
-        description: "Vertrouwelijk — beperkte rolgroep."
-      - name: Secret
-        description: "Geheim — strikt beperkte access, audit-log per inzage."
-
-  - name: BIO
-    description: "ISO 27001 / ISO 27002 Beschikbaarheid/Integriteit/Vertrouwelijkheid classificatie."
-    mutuallyExclusive: false
-    tags:
-      - name: BIV-Hoog
-        description: "Hoge eisen aan beschikbaarheid, integriteit en vertrouwelijkheid."
-      - name: BIV-Midden
-        description: "Middelhoge eisen."
-      - name: BIV-Laag
-        description: "Lage eisen."
-
-  - name: LegalBasis
-    description: "AVG-rechtsgrond (art. 6 + waar nodig art. 9)."
-    mutuallyExclusive: false
-    tags:
-      - name: Art6_1c
-        description: "Wettelijke verplichting (art. 6 lid 1 onder c)."
-      - name: Art6_1e
-        description: "Publieke taak (art. 6 lid 1 onder e)."
-      - name: Art6_1f
-        description: "Gerechtvaardigd belang (art. 6 lid 1 onder f) — bv. FinOps/spend-monitoring."
-      - name: Art9_2h
-        description: "Sociale zekerheid — bijzondere PG (art. 9 lid 2 onder h)."
-      - name: Art5_1b_VerenigbaarGebruik
-        description: "Verenigbaar gebruik wetenschappelijk/statistisch (art. 5 lid 1 onder b)."
-
-  - name: Purpose limitation
-    description: "Toegestane doelen voor access tot deze data (R-AVG-06)."
-    mutuallyExclusive: false
-    tags:
-      - name: Claim payout
-        description: "Claim payoutsverlening (primair proces)."
-      - name: Reintegration
-        description: "Reintegration en arbeidsbemiddeling."
-      - name: Handhaving
-        description: "Toezicht en handhaving."
-      - name: Behandeling
-        description: "Klantbehandeling / dossierafhandeling."
-      - name: Customer interaction
-        description: "Customer interaction (CRM)."
-      - name: Sturingsinfo
-        description: "Sturingsinformatie / managementrapportages."
-      - name: Statistisch_Research
-        description: "Wetenschappelijk of statistisch onderzoek."
-      - name: Actuarie
-        description: "Actuariële berekeningen, cost forecast."
-      - name: Beleid
-        description: "Beleidsondersteuning."
-      - name: Externe_Levering
-        description: "Levering aan ketenpartners (UC-10, Wet SUWI)."
-      - name: Proactieve_Dienstverlening
-        description: "Proactieve dienstverlening (Wet proactieve DV SZW)."
-      - name: Kwaliteitscontrole
-        description: "Datakwaliteit / juistheidsprincipe (UC-07)."
-      - name: Planning
-        description: "Capacity planning (UC-08)."
-
-  - name: AI
-    description: "AI Act risicoclassificatie + algoritmeregister-link."
-    mutuallyExclusive: false
-    tags:
-      - name: Risk-Laag
-        description: "Laag risico (sturingsinfo zonder impact op individu)."
-      - name: Risk-Midden
-        description: "Middelhoog risico."
-      - name: Risk-Hoog
-        description: "Hoog risico (Annex III) — DPIA + IAMA + EU-registratie verplicht."
-      - name: Risk-Verboden
-        description: "Verboden praktijk (social scoring, etc.)."
-      - name: HumanInTheLoop
-        description: "Menselijke tussenkomst verplicht (art. 22 AVG)."
-      - name: Algoritmeregister-Geregistreerd
-        description: "Geregistreerd in algorithm register."
+{
+  "classifications": [
+    {
+      "name": "Confidentiality",
+      "description": "Job-source access classification.",
+      "mutuallyExclusive": true,
+      "tags": [
+        {
+          "name": "Internal",
+          "description": "Authenticated platform users; source redistribution permission still required."
+        },
+        {
+          "name": "Confidential",
+          "description": "Restricted raw source payloads which may contain contacts."
+        }
+      ]
+    },
+    {
+      "name": "Purpose",
+      "description": "Permitted analytical purposes.",
+      "mutuallyExclusive": false,
+      "tags": [
+        {
+          "name": "LabourMarketResearch",
+          "description": "Aggregate demand, skills and salary analysis of advertised roles."
+        },
+        {
+          "name": "QualityControl",
+          "description": "Source completeness, provenance and data-quality checks."
+        }
+      ]
+    },
+    {
+      "name": "DatasetOrigin",
+      "description": "Never mix synthetic fixtures and observed live adverts.",
+      "mutuallyExclusive": true,
+      "tags": [
+        {
+          "name": "Synthetic",
+          "description": "Fictional demonstration postings."
+        },
+        {
+          "name": "Live",
+          "description": "Observed API or authorized feed postings."
+        }
+      ]
+    }
+  ]
+}

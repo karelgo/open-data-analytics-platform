@@ -1,0 +1,24 @@
+{
+  "user_agent": "ODAP-Dutch-IT-Jobs/1.0 (+https://github.com/karelgo/open-data-analytics-platform)",
+  "request_interval_seconds": 1.0,
+  "timeout_seconds": 30,
+  "retries": 3,
+  "sources": [
+    {
+      "name": "adzuna-nl",
+      "adapter": "adzuna",
+      "enabled": true,
+      "country": "nl",
+      "max_pages_per_query": 2,
+      "results_per_page": 50,
+      "queries": ["data engineer", "cloud engineer", "SAP", "AI engineer", "software developer", "cyber security"],
+      "documentation": "https://developer.adzuna.com/overview"
+    }
+  ],
+  "configuration_notes": {
+    "adzuna": "Set ADZUNA_APP_ID and ADZUNA_APP_KEY. Search snapshots are bounded samples, never a census or evidence that missing jobs closed.",
+    "jsonld": "Add an enabled source with adapter=jsonld, name, approved=true, urls=[approved HTTPS JobPosting detail URLs]. robots.txt is checked before fetching. Listing-page discovery is intentionally not implemented.",
+    "rss": "Add an enabled source with adapter=rss, name, approved=true, url=approved HTTPS RSS/Atom feed, country_code=NL. Feed entries rarely include salary/company; missing values remain null. No linked pages are fetched.",
+    "approval": "approved=true records the operator's permission to collect a publisher's feed/pages; robots allowance alone does not grant reuse rights. Check source terms before enabling."
+  }
+}

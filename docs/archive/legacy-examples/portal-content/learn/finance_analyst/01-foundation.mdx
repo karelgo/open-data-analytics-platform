@@ -1,0 +1,97 @@
+---
+title: "Het platform for the Finance Analyst"
+role: finance_analyst
+level: foundation
+order: 1
+duration: "25 min"
+summary: "Cost forecast en cost forecast op gemodelleerde marts, geen PII — en hoe je een DQ-test in dbt-docs leest voordat je op een cijfer vertrouwt."
+labs:
+  - title: "Open Cost forecast dashboard (UC-06)"
+    hint: "Geaggregeerd per maand, regio, claim payoutsoort"
+    href: "/go/superset/"
+  - title: "dbt docs — models achter UC-06"
+    hint: "Welke tests draaien, welke sources voeden de mart"
+    href: "/dbt-docs/"
+quiz:
+  - q: "Waarom zie jij geen BSN of IBAN in `gold.uc06_cost_forecast`?"
+    options:
+      - "Omdat het te veel ruimte zou kosten"
+      - "Omdat een cost forecast een geaggregeerde sturingsmart is — PII is daarvoor niet nodig en wordt op modelniveau weggehaald"
+      - "Omdat het soms op donderdag wel mag"
+      - "Omdat de policies stuk zijn"
+    correct: 1
+  - q: "Een dashboard-cijfer wijkt 5% af van wat je verwacht. Welke check doe je eerst?"
+    options:
+      - "Niets — het cijfer staat in Superset, dus klopt het"
+      - "Open dbt docs en bekijk of de tests on the onderliggende model groen zijn — een falende `not_null` of `unique` test verklaart vaak een uitschieter"
+      - "Mail de data-engineer"
+      - "Reset het dashboard"
+    correct: 1
+    explain: "dbt-tests zijn de eerste defensielinie. Een test op `bedrag_eur` die soms faalt is direct relevant voor je interpretatie."
+  - q: "Wat is de relatie tussen `silver.fin.claim payout_betaling` en `gold.uc06_cost_forecast`?"
+    options:
+      - "Geen — verschillende systemen"
+      - "silver is bron, gold is afgeleid via dbt; lineage zichtbaar in OpenMetadata of dbt-docs"
+      - "Ze zijn elkaars kopie"
+      - "gold is bron, silver is afgeleid"
+    correct: 1
+---
+
+Welcome. FEZ werkt met geld op organisatie-niveau, niet op individuele
+cliënt-niveau. Je rol is in de breedte: trends, prognoses, afwijkingen.
+Het platform is daar precies op ingericht.
+
+## Wat is een gold-mart?
+
+`gold.uc06_cost_forecast` is een dbt-model: een afgeleide tabel die elke nacht
+opnieuw wordt opgebouwd uit `silver.fin.*`. De mart bevat:
+
+- per maand × regio × claim payoutsoort de uitgekeerde som;
+- een 12-maands voortschrijdend gemiddelde;
+- de prognose for the komende 6 maanden (op basis van een eenvoudig ARIMA);
+- een DQ-score per record.
+
+Geen PII. Geen BSN's. Geaggregeerd vanaf laag silver.
+
+## Waarom dbt-docs jouw belangrijkste secundaire applicatie is
+
+Voordat je iets uit een dashboard meeneemt naar een rapport: open dbt-docs
+en bekijk de testen on the onderliggende model. Drie tests die er bij UC-06
+toe doen:
+
+| Test | Wat zegt hij? |
+|---|---|
+| `not_null` op `bedrag_eur` | Is er een record zonder bedrag? Dan klopt de som niet. |
+| `unique` op `(maand, regio, claim payoutsoort)` | Geen dubbeltellingen. |
+| `accepted_values` op `claim payoutsoort` | Geen onbekende soorten — anders draait je groupby door. |
+
+De [Data Quality dashboard](/go/openmetadata/) toont dezelfde tests in
+groter verband: een 24-uurs trend, falende tests met severity, doorlooptijd
+tot fix.
+
+## Lineage in een halve minuut
+
+OpenMetadata laat per kolom zien waar hij vandaan komt. Voor
+`gold.uc06_cost_forecast.bedrag_eur` zie je:
+
+```
+bronze.fin.betaling.bedrag → silver.fin.claim payout_betaling.bedrag_eur → gold.uc06_cost_forecast.bedrag_eur
+```
+
+Bij elke pijl staat de transformation (`SUM`, `*1.0`, etc). Voor je in een
+overleg een cijfer presenteert, moet je deze keten één keer in je hoofd
+hebben — anders is het cijfer een black box.
+
+## Drie applicaties
+
+| Applicatie | Wanneer? |
+|---|---|
+| **Superset** | Cost forecast, cost forecast, DQ-overzicht |
+| **dbt-docs** | Welke transformations achter een cijfer zitten |
+| **OpenMetadata** | Lineage, eigenaar, glossary |
+
+## Volgende stap
+
+In de Practitioner-module schrijf je een korte sturingsbrief op basis van een
+afwijking in UC-06 — inclusief het correct citeren van de DQ-status van het
+onderliggende model.

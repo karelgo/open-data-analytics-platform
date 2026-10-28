@@ -31,6 +31,10 @@ rules:
   - apiGroups: ["spark.stackable.tech"]
     resources: ["sparkapplications"]
     verbs: ["get", "list", "create", "delete", "patch", "watch"]
+  # Manual pipeline launches a metadata refresh Job after dbt success.
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "create", "delete", "list", "watch"]
   # Pods — driver-log-fetch op failure.
   - apiGroups: [""]
     resources: ["pods"]

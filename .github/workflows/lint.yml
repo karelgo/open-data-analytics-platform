@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install --quiet ruff
-      - run: ruff check data-generation/ spark-jobs/
+      - run: ruff check examples/dutch-it-jobs/ spark-jobs/job_market_bronze.py
 
   opa-fmt:
     runs-on: ubuntu-24.04

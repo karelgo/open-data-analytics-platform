@@ -1,9 +1,1 @@
-# dbt-packages for the ODAP platform.
-# Versie-pin per `dbt deps`-run. Update bewust.
-
-packages:
-  - package: dbt-labs/dbt_utils
-    version: 1.3.0
-
-  - package: calogica/dbt_expectations
-    version: 0.10.4
+packages: []

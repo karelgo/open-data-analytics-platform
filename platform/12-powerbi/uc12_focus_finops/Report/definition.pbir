@@ -1,9 +1,0 @@
-{
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json",
-  "version": "4.0",
-  "datasetReference": {
-    "byConnection": {
-      "connectionString": "semanticmodelid=7d480700-013b-4ab5-909a-d2ab17f93e26"
-    }
-  }
-}

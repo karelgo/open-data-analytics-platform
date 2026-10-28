@@ -1,0 +1,121 @@
+---
+title: "Voorstel for a nieuwe sturings-mart"
+role: finance_analyst
+level: expert
+order: 3
+duration: "90 min"
+summary: "Schrijf een use-case-spec for a nieuwe gold-mart die jij vaak vermist — incl. bron-tabellen, kolommen, aggregatieniveau, purpose-limitation en DQ-tests. Dit is wat de data-engineer nodig heeft om te bouwen."
+prereqs:
+  - "finance_analyst/practitioner/2"
+labs:
+  - title: "Bestaande UC-specs in vscode.dev"
+    href: "/go/openmetadata/"
+    vscodePath: "docs/use-cases"
+  - title: "OpenMetadata — bestaande gold-marts"
+    href: "/go/openmetadata/"
+checks:
+  - id: "fez_expert_uc_spec"
+    title: "Use-case spec opgeleverd in juiste structuur"
+quiz:
+  - q: "Wat hoort als allereerste in een use-case spec?"
+    options:
+      - "SQL"
+      - "Purpose limitation (welke wettelijke grondslag, welk besluit / welke sturingsvraag) — alles wat erna komt is afgeleid"
+      - "Kolomnamen"
+      - "Naam van de auteur"
+    correct: 1
+  - q: "Welk aggregatieniveau is gepast voor jouw rol?"
+    options:
+      - "Cliënt-niveau met BSN"
+      - "Geaggregeerd op organisatie-as (regio × maand × claim payoutsoort) — geen PII, in lijn met FEZ-purpose-limitation"
+      - "Per straat"
+      - "Per dossier"
+    correct: 1
+  - q: "Welke DQ-tests stel je minimaal voor?"
+    options:
+      - "Niets"
+      - "`not_null` op groupby-keys, `unique` on the combinatie van groupby-keys, `accepted_values` op enum-kolommen, `relationships` naar masters — minimaal"
+      - "Alleen `not_null`"
+      - "Alleen `unique`"
+    correct: 1
+certifies: true
+---
+
+In deze module schrijf je een use-case spec waar een data-engineer mee aan
+de slag kan. Schrijven is gemakkelijker dan onderhandelen — als je het
+spec goed maakt, hoef je niet 5 keer terug te komen op vragen.
+
+## De vraag
+
+Je merkt al maanden dat de huidige UC-06 (cost forecast) geen onderscheid
+maakt tussen "uitgaven claim payout" en "uitgaven reintegration-trajecten".
+Voor sturing on the reintegration-investering zou een aparte mart helpen.
+
+## Spec-template
+
+In `docs/use-cases/uc-XX-reintegration-budget.md`:
+
+```markdown
+# UC-XX — Reintegration budget mart
+
+## 1. Doel
+Sturingsmart op reintegration-uitgaven per regio × maand × traject-type.
+Ondersteunt FEZ in besluitvorming over budget-allocatie en evaluatie van
+trajecteffectiviteit.
+
+## 2. Purpose limitation
+- Wettelijke grondslag: art. 6 lid 1e AVG (publieke taak — UWV-besluit-
+  vorming).
+- Doel: financieel-economische sturing.
+- Geen cliënt-PII; aggregatie op regio-niveau.
+
+## 3. Bronnen
+- silver.fin.uitgave (reintegration subset)
+- silver.smz.traject (trajecten met type-classificatie)
+- silver.finance.budget (referentie-budget per regio)
+
+## 4. Mart-definitie
+
+Tabel: `gold.uc_xx_reintegration_budget`
+
+| Kolom | Type | Toelichting |
+|---|---|---|
+| maand | DATE | Eerste van de maand |
+| regio_code | VARCHAR | region |
+| traject_type | VARCHAR | enum {opleiding, jobcoaching, ...} |
+| uitgaven_eur | DECIMAL | som uitgegeven |
+| budget_eur | DECIMAL | toegekend budget |
+| n_trajecten | BIGINT | unieke cliënt-trajecten in maand |
+
+Granulariteit: één rij per (maand, regio, type).
+
+## 5. Aggregatie-regels
+- Datum-toewijzing op betalings-datum (niet aanvraag).
+- Een traject met begin/einde over twee maanden: pro-rated dag-deel
+  (niet alles in beginmaand).
+
+## 6. DQ
+- `not_null` op alle groupby-keys + bedragen.
+- `unique` op `(maand, regio, traject_type)`.
+- `accepted_values` op `traject_type`.
+- `relationships` naar `silver.smz.traject_type` master.
+
+## 7. Eigenaar / SLA
+- Eigenaar: finance.analyst.team@odap.local
+- Refresh: dagelijks (vaste tijd).
+- SLA: 99% op-tijd; 5 min nightly window.
+```
+
+## Wat dit voorkomt
+
+Een vage vraag ("we willen iets met reintegration") leidt tot 4 weken
+heen-en-weer praten. Een concrete spec leidt tot een werkende mart in
+een sprint.
+
+## Verificatie
+
+De auto-check controleert dat de spec alle 7 kopjes bevat en in de
+PR-queue staat als `docs/use-cases/uc-*.md`.
+
+> Bij voltooiing van deze module krijg je het Academy-certificaat
+> **Finance Analyst**.

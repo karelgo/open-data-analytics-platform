@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: job-market-settings
+  namespace: odap-platform
+data:
+  # Change explicitly to live and create job-market-api-credentials before enabling.
+  JOB_MARKET_MODE: demo
+  TABLE_FORMAT: delta

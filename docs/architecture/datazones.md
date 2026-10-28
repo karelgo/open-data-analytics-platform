@@ -1,58 +1,14 @@
----
-title: Data zones
-description: Medallion-architecture (bronze/silver/gold) + sensitive vault — zone-scheiding en access.
----
-
-<!-- Auto-generated door scripts/docs_gen.py uit portal/src/data/components.ts.
-     Changes handmatig vervallen bij de volgende CI-build — bewerk de TS-bron. -->
-
 # Data zones
 
-Vier MinIO-buckets, elk met eigen Trino-catalog, plus een aparte vault voor
-bijzondere persoonsgegevens (art. 9 AVG). De zone-naam in de portal en in
-de OPA-policies zijn 1-op-1.
+All analytical layers use the `job_market` schema and separate Trino catalogs.
 
-## Overview
+| Zone | Content | Access |
+|---|---|---|
+| Raw objects | Source responses and run manifests in `odap-bronze/job-market/raw/` | Restricted: responses may contain recruiter contact details |
+| Bronze | `bronze.job_market.observations`: normalized source-job/day observations with provenance | Engineering and stewardship roles |
+| Silver | Contact-redacted observations and one conservative duplicate group per day | Approved research, engineering and stewardship |
+| Gold | Latest inventory and aggregates for demand, skills, salary, geography, work and source quality | Job-market analyst perspectives |
 
-| Catalog | Bucket | Inhoud | Access (default) |
-|---|---|---|---|
-| `bronze` | `odap-bronze` | Onveranderbare brondata (incl. raw PII) | data-engineers (JIT) |
-| `silver` | `odap-silver` | Geconformeerd, gepseudonimiseerd waar mogelijk | analisten + engineers |
-| `gold` | `odap-gold` | CGM-conforme business products | domein-rollen via RBAC |
-| `sensitive` | `sensitive` | Bijzondere persoonsgegevens (art. 9 AVG, medisch) | strikt; 4-eyes principe |
-| `sandbox` | `sandbox` | Gepseudonimiseerd — voor researchers | researcher (read-only) |
+`is_synthetic` distinguishes offline fixtures from live data. Source observations remain separate from deduplicated snapshots. Daily absence does not prove job closure. Original salary units remain available even when no annual EUR comparison is possible.
 
-## Accesssstrategie
-
-```mermaid
-flowchart LR
-    bronze[bronze<br/>raw + PII] -- "ETL: pseudonimiseer" --> silver[silver<br/>geconformeerd]
-    silver -- "dbt-models" --> gold[gold<br/>marts voor BI]
-    bronze -- "alleen via vault-flow" --> sensitive[sensitive<br/>art. 9 AVG]
-    silver -- "pseudo-export" --> sandbox[sandbox<br/>research]
-
-    style sensitive fill:#fee,stroke:#c33
-    style sandbox fill:#eef,stroke:#33c
-```
-
-OPA-policies zijn **format-agnostisch**: ze kijken naar
-`catalog.schema.table`- en kolomnamen, niet to the onderliggende
-bestandsformaat. Switching tussen Delta en Iceberg laat de policies
-onveranderd (zie [ADR-0002](../adr/0002-iceberg-vs-delta.md)).
-
-## Wat zie je per rol?
-
-Dit volgt 1-op-1 de rol-handbooken:
-
-- **Claims Analyst / Claims Analyst / etc.** → primair `gold`,
-  beperkt `silver` (eigen domein). Geen `bronze`.
-- **Data-engineer** → `bronze` (JIT), `silver`, `gold`, `sensitive` (alleen
-  via break-glass).
-- **Data-steward** → read-only over alle zones (governance).
-- **Researcher** → uitsluitend `sandbox`.
-- **Platform-admin** → alles, maar elke query wordt audit-logged (zie
-  [Runbook § 10.3](../runbook.md#103-per-release-audit-trail)).
-
-Welke kolommen je in een gold-mart precies ziet hangt af van de OPA-policies
-in [`opa-policies-src/`](https://github.com/fresh-minds/FreshStackableDataPlatform/tree/main/opa-policies-src).
-Zie [Identity & autorisatie](auth.md) for the policy-flow.
+See the [dictionary and semantics](../use-cases/dutch-it-job-market.md).

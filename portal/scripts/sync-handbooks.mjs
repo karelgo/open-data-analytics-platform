@@ -13,7 +13,7 @@
 // alleen de basename zodat we niet de hele roles.ts hier hoeven te imorteren.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
-import { dirname, resolve, basename } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -24,17 +24,15 @@ const destDir = resolve(__dirname, '..', 'src', 'content', 'handbooks');
 // Mapping role-id → docs/handbooks/-basename. Keep in sync with
 // portal/src/data/roles.ts (handbookPath).
 const MAP = {
-  claims_analyst:          '01-claims-analyst.md',
-  fraud_analyst:             '02-fraud-analyst.md',
-  claims_analyst: '03-claims-analyst.md',
-  marketing_analyst:           '04-marketing-analyst.md',
-  finance_analyst:              '05-finance-analyst.md',
-  operations_manager:              '06-operations-manager.md',
-  marketing_analyst: '07-marketing-analyst.md',
-  researcher:               '08-researcher.md',
-  data_steward:             '09-data-steward.md',
-  data_engineer:            '10-data-engineer.md',
-  platform_admin:           '11-platform-admin.md',
+  "claims_analyst": "01-claims-analyst.md",
+  "fraud_analyst": "02-fraud-analyst.md",
+  "marketing_analyst": "04-marketing-analyst.md",
+  "finance_analyst": "05-finance-analyst.md",
+  "operations_manager": "06-operations-manager.md",
+  "researcher": "08-researcher.md",
+  "data_steward": "09-data-steward.md",
+  "data_engineer": "10-data-engineer.md",
+  "platform_admin": "11-platform-admin.md"
 };
 
 if (!existsSync(srcDir) || !statSync(srcDir).isDirectory()) {

@@ -168,12 +168,14 @@ fi
 log "7/10  Portal Docker-image bouwen + in cluster laden (mode=${DEPLOYMENT_MODE})"
 docker build -f portal/Dockerfile -t odap/portal:dev . >/dev/null
 k3d image import odap/portal:dev -c "${CLUSTER_NAME:-odap-platform}" >/dev/null
-# Sidecar voor /api/airflow/* (FastAPI; triggert convert_to_delta DAG).
+# Optional portal Airflow bridge image.
 docker build -f portal/Dockerfile.airflow-bridge \
              -t odap/portal-airflow-bridge:dev . >/dev/null
 k3d image import odap/portal-airflow-bridge:dev -c "${CLUSTER_NAME:-odap-platform}" >/dev/null
 kubectl -n odap-platform rollout restart deployment portal >/dev/null 2>&1 || true
-ok "portal + airflow-bridge images gebouwd + geïmporteerd"
+docker build -f infrastructure/job-market/Dockerfile -t "${JOBS_IMAGE:-odap/job-market:dev}" . >/dev/null
+k3d image import "${JOBS_IMAGE:-odap/job-market:dev}" -c "${CLUSTER_NAME:-odap-platform}" >/dev/null
+ok "portal + job-market runtime images built and imported"
 
 # ---------------------------------------------------------------------- 8
 log "8/10  Live-only Keycloak realm patches (TOTP, scopes, mappers, attrs)"
@@ -321,26 +323,9 @@ bash tests/smoke/09-portal-up.sh   || warn "smoke 09 meldt fouten"
 bash tests/smoke/14-embed-shell.sh || warn "smoke 14 meldt fouten"
 
 # ---------------------------------------------------------------------- 11
-log "11/11 OpenMetadata demo-seed: UI-fix + UC-mart entities + CGM-glossary links"
-# Drie idempotente acties die OM representatief maken for the demo:
-#  - om-fix-search-mapping: patcht OS-index mappings — OM 1.12 markeert
-#                           glossaryTags/classificationTags als plain text
-#                           waardoor de Explore-UI 500't bij elke search.
-#                           Geen rebuild nodig; fielddata=true online.
-#  - om-demo-seed         : synthetiseert UC-mart tabel-entities + governance-
-#                           meta (owner/domain/dataProduct/Tier/CGM/PII) voor
-#                           UCs die dbt nog niet in Trino heeft gematerialiseerd.
-#  - om-glossary-link     : koppelt CGM-termen (Customer journey, EventStream, Fase,
-#                           Persona, Werknemer, Werkgever, Dienstverband, etc.)
-#                           aan bronze stg_- en mart-tables die de standaard
-#                           enrichment niet dekt.
-# Demo-seed + glossary-link wachten zelf on the openmetadata-init Job
-# (teams/domains/dataProducts/glossary). Faalt onschadelijk als OM nog
-# opspint — re-run met 'make om-fix-search-mapping && make om-demo-seed
-# && make om-glossary-link' is altijd veilig.
-bash "$ROOT/scripts/om-fix-search-mapping.sh" || warn "om-fix-search-mapping meldt fouten — UI Explore kan leeg blijven"
-bash "$ROOT/scripts/om-demo-seed.sh"          || warn "om-demo-seed meldt fouten — re-run handmatig"
-bash "$ROOT/scripts/om-glossary-link.sh"      || warn "om-glossary-link meldt fouten — re-run handmatig"
+log "11/11 OpenMetadata UI configuration"
+bash "$ROOT/scripts/om-fix-search-mapping.sh" || warn "OpenMetadata search mapping needs attention"
+log "Run make jobs-run after deployment to populate the single job-market example."
 
 echo
 ok "Alles klaar. Open: https://platform.${PLATFORM_DOMAIN}:${PLATFORM_PORT}/"

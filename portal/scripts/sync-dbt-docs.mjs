@@ -78,7 +78,7 @@ if (existsSync(src)) {
     In production wordt deze stap door CI of een Airflow-job uitgevoerd zodra de
     silver/gold-runs slagen. Lineage staat ook in
     <a href="https://openmetadata.odap.local:8443">OpenMetadata</a>
-    via de <code>governance_om_ingest</code> DAG.
+    via de <code>dutch_it_jobs_daily</code> DAG.
   </p>
 </body>
 </html>

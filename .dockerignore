@@ -1,0 +1,13 @@
+.git
+.venv*
+**/node_modules
+**/__pycache__
+**/*.pyc
+examples/dutch-it-jobs/output
+examples/dutch-it-jobs/output-live
+examples/dutch-it-jobs/output-*
+dbt/target
+dbt/logs
+dbt/dbt_packages
+portal/dist
+site

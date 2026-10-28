@@ -4,7 +4,7 @@
 // Public documentation site (MkDocs Material, gebouwd door
 // .github/workflows/docs.yml). Voor custom domain: pas dit aan én
 // configureer de CNAME in docs/CNAME.
-export const DOCS_URL = 'https://fresh-minds.github.io/FreshStackableDataPlatform/';
+export const DOCS_URL = 'https://karelgo.github.io/open-data-analytics-platform/';
 
 // Deep-link naar een specifieke architecturelaag in de docs. De anchors
 // komen overeen with the stage-id's in `components.ts` (identity, ingestion,

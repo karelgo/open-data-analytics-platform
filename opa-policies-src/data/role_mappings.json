@@ -2,7 +2,7 @@
   "role_mappings": {
     "roles": {
       "smoketest": {
-        "_role_purpose": "Static-auth user voor smoke-tests + dbt-runs.",
+        "_role_purpose": "Technical pipeline identity; retained for existing service connections.",
         "catalogs": [
           "bronze",
           "silver",
@@ -20,8 +20,8 @@
         "regio_filter": false,
         "break_glass": false
       },
-      "data_steward": {
-        "_role_purpose": "Datakwaliteit, profiler, lineage. Ziet PII voor DQ-controle, niet medisch.",
+      "platform_admin": {
+        "_role_purpose": "Platform operator.",
         "catalogs": [
           "bronze",
           "silver",
@@ -29,8 +29,7 @@
         ],
         "schemas": null,
         "purposes": [
-          "sturingsinfo",
-          "kwaliteitscontrole"
+          "*"
         ],
         "can_see_pii": true,
         "can_see_medical": false,
@@ -39,115 +38,39 @@
         "break_glass": false
       },
       "data_engineer": {
-        "_role_purpose": "Pipeline-eigenaar; JIT-access tot bronze.",
+        "_role_purpose": "Owns daily extracts and transformations.",
         "catalogs": [
-          "bronze"
-        ],
-        "schemas": null,
-        "purposes": [
-          "primair_proces"
-        ],
-        "can_see_pii": true,
-        "can_see_medical": false,
-        "can_see_bankrekening": true,
-        "regio_filter": false,
-        "break_glass": false,
-        "jit_required": true
-      },
-      "claims_analyst": {
-        "_role_purpose": "Claim review (incl. complex / sensitive cases) \u2014 PII and medical context, regional scope, four-eyes required on sensitive zone.",
-        "catalogs": [
-          "sensitive",
+          "bronze",
           "silver",
           "gold"
         ],
         "schemas": [
-          "claims",
-          "eligibility_cases",
-          "uc01_claims_funnel",
-          "uc02_complex_cases"
+          "job_market"
         ],
         "purposes": [
-          "claim_processing",
-          "case_handling",
-          "reintegration"
+          "ingestion",
+          "labour_market_research",
+          "quality_control"
         ],
         "can_see_pii": true,
-        "can_see_medical": true,
+        "can_see_medical": false,
         "can_see_bankrekening": false,
-        "regio_filter": true,
-        "four_eyes_required": true,
+        "regio_filter": false,
         "break_glass": false
       },
-      "fraud_analyst": {
-        "_role_purpose": "Fraud / risk enforcement. May see bank account details for investigations.",
+      "data_steward": {
+        "_role_purpose": "Owns provenance, data quality and source permissions.",
         "catalogs": [
+          "bronze",
           "silver",
           "gold"
         ],
         "schemas": [
-          "service_requests",
-          "uc03_fraud_risk"
+          "job_market"
         ],
         "purposes": [
-          "enforcement"
-        ],
-        "can_see_pii": true,
-        "can_see_medical": false,
-        "can_see_bankrekening": true,
-        "regio_filter": false,
-        "break_glass": false
-      },
-      "finance_analyst": {
-        "_role_purpose": "FEZ \u2014 geaggregeerde data, geen PII.",
-        "catalogs": [
-          "gold"
-        ],
-        "schemas": [
-          "uc06_cost_forecast"
-        ],
-        "purposes": [
-          "actuarie",
-          "beleid"
-        ],
-        "can_see_pii": false,
-        "can_see_medical": false,
-        "can_see_bankrekening": false,
-        "regio_filter": false,
-        "break_glass": false
-      },
-      "operations_manager": {
-        "_role_purpose": "SMZ-planning (UC-08); geen cli\u00ebnt-PII.",
-        "catalogs": [
-          "gold",
-          "silver"
-        ],
-        "schemas": [
-          "uc08_capacity_planning",
-          "smz"
-        ],
-        "purposes": [
-          "planning"
-        ],
-        "can_see_pii": false,
-        "can_see_medical": false,
-        "can_see_bankrekening": false,
-        "regio_filter": false,
-        "break_glass": false
-      },
-      "marketing_analyst": {
-        "_role_purpose": "Customer 360 + proactive outreach worklists; PII visible, no medical, opt-out filtered.",
-        "catalogs": [
-          "gold"
-        ],
-        "schemas": [
-          "uc04_eligibility_outreach",
-          "uc05_customer_360"
-        ],
-        "purposes": [
-          "customer_contact",
-          "case_handling",
-          "proactive_outreach"
+          "quality_control",
+          "labour_market_research"
         ],
         "can_see_pii": true,
         "can_see_medical": false,
@@ -156,13 +79,16 @@
         "break_glass": false
       },
       "researcher": {
-        "_role_purpose": "Sandbox-zone (UC-09), gepseudonimiseerde panels.",
+        "_role_purpose": "Research on sanitized job observations.",
         "catalogs": [
-          "sandbox"
+          "silver",
+          "gold"
         ],
-        "schemas": null,
+        "schemas": [
+          "job_market"
+        ],
         "purposes": [
-          "statistisch_onderzoek"
+          "labour_market_research"
         ],
         "can_see_pii": false,
         "can_see_medical": false,
@@ -170,140 +96,117 @@
         "regio_filter": false,
         "break_glass": false
       },
-      "platform_admin": {
-        "_role_purpose": "Break-glass admin. Audit-log per gebruik.",
+      "claims_analyst": {
+        "_role_purpose": "Existing Keycloak role ID retained; job-market analytics only.",
         "catalogs": [
-          "bronze",
-          "silver",
-          "gold",
-          "sensitive",
-          "sandbox"
+          "gold"
         ],
-        "schemas": null,
+        "schemas": [
+          "job_market"
+        ],
         "purposes": [
-          "*"
+          "labour_market_research"
         ],
-        "can_see_pii": true,
-        "can_see_medical": true,
-        "can_see_bankrekening": true,
+        "can_see_pii": false,
+        "can_see_medical": false,
+        "can_see_bankrekening": false,
         "regio_filter": false,
-        "break_glass": true
+        "break_glass": false
+      },
+      "fraud_analyst": {
+        "_role_purpose": "Existing Keycloak role ID retained; job-market analytics only.",
+        "catalogs": [
+          "gold"
+        ],
+        "schemas": [
+          "job_market"
+        ],
+        "purposes": [
+          "labour_market_research"
+        ],
+        "can_see_pii": false,
+        "can_see_medical": false,
+        "can_see_bankrekening": false,
+        "regio_filter": false,
+        "break_glass": false
+      },
+      "finance_analyst": {
+        "_role_purpose": "Existing Keycloak role ID retained; job-market analytics only.",
+        "catalogs": [
+          "gold"
+        ],
+        "schemas": [
+          "job_market"
+        ],
+        "purposes": [
+          "labour_market_research"
+        ],
+        "can_see_pii": false,
+        "can_see_medical": false,
+        "can_see_bankrekening": false,
+        "regio_filter": false,
+        "break_glass": false
+      },
+      "operations_manager": {
+        "_role_purpose": "Existing Keycloak role ID retained; job-market analytics only.",
+        "catalogs": [
+          "gold"
+        ],
+        "schemas": [
+          "job_market"
+        ],
+        "purposes": [
+          "labour_market_research"
+        ],
+        "can_see_pii": false,
+        "can_see_medical": false,
+        "can_see_bankrekening": false,
+        "regio_filter": false,
+        "break_glass": false
+      },
+      "marketing_analyst": {
+        "_role_purpose": "Existing Keycloak role ID retained; job-market analytics only.",
+        "catalogs": [
+          "gold"
+        ],
+        "schemas": [
+          "job_market"
+        ],
+        "purposes": [
+          "labour_market_research"
+        ],
+        "can_see_pii": false,
+        "can_see_medical": false,
+        "can_see_bankrekening": false,
+        "regio_filter": false,
+        "break_glass": false
       }
     },
     "resource_purposes": {
-      "gold.uc01_claims_funnel.*": [
-        "sturingsinfo"
+      "bronze.job_market.*": [
+        "ingestion",
+        "quality_control"
       ],
-      "gold.uc04_eligibility_outreach.*": [
-        "proactieve_dienstverlening"
+      "silver.job_market.*": [
+        "labour_market_research",
+        "quality_control"
       ],
-      "gold.uc05_customer_360.*": [
-        "customer interaction",
-        "behandeling"
-      ],
-      "gold.uc06_cost_forecast.*": [
-        "actuarie",
-        "beleid"
-      ],
-      "gold.uc07_dq_policies.*": [
-        "primair_proces",
-        "kwaliteitscontrole"
-      ],
-      "gold.uc08_capacity_planning.*": [
-        "planning"
-      ],
-      "silver.claims.*": [
-        "claim payout",
-        "behandeling",
-        "reintegration"
-      ],
-      "silver.service_requests.*": [
-        "claim payout",
-        "handhaving"
-      ],
-      "silver.eligibility_cases.*": [
-        "reintegration",
-        "behandeling"
-      ],
-      "silver.customers.*": [
-        "customer interaction",
-        "behandeling"
-      ],
-      "silver.finance.*": [
-        "actuarie",
-        "beleid"
-      ],
-      "silver.policies.*": [
-        "primair_proces",
-        "kwaliteitscontrole"
-      ],
-      "silver.persons.*": [
-        "primair_proces",
-        "kwaliteitscontrole"
-      ],
-      "silver.incidents.*": [
-        "claim payout"
-      ],
-      "bronze.*": [
-        "primair_proces"
-      ],
-      "sensitive.eligibility_cases.*": [
-        "reintegration",
-        "behandeling"
+      "gold.job_market.*": [
+        "labour_market_research",
+        "quality_control"
       ]
     },
     "sensitive_columns": {
-      "bsn": {
-        "pii": true,
-        "medical": false,
-        "bankrekening": false
+      "raw_payload": {
+        "pii": true
       },
-      "voornaam": {
-        "pii": true,
-        "medical": false,
-        "bankrekening": false
+      "email": {
+        "pii": true
       },
-      "achternaam": {
-        "pii": true,
-        "medical": false,
-        "bankrekening": false
-      },
-      "birth_date": {
-        "pii": true,
-        "medical": false,
-        "bankrekening": false
-      },
-      "straat": {
-        "pii": true,
-        "medical": false,
-        "bankrekening": false
-      },
-      "huisnummer": {
-        "pii": true,
-        "medical": false,
-        "bankrekening": false
-      },
-      "iban": {
-        "pii": true,
-        "medical": false,
-        "bankrekening": true
-      },
-      "bankrekening": {
-        "pii": true,
-        "medical": false,
-        "bankrekening": true
-      },
-      "diagnose": {
-        "pii": false,
-        "medical": true,
-        "bankrekening": false
-      },
-      "icd10": {
-        "pii": false,
-        "medical": true,
-        "bankrekening": false
+      "phone": {
+        "pii": true
       }
     }
   },
-  "_comment": "Role \u2192 catalogs / schemas / purposes / capability-mapping. Brondata voor opa-policies-src/trino/*.rego. Wordt door build-opa-bundle.sh meegebakken in de OPA-bundle ConfigMap (key: data.json)."
+  "_comment": "One Dutch IT job-market use case; existing realm role IDs retained for compatibility."
 }

@@ -27,14 +27,8 @@ source:
       # synthetic-load — voorkomt verloren tijd op lege schemas en
       # houdt de OM-PATCH-volume binnen wat de shared Postgres trekt.
       schemaFilterPattern:
-        includes:
-          # Silver staging (anchor-domains met substantieel volume)
-          - persoon
-          - polisadm
-          - intermediate
-          # Gold UC marts (UC11 = primary customer journey-anchor; UC07 = DQ)
-          - uc11_customer_journey
-          - uc07_dq_policies
+        includes: [job_market]
+
 processor:
   type: orm-profiler
   config: {}

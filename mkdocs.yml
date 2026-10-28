@@ -11,11 +11,11 @@ site_description: >-
   Documentation for the ODAP reference implementation of a compliant data and
   analytics platform — architecture, components, roles, use cases, and
   decisions.
-site_url: https://fresh-minds.github.io/FreshStackableDataPlatform/
+site_url: https://karelgo.github.io/open-data-analytics-platform/
 site_author: Open Data & Analytics Platform contributors
 
-repo_name: fresh-minds/FreshStackableDataPlatform
-repo_url: https://github.com/fresh-minds/FreshStackableDataPlatform
+repo_name: karelgo/open-data-analytics-platform
+repo_url: https://github.com/karelgo/open-data-analytics-platform
 edit_uri: edit/main/docs/
 
 # The full content tree lives under docs/ (existing layout). The architecture
@@ -32,6 +32,7 @@ exclude_docs: |
   /README.md
   /README.md.bak
   /_snippets/*
+  /archive/**
 
 # Documentation content is English; technical identifiers (paths, column names,
 # tool names) stay as in code (see docs/README.md § Conventions).
@@ -90,8 +91,7 @@ plugins:
       lang:
         - en
   - awesome-pages              # nav from .pages files if present; otherwise fallback to nav: below
-  - tags:
-      tags_file: tags.md
+  - tags
 
 # Rewrite ../..-links to absolute GitHub URLs so references to files
 # OUTSIDE docs/ (dbt/, opa-policies-src/, scripts/, ...) work on
@@ -152,41 +152,26 @@ nav:
   - Architecture:
       - Overview: architecture/index.md
       - Components: architecture/components.md
-      - Data zones: architecture/data zones.md
+      - Data zones: architecture/datazones.md
       - Identity & authorization: architecture/auth.md
       - Table format abstraction: architecture/table-format.md
       - Naming conventions: architecture/naming.md
       - Original reference: architecture/reference.md
-  - Roles:
-      - Overview: roles/index.md
-      - Claims Analyst: handbooks/01-claims-analyst.md
-      - Fraud Analyst: handbooks/02-fraud-analyst.md
-      - Marketing Analyst: handbooks/04-marketing-analyst.md
-      - Finance Analyst: handbooks/05-finance-analyst.md
-      - Operations Manager: handbooks/06-operations-manager.md
-      - Researcher: handbooks/08-researcher.md
+  - Job market:
+      - Overview: use-cases/index.md
+      - Walkthrough and dictionary: use-cases/dutch-it-job-market.md
+      - Role handbooks: handbooks/README.md
+      - Role scopes: roles/index.md
+      - Job Market Analyst: handbooks/01-claims-analyst.md
+      - Source Quality Analyst: handbooks/02-fraud-analyst.md
+      - Skills Analyst: handbooks/04-marketing-analyst.md
+      - Salary Analyst: handbooks/05-finance-analyst.md
+      - Market Operations: handbooks/06-operations-manager.md
+      - Labour Market Researcher: handbooks/08-researcher.md
       - Data Steward: handbooks/09-data-steward.md
       - Data Engineer: handbooks/10-data-engineer.md
       - Platform Admin: handbooks/11-platform-admin.md
-      - Smoke test (system role): handbooks/12-smoketest-systeem.md
-      - CSV upload (all roles): handbooks/csv-upload.md
       - Request access: access-request-guide.md
-  - Use cases:
-      - Overview: use-cases/index.md
-      - UC-01 · Claims funnel: use-cases/uc01-claims-funnel.md
-      - "UC-02 · Complex cases (spec-only)": use-cases/uc02-complex-cases-ai.md
-      - "UC-03 · Fraud risk (spec-only)": use-cases/uc03-fraud-risk.md
-      - UC-04 · Eligibility outreach: use-cases/uc04-eligibility-outreach.md
-      - UC-05 · Customer 360: use-cases/uc05-customer-360.md
-      - UC-06 · Cost forecast: use-cases/uc06-cost-forecast.md
-      - UC-07 · DQ policy administration: use-cases/uc07-dq-policies.md
-      - "UC-08 · Capacity planning (spec-only)": use-cases/uc08-capacity-planning.md
-      - UC-09 · Reintegration effect: use-cases/uc09-reintegration-effect.md
-      - "UC-10 · Data services API (spec-only)": use-cases/uc10-data-services.md
-      - UC-11 · Customer journey: use-cases/uc11-customer-journey.md
-      - UC-11 · Walkthrough: use-cases/uc11-customer-journey-walkthrough.md
-      - UC-12 · FOCUS FinOps: use-cases/uc12-focus-finops.md
-      - "UC-12 · FOCUS FinOps — Power BI variant": use-cases/uc12-focus-finops-powerbi.md
   - Decisions:
       - Overview: adr/index.md
       - ADR-0001 · Stackable as base: adr/0001-stackable-as-base.md
@@ -197,6 +182,7 @@ nav:
       - ADR-0006 · Delta chosen for this impl.: adr/0006-delta-chosen-for-this-implementation.md
       - ADR-0007 · Airflow pipeline architecture: adr/0007-airflow-pipeline-architecture.md
       - ADR-0008 · Self-service data access: adr/0008-self-service-data-access.md
+      - Entra broker record: adr/0008-entra-broker-via-keycloak.md
       - ADR-0009 · NetworkPolicies strategy: adr/0009-networkpolicies-strategy.md
       - ADR-0010 · platform-config single source: adr/0010-platform-config-single-source.md
   - Compliance:
@@ -212,7 +198,6 @@ nav:
       - Architecture (legacy stub): architecture.md
       - Redesign inventory: redesign-inventory.md
       - Handbooks — index: handbooks/README.md
-      - Handbook (all roles bundled): handbooks/00-handboek.md
       - Explorations — Multica vs Nanitics: explorations/multica-vs-nanitics.md
       - Explorations — Multica Foundry: explorations/multica-foundry.md
       - Explorations — Watcher design: explorations/wachter-design.md
@@ -221,7 +206,7 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/fresh-minds/FreshStackableDataPlatform
+      link: https://github.com/karelgo/open-data-analytics-platform
       name: Repository on GitHub
   generator: false
   status:
@@ -247,5 +232,5 @@ validation:
 
 copyright: >-
   Apache License 2.0 ·
-  <a href="https://github.com/fresh-minds/FreshStackableDataPlatform/blob/main/LICENSE">LICENSE</a> ·
-  All datasets in this reference are synthetic — no real data.
+  <a href="https://github.com/karelgo/open-data-analytics-platform/blob/main/LICENSE">LICENSE</a> ·
+  Offline example data is synthetic; live sources are explicitly configured.

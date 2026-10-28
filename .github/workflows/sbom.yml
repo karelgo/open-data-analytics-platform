@@ -16,17 +16,17 @@ jobs:
   # so we don't add a second actions/upload-artifact step (that triggered a
   # 409 Conflict — "an artifact with this name already exists"). Default
   # retention follows the repo Actions setting.
-  sbom-data-generation:
+  sbom-job-market:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Generate SBOM (data-generation)
+      - name: Generate SBOM (job market)
         uses: anchore/sbom-action@v0
         with:
-          path: ./data-generation
+          path: ./examples/dutch-it-jobs
           format: cyclonedx-json
-          output-file: sbom-data-generation.cdx.json
-          artifact-name: sbom-data-generation
+          output-file: sbom-job-market.cdx.json
+          artifact-name: sbom-job-market
 
   sbom-spark-jobs:
     runs-on: ubuntu-24.04

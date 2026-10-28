@@ -80,7 +80,7 @@ def _storage_options() -> dict[str, str]:
 def read_delta(table_uri: str, **kwargs: Any):
     """Read a Delta table from MinIO into a pandas DataFrame.
 
-    ``table_uri`` is the s3a-style path, e.g. ``s3a://odap-silver/wia/aanvraag``.
+    ``table_uri`` is the s3a-style path, e.g. ``s3a://odap-bronze/job-market/observations``.
     """
     from deltalake import DeltaTable
 

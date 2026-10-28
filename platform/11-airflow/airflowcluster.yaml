@@ -1,22 +1,3 @@
-# AirflowCluster — orchestratie voor dbt-runs, lakehouse-maintenance, seed,
-# en OpenMetadata-ingestion.
-#
-# Architecture: docs/adr/0007-airflow-pipeline-architecture.md
-#
-# DB: gedeelde Postgres `odap-data/postgres-postgresql.odap-data.svc.cluster.local`
-#     database `airflow` (init-script in fase 1 maakt deze aan).
-# Auth: OIDC via keycloak (production). Voor dev is admin-flow ook open.
-#
-# Mounts (zie kustomization.yaml configMapGenerator):
-#   - /stackable/airflow/dags/  ← airflow-dags     (DAG-aanroepers)
-#   - /opt/odap/airflow/include/ ← airflow-include  (factories + helpers, op PYTHONPATH)
-#   - /opt/odap/airflow/sources/ ← airflow-sources  (YAML source-registry)
-#   - /opt/odap/dbt/             ← dbt-manifest     (manifest.json voor Cosmos)
-#
-# Cosmos (astronomer-cosmos) wordt door een initContainer pip-geïnstalleerd
-# in een emptyDir-volume `/cosmos-pkgs`, dat ook op PYTHONPATH komt.
-# Production: bouw een custom image (infrastructure/airflow/Dockerfile, TODO).
----
 apiVersion: airflow.stackable.tech/v1alpha1
 kind: AirflowCluster
 metadata:
@@ -24,438 +5,63 @@ metadata:
   namespace: odap-platform
 spec:
   image:
-    productVersion: "3.0.6"
+    productVersion: 3.0.6
   clusterConfig:
-    # 26.3: database/executor/listenerClass uit clusterConfig.
-    # Database-config zit in credentialsSecret (zie secret).
-    # Executor is nu top-level kubernetesExecutors block.
     loadExamples: false
     exposeConfig: false
     credentialsSecret: airflow-postgres-credentials
     authentication:
-      - authenticationClass: keycloak
-        oidc:
-          clientCredentialsSecret: airflow-oidc-client
-
+    - authenticationClass: keycloak
+      oidc:
+        clientCredentialsSecret: airflow-oidc-client
   webservers:
     roleConfig:
       listenerClass: cluster-internal
-    # Airflow draait achter TLS-terminating ingress-nginx. Airflow 3.x
-    # splitst de webserver in een API-server (issuer/redirect-URI) +
-    # FAB-UI; vandaar AIRFLOW__API__BASE_URL én AIRFLOW__FAB__BASE_URL.
-    # Zonder die twee bouwt Flask de OAuth redirect_uri als
-    # http://...:8443 → nginx 400 "plain HTTP request was sent to HTTPS
-    # port". REQUESTS_CA_BUNDLE/SSL_CERT_FILE zijn for the OAuth
-    # token-exchange naar https://keycloak.odap.local:8443
-    # (cert-manager self-signed CA).
-    # NB: airflow.cfg dump op disk toont nog defaults; env-vars
-    # overschrijven cfg op runtime. Verifieer met
-    # `airflow config get-value api base_url` in een verse pod.
     envOverrides:
-      REQUESTS_CA_BUNDLE: "/etc/platform-ca/ca.crt"
-      SSL_CERT_FILE: "/etc/platform-ca/ca.crt"
-      # Path-routing onder platform.odap.local/airflow (same-origin
-      # for the portal embed-shell). De ingress voegt X-Forwarded-Prefix
-      # toe; PROXY_FIX_X_PREFIX=1 hieronder zorgt dat FAB de prefix in z'n
-      # redirect_uri-opbouw verwerkt. Zonder dit landt OAuth-redirect op
-      # /oauth-authorized i.p.v. /airflow/oauth-authorized → 404.
-      AIRFLOW__API__BASE_URL: "https://platform.odap.local:8443/airflow"
-      AIRFLOW__FAB__BASE_URL: "https://platform.odap.local:8443/airflow"
-      AIRFLOW__FAB__ENABLE_PROXY_FIX: "True"
-      AIRFLOW__FAB__PROXY_FIX_X_PROTO: "1"
-      AIRFLOW__FAB__PROXY_FIX_X_HOST: "1"
-      AIRFLOW__FAB__PROXY_FIX_X_PORT: "1"
-      AIRFLOW__FAB__PROXY_FIX_X_PREFIX: "1"
-      # ADR-0007: include/ + cosmos op PYTHONPATH zodat factory-imports werken.
-      # Include zelf + cosmos VOOR system-paths zodat factory-imports voorrang hebben.
-      # Stackable's eigen log_config + dags-folder achteraan om defaults te behouden.
-      PYTHONPATH: "/opt/odap/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
-      # Stackable 26.3 detecteert executor uit *Executors-block, maar voor onze
-      # setup expliciet zetten zodat tasks via KubernetesExecutor een eigen pod krijgen.
-      AIRFLOW__CORE__EXECUTOR: "KubernetesExecutor"
-      AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "odap-platform"
-      # Geen pod_template_file — laat Airflow de defaults gebruiken; podOverrides
-      # in kubernetesExecutors-blok hierboven definiëren de mounts + initContainers.
-      SOURCES_DIR: "/opt/odap/airflow/sources"
-      DBT_MANIFEST_PATH: "/opt/odap/dbt/manifest.json"
-    # NB: configOverrides voor `webserver_config.py` werkt NIET in
-    # Stackable Airflow 26.3 — de operator accepteert de keys in de CRD
-    # maar rendert ze niet in de gegenereerde file. Daarom doen we de
-    # role-mapping via een subPath-mount bovenop de gegenereerde file
-    # (zie webserver-config.yaml ConfigMap + volume mount onderaan
-    # roleGroups.default.podOverrides). Dat geeft ons ook ruimte om
-    # een custom FAB_SECURITY_MANAGER_CLASS te zetten — nodig omdat
-    # FAB's default get_oauth_user_info het Keycloak `roles` claim
-    # niet leest. (Airflow 3: setting heet FAB_SECURITY_MANAGER_CLASS
-    # en accepteert een import-pad-string ipv een class.)
+      REQUESTS_CA_BUNDLE: /etc/platform-ca/ca.crt
+      SSL_CERT_FILE: /etc/platform-ca/ca.crt
+      AIRFLOW__API__BASE_URL: https://platform.odap.local:8443/airflow
+      AIRFLOW__FAB__BASE_URL: https://platform.odap.local:8443/airflow
+      AIRFLOW__FAB__ENABLE_PROXY_FIX: 'True'
+      AIRFLOW__FAB__PROXY_FIX_X_PROTO: '1'
+      AIRFLOW__FAB__PROXY_FIX_X_HOST: '1'
+      AIRFLOW__FAB__PROXY_FIX_X_PORT: '1'
+      AIRFLOW__FAB__PROXY_FIX_X_PREFIX: '1'
+      PYTHONPATH: /opt/odap/airflow/include:/stackable/app/log_config:/stackable/airflow/dags
+      AIRFLOW__CORE__EXECUTOR: KubernetesExecutor
+      AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: odap-platform
     config:
       logging:
         enableVectorAgent: false
       resources:
         cpu:
-          min: "100m"
-          max: "500m"
-        # Airflow 3 api-server (Uvicorn + FAB-UI) + Cosmos imports vragen
-        # meer dan 2.x's webserver. 1Gi was te krap; OOMKilled bij CLI-load.
+          min: 100m
+          max: 500m
         memory:
-          limit: "1500Mi"
+          limit: 1500Mi
     roleGroups:
       default:
         replicas: 1
         podOverrides:
           spec:
-            # ADR-0007: pip-installeer cosmos in emptyDir die ook door
-            # de airflow-container wordt gemount op PYTHONPATH.
-            initContainers:
-              - name: cosmos-init
-                # Match Python-versie van Stackable airflow 3.0.6 image
-                # (Python 3.12) zodat C-extensies (msgpack, pyyaml) laden.
-                image: python:3.12-slim
-                command:
-                  - sh
-                  - -ec
-                  - |
-                    # /cosmos-pkgs staat op PYTHONPATH VÓÓR site-packages, dus
-                    # een transitief geïnstalleerd `airflow` of `apache_airflow*`
-                    # shadowt de system Airflow. --no-deps voorkomt dat pip
-                    # apache-airflow als transitive dep meeneemt.
-                    pip install --disable-pip-version-check \
-                      --target=/cosmos-pkgs --no-deps \
-                      "astronomer-cosmos==1.12.0"
-                    # Cosmos-runtime deps die NIET in het Stackable airflow image
-                    # zitten. attrs/jinja2/pendulum/pluggy/packaging/typing_ext
-                    # zijn airflow-standaard — alleen aenum + methodtools (+ pure-
-                    # python wirerope dep) hebben we nodig.
-                    pip install --disable-pip-version-check \
-                      --target=/cosmos-pkgs \
-                      "aenum>=3.1" "methodtools>=0.4.7"
-                    # Defensieve cleanup: als pip toch een airflow/provider-
-                    # shadow naar /cosmos-pkgs schreef, weg ermee.
-                    cd /cosmos-pkgs
-                    rm -rf airflow apache_airflow apache_airflow-*.dist-info \
-                           airflow_providers_* 2>/dev/null || true
-                    touch /cosmos-pkgs/.ready
-                volumeMounts:
-                  - name: cosmos-pkgs
-                    mountPath: /cosmos-pkgs
-              # Manifest is gzipped in de ConfigMap (raw is 1.2MB > CM-limiet).
-              # Decompress hier zodat de scheduler een klare manifest.json vindt.
-              - name: manifest-decompress
-                image: busybox:1.36
-                command:
-                  - sh
-                  - -c
-                  - |
-                    # Cosmos vereist een complete dbt-project layout (dbt_project.yml +
-                    # models/ + seeds/ etc) ook bij LoadMode.DBT_MANIFEST. Tarball
-                    # van het hele dbt-project zit in dezelfde ConfigMap.
-                    if [ -f /dbt-manifest-gz/dbt-project.tar.gz ]; then
-                      tar xzf /dbt-manifest-gz/dbt-project.tar.gz -C /dbt-manifest/
-                      echo "dbt-project uitgepakt:"
-                      ls /dbt-manifest/
-                    fi
-                    if [ -f /dbt-manifest-gz/manifest.json.gz ]; then
-                      gunzip -c /dbt-manifest-gz/manifest.json.gz > /dbt-manifest/manifest.json
-                      ls -lh /dbt-manifest/manifest.json
-                    else
-                      echo "manifest.json.gz nog niet aanwezig — Cosmos draait in fallback-modus"
-                      echo '{"nodes":{},"sources":{}}' > /dbt-manifest/manifest.json
-                    fi
-                volumeMounts:
-                  - name: dbt-manifest-gz
-                    mountPath: /dbt-manifest-gz
-                  - name: dbt-manifest-decompressed
-                    mountPath: /dbt-manifest
             containers:
-              - name: airflow
-                # SubPath-mount op /stackable/app/config/webserver_config.py
-                # faalt — Stackable mount daar een projected ConfigMap met
-                # een symlink (..data/webserver_config.py), runc kan geen
-                # file-overlay leggen op een symlink ("not a directory").
-                #
-                # Stackable's container-args doen vóór `airflow webserver`:
-                #   cp -RL /stackable/app/config/webserver_config.py \
-                #          /stackable/airflow/webserver_config.py
-                # Wij overschrijven de DESTINATION via een postStart hook.
-                # Flask-app-init duurt ~5s, deze cp <100ms — race-veilig.
-                # Bij operator-upgrades blijft dit werken zolang de cp-
-                # destination /stackable/airflow/webserver_config.py blijft.
-                lifecycle:
-                  postStart:
-                    exec:
-                      command:
-                        - bash
-                        - -c
-                        - |
-                          for _ in $(seq 1 50); do
-                            [ -f /stackable/airflow/webserver_config.py ] && break
-                            sleep 0.1
-                          done
-                          cp -L /airflow-config/webserver_config.py \
-                                /stackable/airflow/webserver_config.py
-                volumeMounts:
-                  - name: platform-ca
-                    mountPath: /etc/platform-ca
-                    readOnly: true
-                  - name: cosmos-pkgs
-                    mountPath: /cosmos-pkgs
-                    readOnly: true
-                  - name: airflow-include
-                    mountPath: /opt/odap/airflow/include
-                    readOnly: true
-                  - name: airflow-sources
-                    mountPath: /opt/odap/airflow/sources
-                    readOnly: true
-                  - name: dbt-manifest-decompressed
-                    mountPath: /opt/odap/dbt
-                    readOnly: true
-                  - name: airflow-dags
-                    mountPath: /stackable/airflow/dags
-                    readOnly: true
-                  # ConfigMap-bron for the postStart-hook (zie hierboven).
-                  - name: webserver-config
-                    mountPath: /airflow-config
-                    readOnly: true
-            volumes:
-              - name: platform-ca
-                configMap:
-                  name: platform-ca-bundle
-              - name: cosmos-pkgs
-                emptyDir: {}
-              - name: airflow-dags
-                configMap:
-                  name: airflow-dags
-              - name: airflow-include
-                configMap:
-                  name: airflow-include
-              - name: airflow-sources
-                configMap:
-                  name: airflow-sources
-              - name: dbt-manifest-gz
-                configMap:
-                  name: dbt-manifest
-                  optional: true
-              - name: dbt-manifest-decompressed
-                emptyDir: {}     # ontbreekt vóór dbt-manifest-Job; OK
-              - name: webserver-config
-                configMap:
-                  name: airflow-webserver-config
-
-  schedulers:
-    envOverrides:
-      REQUESTS_CA_BUNDLE: "/etc/platform-ca/ca.crt"
-      SSL_CERT_FILE: "/etc/platform-ca/ca.crt"
-      # Airflow 3.x: [webserver] is gesplitst in [api] + [fab]. Zelfde
-      # set als webservers — de scheduler genereert ook redirect_uri's
-      # voor task-logs / Cosmos-callbacks die door nginx terug komen.
-      # Path-routing onder platform.odap.local/airflow.
-      AIRFLOW__API__BASE_URL: "https://platform.odap.local:8443/airflow"
-      AIRFLOW__FAB__BASE_URL: "https://platform.odap.local:8443/airflow"
-      AIRFLOW__FAB__ENABLE_PROXY_FIX: "True"
-      AIRFLOW__FAB__PROXY_FIX_X_PROTO: "1"
-      AIRFLOW__FAB__PROXY_FIX_X_HOST: "1"
-      AIRFLOW__FAB__PROXY_FIX_X_PORT: "1"
-      AIRFLOW__FAB__PROXY_FIX_X_PREFIX: "1"
-      # ADR-0007 — zelfde set als webservers; scheduler parseert DAGs en
-      # heeft cosmos + sources_loader nodig.
-      # Include zelf + cosmos VOOR system-paths zodat factory-imports voorrang hebben.
-      # Stackable's eigen log_config + dags-folder achteraan om defaults te behouden.
-      PYTHONPATH: "/opt/odap/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
-      # Stackable 26.3 detecteert executor uit *Executors-block, maar voor onze
-      # setup expliciet zetten zodat tasks via KubernetesExecutor een eigen pod krijgen.
-      AIRFLOW__CORE__EXECUTOR: "KubernetesExecutor"
-      AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "odap-platform"
-      # Geen pod_template_file — laat Airflow de defaults gebruiken; podOverrides
-      # in kubernetesExecutors-blok hierboven definiëren de mounts + initContainers.
-      SOURCES_DIR: "/opt/odap/airflow/sources"
-      DBT_MANIFEST_PATH: "/opt/odap/dbt/manifest.json"
-    config:
-      logging:
-        enableVectorAgent: false
-      resources:
-        cpu:
-          min: "100m"
-          max: "1000m"
-        # Airflow 3.x draait scheduler + dag-processor in dezelfde container
-        # (Stackable 26.3 startup-script start beide processen). Cosmos
-        # serialiseert ~100 task-instances per DAG. 1Gi → OOM-kill.
-        memory:
-          limit: "2Gi"
-    roleGroups:
-      default:
-        replicas: 1
-        podOverrides:
-          spec:
-            initContainers:
-              - name: cosmos-init
-                image: python:3.12-slim
-                command:
-                  - sh
-                  - -ec
-                  - |
-                    # Zie webservers blok voor uitleg --no-deps + cleanup.
-                    pip install --disable-pip-version-check \
-                      --target=/cosmos-pkgs --no-deps \
-                      "astronomer-cosmos==1.12.0"
-                    pip install --disable-pip-version-check \
-                      --target=/cosmos-pkgs \
-                      "aenum>=3.1" "methodtools>=0.4.7"
-                    cd /cosmos-pkgs
-                    rm -rf airflow apache_airflow apache_airflow-*.dist-info \
-                           airflow_providers_* 2>/dev/null || true
-                    touch /cosmos-pkgs/.ready
-                volumeMounts:
-                  - name: cosmos-pkgs
-                    mountPath: /cosmos-pkgs
-              - name: manifest-decompress
-                image: busybox:1.36
-                command:
-                  - sh
-                  - -c
-                  - |
-                    # Cosmos vereist een complete dbt-project layout (dbt_project.yml +
-                    # models/ + seeds/ etc) ook bij LoadMode.DBT_MANIFEST. Tarball
-                    # van het hele dbt-project zit in dezelfde ConfigMap.
-                    if [ -f /dbt-manifest-gz/dbt-project.tar.gz ]; then
-                      tar xzf /dbt-manifest-gz/dbt-project.tar.gz -C /dbt-manifest/
-                      echo "dbt-project uitgepakt:"
-                      ls /dbt-manifest/
-                    fi
-                    if [ -f /dbt-manifest-gz/manifest.json.gz ]; then
-                      gunzip -c /dbt-manifest-gz/manifest.json.gz > /dbt-manifest/manifest.json
-                      ls -lh /dbt-manifest/manifest.json
-                    else
-                      echo "manifest.json.gz nog niet aanwezig — Cosmos draait in fallback-modus"
-                      echo '{"nodes":{},"sources":{}}' > /dbt-manifest/manifest.json
-                    fi
-                volumeMounts:
-                  - name: dbt-manifest-gz
-                    mountPath: /dbt-manifest-gz
-                  - name: dbt-manifest-decompressed
-                    mountPath: /dbt-manifest
-            containers:
-              - name: airflow
-                volumeMounts:
-                  - name: platform-ca
-                    mountPath: /etc/platform-ca
-                    readOnly: true
-                  - name: cosmos-pkgs
-                    mountPath: /cosmos-pkgs
-                    readOnly: true
-                  - name: airflow-include
-                    mountPath: /opt/odap/airflow/include
-                    readOnly: true
-                  - name: airflow-sources
-                    mountPath: /opt/odap/airflow/sources
-                    readOnly: true
-                  - name: dbt-manifest-decompressed
-                    mountPath: /opt/odap/dbt
-                    readOnly: true
-                  - name: airflow-dags
-                    mountPath: /stackable/airflow/dags
-                    readOnly: true
-            volumes:
-              - name: platform-ca
-                configMap:
-                  name: platform-ca-bundle
-              - name: cosmos-pkgs
-                emptyDir: {}
-              - name: airflow-dags
-                configMap:
-                  name: airflow-dags
-              - name: airflow-include
-                configMap:
-                  name: airflow-include
-              - name: airflow-sources
-                configMap:
-                  name: airflow-sources
-              - name: dbt-manifest-gz
-                configMap:
-                  name: dbt-manifest
-                  optional: true
-              - name: dbt-manifest-decompressed
-                emptyDir: {}
-
-  # Stackable Airflow 26.3: gebruik kubernetesExecutors-blok voor K8s-executor.
-  # Tasks krijgen dan elk een eigen Pod (geen Celery workers nodig).
-  # We mounten dezelfde cosmos-init + dbt-manifest + sources/include op het
-  # task-pod-template zodat Cosmos's per-model tasks correct worden gedeserialiseerd.
-  kubernetesExecutors:
-    config:
-      logging:
-        enableVectorAgent: false
-      resources:
-        cpu:
-          min: "100m"
-          max: "1000m"
-        memory:
-          limit: "1Gi"
-    envOverrides:
-      REQUESTS_CA_BUNDLE: "/etc/platform-ca/ca.crt"
-      SSL_CERT_FILE: "/etc/platform-ca/ca.crt"
-      PYTHONPATH: "/opt/odap/airflow/include:/cosmos-pkgs:/stackable/app/log_config:/stackable/airflow/dags"
-      SOURCES_DIR: "/opt/odap/airflow/sources"
-      DBT_MANIFEST_PATH: "/opt/odap/dbt/manifest.json"
-    podOverrides:
-      spec:
-        initContainers:
-          - name: cosmos-init
-            image: python:3.12-slim
-            command:
-              - sh
-              - -ec
-              - |
-                # Zie webservers/schedulers blok voor uitleg --no-deps + cleanup.
-                pip install --disable-pip-version-check \
-                  --target=/cosmos-pkgs --no-deps \
-                  "astronomer-cosmos==1.12.0"
-                pip install --disable-pip-version-check \
-                  --target=/cosmos-pkgs \
-                  "aenum>=3.1" "methodtools>=0.4.7"
-                cd /cosmos-pkgs
-                rm -rf airflow apache_airflow apache_airflow-*.dist-info \
-                       airflow_providers_* 2>/dev/null || true
-                touch /cosmos-pkgs/.ready
-            volumeMounts:
-              - name: cosmos-pkgs
-                mountPath: /cosmos-pkgs
-          - name: manifest-decompress
-            image: busybox:1.36
-            command:
-              - sh
-              - -c
-              - |
-                if [ -f /dbt-manifest-gz/dbt-project.tar.gz ]; then
-                  tar xzf /dbt-manifest-gz/dbt-project.tar.gz -C /dbt-manifest/
-                fi
-                if [ -f /dbt-manifest-gz/manifest.json.gz ]; then
-                  gunzip -c /dbt-manifest-gz/manifest.json.gz > /dbt-manifest/manifest.json
-                else
-                  echo '{"nodes":{},"sources":{}}' > /dbt-manifest/manifest.json
-                fi
-            volumeMounts:
-              - name: dbt-manifest-gz
-                mountPath: /dbt-manifest-gz
-              - name: dbt-manifest-decompressed
-                mountPath: /dbt-manifest
-        containers:
-          - name: base
-            # Voor uc11_databricks + uc11_fabric DAG-tasks: Secret met FABRIC_* /
-            # DATABRICKS_* env-vars. Optional zodat non-uc11 DAGs (silver/gold
-            # factories) zonder Secret blijven werken — die hebben hem niet nodig.
-            envFrom:
-              - secretRef:
-                  name: uc11-multiplatform-creds
-                  optional: true
-            volumeMounts:
+            - name: airflow
+              lifecycle:
+                postStart:
+                  exec:
+                    command:
+                    - bash
+                    - -c
+                    - |
+                      for _ in $(seq 1 50); do
+                        [ -f /stackable/airflow/webserver_config.py ] && break
+                        sleep 0.1
+                      done
+                      cp -L /airflow-config/webserver_config.py \
+                            /stackable/airflow/webserver_config.py
+              volumeMounts:
               - name: platform-ca
                 mountPath: /etc/platform-ca
-                readOnly: true
-              - name: cosmos-pkgs
-                mountPath: /cosmos-pkgs
-                readOnly: true
-              - name: airflow-dags
-                mountPath: /stackable/airflow/dags
                 readOnly: true
               - name: airflow-include
                 mountPath: /opt/odap/airflow/include
@@ -463,27 +69,129 @@ spec:
               - name: airflow-sources
                 mountPath: /opt/odap/airflow/sources
                 readOnly: true
-              - name: dbt-manifest-decompressed
-                mountPath: /opt/odap/dbt
+              - name: airflow-dags
+                mountPath: /stackable/airflow/dags
                 readOnly: true
-        volumes:
-          - name: platform-ca
-            configMap:
-              name: platform-ca-bundle
-          - name: cosmos-pkgs
-            emptyDir: {}
-          - name: airflow-dags
-            configMap:
-              name: airflow-dags
-          - name: airflow-include
-            configMap:
-              name: airflow-include
-          - name: airflow-sources
-            configMap:
-              name: airflow-sources
-          - name: dbt-manifest-gz
-            configMap:
-              name: dbt-manifest
+              - name: webserver-config
+                mountPath: /airflow-config
+                readOnly: true
+            volumes:
+            - name: platform-ca
+              configMap:
+                name: platform-ca-bundle
+            - name: airflow-dags
+              configMap:
+                name: airflow-dags
+            - name: airflow-include
+              configMap:
+                name: airflow-include
+            - name: airflow-sources
+              configMap:
+                name: airflow-sources
+            - name: webserver-config
+              configMap:
+                name: airflow-webserver-config
+  schedulers:
+    envOverrides:
+      REQUESTS_CA_BUNDLE: /etc/platform-ca/ca.crt
+      SSL_CERT_FILE: /etc/platform-ca/ca.crt
+      AIRFLOW__API__BASE_URL: https://platform.odap.local:8443/airflow
+      AIRFLOW__FAB__BASE_URL: https://platform.odap.local:8443/airflow
+      AIRFLOW__FAB__ENABLE_PROXY_FIX: 'True'
+      AIRFLOW__FAB__PROXY_FIX_X_PROTO: '1'
+      AIRFLOW__FAB__PROXY_FIX_X_HOST: '1'
+      AIRFLOW__FAB__PROXY_FIX_X_PORT: '1'
+      AIRFLOW__FAB__PROXY_FIX_X_PREFIX: '1'
+      PYTHONPATH: /opt/odap/airflow/include:/stackable/app/log_config:/stackable/airflow/dags
+      AIRFLOW__CORE__EXECUTOR: KubernetesExecutor
+      AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: odap-platform
+    config:
+      logging:
+        enableVectorAgent: false
+      resources:
+        cpu:
+          min: 100m
+          max: 1000m
+        memory:
+          limit: 2Gi
+    roleGroups:
+      default:
+        replicas: 1
+        podOverrides:
+          spec:
+            containers:
+            - name: airflow
+              volumeMounts:
+              - name: platform-ca
+                mountPath: /etc/platform-ca
+                readOnly: true
+              - name: airflow-include
+                mountPath: /opt/odap/airflow/include
+                readOnly: true
+              - name: airflow-sources
+                mountPath: /opt/odap/airflow/sources
+                readOnly: true
+              - name: airflow-dags
+                mountPath: /stackable/airflow/dags
+                readOnly: true
+            volumes:
+            - name: platform-ca
+              configMap:
+                name: platform-ca-bundle
+            - name: airflow-dags
+              configMap:
+                name: airflow-dags
+            - name: airflow-include
+              configMap:
+                name: airflow-include
+            - name: airflow-sources
+              configMap:
+                name: airflow-sources
+  kubernetesExecutors:
+    config:
+      logging:
+        enableVectorAgent: false
+      resources:
+        cpu:
+          min: 100m
+          max: 1000m
+        memory:
+          limit: 1Gi
+    envOverrides:
+      REQUESTS_CA_BUNDLE: /etc/platform-ca/ca.crt
+      SSL_CERT_FILE: /etc/platform-ca/ca.crt
+      PYTHONPATH: /opt/odap/airflow/include:/stackable/app/log_config:/stackable/airflow/dags
+    podOverrides:
+      spec:
+        containers:
+        - name: base
+          envFrom:
+          - secretRef:
+              name: uc11-multiplatform-creds
               optional: true
-          - name: dbt-manifest-decompressed
-            emptyDir: {}
+          volumeMounts:
+          - name: platform-ca
+            mountPath: /etc/platform-ca
+            readOnly: true
+          - name: airflow-dags
+            mountPath: /stackable/airflow/dags
+            readOnly: true
+          - name: airflow-include
+            mountPath: /opt/odap/airflow/include
+            readOnly: true
+          - name: airflow-sources
+            mountPath: /opt/odap/airflow/sources
+            readOnly: true
+        volumes:
+        - name: platform-ca
+          configMap:
+            name: platform-ca-bundle
+        - name: airflow-dags
+          configMap:
+            name: airflow-dags
+        - name: airflow-include
+          configMap:
+            name: airflow-include
+        - name: airflow-sources
+          configMap:
+            name: airflow-sources

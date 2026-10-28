@@ -66,7 +66,7 @@ De Rego-policies in [`opa-policies-src/`](https://github.com/fresh-minds/FreshSt
 | `trino-base.rego` | OIDC token-validatie, role-mapping |
 | `trino-data-access.rego` | Catalog/schema/table-access per rol |
 | `trino-purpose-limitation.rego` | Purpose limitation (purpose) afdwingen op gold-tabellen |
-| `trino-row-filters.rego` | Rij-filters per rol (bijv. Fraud Analyst ziet alleen WW-claims) |
+| `trino-row-filters.rego` | Row filters and schema grants for the job-market subject |
 | `trino-column-masks.rego` | Kolom-maskering (PII, gezondheid → hash of `***`) |
 | `trino-platform-roles.rego` | UWV-rol-definities (single source) |
 

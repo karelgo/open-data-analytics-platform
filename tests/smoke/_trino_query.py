@@ -44,6 +44,9 @@ req = urllib.request.Request(
 )
 resp = json.loads(urllib.request.urlopen(req, context=ctx).read())
 
+if resp.get("error"):
+    sys.exit(f"Trino error: {resp['error']}")
+
 rows = list(resp.get("data") or [])
 while resp.get("nextUri"):
     next_req = urllib.request.Request(resp["nextUri"], headers=headers)

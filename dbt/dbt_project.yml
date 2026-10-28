@@ -1,134 +1,52 @@
 name: odap_data_platform
-version: 0.1.0
+version: 0.2.0
 config-version: 2
-
 profile: trino_default
-
-model-paths: ["models"]
-seed-paths: ["seeds"]
-test-paths: ["tests"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
-analysis-paths: ["analyses"]
-
+model-paths:
+- models
+seed-paths:
+- seeds
+test-paths:
+- tests
+macro-paths:
+- macros
 target-path: target
 clean-targets:
-  - target
-  - dbt_packages
-
-# Centrale variabelen — table_format komt uit env, default delta.
-# Switching naar iceberg: TABLE_FORMAT=iceberg dbt run.
+- target
+- dbt_packages
 vars:
-  table_format: "{{ env_var('TABLE_FORMAT', 'delta') }}"
-  # Zout voor pseudonymize-macro. DEV-only; production via secret.
-  pseudonymize_salt: "{{ env_var('PSEUDONYMIZE_SALT', 'ODAP-DEV-SALT') }}"
-
-# Schemas met expliciete S3-locatie pre-creëren. Stackable's Hive-Metastore
-# heeft geen globale `warehouse.dir` config; zonder expliciete schema-locatie
-# defaultet HMS naar `file:/stackable/warehouse/...` wat Trino's Delta-Lake-
-# connector niet kan schrijven ("No factory for location: file:..."). De
-# ensure_schemas() macro genereert per target de juiste statements:
-# Trino krijgt de WITH-(location)-CREATEs, Databricks/Fabric is een no-op
-# (daar wordt schema-setup elders gedaan).
+  table_format: '{{ env_var(''TABLE_FORMAT'', ''delta'') }}'
 on-run-start:
-  - "{{ ensure_schemas() }}"
-
-# ----------------------------------------------------------------------
-# Model-config per laag.
-#   staging  -> catalog `silver`,    schema = domein (ww, wia, ...)
-#   intermediate -> catalog `silver`, schema = `intermediate`
-#   marts    -> catalog `gold`,      schema = uc-id
-#
-# Table-format (delta vs iceberg) wordt niet hier gehard-codeerd; models
-# gebruiken `properties=table_format_properties()` via de macro.
-# ----------------------------------------------------------------------
+- '{{ ensure_schemas() }}'
 models:
   odap_data_platform:
+    +schema: job_market
     +on_table_exists: replace
-
+    +meta:
+      owner: labour-market-data-team
+      use_case: dutch-it-job-market
+      classification: public-job-advertisement
+      purpose: labour-market-analysis
+      domain: job_market
+      purpose-limitation:
+      - labour_market_research
+      bio_classificatie: intern
+      eigenaar: data_platform
+      pii_kolommen: []
+      legal_basis: source_permission_required
+      retention period_jaren: 1
+      risk_tier: laag
+      cgm_entiteiten:
+      - JobPosting
+      - DailySnapshot
     staging:
       +database: silver
       +materialized: view
-      persona:
-        +schema: persons
-      polisadm:
-        +schema: policies
-      ww:
-        +schema: service_requests
-      wia:
-        +schema: claims
-      wajong:
-        +schema: eligibility_cases
-      zw:
-        +schema: incidents
-      crm:
-        +schema: customers
-      fez:
-        +schema: finance
-      customer interaction:
-        +schema: customer_interactions
-      finops:
-        +schema: finops
-
     intermediate:
       +database: silver
-      +schema: intermediate
       +materialized: view
-
     marts:
       +database: gold
       +materialized: table
-      uc01_claims_funnel:
-        +schema: uc01_claims_funnel
-      uc04_eligibility_outreach:
-        +schema: uc04_eligibility_outreach
-      uc05_customer_360:
-        +schema: uc05_customer_360
-      uc06_cost_forecast:
-        +schema: uc06_cost_forecast
-      uc07_dq_policies:
-        +schema: uc07_dq_policies
-      uc09_reintegration_effect:
-        +schema: uc09_reintegration_effect
-      uc11_customer_journey:
-        +schema: uc11_customer_journey
-      uc12_focus_finops:
-        +schema: uc12_focus_finops
-      uc_customer_satisfaction:
-        +schema: uc_customer_satisfaction
-      dq_overview:
-        +schema: dq_overview
-
-# ----------------------------------------------------------------------
-# Seeds
-# ----------------------------------------------------------------------
-seeds:
-  odap_data_platform:
-    +database: silver
-    +schema: seed
-    +quote_columns: false
-    cgm_claim payout_typen:
-      +column_types:
-        code: varchar(8)
-        beschrijving: varchar(200)
-        wet: varchar(8)
-    cgm_wet_codes:
-      +column_types:
-        code: varchar(8)
-        naam: varchar(80)
-        omschrijving: varchar(400)
-    cgm_regio_codes:
-      +column_types:
-        code: varchar(4)
-        naam: varchar(80)
-        provincie: varchar(40)
-    tw_normen_2026:
-      +column_types:
-        huishoud_type: varchar(40)
-        norm_per_maand_eur: integer
-    scenario_inputs:
-      +column_types:
-        scenario_id: varchar(40)
-        beschrijving: varchar(200)
-        parameter: varchar(80)
-        waarde: varchar(40)
+    +tags:
+    - job_market

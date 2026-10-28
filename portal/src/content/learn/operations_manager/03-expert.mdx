@@ -1,108 +1,41 @@
 ---
-title: "Capaciteitsadvies opstellen for the volgende kwartaal"
-role: operations_manager
-level: expert
-order: 3
-duration: "75 min"
-summary: "Op basis van trends in UC-08 een onderbouwd capaciteits-advies — incl. seizoens-correctie, what-if-scenario's en duidelijke caveats about the modelaannames."
-prereqs:
-  - "operations_manager/practitioner/2"
-labs:
-  - title: "SMZ planning dashboard — historische trends"
-    href: "/go/superset/"
-  - title: "Glossary — capaciteitsdefinities"
-    href: "/go/openmetadata/"
-checks:
-  - id: "smz_expert_advies"
-    title: "Kwartaal-advies opgeleverd met onderbouwing"
-quiz:
-  - q: "Hoe corrigeer je voor seizoens-effecten?"
-    options:
-      - "Niet"
-      - "Vergelijk met dezelfde kwartalen in eerdere jaren (year-over-year), niet alleen kwartaal-op-kwartaal"
-      - "Op het oog"
-      - "Door het te negeren"
-    correct: 1
-  - q: "Een aanbeveling met 4 scenario's: wat is het probleem?"
-    options:
-      - "Geen probleem — meer is beter"
-      - "Te veel keuzes verlamt; kies 1 hoofdscenario + 1 risico-scenario, met duidelijke trigger-conditie wanneer to the tweede over te gaan"
-      - "Te weinig"
-      - "Niets"
-    correct: 1
-  - q: "Welke aanname benoem je expliciet?"
-    options:
-      - "Geen, het zijn aannames"
-      - "Stabiele no-show%, gelijkblijvende personeelsbezetting; afwijken hiervan veranderd het advies"
-      - "Alles"
-      - "Niets"
-    correct: 1
-certifies: true
+{
+  "title": "Review evidence and source coverage",
+  "role": "operations_manager",
+  "level": "expert",
+  "order": 1,
+  "duration": "20 min",
+  "summary": "Explain a result with definitions, limitations and reproducible evidence.",
+  "labs": [
+    {
+      "title": "Open Dutch IT jobs",
+      "href": "/job-market/"
+    },
+    {
+      "title": "Open Superset",
+      "href": "/embed/superset/"
+    },
+    {
+      "title": "Open catalog",
+      "href": "/embed/openmetadata/"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a vacancy missing from today’s bounded search prove?",
+      "options": [
+        "The job closed",
+        "Only that it was not observed in this search"
+      ],
+      "correct": 1,
+      "explain": "Search coverage, source failures or pagination may explain the absence."
+    }
+  ]
+}
 ---
 
-In deze module lever je een capaciteits-advies aan dat een leidinggevende
-kan ondertekenen — niet "een suggestie", een onderbouwde aanbeveling.
+Prepare a short analysis comparing two daily snapshots. Include the source set and extraction status, distinct vacancy denominator, overlapping domains and salary coverage. Explain whether any observed change could come from missing sources or page limits.
 
-## Casus
+Engineers can rerun a date and verify that its partition remains unique. Stewards review lineage and classifications. Analysts verify that estimates, hourly rates and unknown values are treated according to the dictionary.
 
-Q4 staat for the deur. Op basis van Q1–Q3 zie je oplopende wachttijden in
-herhaal-spreekuren in regio West (4.2 wk, doel &lt;3). Wat advies je voor Q4?
-
-## Stap 1 — context opbouwen
-
-Drie cijfers die je nodig hebt:
-
-| Maat | 2024-Q4 | 2025-Q1–Q3 |
-|---|---|---|
-| Vraag herhaal-spreekuren/wk | 408 | 462 |
-| Capaciteit/wk | 410 | 410 |
-| No-show% | 6.1% | 6.4% |
-
-Vraag stijgt sneller dan capaciteit. No-show stabiel.
-
-## Stap 2 — seizoens-correctie
-
-YoY (year-over-year): Q4 vs Q1–Q3 in 2024 lag al 12% hoger door
-griep-piek + jaar-eind-aanlopers. Dat patroon zie je nu ook beginnen.
-Verwachting Q4-2025: vraag stijgt naar ~510/wk.
-
-## Stap 3 — twee scenario's, geen vier
-
-```
-Hoofdscenario:
-  +25 capaciteit/wk in week 41-13 (Q4 + start Q1)
-  Effect (gemodelleerd): wachttijd 4.2 → 2.9 wk
-  Last: +6% personeelskosten
-  Trigger om naar B over te gaan: vraag > 540/wk in 2 opeenvolgende weken
-
-Risico-scenario B:
-  Hoofdscenario + tijdelijk extra spoed-spreekuur
-  Last: +9%
-```
-
-Twee scenario's with a **trigger-conditie**. Niet vier waar de
-leidinggevende uit moet kiezen.
-
-## Stap 4 — aannames expliciet
-
-Zet onderaan het advies:
-
-```
-Aannames die het advies dragen:
-  - No-show% blijft 6-7%; bij stijging boven 8% moet capaciteit groter
-  - Personeels-uitval normaal (geen burnout-piek)
-  - Geen wijziging spreekuur-richtlijnen
-Bij afwijken: advies herijken voor week 47.
-```
-
-Zo voorkom je het verwijt "je advies klopte niet" als het werkelijke
-verloop afwijkt — je had de uitgangspunten genoemd, of zal achteraf
-gevraagd worden waarom je ze niet noemde.
-
-## Verificatie
-
-De auto-check controleert dat het advies twee scenario's bevat met
-trigger-conditie en dat aannames expliciet zijn benoemd.
-
-> Bij voltooiing van deze module krijg je het Academy-certificaat
-> **Operations Manager**.
+[Continue in the job-market explorer](/job-market/).

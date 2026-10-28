@@ -24,15 +24,15 @@ export interface TrackMeta {
 
 // One-liner per role — shown above the track on /learn/<role>/.
 export const tracks: TrackMeta[] = [
-  { role: 'claims_analyst',     oneLiner: 'Review claims with dashboards and purpose-limitation-aware queries.' },
-  { role: 'fraud_analyst',      oneLiner: 'Interpret fraud-risk signals within enforcement-purpose limits.' },
-  { role: 'marketing_analyst',  oneLiner: 'Build customer 360 views without unnecessary PII exposure.' },
-  { role: 'finance_analyst',    oneLiner: 'Analyse cost and forecast on modelled finance marts.' },
-  { role: 'operations_manager', oneLiner: 'Capacity planning on aggregated operational data.' },
-  { role: 'researcher',         oneLiner: 'Run research on pseudonymised sandbox zones.' },
-  { role: 'data_steward',       oneLiner: 'Govern data quality, lineage, and classifications.' },
-  { role: 'data_engineer',      oneLiner: 'Build pipelines from source to mart, with tests and lineage.' },
-  { role: 'platform_admin',     oneLiner: 'Operate cluster, identity, and operators — incl. break-glass.' },
+  { role: 'claims_analyst',     oneLiner: 'Compare daily observed demand across six overlapping domains.' },
+  { role: 'fraud_analyst',      oneLiner: 'Review source coverage, completeness and duplicate observations.' },
+  { role: 'marketing_analyst',  oneLiner: 'Explore technologies, skills and employer demand in advertised roles.' },
+  { role: 'finance_analyst',    oneLiner: 'Compare reported salaries with original units and coverage visible.' },
+  { role: 'operations_manager', oneLiner: 'Monitor daily snapshots and distinguish coverage changes from market changes.' },
+  { role: 'researcher',         oneLiner: 'Study contact-redacted observations and preserve provenance and uncertainty.' },
+  { role: 'data_steward',       oneLiner: 'Own job definitions, source provenance, quality tests and classifications.' },
+  { role: 'data_engineer',      oneLiner: 'Operate extraction, Spark Bronze and tested dbt Silver and Gold models.' },
+  { role: 'platform_admin',     oneLiner: 'Operate service health, identity and authorization for the daily pipeline.' },
 ];
 
 export function trackFor(role: RoleId): TrackMeta | undefined {

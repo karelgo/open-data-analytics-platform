@@ -1,0 +1,116 @@
+---
+title: "What-if scenario op spreekuur-bezetting"
+role: operations_manager
+level: practitioner
+order: 2
+duration: "30 min"
+summary: "Op aggregaten een eenvoudig scenario doorrekenen: 10% extra herhaal-spreekuur — gevolgen voor doorlooptijd en bezetting. Geen PII."
+prereqs:
+  - "operations_manager/foundation/1"
+labs:
+  - title: "SMZ planning dashboard"
+    href: "/go/superset/"
+  - title: "Glossary spreekuur-typen"
+    href: "/go/openmetadata/"
+checks:
+  - id: "smz_practitioner_scenario"
+    title: "What-if-rapport gemaakt zonder PII"
+quiz:
+  - q: "Je gebruikt een tabel waarin per record één cliënt staat. Wat doe je?"
+    options:
+      - "Doorgaan — je hebt geen tijd"
+      - "Stoppen en de mart op aggregaat-niveau pakken (`gold.uc08_capacity_planning_planning_weekly`); het record-niveau is voor SMZ-arts, niet voor planner"
+      - "PII negeren"
+      - "Naar de data-engineer mailen"
+    correct: 1
+  - q: "Hoe formuleer je het what-if-resultaat zonder over individuele cliënten te praten?"
+    options:
+      - "Met namen erbij voor concreetheid"
+      - "Op spreekuur-type × week × locatie aggregaat: ‘+12 herhaalspreekuren leidt tot wachttijd-verlaging van 1.4 dag’"
+      - "Met BSN's gemaskeerd"
+      - "Pas op vraag"
+    correct: 1
+  - q: "Een leidinggevende vraagt om een lijst van cliënten die niet zijn komen opdagen. Wat zeg je?"
+    options:
+      - "Hier is de lijst"
+      - "Dat past niet bij planning-doel; de SMZ-arbeidsdeskundige met cliënt-doel kan dat opvragen voor zijn rol"
+      - "Ik weet het niet"
+      - "Niet zonder JIT"
+    correct: 1
+---
+
+In deze module bouw je een eenvoudig what-if scenario zonder een
+cliënt-PII regel te raken.
+
+## Casus
+
+De spreekuur-wachttijd in regio West loopt op (gem. 4.2 weken, doel &lt;3).
+Voorstel: 10% extra herhaal-spreekuren in week 41–48. Wat is het effect?
+
+## Stap 1 — basisbezetting bekijken
+
+Open [SMZ-dashboard](/go/superset/) → tab "Bezetting per type" →
+filter regio West → weken 35–48.
+
+Lees per type af:
+
+| Spreekuur-type | Capaciteit/week | Vraag/week | Wachtrij |
+|---|---|---|---|
+| Eerste | 220 | 198 | 0.9 wk |
+| Herhaal | 410 | 462 | 4.2 wk |
+| Spoed | 50 | 44 | 0.0 wk |
+
+De bottleneck is herhaal — wat het voorstel ook al impliceert.
+
+## Stap 2 — what-if invoeren
+
+In het dashboard klik je "Scenario", + "Variabele":
+
+- type = `herhaal`
+- delta = `+10%` (capaciteit)
+- weken = `41–48`
+
+Het dashboard rekent direct door on the geaggregeerde mart en toont:
+
+| Metric | Was | Wordt | Δ |
+|---|---|---|---|
+| Wachttijd herhaal | 4.2 wk | 2.8 wk | -1.4 wk |
+| Bezetting eerste-spreekuur | onveranderd | onveranderd | 0 |
+| Totale spreekuur-uren | 100% | 104% | +4% |
+
+## Stap 3 — caveats opzoeken
+
+Open de [glossary](/go/openmetadata/) → "no-show" en "wachttijd". Twee
+nuances die je moet kennen:
+
+- "wachttijd" wordt gemeten van *aanvraag* tot *spreekuur*, dus
+  vroeg-aanmeldingen vertekenen;
+- "no-show" telt vanaf 24u afmelding — afmeldingen &lt;24u vallen onder
+  "kort-afmeldingen" en zijn niet hetzelfde.
+
+## Stap 4 — rapport schrijven
+
+Een korte notitie:
+
+```
+SUBJECT: What-if 10% extra herhaal-spreekuur, regio West, weken 41-48
+
+Bron: gold.uc08_capacity_planning_planning_weekly (2025-09-01)
+Effect:
+  - Wachttijd herhaal: 4.2 → 2.8 weken (-1.4)
+  - Bezetting eerste-spreekuur: ongewijzigd
+  - Capaciteitslast (uren totaal): +4%
+Caveats:
+  - Vraag is gevoelig voor seizoens-piek week 50; effect kan tegen
+    Kerst opnieuw oplopen.
+  - "Wachttijd" volgens glossary-definitie: aanvraag → spreekuur;
+    cliënten die laat aanmelden tellen mee.
+Aanbeveling: pilot 4 weken; her-evalueren op week 45.
+```
+
+Geen PII. Geen individuele cliënten. Voor planning is dit alles.
+
+## Verificatie
+
+De auto-check valideert dat de notitie geen kolommen op cliënt-niveau bevat
+en dat alleen de planning-mart is geraadpleegd.
